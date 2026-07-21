@@ -1,0 +1,150 @@
+{
+  "name": "Property",
+  "type": "object",
+  "title": "Property",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "Titlu"
+    },
+    "description": {
+      "type": "string",
+      "title": "Descriere"
+    },
+    "price_monthly": {
+      "type": "number",
+      "title": "Pre\u021b lunar"
+    },
+    "currency": {
+      "type": "string",
+      "enum": [
+        "GBP",
+        "EUR",
+        "RON"
+      ],
+      "default": "EUR",
+      "title": "Moned\u0103"
+    },
+    "country": {
+      "type": "string",
+      "enum": [
+        "RO",
+        "UK"
+      ],
+      "default": "RO",
+      "title": "\u021aar\u0103"
+    },
+    "city": {
+      "type": "string",
+      "title": "Ora\u0219"
+    },
+    "zone": {
+      "type": "string",
+      "title": "Zona"
+    },
+    "property_type": {
+      "type": "string",
+      "enum": [
+        "Garsonier\u0103",
+        "2 Camere",
+        "3 Camere",
+        "4+ Camere",
+        "Cas\u0103",
+        "Studio"
+      ],
+      "title": "Tip proprietate"
+    },
+    "rooms": {
+      "type": "number",
+      "title": "Nr. camere"
+    },
+    "surface_sqm": {
+      "type": "number",
+      "title": "Suprafa\u021b\u0103 (mp)"
+    },
+    "deposit": {
+      "type": "number",
+      "title": "Depozit"
+    },
+    "furnished": {
+      "type": "boolean",
+      "default": true,
+      "title": "Mobilat"
+    },
+    "pet_friendly": {
+      "type": "boolean",
+      "default": false,
+      "title": "Pet Friendly"
+    },
+    "parking": {
+      "type": "boolean",
+      "default": false,
+      "title": "Parcare"
+    },
+    "available_from": {
+      "type": "string",
+      "format": "date",
+      "title": "Disponibil din"
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Imagini"
+    },
+    "ai_video_url": {
+      "type": "string",
+      "title": "AI Walkthrough URL"
+    },
+    "latitude": {
+      "type": "number",
+      "title": "Latitudine"
+    },
+    "longitude": {
+      "type": "number",
+      "title": "Longitudine"
+    },
+    "owner_name": {
+      "type": "string",
+      "title": "Nume proprietar"
+    },
+    "owner_verified": {
+      "type": "boolean",
+      "default": false,
+      "title": "Proprietar verificat"
+    },
+    "ai_tour_verified": {
+      "type": "boolean",
+      "default": false,
+      "title": "Tur AI verificat"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Activ",
+        "Rezervat",
+        "\u00cenchis"
+      ],
+      "default": "Activ",
+      "title": "Status"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false,
+      "title": "Featured"
+    },
+    "views_count": {
+      "type": "number",
+      "default": 0,
+      "title": "Vizualiz\u0103ri"
+    }
+  },
+  "required": [
+    "title",
+    "price_monthly",
+    "country",
+    "city",
+    "property_type"
+  ]
+}
