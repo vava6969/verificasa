@@ -54,7 +54,7 @@ export default function Landing() {
       <section className="relative min-h-[640px] overflow-hidden">
         <HeroPhoto />
 
-        <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-56 pt-24 text-center sm:px-6 sm:pb-64 sm:pt-28 lg:px-8 opacity-100">
+        <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-56 pt-24 text-center sm:px-6 sm:pb-64 sm:pt-28 lg:px-8 opacity-100 rounded-md">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 py-1.5 text-xs font-semibold text-mint backdrop-blur-md">
             <Sparkles className="h-3.5 w-3.5" /> {country === "UK" ? "🇬🇧" : "🇷🇴"} {t("hero_badge", { legalShort: heroBadge })}
           </span>
