@@ -1,19 +1,28 @@
-import React, { createContext, useContext, useMemo, useState, useCallback } from "react";
+import React, { createContext, useContext, useMemo, useState, useCallback, useEffect } from "react";
+import { makeT } from "@/i18n";
 
 const CountryContext = createContext(null);
 
 const RATES = {
-  // base EUR
   EUR: { EUR: 1, GBP: 0.85, RON: 4.97 },
   GBP: { EUR: 1.18, GBP: 1, RON: 5.85 },
   RON: { EUR: 0.20, GBP: 0.17, RON: 1 },
 };
 
 export function CountryProvider({ children }) {
-  const [country, setCountry] = useState("RO"); // 'RO' | 'UK'
+  const [country, setCountry] = useState(() => {
+    if (typeof window !== "undefined") return localStorage.getItem("ea_country") || "RO";
+    return "RO";
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") localStorage.setItem("ea_country", country);
+  }, [country]);
+
+  const switchCountry = useCallback((c) => setCountry(c), []);
 
   const currency = country === "UK" ? "GBP" : "RON";
-  const currencySymbol = currency === "GBP" ? "£" : currency === "EUR" ? "€" : "lei";
+  const lang = country === "UK" ? "en" : "ro";
 
   const legalInfo = useMemo(() => {
     if (country === "UK") {
@@ -21,7 +30,7 @@ export function CountryProvider({ children }) {
         tenantFee: "0 Fees for Tenants",
         legal1: "Tenant Fees Act 2019",
         legal2: "CMP Protected · Property Redress Scheme",
-        commission: "Comision suportat integral de proprietar (Landlord)",
+        commission: "Fee fully covered by landlord",
       };
     }
     return {
@@ -44,15 +53,17 @@ export function CountryProvider({ children }) {
   const formatPrice = useCallback(
     (amount, fromCurrency) => {
       const value = convert(amount, fromCurrency);
-      const formatted = value.toLocaleString("ro-RO");
+      const formatted = value.toLocaleString(country === "UK" ? "en-GB" : "ro-RO");
       return currency === "GBP" ? `£${formatted}` : currency === "EUR" ? `€${formatted}` : `${formatted} lei`;
     },
-    [convert, currency]
+    [convert, currency, country]
   );
 
+  const t = useMemo(() => makeT(lang), [lang]);
+
   const value = useMemo(
-    () => ({ country, setCountry, currency, currencySymbol, legalInfo, convert, formatPrice }),
-    [country, currency, currencySymbol, legalInfo, convert, formatPrice]
+    () => ({ country, setCountry: switchCountry, currency, lang, t, legalInfo, convert, formatPrice }),
+    [country, switchCountry, currency, lang, t, legalInfo, convert, formatPrice]
   );
 
   return <CountryContext.Provider value={value}>{children}</CountryContext.Provider>;

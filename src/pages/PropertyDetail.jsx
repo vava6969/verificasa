@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { base44 } from "@/api/base44Client";
+
+// Fix default marker icon for bundled leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
 import { useCountry } from "@/components/CountryContext";
 import AITourPlayer from "@/components/AITourPlayer";
 import { Image } from "@/components/ui/image";
@@ -14,14 +23,17 @@ import {
   Calendar, ShieldCheck, FileText, CheckCircle2, ChevronLeft, Send,
 } from "lucide-react";
 
+const DEMO_VIDEO = "https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-modern-living-room-41558-large.mp4";
+const DEMO_FALLBACK = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4";
+
 export default function PropertyDetail() {
   const { id } = useParams();
-  const { country, formatPrice, legalInfo } = useCountry();
+  const { country, formatPrice, t, legalInfo } = useCountry();
   const { toast } = useToast();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
-  const [tab, setTab] = useState("ai"); // 'ai' | 'gallery'
+  const [tab, setTab] = useState("ai");
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: "", email: "", phone: "", occupation: "", estimated_income: "", move_date: "", message: "", preferred_visit_date: "",
@@ -35,7 +47,7 @@ export default function PropertyDetail() {
         if (cancelled) return;
         setProperty(p);
       } catch (e) {
-        if (!cancelled) setProperty(null);
+        if (cancelled) setProperty(null);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -48,7 +60,7 @@ export default function PropertyDetail() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email) {
-      toast({ title: "Completează numele și emailul", variant: "destructive" });
+      toast({ title: t("requiredComplete"), variant: "destructive" });
       return;
     }
     setSubmitting(true);
@@ -66,10 +78,10 @@ export default function PropertyDetail() {
         preferred_visit_date: form.preferred_visit_date || null,
         status: "Nou",
       });
-      toast({ title: "Cerere trimisă!", description: "Proprietarul a primit cererea ta pre-calificată." });
+      toast({ title: t("submit_sent"), description: t("submit_sent_desc") });
       setForm({ name: "", email: "", phone: "", occupation: "", estimated_income: "", move_date: "", message: "", preferred_visit_date: "" });
     } catch (err) {
-      toast({ title: "Eroare la trimitere", variant: "destructive" });
+      toast({ title: t("submit_err"), variant: "destructive" });
     } finally {
       setSubmitting(false);
     }
@@ -91,8 +103,8 @@ export default function PropertyDetail() {
   if (!property) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-24 text-center sm:px-6 lg:px-8">
-        <p className="font-heading text-2xl font-bold text-navy">Proprietatea nu a fost găsită</p>
-        <Button asChild className="mt-4 gradient-mint text-navy"><Link to="/">Înapoi la pagina principală</Link></Button>
+        <p className="font-heading text-2xl font-bold text-navy">{t("not_found")}</p>
+        <Button asChild className="mt-4 gradient-mint text-navy"><Link to="/">{t("back_home")}</Link></Button>
       </div>
     );
   }
@@ -101,42 +113,46 @@ export default function PropertyDetail() {
   const images = p.images?.length ? p.images : [];
 
   const stats = [
-    { icon: BedDouble, label: "Camere", value: p.rooms },
-    { icon: Maximize, label: "Suprafață", value: `${p.surface_sqm} mp` },
-    { icon: Wallet, label: "Depozit", value: formatPrice(p.deposit || p.price_monthly, p.currency) },
-    { icon: Calendar, label: "Disponibil", value: p.available_from ? new Date(p.available_from).toLocaleDateString("ro-RO") : "Imediat" },
+    { icon: BedDouble, label: t("stat_rooms"), value: p.rooms },
+    { icon: Maximize, label: t("stat_area"), value: `${p.surface_sqm} mp` },
+    { icon: Wallet, label: t("stat_deposit"), value: formatPrice(p.deposit || p.price_monthly, p.currency) },
+    { icon: Calendar, label: t("stat_avail"), value: p.available_from ? new Date(p.available_from).toLocaleDateString(country === "UK" ? "en-GB" : "ro-RO") : t("immediate") },
   ];
 
   return (
     <div className="bg-secondary/30">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <Link to="/search" className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-navy">
-          <ChevronLeft className="h-4 w-4" /> Înapoi la rezultate
+          <ChevronLeft className="h-4 w-4" /> {t("back_results")}
         </Link>
 
-        {/* HERO: AI TOUR / GALLERY */}
+        {/* HERO */}
         <div className="mt-4">
           <div className="mb-3 flex items-center gap-2">
-            <button
-              onClick={() => setTab("ai")}
-              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "ai" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}
-            >
-              <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5" /> AI Walkthrough</span>
+            <button onClick={() => setTab("ai")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "ai" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+              <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5" /> {t("tab_ai")}</span>
             </button>
-            <button
-              onClick={() => setTab("gallery")}
-              className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "gallery" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}
-            >
-              Galerie ({images.length})
+            <button onClick={() => setTab("gallery")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "gallery" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+              {t("tab_gallery")} ({images.length})
             </button>
           </div>
 
           {tab === "ai" ? (
-            <AITourPlayer
-              videoUrl={p.ai_video_url || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"}
-              poster={images[0]}
-              title={p.title}
-            />
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-navy-deep shadow-soft">
+              <video autoPlay muted loop playsInline poster={images[0]} className="aspect-video w-full object-cover">
+                <source src={p.ai_video_url || DEMO_VIDEO} type="video/mp4" />
+                <source src={DEMO_FALLBACK} type="video/mp4" />
+              </video>
+              {/* subtle controls overlay */}
+              <div className="absolute left-3 top-3">
+                <span className="flex items-center gap-1 rounded-full bg-navy/80 px-2.5 py-1 text-[11px] font-semibold text-mint backdrop-blur">
+                  <Sparkles className="h-3 w-3" /> {t("aip_badge")}
+                </span>
+              </div>
+              <div className="pointer-events-none absolute bottom-3 left-3">
+                <p className="text-sm font-semibold text-white drop-shadow">{p.title}</p>
+              </div>
+            </div>
           ) : (
             <div className="overflow-hidden rounded-2xl border border-border bg-white">
               {images[activeImage] ? (
@@ -147,11 +163,7 @@ export default function PropertyDetail() {
               {images.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto p-3">
                   {images.map((img, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setActiveImage(i)}
-                      className={`h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition ${activeImage === i ? "border-mint" : "border-transparent"}`}
-                    >
+                    <button key={i} onClick={() => setActiveImage(i)} className={`h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition ${activeImage === i ? "border-mint" : "border-transparent"}`}>
                       <Image src={img} alt={`thumb ${i}`} fittingType="fill" className="h-full w-full" />
                     </button>
                   ))}
@@ -173,59 +185,58 @@ export default function PropertyDetail() {
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
-          {/* LEFT: details */}
+          {/* LEFT */}
           <div className="space-y-6 lg:col-span-2">
             <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <h1 className="font-heading text-2xl font-bold text-navy sm:text-3xl">{p.title}</h1>
                   <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4" /> {p.zone}, {p.city}, {p.country === "UK" ? "Marea Britanie" : "România"}
+                    <MapPin className="h-4 w-4" /> {p.zone}, {p.city}, {p.country === "UK" ? "United Kingdom" : "România"}
                   </p>
                 </div>
                 <div className="text-right">
                   <p className="font-heading text-2xl font-bold text-navy">{formatPrice(p.price_monthly, p.currency)}</p>
-                  <p className="text-xs text-muted-foreground">/lună</p>
+                  <p className="text-xs text-muted-foreground">{t("pc_permonth")}</p>
                 </div>
               </div>
 
-              {/* TRUST BADGES */}
+              {/* BADGES */}
               <div className="mt-4 flex flex-wrap gap-2">
                 {p.owner_verified && (
                   <span className="flex items-center gap-1 rounded-full bg-mint-soft px-3 py-1 text-xs font-semibold text-navy">
-                    <BadgeCheck className="h-3.5 w-3.5" /> Proprietar Verificat
+                    <BadgeCheck className="h-3.5 w-3.5" /> {t("badge_owner_v")}
                   </span>
                 )}
                 {p.ai_tour_verified && (
                   <span className="flex items-center gap-1 rounded-full bg-navy px-3 py-1 text-xs font-semibold text-mint">
-                    <Sparkles className="h-3.5 w-3.5" /> Tur AI Verificat Teren
+                    <Sparkles className="h-3.5 w-3.5" /> {t("badge_aitour_v")}
                   </span>
                 )}
                 {p.pet_friendly && (
                   <span className="flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
-                    <PawPrint className="h-3.5 w-3.5" /> Pet Friendly Approved
+                    <PawPrint className="h-3.5 w-3.5" /> {t("badge_pet_v")}
                   </span>
                 )}
                 {p.parking && (
                   <span className="flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800">
-                    <Car className="h-3.5 w-3.5" /> Parcare
+                    <Car className="h-3.5 w-3.5" /> {t("badge_parking")}
                   </span>
                 )}
                 {p.furnished && (
                   <span className="flex items-center gap-1 rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-800">
-                    <CheckCircle2 className="h-3.5 w-3.5" /> Mobilat
+                    <CheckCircle2 className="h-3.5 w-3.5" /> {t("badge_furnished")}
                   </span>
                 )}
               </div>
 
-              {/* LEGAL */}
               <div className="mt-4 rounded-xl bg-mint-soft/60 p-3">
                 <p className="flex items-center gap-2 text-xs font-semibold text-navy">
                   <ShieldCheck className="h-4 w-4" /> {legalInfo.tenantFee} · {legalInfo.legal1}
                 </p>
               </div>
 
-              <h2 className="mt-6 font-heading text-lg font-bold text-navy">Descriere</h2>
+              <h2 className="mt-6 font-heading text-lg font-bold text-navy">{t("desc_h")}</h2>
               <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{p.description}</p>
             </div>
 
@@ -233,42 +244,42 @@ export default function PropertyDetail() {
             {p.latitude && p.longitude && (
               <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-soft">
                 <div className="border-b border-border p-4">
-                  <h3 className="font-heading font-bold text-navy">Locație & Facilități apropiate</h3>
-                  <p className="text-xs text-muted-foreground">Școli · Metrou · Supermarket</p>
+                  <h3 className="font-heading font-bold text-navy">{t("map_h")}</h3>
+                  <p className="text-xs text-muted-foreground">{t("map_sub")}</p>
                 </div>
                 <MapPreview lat={p.latitude} lng={p.longitude} title={p.title} />
               </div>
             )}
           </div>
 
-          {/* RIGHT: contact / pre-qualification */}
+          {/* RIGHT */}
           <div className="lg:col-span-1">
             <div className="sticky top-20 rounded-2xl border border-border bg-white p-6 shadow-soft">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-mint" />
-                <h3 className="font-heading text-lg font-bold text-navy">Contactează & Programează</h3>
+                <h3 className="font-heading text-lg font-bold text-navy">{t("contact_h")}</h3>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">Pre-calificare chiriaș — primești doar lead-uri serioase.</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("contact_sub")}</p>
 
               <form onSubmit={handleSubmit} className="mt-4 space-y-3">
-                <input required value={form.name} onChange={(e) => handleChange("name", e.target.value)} placeholder="Nume complet" className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
-                <input required type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)} placeholder="Email" className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
-                <input value={form.phone} onChange={(e) => handleChange("phone", e.target.value)} placeholder="Telefon" className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
+                <input required value={form.name} onChange={(e) => handleChange("name", e.target.value)} placeholder={t("ph_name")} className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
+                <input required type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)} placeholder={t("ph_email")} className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
+                <input value={form.phone} onChange={(e) => handleChange("phone", e.target.value)} placeholder={t("ph_phone")} className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
 
                 <div className="rounded-xl bg-mint-soft/40 p-3">
-                  <p className="mb-2 text-xs font-semibold text-navy">Pre-calificare chiriaș</p>
+                  <p className="mb-2 text-xs font-semibold text-navy">{t("prequal")}</p>
                   <div className="space-y-2.5">
-                    <input value={form.occupation} onChange={(e) => handleChange("occupation", e.target.value)} placeholder="Ocupație (ex. IT, Medic)" className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-mint" />
-                    <input type="number" value={form.estimated_income} onChange={(e) => handleChange("estimated_income", e.target.value)} placeholder="Venit estimat lunar" className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-mint" />
+                    <input value={form.occupation} onChange={(e) => handleChange("occupation", e.target.value)} placeholder={t("ph_occupation")} className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-mint" />
+                    <input type="number" value={form.estimated_income} onChange={(e) => handleChange("estimated_income", e.target.value)} placeholder={t("ph_income")} className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-mint" />
                     <input type="date" value={form.move_date} onChange={(e) => handleChange("move_date", e.target.value)} className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-mint" />
                     <input type="date" value={form.preferred_visit_date} onChange={(e) => handleChange("preferred_visit_date", e.target.value)} className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-mint" />
                   </div>
                 </div>
 
-                <textarea value={form.message} onChange={(e) => handleChange("message", e.target.value)} placeholder="Mesaj către proprietar..." rows={3} className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
+                <textarea value={form.message} onChange={(e) => handleChange("message", e.target.value)} placeholder={t("ph_msg")} rows={3} className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
 
                 <Button type="submit" disabled={submitting} className="w-full gradient-mint text-navy shadow-soft hover:opacity-90">
-                  <Send className="h-4 w-4" /> {submitting ? "Se trimite..." : "Trimite cerere pre-calificată"}
+                  <Send className="h-4 w-4" /> {submitting ? t("sending") : t("btn_send")}
                 </Button>
               </form>
 
@@ -287,10 +298,7 @@ function MapPreview({ lat, lng, title }) {
   return (
     <div className="h-72 w-full">
       <MapContainer center={[lat, lng]} zoom={14} style={{ height: "100%", width: "100%" }}>
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; OpenStreetMap'
-        />
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap' />
         <Marker position={[lat, lng]}>
           <Popup>{title}</Popup>
         </Marker>

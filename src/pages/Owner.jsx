@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
+import { getCities, getZones } from "@/components/locations";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Camera, Sparkles, Eye, MessageSquare, FileText, TrendingUp, Upload,
-  CheckCircle2, Clock, Plus, Download,
+  Camera, Sparkles, Eye, MessageSquare, FileText, TrendingUp, Upload, Plus, Download,
 } from "lucide-react";
 
 export default function Owner() {
-  const { country, legalInfo } = useCountry();
+  const { country, t } = useCountry();
   const { toast } = useToast();
   const [properties, setProperties] = useState(null);
   const [inquiries, setInquiries] = useState([]);
@@ -34,27 +34,28 @@ export default function Owner() {
 
   const totalViews = (properties || []).reduce((a, p) => a + (p.views_count || 0), 0);
 
+  const STAT_CARDS = [
+    { icon: FileText, label: t("s_active"), value: properties?.length ?? "—" },
+    { icon: Eye, label: t("s_views"), value: totalViews },
+    { icon: MessageSquare, label: t("s_inq"), value: inquiries.length },
+    { icon: TrendingUp, label: t("s_mon"), value: country === "UK" ? "Landlord" : "30-50%" },
+  ];
+
   return (
     <div className="bg-secondary/30">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="font-heading text-3xl font-bold text-navy">Dashboard Proprietar</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Gestionează anunțuri, tururi AI și cereri de vizionare.</p>
+            <h1 className="font-heading text-3xl font-bold text-navy">{t("owner_h")}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">{t("owner_sub")}</p>
           </div>
           <Button onClick={() => setShowForm((s) => !s)} className="gradient-mint text-navy shadow-soft hover:opacity-90">
-            <Plus className="h-4 w-4" /> Adaugă Anunț
+            <Plus className="h-4 w-4" /> {t("owner_add")}
           </Button>
         </div>
 
-        {/* STAT CARDS */}
         <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {[
-            { icon: FileText, label: "Anunțuri active", value: properties?.length ?? "—" },
-            { icon: Eye, label: "Vizionări AI Tour", value: totalViews },
-            { icon: MessageSquare, label: "Cereri vizionare", value: inquiries.length },
-            { icon: TrendingUp, label: "Monetizare", value: country === "UK" ? "Landlord" : "30-50%" },
-          ].map((s, i) => (
+          {STAT_CARDS.map((s, i) => (
             <div key={i} className="rounded-2xl border border-border bg-white p-5 shadow-soft">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-mint-soft">
                 <s.icon className="h-5 w-5 text-navy" />
@@ -67,15 +68,15 @@ export default function Owner() {
 
         {showForm && <NewPropertyForm onDone={() => { setShowForm(false); load(); }} />}
 
-        {/* PROPERTIES LIST */}
+        {/* PROPERTIES */}
         <div className="mt-8">
-          <h2 className="font-heading text-xl font-bold text-navy">Proprietățile mele</h2>
+          <h2 className="font-heading text-xl font-bold text-navy">{t("my_props")}</h2>
           {properties === null ? (
             <div className="mt-4 space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-2xl" />)}</div>
           ) : properties.length === 0 ? (
             <div className="mt-4 rounded-2xl border border-dashed border-border py-16 text-center">
               <Camera className="mx-auto h-8 w-8 text-muted-foreground/40" />
-              <p className="mt-3 text-sm text-muted-foreground">Nu ai anunțuri încă. Adaugă prima proprietate.</p>
+              <p className="mt-3 text-sm text-muted-foreground">{t("no_props")}</p>
             </div>
           ) : (
             <div className="mt-4 space-y-3">
@@ -90,12 +91,10 @@ export default function Owner() {
                   </div>
                   <div className="flex items-center gap-4 text-xs">
                     <span className="flex items-center gap-1 text-muted-foreground"><Eye className="h-3.5 w-3.5" /> {p.views_count || 0}</span>
-                    <span className={`flex items-center gap-1 ${p.ai_video_url ? "text-mint" : "text-muted-foreground"}`}><Sparkles className="h-3.5 w-3.5" /> {p.ai_video_url ? "AI Activ" : "Fără AI"}</span>
+                    <span className={`flex items-center gap-1 ${p.ai_video_url ? "text-mint" : "text-muted-foreground"}`}><Sparkles className="h-3.5 w-3.5" /> {p.ai_video_url ? t("ai_active") : t("ai_none")}</span>
                     <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${p.status === "Activ" ? "bg-mint-soft text-navy" : "bg-secondary text-muted-foreground"}`}>{p.status}</span>
                   </div>
-                  <Button variant="outline" size="sm" className="gap-1">
-                    <Download className="h-3.5 w-3.5" /> Contract PDF
-                  </Button>
+                  <Button variant="outline" size="sm" className="gap-1"><Download className="h-3.5 w-3.5" /> {t("contract_pdf")}</Button>
                 </div>
               ))}
             </div>
@@ -105,26 +104,22 @@ export default function Owner() {
         {/* INQUIRIES */}
         {inquiries.length > 0 && (
           <div className="mt-8">
-            <h2 className="font-heading text-xl font-bold text-navy">Cereri de vizionare primite</h2>
+            <h2 className="font-heading text-xl font-bold text-navy">{t("inq_title")}</h2>
             <div className="mt-4 space-y-3">
               {inquiries.map((inq) => (
                 <div key={inq.id} className="rounded-2xl border border-border bg-white p-4 shadow-soft">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <p className="font-heading font-bold text-navy">{inq.name} <span className="text-xs font-normal text-muted-foreground">— {inq.property_title}</span></p>
-                      <p className="text-xs text-muted-foreground">{inq.email} · {inq.phone || "fără telefon"}</p>
+                      <p className="text-xs text-muted-foreground">{inq.email} · {inq.phone || t("inq_no_phone")}</p>
                     </div>
-                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
-                      inq.status === "Nou" ? "bg-blue-50 text-blue-700" :
-                      inq.status === "Calificat" ? "bg-mint-soft text-navy" :
-                      inq.status === "Vizionare programată" ? "bg-amber-50 text-amber-700" : "bg-secondary text-muted-foreground"
-                    }`}>{inq.status}</span>
+                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${inq.status === "Nou" ? "bg-blue-50 text-blue-700" : inq.status === "Calificat" ? "bg-mint-soft text-navy" : inq.status === "Vizionare programată" ? "bg-amber-50 text-amber-700" : "bg-secondary text-muted-foreground"}`}>{inq.status}</span>
                   </div>
                   {(inq.occupation || inq.estimated_income) && (
                     <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
-                      {inq.occupation && <span>💼 {inq.occupation}</span>}
-                      {inq.estimated_income && <span>💰 Venit: {inq.estimated_income}</span>}
-                      {inq.move_date && <span>📅 Mutare: {new Date(inq.move_date).toLocaleDateString("ro-RO")}</span>}
+                      {inq.occupation && <span>{t("inq_occupation")} {inq.occupation}</span>}
+                      {inq.estimated_income && <span>💰 {t("inq_income")} {inq.estimated_income}</span>}
+                      {inq.move_date && <span>📅 {t("inq_move")} {new Date(inq.move_date).toLocaleDateString("ro-RO")}</span>}
                     </div>
                   )}
                 </div>
@@ -138,8 +133,9 @@ export default function Owner() {
 }
 
 function NewPropertyForm({ onDone }) {
-  const { country } = useCountry();
+  const { country, t } = useCountry();
   const { toast } = useToast();
+  const cities = useMemo(() => getCities(country), [country]);
   const [form, setForm] = useState({
     title: "", description: "", price_monthly: "", city: "", zone: "", property_type: "Garsonieră",
     rooms: "1", surface_sqm: "", deposit: "", available_from: "", images: "", ai_video_url: "",
@@ -147,6 +143,8 @@ function NewPropertyForm({ onDone }) {
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const zones = useMemo(() => getZones(country, form.city), [country, form.city]);
 
   const handleFile = async (e) => {
     const files = Array.from(e.target.files || []);
@@ -159,9 +157,9 @@ function NewPropertyForm({ onDone }) {
         urls.push(file_url);
       }
       setForm((f) => ({ ...f, images: [...(f.images ? f.images.split(",").filter(Boolean) : []), ...urls].join(",") }));
-      toast({ title: `${urls.length} imagini încărcate` });
+      toast({ title: t("uploaded", { n: urls.length }) });
     } catch (err) {
-      toast({ title: "Eroare la încărcare", variant: "destructive" });
+      toast({ title: t("upload_err"), variant: "destructive" });
     } finally {
       setUploading(false);
     }
@@ -170,12 +168,12 @@ function NewPropertyForm({ onDone }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title || !form.price_monthly || !form.city) {
-      toast({ title: "Completează titlu, preț și oraș", variant: "destructive" });
+      toast({ title: t("complete_fields"), variant: "destructive" });
       return;
     }
     setSaving(true);
     try {
-      const demoVideo = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4";
+      const demoVideo = "https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-modern-living-room-41558-large.mp4";
       await base44.entities.Property.create({
         title: form.title,
         description: form.description,
@@ -203,66 +201,68 @@ function NewPropertyForm({ onDone }) {
         featured: true,
         views_count: 0,
       });
-      toast({ title: "Anunț creat cu Tur AI!", description: "Proprietatea a fost publicată." });
+      toast({ title: t("created_title"), description: t("created_desc") });
       onDone();
     } catch (err) {
-      toast({ title: "Eroare la salvare", variant: "destructive" });
+      toast({ title: t("save_err"), variant: "destructive" });
     } finally {
       setSaving(false);
     }
   };
 
-  const field = (k, ph, type = "text") => (
-    <input
-      type={type}
-      value={form[k]}
-      onChange={(e) => setForm((f) => ({ ...f, [k]: e.target.value }))}
-      placeholder={ph}
-      className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint"
-    />
-  );
+  const TYPES = country === "UK"
+    ? ["Studio", "2 Camere", "3 Camere", "4+ Camere", "Casă"]
+    : ["Garsonieră", "2 Camere", "3 Camere", "4+ Camere", "Casă"];
+
+  const inputCls = "w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint";
 
   return (
     <form onSubmit={handleSubmit} className="mt-6 rounded-2xl border border-border bg-white p-6 shadow-soft">
       <div className="flex items-center gap-2">
         <Camera className="h-5 w-5 text-mint" />
-        <h3 className="font-heading text-lg font-bold text-navy">Adaugă proprietate + Tur AI</h3>
+        <h3 className="font-heading text-lg font-bold text-navy">{t("new_prop_h")}</h3>
       </div>
-      <p className="mt-1 text-xs text-muted-foreground">Încarcă 5-10 poze 2D — generăm automat un Tur AI preview.</p>
+      <p className="mt-1 text-xs text-muted-foreground">{t("new_prop_d")}</p>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {field("title", "Titlu anunț")}
-        <select value={form.property_type} onChange={(e) => setForm((f) => ({ ...f, property_type: e.target.value }))} className="rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint">
-          {["Garsonieră", "2 Camere", "3 Camere", "4+ Camere", "Studio", "Casă"].map((t) => <option key={t}>{t}</option>)}
+        <input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder={t("f_title")} className={inputCls} />
+        <select value={form.property_type} onChange={(e) => setForm((f) => ({ ...f, property_type: e.target.value }))} className={inputCls}>
+          {TYPES.map((tp) => <option key={tp} value={tp}>{tp}</option>)}
         </select>
-        {field("city", country === "UK" ? "Oraș (London)" : "Oraș (București)")}
-        {field("zone", "Zona (ex. Aviatorilor / Shoreditch)")}
-        {field("price_monthly", "Preț /lună", "number")}
-        {field("deposit", "Depozit", "number")}
-        {field("rooms", "Nr. camere", "number")}
-        {field("surface_sqm", "Suprafață (mp)", "number")}
-        {field("available_from", "Disponibil din", "date")}
-        {field("owner_name", "Nume proprietar")}
-        {field("latitude", "Latitudine", "number")}
-        {field("longitude", "Longitudine", "number")}
+        <select value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value, zone: "" }))} className={inputCls}>
+          <option value="">{country === "UK" ? t("f_city_uk") : t("f_city_ro")}</option>
+          {cities.map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
+        <select value={form.zone} onChange={(e) => setForm((f) => ({ ...f, zone: e.target.value }))} disabled={!form.city} className={inputCls}>
+          <option value="">{t("f_zone")}</option>
+          {zones.map((z) => <option key={z} value={z}>{z}</option>)}
+        </select>
+        <input type="number" value={form.price_monthly} onChange={(e) => setForm((f) => ({ ...f, price_monthly: e.target.value }))} placeholder={t("f_price")} className={inputCls} />
+        <input type="number" value={form.deposit} onChange={(e) => setForm((f) => ({ ...f, deposit: e.target.value }))} placeholder={t("f_deposit")} className={inputCls} />
+        <input type="number" value={form.rooms} onChange={(e) => setForm((f) => ({ ...f, rooms: e.target.value }))} placeholder={t("f_rooms")} className={inputCls} />
+        <input type="number" value={form.surface_sqm} onChange={(e) => setForm((f) => ({ ...f, surface_sqm: e.target.value }))} placeholder={t("f_surface")} className={inputCls} />
+        <input type="date" value={form.available_from} onChange={(e) => setForm((f) => ({ ...f, available_from: e.target.value }))} placeholder={t("f_avail")} className={inputCls} />
+        <input value={form.owner_name} onChange={(e) => setForm((f) => ({ ...f, owner_name: e.target.value }))} placeholder={t("f_owner")} className={inputCls} />
+        <input type="number" value={form.latitude} onChange={(e) => setForm((f) => ({ ...f, latitude: e.target.value }))} placeholder={t("f_lat")} className={inputCls} />
+        <input type="number" value={form.longitude} onChange={(e) => setForm((f) => ({ ...f, longitude: e.target.value }))} placeholder={t("f_lng")} className={inputCls} />
       </div>
 
-      <textarea value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="Descriere..." rows={3} className="mt-3 w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
+      <textarea value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder={t("f_desc")} rows={3} className={`mt-3 ${inputCls}`} />
 
       <div className="mt-3">
         <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-secondary/20 px-4 py-6 text-sm text-muted-foreground transition hover:border-mint hover:text-navy">
           <Upload className="h-5 w-5" />
-          {uploading ? "Se încarcă..." : "Încarcă 5-10 poze 2D pentru Tur AI"}
+          {uploading ? t("uploading") : t("upload_btn")}
           <input type="file" accept="image/*" multiple className="hidden" onChange={handleFile} />
         </label>
-        {form.images && <p className="mt-1 text-xs text-mint">{form.images.split(",").length} imagini încărcate ✓</p>}
+        {form.images && <p className="mt-1 text-xs text-mint">{t("uploaded_n", { n: form.images.split(",").length })}</p>}
       </div>
 
       <div className="mt-4 flex items-center gap-2">
         <Button type="submit" disabled={saving || uploading} className="gradient-mint text-navy shadow-soft hover:opacity-90">
-          <Sparkles className="h-4 w-4" /> {saving ? "Se salvează..." : "Publică + Generează Tur AI"}
+          <Sparkles className="h-4 w-4" /> {saving ? t("saving") : t("pub_btn")}
         </Button>
-        <Button type="button" variant="outline" onClick={onDone}>Anulează</Button>
+        <Button type="button" variant="outline" onClick={onDone}>{t("cancel")}</Button>
       </div>
     </form>
   );
