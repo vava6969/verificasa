@@ -29,6 +29,7 @@ export default function Header() {
 
         <div className="flex items-center gap-2">
           <div className="hidden items-center gap-1.5 rounded-full border border-border bg-secondary/60 px-3 py-1.5 lg:flex">
+            <span className="text-xs">{country === "UK" ? "🇬🇧" : "🇷🇴"}</span>
             <span className="text-[11px] font-bold text-navy">{currency}</span>
             <span className="mx-1 h-3 w-px bg-border" />
             <span className="text-[11px] font-medium text-foreground/60">{legalInfo.legal1}</span>

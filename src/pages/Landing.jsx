@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import SearchBar from "@/components/SearchBar";
 import PropertyCard from "@/components/PropertyCard";
-import HeroVideo from "@/components/HeroVideo";
+import HeroPhoto from "@/components/HeroPhoto";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -23,8 +23,6 @@ const VALUE_PROPS = (t) => [
   { icon: ShieldCheck, title: t("vp2_t"), desc: t("vp2_d") },
   { icon: BadgePercent, title: t("vp3_t"), desc: t("vp3_d") },
 ];
-
-const HERO_VIDEO_URL = "https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-modern-living-room-41558-large.mp4";
 
 export default function Landing() {
   const { country, t } = useCountry();
@@ -54,11 +52,11 @@ export default function Landing() {
     <div>
       {/* HERO */}
       <section className="relative min-h-[640px] overflow-hidden">
-        <HeroVideo />
+        <HeroPhoto />
 
         <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-56 pt-24 text-center sm:px-6 sm:pb-64 sm:pt-28 lg:px-8">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-xs font-semibold text-mint backdrop-blur-md">
-            <Sparkles className="h-3.5 w-3.5" /> {t("hero_badge", { legalShort: heroBadge })}
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 py-1.5 text-xs font-semibold text-mint backdrop-blur-md">
+            <Sparkles className="h-3.5 w-3.5" /> {country === "UK" ? "🇬🇧" : "🇷🇴"} {t("hero_badge", { legalShort: heroBadge })}
           </span>
 
           <h1 className="mt-6 max-w-4xl font-heading text-4xl font-bold leading-[1.08] tracking-tight text-white drop-shadow-sm sm:text-5xl lg:text-6xl">
@@ -188,12 +186,18 @@ export default function Landing() {
           </div>
 
           <div className="relative">
-            <div className="aspect-video overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
-              <video autoPlay muted loop playsInline className="h-full w-full object-cover">
-                <source src={HERO_VIDEO_URL} type="video/mp4" />
-                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" type="video/mp4" />
-              </video>
-              <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/40 to-transparent" />
+            <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
+              <img
+                src="https://images.unsplash.com/photo-1493809842364-78817add736c?w=1200&q=80"
+                alt="AI Virtual Walkthrough preview"
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/60 to-transparent" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-glow transition hover:scale-105">
+                  <Play className="h-7 w-7 text-navy" />
+                </span>
+              </div>
               <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
                 <span className="rounded-full bg-navy/80 px-3 py-1.5 text-xs font-semibold text-mint backdrop-blur">AI Walkthrough</span>
                 <span className="rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-navy">02:14</span>

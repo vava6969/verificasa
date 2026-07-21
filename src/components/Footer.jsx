@@ -42,14 +42,14 @@ export default function Footer() {
             <ul className="mt-4 space-y-2.5 text-sm text-white/60">
               <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-mint" /> hello@estateai.tour</li>
               <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-mint" /> {country === "UK" ? "+44 20 1234 5678" : "+40 21 123 4567"}</li>
-              <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-mint" /> {country === "UK" ? "London, UK" : "București, RO"}</li>
+              <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-mint" /> {country === "UK" ? "🇬🇧 London, UK" : "🇷🇴 București, RO"}</li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-white/40 sm:flex-row">
           <p>{t("f_rights")}</p>
-          <p>{t("f_compliant_ro")}</p>
+          <p>{country === "UK" ? "🇬🇧" : "🇷🇴"} {t("f_compliant_ro")}</p>
         </div>
       </div>
     </footer>
