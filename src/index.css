@@ -5,55 +5,70 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --foreground: 217 24% 14%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 217 24% 14%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 222 56% 16%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
+    --popover-foreground: 217 24% 14%;
+    --primary: 152 100% 33%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 217 24% 14%;
+    --muted: 210 20% 96%;
     --muted-foreground: 215 16% 47%;
-    --accent: 156 72% 52%;
-    --accent-foreground: 222 56% 16%;
-    --destructive: 0 84% 60%;
+    --accent: 37 51% 56%;
+    --accent-foreground: 217 24% 14%;
+    --destructive: 0 72% 46%;
     --destructive-foreground: 0 0% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 156 72% 52%;
-    --radius: 0.75rem;
+    --border: 214 20% 90%;
+    --input: 214 20% 90%;
+    --ring: 152 100% 33%;
+    --radius: 0.9rem;
     --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
     --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    --navy: 222 56% 16%;
-    --navy-deep: 222 60% 11%;
-    --mint: 156 72% 52%;
-    --mint-soft: 156 72% 95%;
+    --navy: 217 24% 14%;
+    --navy-deep: 217 32% 9%;
+    --gold: 37 51% 56%;
+    --gold-soft: 40 60% 95%;
+    --gold-deep: 36 45% 38%;
+    --emerald: 152 100% 33%;
+    --emerald-soft: 152 80% 94%;
+    /* legacy aliases kept so existing components still compile */
+    --mint: 152 100% 33%;
+    --mint-soft: 152 80% 94%;
   }
 
   .dark {
-    --background: 222 56% 7%;
+    --background: 217 32% 9%;
     --foreground: 0 0% 98%;
-    --card: 222 56% 10%;
+    --card: 217 28% 12%;
     --card-foreground: 0 0% 98%;
-    --popover: 222 56% 10%;
+    --popover: 217 28% 12%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 222 56% 16%;
-    --secondary: 222 30% 18%;
+    --primary: 152 100% 40%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 24% 18%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 222 30% 18%;
+    --muted: 217 24% 18%;
     --muted-foreground: 215 20% 65%;
-    --accent: 156 72% 52%;
-    --accent-foreground: 222 56% 16%;
+    --accent: 37 51% 60%;
+    --accent-foreground: 217 32% 9%;
     --destructive: 0 62% 40%;
     --destructive-foreground: 0 0% 98%;
-    --border: 222 30% 22%;
-    --input: 222 30% 22%;
-    --ring: 156 72% 52%;
+    --border: 217 24% 22%;
+    --input: 217 24% 22%;
+    --ring: 152 100% 40%;
+    --navy: 217 32% 9%;
+    --navy-deep: 217 38% 6%;
+    --gold: 37 51% 60%;
+    --gold-soft: 36 40% 20%;
+    --gold-deep: 36 50% 55%;
+    --emerald: 152 100% 40%;
+    --emerald-soft: 152 40% 16%;
+    --mint: 152 100% 40%;
+    --mint-soft: 152 40% 16%;
   }
 }
 
@@ -61,11 +76,9 @@
   * {
     @apply border-border outline-ring/50;
   }
-
   body {
     @apply bg-background text-foreground font-body antialiased;
   }
-
   h1, h2, h3, h4, h5 {
     @apply font-heading tracking-tight;
   }
@@ -80,8 +93,20 @@
   .bg-mint-soft { background-color: hsl(var(--mint-soft)); }
   .border-mint { border-color: hsl(var(--mint)); }
   .ring-mint { --tw-ring-color: hsl(var(--mint)); }
-  .gradient-navy { background-image: linear-gradient(135deg, hsl(222 60% 11%) 0%, hsl(222 56% 18%) 60%, hsl(214 40% 24%) 100%); }
-  .gradient-mint { background-image: linear-gradient(135deg, hsl(156 72% 52%) 0%, hsl(166 70% 45%) 100%); }
-  .shadow-soft { box-shadow: 0 2px 8px -2px rgb(15 23 42 / 0.08), 0 8px 24px -8px rgb(15 23 42 / 0.12); }
-  .shadow-glow { box-shadow: 0 0 0 1px hsl(156 72% 52% / 0.2), 0 12px 40px -12px hsl(156 72% 52% / 0.4); }
+  .text-gold { color: hsl(var(--gold)); }
+  .bg-gold { background-color: hsl(var(--gold)); }
+  .bg-gold-soft { background-color: hsl(var(--gold-soft)); }
+  .border-gold { border-color: hsl(var(--gold)); }
+  .text-gold-deep { color: hsl(var(--gold-deep)); }
+  .text-emerald { color: hsl(var(--emerald)); }
+  .bg-emerald { background-color: hsl(var(--emerald)); }
+  .bg-emerald-soft { background-color: hsl(var(--emerald-soft)); }
+  .border-emerald { border-color: hsl(var(--emerald)); }
+  .gradient-navy { background-image: linear-gradient(135deg, hsl(217 38% 6%) 0%, hsl(217 24% 14%) 60%, hsl(214 30% 20%) 100%); }
+  .gradient-gold { background-image: linear-gradient(135deg, hsl(40 60% 58%) 0%, hsl(36 45% 44%) 100%); }
+  .gradient-emerald { background-image: linear-gradient(135deg, hsl(152 100% 38%) 0%, hsl(160 90% 30%) 100%); }
+  .gradient-mint { background-image: linear-gradient(135deg, hsl(152 100% 38%) 0%, hsl(160 90% 30%) 100%); }
+  .shadow-soft { box-shadow: 0 2px 10px -3px rgb(27 34 44 / 0.10), 0 10px 30px -12px rgb(27 34 44 / 0.14); }
+  .shadow-glow { box-shadow: 0 0 0 1px hsl(152 100% 33% / 0.25), 0 14px 44px -14px hsl(152 100% 33% / 0.45); }
+  .shadow-gold { box-shadow: 0 6px 24px -10px hsl(37 51% 56% / 0.5); }
 }

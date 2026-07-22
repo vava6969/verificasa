@@ -1,18 +1,27 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Play, MapPin, Maximize, BedDouble, BadgeCheck, Sparkles, PawPrint, Car, Tag } from "lucide-react";
+import { Play, MapPin, Maximize, BedDouble, ShieldCheck, Sparkles, PawPrint, Car, TrainFront, Volume2, Wifi, ArrowLeftRight, BadgePercent } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { Image } from "@/components/ui/image";
 
+// VerifiCasa verification badges + Scor Confort chips.
 export default function PropertyCard({ property }) {
-  const { country, formatPrice, t } = useCountry();
+  const { currency, formatPrice, t } = useCountry();
   const p = property;
   const cover = p.images?.[0];
 
-  const badges = [];
-  if (p.owner_verified) badges.push({ icon: BadgeCheck, label: t("pc_verified"), cls: "bg-mint text-navy" });
-  if (p.ai_tour_verified) badges.push({ icon: Sparkles, label: t("pc_aitour"), cls: "bg-navy text-mint" });
-  if (p.pet_friendly) badges.push({ icon: PawPrint, label: t("pc_pet"), cls: "bg-amber-100 text-amber-800" });
+  const isField = p.verification_level === "field_certified";
+  const isVideo = p.verification_level === "video_ai" || !!p.ai_video_url;
+
+  const eur = formatPrice(p.price_monthly, p.currency, "EUR");
+  const ron = formatPrice(p.price_monthly, p.currency, "RON");
+  const primary = currency === "EUR" ? eur : ron;
+  const secondary = currency === "EUR" ? ron : eur;
+
+  const comfort = [];
+  if (p.metro_distance_min != null) comfort.push({ icon: TrainFront, label: `${p.metro_distance_min} min metrou` });
+  if (p.noise_db != null) comfort.push({ icon: Volume2, label: `${p.noise_db} dB` });
+  if (p.internet_speed_mbps != null) comfort.push({ icon: Wifi, label: `${p.internet_speed_mbps} Mbps` });
 
   return (
     <Link
@@ -23,26 +32,45 @@ export default function PropertyCard({ property }) {
         {cover ? (
           <Image src={cover} alt={p.title} fittingType="fill" className="h-full w-full transition-transform duration-500 group-hover:scale-[1.06]" />
         ) : (
-          <div className="h-full w-full bg-gradient-to-br from-navy/10 to-mint/20" />
+          <div className="h-full w-full bg-gradient-to-br from-navy/10 to-emerald/20" />
         )}
 
-        {p.ai_video_url && (
+        {isVideo && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 backdrop-blur transition-transform duration-300 group-hover:scale-110">
               <Play className="ml-0.5 h-6 w-6 fill-navy text-navy" />
             </div>
-            <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full bg-navy/80 px-2.5 py-1 text-[11px] font-semibold text-mint backdrop-blur">
-              <Sparkles className="h-3 w-3" /> {t("pc_ai")}
-            </span>
+          </div>
+        )}
+
+        {/* "100% Verificat" ribbon */}
+        {isField && (
+          <div className="absolute left-0 top-3 flex items-center gap-1 rounded-r-full bg-gold px-3 py-1 text-[11px] font-bold text-navy shadow-gold">
+            <ShieldCheck className="h-3.5 w-3.5" /> 100% Verificat
           </div>
         )}
 
         <div className="absolute right-3 top-3 flex flex-col items-end gap-1.5">
-          {badges.map((b, i) => (
-            <span key={i} className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold ${b.cls} backdrop-blur`}>
-              <b.icon className="h-3 w-3" /> {b.label}
+          {isField && (
+            <span className="flex items-center gap-1 rounded-full bg-gold px-2.5 py-1 text-[11px] font-bold text-navy backdrop-blur">
+              <ShieldCheck className="h-3 w-3" /> VerifiCasa Certified
             </span>
-          ))}
+          )}
+          {isVideo && !isField && (
+            <span className="flex items-center gap-1 rounded-full bg-emerald px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur">
+              <Sparkles className="h-3 w-3" /> Verificat Video & AI
+            </span>
+          )}
+          {p.pet_friendly && (
+            <span className="flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold text-navy backdrop-blur">
+              <PawPrint className="h-3 w-3" /> Pet
+            </span>
+          )}
+          {p.is_swap_available && (
+            <span className="flex items-center gap-1 rounded-full bg-navy/80 px-2.5 py-1 text-[11px] font-bold text-emerald backdrop-blur">
+              <ArrowLeftRight className="h-3 w-3" /> Schimb
+            </span>
+          )}
         </div>
       </div>
 
@@ -54,24 +82,41 @@ export default function PropertyCard({ property }) {
               <MapPin className="h-3 w-3 shrink-0" /> <span className="truncate">{p.zone}, {p.city}</span>
             </p>
           </div>
-          <span className="shrink-0 rounded-lg bg-mint-soft px-2 py-1 text-[11px] font-bold text-navy">{p.property_type}</span>
+          <span className="shrink-0 rounded-lg bg-emerald-soft px-2 py-1 text-[11px] font-bold text-emerald">{p.property_type}</span>
         </div>
 
         <div className="mt-3 flex items-center gap-3 text-xs text-foreground/70">
           <span className="flex items-center gap-1"><BedDouble className="h-3.5 w-3.5" /> {p.rooms} {t("sep_rooms")}</span>
           <span className="flex items-center gap-1"><Maximize className="h-3.5 w-3.5" /> {p.surface_sqm} mp</span>
-          {p.parking && <span className="flex items-center gap-1"><Car className="h-3.5 w-3.5" /></span>}
-          {country === "UK" && p.pet_friendly && <span className="flex items-center gap-1 text-mint"><PawPrint className="h-3.5 w-3.5" /></span>}
+          {p.floor && <span className="flex items-center gap-1 text-foreground/60">Etaj {p.floor}</span>}
+          {p.parking && <span className="flex items-center gap-1 text-emerald"><Car className="h-3.5 w-3.5" /></span>}
         </div>
+
+        {/* Scor Confort chips */}
+        {comfort.length > 0 && (
+          <div className="mt-2.5 flex flex-wrap gap-1.5">
+            {comfort.map((c, i) => (
+              <span key={i} className="flex items-center gap-1 rounded-md bg-secondary px-1.5 py-0.5 text-[10px] font-semibold text-foreground/65">
+                <c.icon className="h-3 w-3" /> {c.label}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="mt-4 flex items-end justify-between border-t border-border/60 pt-3">
           <div>
-            <p className="font-heading text-lg font-bold text-navy">{formatPrice(p.price_monthly, p.currency)}</p>
-            <p className="text-[11px] text-muted-foreground">{t("pc_permonth")}</p>
+            <p className="font-heading text-lg font-bold text-navy">{primary}<span className="text-xs font-medium text-muted-foreground">/lună</span></p>
+            <p className="text-[11px] text-muted-foreground">≈ {secondary}</p>
           </div>
-          <span className="flex items-center gap-1 text-[11px] font-semibold text-mint">
-            <Tag className="h-3 w-3" /> {country === "UK" ? t("pc_0fees") : t("pc_com")}
-          </span>
+          {p.deposit_option === "verificasa_guarantee" ? (
+            <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-1 text-[10px] font-bold text-emerald">
+              <BadgePercent className="h-3 w-3" /> Garanție 0
+            </span>
+          ) : (
+            <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald">
+              {p.commission_free ? "Fără comision" : "Comision corect"}
+            </span>
+          )}
         </div>
       </div>
     </Link>

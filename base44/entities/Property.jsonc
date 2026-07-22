@@ -18,9 +18,9 @@
     "currency": {
       "type": "string",
       "enum": [
-        "GBP",
         "EUR",
-        "RON"
+        "RON",
+        "GBP"
       ],
       "default": "EUR",
       "title": "Moned\u0103"
@@ -28,11 +28,14 @@
     "country": {
       "type": "string",
       "enum": [
-        "RO",
-        "UK"
+        "RO"
       ],
       "default": "RO",
       "title": "\u021aar\u0103"
+    },
+    "county": {
+      "type": "string",
+      "title": "Jude\u021b"
     },
     "city": {
       "type": "string",
@@ -40,7 +43,11 @@
     },
     "zone": {
       "type": "string",
-      "title": "Zona"
+      "title": "Zona / Cartier"
+    },
+    "landmark": {
+      "type": "string",
+      "title": "Punct de interes / Metrou"
     },
     "property_type": {
       "type": "string",
@@ -61,6 +68,10 @@
     "surface_sqm": {
       "type": "number",
       "title": "Suprafa\u021b\u0103 (mp)"
+    },
+    "floor": {
+      "type": "string",
+      "title": "Etaj"
     },
     "deposit": {
       "type": "number",
@@ -95,7 +106,7 @@
     },
     "ai_video_url": {
       "type": "string",
-      "title": "AI Walkthrough URL"
+      "title": "Tur AI / Video URL"
     },
     "latitude": {
       "type": "number",
@@ -138,6 +149,87 @@
       "type": "number",
       "default": 0,
       "title": "Vizualiz\u0103ri"
+    },
+    "verification_level": {
+      "type": "string",
+      "enum": [
+        "unverified",
+        "video_ai",
+        "field_certified"
+      ],
+      "default": "unverified",
+      "title": "Nivel verificare"
+    },
+    "inspection_report_url": {
+      "type": "string",
+      "title": "Raport inspec\u021bie (PDF)"
+    },
+    "noise_db": {
+      "type": "number",
+      "title": "Zgomot ambiental (dB)"
+    },
+    "light_orientation": {
+      "type": "string",
+      "title": "Orientare lumin\u0103"
+    },
+    "water_pressure_ok": {
+      "type": "boolean",
+      "default": true,
+      "title": "Presiune ap\u0103 OK"
+    },
+    "internet_speed_mbps": {
+      "type": "number",
+      "title": "Vitez\u0103 internet (Mbps)"
+    },
+    "metro_distance_min": {
+      "type": "number",
+      "title": "Drum metrou (min)"
+    },
+    "deposit_option": {
+      "type": "string",
+      "enum": [
+        "standard",
+        "verificasa_guarantee"
+      ],
+      "default": "standard",
+      "title": "Op\u021biune garan\u021bie"
+    },
+    "monthly_utilities_estimate": {
+      "type": "number",
+      "title": "Estimare utilit\u0103\u021bi/lun\u0103"
+    },
+    "maintenance_fee": {
+      "type": "number",
+      "title": "\u00centre\u021binere/lun\u0103"
+    },
+    "price_fairness": {
+      "type": "string",
+      "enum": [
+        "sub_piata",
+        "corect",
+        "peste_medie"
+      ],
+      "title": "Corectitudine pre\u021b"
+    },
+    "commission_free": {
+      "type": "boolean",
+      "default": false,
+      "title": "F\u0103r\u0103 comision"
+    },
+    "reserve_instant": {
+      "type": "boolean",
+      "default": false,
+      "title": "Rezervare instant\u0103"
+    },
+    "is_swap_available": {
+      "type": "boolean",
+      "default": false,
+      "title": "Disponibil schimb de chirie"
+    },
+    "external_inspection_pending": {
+      "type": "boolean",
+      "default": false,
+      "title": "Inspec\u021bie extern\u0103 \u00een curs"
     }
   },
   "required": [
