@@ -73,7 +73,7 @@ export default function Landing() {
             <span className="text-gold">Fără surprize neplăcute.</span>
           </h1>
 
-          <p className="mt-5 max-w-2xl text-base text-white/80 sm:text-lg">
+          <p className="mt-5 max-w-2xl rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-base text-white/85 backdrop-blur-md sm:text-lg">
             VerifiCasa transformă închirierile: tururi AI immersive, inspecții fizice verificate de agenți
             și garanții care protejează chiriașul și proprietarul.
           </p>
@@ -84,7 +84,7 @@ export default function Landing() {
 
           <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium text-white/70">
             {COMFORT_CHIPS.map((c, i) => (
-              <span key={i} className="flex items-center gap-1.5">
+              <span key={i} className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/80 backdrop-blur-md">
                 <c.icon className="h-3.5 w-3.5 text-emerald" /> {c.label}
               </span>
             ))}
