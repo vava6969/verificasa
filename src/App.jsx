@@ -11,6 +11,10 @@ import Landing from '@/pages/Landing';
 import SearchPage from '@/pages/Search';
 import PropertyDetail from '@/pages/PropertyDetail';
 import Owner from '@/pages/Owner';
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword from '@/pages/ResetPassword';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -39,6 +43,10 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route element={<Layout />}>
         <Route path="/" element={<Landing />} />
         <Route path="/search" element={<SearchPage />} />

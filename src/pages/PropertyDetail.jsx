@@ -14,6 +14,7 @@ L.Icon.Default.mergeOptions({
 });
 import { useCountry } from "@/components/CountryContext";
 import AITourPlayer from "@/components/AITourPlayer";
+import ShareableStoryCard from "@/components/ShareableStoryCard";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -182,6 +183,11 @@ export default function PropertyDetail() {
               <p className="text-xs text-muted-foreground">{s.label}</p>
             </div>
           ))}
+        </div>
+
+        {/* Shareable story card generator (under the announcement) */}
+        <div className="mt-4 mx-auto max-w-md">
+          <ShareableStoryCard property={p} />
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-3">

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Play, MapPin, Maximize, BedDouble, ShieldCheck, Sparkles, PawPrint, Car, TrainFront, Volume2, Wifi, ArrowLeftRight, BadgePercent } from "lucide-react";
+import { Play, MapPin, Maximize, BedDouble, ShieldCheck, Sparkles, PawPrint, Car, TrainFront, Volume2, Wifi, ArrowLeftRight, BadgePercent, TrendingDown, TrendingUp } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { Image } from "@/components/ui/image";
 
@@ -17,6 +17,13 @@ export default function PropertyCard({ property }) {
   const ron = formatPrice(p.price_monthly, p.currency, "RON");
   const primary = currency === "EUR" ? eur : ron;
   const secondary = currency === "EUR" ? ron : eur;
+
+  const FAIRNESS = {
+    sub_piata: { label: "Sub prețul pieței", cls: "bg-emerald-soft text-emerald", icon: TrendingDown },
+    corect: { label: "Preț corect", cls: "bg-gold-soft text-gold-deep", icon: BadgePercent },
+    peste_medie: { label: "Peste media pieței", cls: "bg-destructive/10 text-destructive", icon: TrendingUp },
+  };
+  const fairness = p.price_fairness ? FAIRNESS[p.price_fairness] : null;
 
   const comfort = [];
   if (p.metro_distance_min != null) comfort.push({ icon: TrainFront, label: `${p.metro_distance_min} min metrou` });
@@ -107,6 +114,11 @@ export default function PropertyCard({ property }) {
           <div>
             <p className="font-heading text-lg font-bold text-navy">{primary}<span className="text-xs font-medium text-muted-foreground">/lună</span></p>
             <p className="text-[11px] text-muted-foreground">≈ {secondary}</p>
+            {fairness && (
+              <span className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${fairness.cls}`}>
+                <fairness.icon className="h-3 w-3" /> {fairness.label}
+              </span>
+            )}
           </div>
           {p.deposit_option === "verificasa_guarantee" ? (
             <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-1 text-[10px] font-bold text-emerald">

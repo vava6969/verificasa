@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import { getCities, getZones } from "@/components/locations";
 import PropertyCard from "@/components/PropertyCard";
-import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock } from "lucide-react";
+import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, SlidersHorizontal, ArrowDownUp } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // VerifiCasa verification filters — each applies a real-property predicate.
@@ -19,11 +19,31 @@ const VERIF_FILTERS = [
   { key: "parking", label: "Parcare", icon: Home, test: (p) => !!p.parking },
 ];
 
+const FAIRNESS_OPTIONS = [
+  { value: "", label: "Preț corectitate (toate)" },
+  { value: "sub_piata", label: "Sub prețul pieței" },
+  { value: "corect", label: "Preț corect" },
+  { value: "peste_medie", label: "Peste media pieței" },
+];
+
+const SORT_OPTIONS = [
+  { value: "", label: "Sortează după" },
+  { value: "newest", label: "Cele mai noi" },
+  { value: "price_asc", label: "Preț crescător" },
+  { value: "price_desc", label: "Preț descrescător" },
+];
+
 export default function SearchPage() {
   const { country } = useCountry();
   const [params, setParams] = useSearchParams();
   const [properties, setProperties] = useState(null);
   const [budget, setBudget] = useState("");
+  const [roomsMin, setRoomsMin] = useState("");
+  const [surfaceMin, setSurfaceMin] = useState("");
+  const [furnished, setFurnished] = useState(false);
+  const [swap, setSwap] = useState(false);
+  const [fairness, setFairness] = useState("");
+  const [sort, setSort] = useState("");
 
   const cityParam = params.get("city");
   const zoneParam = params.get("zone");
@@ -66,7 +86,7 @@ export default function SearchPage() {
     });
   };
 
-  const filtered = (properties || []).filter((p) => {
+  let filtered = (properties || []).filter((p) => {
     if (p.country !== "RO") return false;
     if (cityParam && !p.city?.toLowerCase().includes(cityParam.toLowerCase())) return false;
     if (zoneParam && !p.zone?.toLowerCase().includes(zoneParam.toLowerCase())) return false;
@@ -77,8 +97,17 @@ export default function SearchPage() {
       if (activeFilters.has(f.key) && !f.test(p)) return false;
     }
     if (budget) { const max = parseInt(budget, 10); if (!isNaN(max) && p.price_monthly > max) return false; }
+    if (roomsMin) { const r = parseInt(roomsMin, 10); if (!isNaN(r) && (p.rooms == null || p.rooms < r)) return false; }
+    if (surfaceMin) { const s = parseFloat(surfaceMin); if (!isNaN(s) && (p.surface_sqm == null || p.surface_sqm < s)) return false; }
+    if (furnished && !p.furnished) return false;
+    if (swap && !p.is_swap_available) return false;
+    if (fairness && p.price_fairness !== fairness) return false;
     return true;
   });
+
+  if (sort === "price_asc") filtered = [...filtered].sort((a, b) => (a.price_monthly || 0) - (b.price_monthly || 0));
+  else if (sort === "price_desc") filtered = [...filtered].sort((a, b) => (b.price_monthly || 0) - (a.price_monthly || 0));
+  else if (sort === "newest") filtered = [...filtered].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
 
   const found = filtered.length;
 
@@ -140,6 +169,73 @@ export default function SearchPage() {
             placeholder="Buget max /lună (€)"
             className="w-48 rounded-full border border-border bg-white px-4 py-2 text-sm outline-none focus:border-emerald"
           />
+        </div>
+      </div>
+
+      {/* Advanced filters */}
+      <div className="mb-6 rounded-2xl border border-border bg-secondary/30 p-4">
+        <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-foreground/60">
+          <SlidersHorizontal className="h-4 w-4 text-emerald" /> Filtre avansate
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <select
+            value={roomsMin}
+            onChange={(e) => setRoomsMin(e.target.value)}
+            className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium outline-none focus:border-emerald"
+          >
+            <option value="">Camere (min)</option>
+            <option value="1">1+ camere</option>
+            <option value="2">2+ camere</option>
+            <option value="3">3+ camere</option>
+            <option value="4">4+ camere</option>
+          </select>
+
+          <input
+            type="number"
+            value={surfaceMin}
+            onChange={(e) => setSurfaceMin(e.target.value)}
+            placeholder="Suprafață min (mp)"
+            className="w-44 rounded-full border border-border bg-white px-4 py-2 text-sm outline-none focus:border-emerald"
+          />
+
+          <select
+            value={fairness}
+            onChange={(e) => setFairness(e.target.value)}
+            className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium outline-none focus:border-emerald"
+          >
+            {FAIRNESS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+
+          <button
+            type="button"
+            onClick={() => setFurnished((v) => !v)}
+            className={`flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+              furnished ? "border-emerald bg-emerald text-white shadow-soft" : "border-border bg-white text-foreground/70 hover:border-emerald/50"
+            }`}
+          >
+            Mobilat
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSwap((v) => !v)}
+            className={`flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+              swap ? "border-emerald bg-emerald text-white shadow-soft" : "border-border bg-white text-foreground/70 hover:border-emerald/50"
+            }`}
+          >
+            Schimb de chirie
+          </button>
+
+          <div className="ml-auto flex items-center gap-2">
+            <ArrowDownUp className="h-4 w-4 text-foreground/50" />
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium outline-none focus:border-emerald"
+            >
+              {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
         </div>
       </div>
 

@@ -51,7 +51,7 @@ export default function Header() {
                   currency === cur ? "bg-navy text-white" : "text-foreground/60 hover:text-navy"
                 }`}
               >
-                {cur}
+                <span className="mr-1">{cur === "EUR" ? "🇬🇧" : "🇷🇴"}</span>{cur}
               </button>
             ))}
           </div>
