@@ -4,7 +4,10 @@ import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import { getCities, getZones } from "@/components/locations";
 import PropertyCard from "@/components/PropertyCard";
-import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, SlidersHorizontal, ArrowDownUp } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, SlidersHorizontal, ArrowDownUp, BookmarkPlus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // VerifiCasa verification filters — each applies a real-property predicate.
@@ -35,6 +38,8 @@ const SORT_OPTIONS = [
 
 export default function SearchPage() {
   const { country } = useCountry();
+  const { user, isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const [params, setParams] = useSearchParams();
   const [properties, setProperties] = useState(null);
   const [budget, setBudget] = useState("");
@@ -111,18 +116,38 @@ export default function SearchPage() {
 
   const found = filtered.length;
 
+  const saveSearch = async () => {
+    if (!isAuthenticated) { toast({ title: "Conectează-te pentru a salva căutarea", variant: "destructive" }); return; }
+    const qs = params.toString();
+    if (!qs) { toast({ title: "Aplică niște filtre mai întâi", variant: "destructive" }); return; }
+    const parts = [];
+    if (cityParam) parts.push(cityParam);
+    if (zoneParam) parts.push(zoneParam);
+    if (typeParam) parts.push(typeParam);
+    const label = parts.length ? parts.join(" · ") : "Toate proprietățile";
+    try {
+      await base44.entities.SavedSearch.create({ user_id: user.id, label, query_string: qs });
+      toast({ title: "Căutare salvată", description: "O găsești în meniul tău → Căutări salvate" });
+    } catch (e) { toast({ title: "Eroare la salvare", variant: "destructive" }); }
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-6">
-        <h1 className="font-heading text-2xl font-bold text-navy">
-          {cityParam || zoneParam || typeParam ? "Rezultate căutare" : "Toate proprietățile"}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {cityParam && `Oraș: ${cityParam} · `}
-          {zoneParam && `Zona: ${zoneParam} · `}
-          {typeParam && `Tip: ${typeParam} · `}
-          {found} {found === 1 ? "proprietate găsită" : "proprietăți găsite"}
-        </p>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-heading text-2xl font-bold text-navy">
+            {cityParam || zoneParam || typeParam ? "Rezultate căutare" : "Toate proprietățile"}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {cityParam && `Oraș: ${cityParam} · `}
+            {zoneParam && `Zona: ${zoneParam} · `}
+            {typeParam && `Tip: ${typeParam} · `}
+            {found} {found === 1 ? "proprietate găsită" : "proprietăți găsite"}
+          </p>
+        </div>
+        <Button onClick={saveSearch} variant="outline" className="gap-1.5 border-emerald/40 text-emerald hover:bg-emerald-soft">
+          <BookmarkPlus className="h-4 w-4" /> Salvează căutarea
+        </Button>
       </div>
 
       {/* City / zone selectors */}

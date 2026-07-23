@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -25,7 +25,10 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
   Calendar, ShieldCheck, FileText, CheckCircle2, ChevronLeft, Send, Phone,
+  Heart, MessageCircle,
 } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
+import { startConversation } from "@/lib/conversations";
 
 const DEMO_VIDEO = "https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-modern-living-room-41558-large.mp4";
 const DEMO_FALLBACK = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4";
@@ -42,6 +45,21 @@ export default function PropertyDetail() {
   const [form, setForm] = useState({
     name: "", email: "", phone: "", occupation: "", estimated_income: "", move_date: "", message: "", preferred_visit_date: "",
   });
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!user || !property) return;
+    (async () => {
+      try {
+        const list = await base44.entities.SavedProperty.filter({ user_id: user.id, property_id: property.id }, "-created_date", 1);
+        if (!cancelled) setSaved(list.length > 0);
+      } catch (e) {}
+    })();
+    return () => { cancelled = true; };
+  }, [user, property]);
 
   useEffect(() => {
     let cancelled = false;
@@ -115,6 +133,28 @@ export default function PropertyDetail() {
 
   const p = property;
   const images = p.images?.length ? p.images : [];
+
+  const toggleSave = async () => {
+    if (!user) { navigate("/login"); return; }
+    try {
+      if (saved) {
+        const list = await base44.entities.SavedProperty.filter({ user_id: user.id, property_id: p.id }, "-created_date", 10);
+        for (const s of list) await base44.entities.SavedProperty.delete(s.id);
+        setSaved(false); toast({ title: "Eliminat din salvate" });
+      } else {
+        await base44.entities.SavedProperty.create({ user_id: user.id, property_id: p.id });
+        setSaved(true); toast({ title: "Anunț salvat" });
+      }
+    } catch (e) { toast({ title: "Eroare", variant: "destructive" }); }
+  };
+
+  const handleMessage = async () => {
+    if (!user) { navigate("/login"); return; }
+    try {
+      const conv = await startConversation(user, p);
+      navigate(`/messages?c=${conv.id}`);
+    } catch (e) { toast({ title: "Eroare la mesaj", variant: "destructive" }); }
+  };
 
   const stats = [
     { icon: BedDouble, label: t("stat_rooms"), value: p.rooms },
@@ -284,6 +324,15 @@ export default function PropertyDetail() {
                 <h3 className="font-heading text-lg font-bold text-navy">{t("contact_h")}</h3>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">{t("contact_sub")}</p>
+
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <Button type="button" variant="outline" onClick={toggleSave} className="gap-1.5">
+                  <Heart className={`h-4 w-4 ${saved ? "fill-rose-500 text-rose-500" : ""}`} /> {saved ? "Salvat" : "Salvează"}
+                </Button>
+                <Button type="button" onClick={handleMessage} className="gap-1.5 bg-navy text-emerald hover:opacity-90">
+                  <MessageCircle className="h-4 w-4" /> Mesaj
+                </Button>
+              </div>
 
               <form onSubmit={handleSubmit} className="mt-4 space-y-3">
                 <div className="rounded-xl bg-emerald-soft/40 p-3">

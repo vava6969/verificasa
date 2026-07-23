@@ -19,6 +19,9 @@ import ResetPassword from '@/pages/ResetPassword';
 import MyProperties from '@/pages/MyProperties';
 import Admin from '@/pages/Admin';
 import Settings from '@/pages/Settings';
+import Messages from '@/pages/Messages';
+import Saved from '@/pages/Saved';
+import SavedSearches from '@/pages/SavedSearches';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 const AuthenticatedApp = () => {
@@ -60,6 +63,9 @@ const AuthenticatedApp = () => {
           <Route path="/my-properties" element={<MyProperties />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/saved" element={<Saved />} />
+          <Route path="/searches" element={<SavedSearches />} />
+          <Route path="/messages" element={<Messages />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />

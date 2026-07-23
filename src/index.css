@@ -109,4 +109,11 @@
   .shadow-soft { box-shadow: 0 2px 10px -3px rgb(27 34 44 / 0.10), 0 10px 30px -12px rgb(27 34 44 / 0.14); }
   .shadow-glow { box-shadow: 0 0 0 1px hsl(152 100% 33% / 0.25), 0 14px 44px -14px hsl(152 100% 33% / 0.45); }
   .shadow-gold { box-shadow: 0 6px 24px -10px hsl(37 51% 56% / 0.5); }
+
+  /* Dark-mode: flip solid white surfaces and navy text to theme tokens,
+     so text stays readable on the dark page background. Translucent
+     white badges over images keep fixed dark text via slate utilities. */
+  .dark .bg-white { background-color: hsl(var(--card)); }
+  .dark .text-navy { color: hsl(var(--foreground)); }
+  .dark .bg-gold.text-navy { color: hsl(var(--accent-foreground)); }
 }

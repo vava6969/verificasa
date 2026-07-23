@@ -89,7 +89,7 @@ export default function Header() {
                   <DropdownMenuItem onClick={() => navigate("/")}><LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/messages")}><MessageCircle className="mr-2 h-4 w-4" /> Mesajele mele</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/saved")}><Bookmark className="mr-2 h-4 w-4" /> Anunțuri salvate</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/search")}><Search className="mr-2 h-4 w-4" /> Căutări salvate</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/searches")}><Search className="mr-2 h-4 w-4" /> Căutări salvate</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate("/owner")}><Plus className="mr-2 h-4 w-4" /> Adaugă anunț</DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/my-properties")}><Home className="mr-2 h-4 w-4" /> Anunțurile mele</DropdownMenuItem>

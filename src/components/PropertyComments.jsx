@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
-import { MessageSquare, ShieldCheck, BadgeCheck, Lock, Heart, Reply, Send } from "lucide-react";
+import { MessageSquare, ShieldCheck, BadgeCheck, Lock, Heart, Reply, Send, Trash2 } from "lucide-react";
 
 const ROLE_BADGE = {
   SUPER_ADMIN: { label: "Super Admin", cls: "bg-gold text-navy" },
@@ -15,6 +15,8 @@ const ROLE_BADGE = {
   PROPRIETAR: { label: "Proprietar", cls: "bg-emerald text-white" },
   SUPPORT: { label: "Support", cls: "bg-secondary text-foreground" },
 };
+
+const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 
 function Avatar({ url, name, className }) {
   const initials = (name || "?").split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase();
@@ -31,6 +33,7 @@ function Avatar({ url, name, className }) {
 export default function PropertyComments({ property }) {
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const isAdmin = isAuthenticated && ADMIN_ROLES.includes((user?.role || "").toUpperCase());
   const [comments, setComments] = useState(null);
   const [content, setContent] = useState("");
   const [posting, setPosting] = useState(false);
@@ -55,21 +58,14 @@ export default function PropertyComments({ property }) {
     setPosting(true);
     try {
       await base44.entities.Comment.create({
-        property_id: property.id,
-        property_title: property.title,
-        user_id: user.id,
-        user_name: user.full_name || user.email,
+        property_id: property.id, property_title: property.title,
+        user_id: user.id, user_name: user.full_name || user.email,
         user_role: (user.role || "PROPRIETAR").toUpperCase(),
-        avatar_url: user.avatar_url || "",
-        content: content.trim(),
-        likes: [],
+        avatar_url: user.avatar_url || "", content: content.trim(), likes: [],
       });
-      setContent("");
-      load();
-      toast({ title: "Comentariu adăugat" });
-    } catch (err) {
-      toast({ title: "Eroare la comentariu", variant: "destructive" });
-    } finally { setPosting(false); }
+      setContent(""); load(); toast({ title: "Comentariu adăugat" });
+    } catch (err) { toast({ title: "Eroare la comentariu", variant: "destructive" }); }
+    finally { setPosting(false); }
   };
 
   const submitReply = async (parentId) => {
@@ -78,22 +74,14 @@ export default function PropertyComments({ property }) {
     setReplyPosting(true);
     try {
       await base44.entities.Comment.create({
-        property_id: property.id,
-        property_title: property.title,
-        user_id: user.id,
-        user_name: user.full_name || user.email,
+        property_id: property.id, property_title: property.title,
+        user_id: user.id, user_name: user.full_name || user.email,
         user_role: (user.role || "PROPRIETAR").toUpperCase(),
-        avatar_url: user.avatar_url || "",
-        content: replyContent.trim(),
-        parent_id: parentId,
-        likes: [],
+        avatar_url: user.avatar_url || "", content: replyContent.trim(), parent_id: parentId, likes: [],
       });
-      setReplyContent("");
-      setReplyTo(null);
-      load();
-    } catch (err) {
-      toast({ title: "Eroare la răspuns", variant: "destructive" });
-    } finally { setReplyPosting(false); }
+      setReplyContent(""); setReplyTo(null); load();
+    } catch (err) { toast({ title: "Eroare la răspuns", variant: "destructive" }); }
+    finally { setReplyPosting(false); }
   };
 
   const toggleLike = async (c) => {
@@ -102,12 +90,17 @@ export default function PropertyComments({ property }) {
     const has = likes.includes(user.id);
     const next = has ? likes.filter((id) => id !== user.id) : [...likes, user.id];
     setComments((cs) => (cs || []).map((x) => (x.id === c.id ? { ...x, likes: next } : x)));
+    try { await base44.entities.Comment.update(c.id, { likes: next }); }
+    catch (e) { setComments((cs) => (cs || []).map((x) => (x.id === c.id ? { ...x, likes } : x))); toast({ title: "Eroare la like", variant: "destructive" }); }
+  };
+
+  const deleteComment = async (c) => {
+    if (!confirm("Ștergi acest comentariu?")) return;
     try {
-      await base44.entities.Comment.update(c.id, { likes: next });
-    } catch (e) {
-      setComments((cs) => (cs || []).map((x) => (x.id === c.id ? { ...x, likes } : x)));
-      toast({ title: "Eroare la like", variant: "destructive" });
-    }
+      await base44.entities.Comment.delete(c.id);
+      setComments((cs) => (cs || []).filter((x) => x.id !== c.id && x.parent_id !== c.id));
+      toast({ title: "Comentariu șters" });
+    } catch (e) { toast({ title: "Eroare la ștergere", variant: "destructive" }); }
   };
 
   const topLevel = (comments || []).filter((c) => !c.parent_id);
@@ -133,49 +126,36 @@ export default function PropertyComments({ property }) {
           <Avatar url={c.avatar_url} name={name} className="h-9 w-9 shrink-0" />
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-semibold text-navy">{name}</span>
+              <span className="font-semibold text-navy dark:text-foreground">{name}</span>
               {renderBadge(c.user_role)}
-              <span className="ml-auto text-[10px] text-muted-foreground">
-                {new Date(c.created_date).toLocaleDateString("ro-RO")}
-              </span>
+              <span className="ml-auto text-[10px] text-muted-foreground">{new Date(c.created_date).toLocaleDateString("ro-RO")}</span>
             </div>
             <p className="mt-1 text-sm text-foreground/80">{c.content}</p>
             <div className="mt-2 flex items-center gap-3">
-              <button
-                onClick={() => toggleLike(c)}
-                className={cn("flex items-center gap-1 text-xs font-semibold transition", liked ? "text-rose-500" : "text-muted-foreground hover:text-rose-500")}
-              >
+              <button onClick={() => toggleLike(c)} className={cn("flex items-center gap-1 text-xs font-semibold transition", liked ? "text-rose-500" : "text-muted-foreground hover:text-rose-500")}>
                 <Heart className={cn("h-3.5 w-3.5", liked && "fill-rose-500")} /> {likeCount > 0 ? likeCount : ""} Apreciază
               </button>
               {canPost && !isReply && (
-                <button
-                  onClick={() => { setReplyTo(replyTo === c.id ? null : c.id); setReplyContent(""); }}
-                  className="flex items-center gap-1 text-xs font-semibold text-muted-foreground transition hover:text-emerald"
-                >
+                <button onClick={() => { setReplyTo(replyTo === c.id ? null : c.id); setReplyContent(""); }} className="flex items-center gap-1 text-xs font-semibold text-muted-foreground transition hover:text-emerald">
                   <Reply className="h-3.5 w-3.5" /> Răspunde
+                </button>
+              )}
+              {isAdmin && (
+                <button onClick={() => deleteComment(c)} className="ml-auto flex items-center gap-1 text-xs font-semibold text-muted-foreground transition hover:text-destructive">
+                  <Trash2 className="h-3.5 w-3.5" /> Șterge
                 </button>
               )}
             </div>
 
             {replyTo === c.id && canPost && (
               <div className="mt-3 flex items-end gap-2">
-                <Textarea
-                  value={replyContent}
-                  onChange={(e) => setReplyContent(e.target.value)}
-                  rows={2}
-                  placeholder={`Răspunde lui ${name}...`}
-                  className="resize-none text-sm"
-                />
-                <Button type="button" size="sm" onClick={() => submitReply(c.id)} disabled={replyPosting} className="bg-emerald text-white hover:bg-emerald/90">
-                  <Send className="h-4 w-4" />
-                </Button>
+                <Textarea value={replyContent} onChange={(e) => setReplyContent(e.target.value)} rows={2} placeholder={`Răspunde lui ${name}...`} className="resize-none text-sm" />
+                <Button type="button" size="sm" onClick={() => submitReply(c.id)} disabled={replyPosting} className="bg-emerald text-white hover:bg-emerald/90"><Send className="h-4 w-4" /></Button>
               </div>
             )}
 
-            {isReply === false && repliesOf(c.id).length > 0 && (
-              <div className="mt-1 space-y-0 divide-y divide-border/30">
-                {repliesOf(c.id).map((r) => renderComment(r, true))}
-              </div>
+            {!isReply && repliesOf(c.id).length > 0 && (
+              <div className="mt-1 space-y-0 divide-y divide-border/30">{repliesOf(c.id).map((r) => renderComment(r, true))}</div>
             )}
           </div>
         </div>
@@ -184,16 +164,14 @@ export default function PropertyComments({ property }) {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
+    <div className="rounded-2xl border border-border bg-white p-6 shadow-soft dark:bg-card">
       <div className="flex items-center gap-2">
         <MessageSquare className="h-5 w-5 text-emerald" />
-        <h3 className="font-heading text-lg font-bold text-navy">Comentarii</h3>
+        <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">Comentarii</h3>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
         {isAuthenticated
-          ? user?.is_verified
-            ? "Poți publica comentarii și răspunsuri (cont verificat)."
-            : "Doar conturile verificate pot pubblica. Aprecierile sunt libere."
+          ? user?.is_verified ? "Poți publica comentarii și răspunsuri (cont verificat)." : "Doar conturile verificate pot publica. Aprecierile sunt libere."
           : "Conectează-te pentru a comenta sau aprecia."}
       </p>
 
@@ -204,9 +182,7 @@ export default function PropertyComments({ property }) {
               <Avatar url={user.avatar_url} name={user.full_name || user.email} className="h-9 w-9 shrink-0" />
               <div className="flex-1 space-y-2">
                 <Textarea value={content} onChange={(e) => setContent(e.target.value)} rows={3} placeholder="Scrie un comentariu..." className="resize-none" />
-                <Button type="submit" disabled={posting} className="bg-emerald text-white hover:bg-emerald/90">
-                  {posting ? "Public..." : "Publică"}
-                </Button>
+                <Button type="submit" disabled={posting} className="bg-emerald text-white hover:bg-emerald/90">{posting ? "Public..." : "Publică"}</Button>
               </div>
             </div>
           </form>
@@ -222,13 +198,9 @@ export default function PropertyComments({ property }) {
       )}
 
       <div className="mt-5 divide-y divide-border/50">
-        {comments === null ? (
-          <p className="text-sm text-muted-foreground">Se încarcă...</p>
-        ) : topLevel.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Niciun comentariu încă. Fii primul!</p>
-        ) : (
-          topLevel.map((c) => renderComment(c))
-        )}
+        {comments === null ? <p className="text-sm text-muted-foreground">Se încarcă...</p>
+        : topLevel.length === 0 ? <p className="text-sm text-muted-foreground">Niciun comentariu încă. Fii primul!</p>
+        : topLevel.map((c) => renderComment(c))}
       </div>
     </div>
   );

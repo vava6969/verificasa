@@ -1,0 +1,24 @@
+{
+  "name": "SavedSearch",
+  "type": "object",
+  "title": "SavedSearch",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "title": "User ID"
+    },
+    "label": {
+      "type": "string",
+      "title": "Etichet\u0103"
+    },
+    "query_string": {
+      "type": "string",
+      "title": "Query string (URL params)"
+    }
+  },
+  "required": [
+    "user_id",
+    "label",
+    "query_string"
+  ]
+}
