@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
-import { getCities, getZones } from "@/components/locations";
+import { useAuth } from "@/lib/AuthContext";
+import { getCities, getZones, getCounty } from "@/components/locations";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
@@ -12,15 +13,17 @@ import {
 
 export default function Owner() {
   const { country, t } = useCountry();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [properties, setProperties] = useState(null);
   const [inquiries, setInquiries] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
   const load = async () => {
+    if (!user?.id) return;
     try {
       const [ps, inq] = await Promise.all([
-        base44.entities.Property.list("-created_date", 50),
+        base44.entities.Property.filter({ created_by_id: user.id }, "-created_date", 50),
         base44.entities.Inquiry.list("-created_date", 50),
       ]);
       setProperties(ps);
@@ -30,7 +33,7 @@ export default function Owner() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [user?.id]);
 
   const totalViews = (properties || []).reduce((a, p) => a + (p.views_count || 0), 0);
 
@@ -178,8 +181,9 @@ function NewPropertyForm({ onDone }) {
         title: form.title,
         description: form.description,
         price_monthly: Number(form.price_monthly),
-        currency: country === "UK" ? "GBP" : "RON",
+        currency: "EUR",
         country,
+        county: getCounty(form.city),
         city: form.city,
         zone: form.zone,
         property_type: form.property_type,
@@ -210,9 +214,7 @@ function NewPropertyForm({ onDone }) {
     }
   };
 
-  const TYPES = country === "UK"
-    ? ["Studio", "2 Camere", "3 Camere", "4+ Camere", "Casă"]
-    : ["Garsonieră", "2 Camere", "3 Camere", "4+ Camere", "Casă"];
+  const TYPES = ["Garsonieră", "2 Camere", "3 Camere", "4+ Camere", "Casă", "Studio"];
 
   const inputCls = "w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint";
 
@@ -230,7 +232,7 @@ function NewPropertyForm({ onDone }) {
           {TYPES.map((tp) => <option key={tp} value={tp}>{tp}</option>)}
         </select>
         <select value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value, zone: "" }))} className={inputCls}>
-          <option value="">{country === "UK" ? t("f_city_uk") : t("f_city_ro")}</option>
+          <option value="">Oraş</option>
           {cities.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
         <select value={form.zone} onChange={(e) => setForm((f) => ({ ...f, zone: e.target.value }))} disabled={!form.city} className={inputCls}>

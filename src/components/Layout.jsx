@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CountryProvider } from "@/components/CountryContext";
 import ScrollToTop from "@/components/ScrollToTop";
+import InstagramPopup from "@/components/InstagramPopup";
 
 export default function Layout() {
   return (
@@ -15,6 +16,7 @@ export default function Layout() {
           <Outlet />
         </main>
         <Footer />
+        <InstagramPopup />
       </div>
     </CountryProvider>
   );

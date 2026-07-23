@@ -55,7 +55,7 @@ export default function SearchBar({ compact = false }) {
         <div className={inputCls}>
           <MapPin className="h-4 w-4 shrink-0 text-emerald" />
           <select value={city} onChange={(e) => handleCity(e.target.value)} className="w-full cursor-pointer bg-transparent text-sm text-navy outline-none">
-            <option value="">Oraș (ex. București)</option>
+            <option value="">Oraș</option>
             {cities.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
