@@ -1,0 +1,28 @@
+{
+  "name": "Message",
+  "type": "object",
+  "title": "Message",
+  "properties": {
+    "conversation_id": {
+      "type": "string",
+      "title": "Conversation ID"
+    },
+    "sender_id": {
+      "type": "string",
+      "title": "Sender ID"
+    },
+    "sender_name": {
+      "type": "string",
+      "title": "Nume expeditor"
+    },
+    "content": {
+      "type": "string",
+      "title": "Mesaj"
+    }
+  },
+  "required": [
+    "conversation_id",
+    "sender_id",
+    "content"
+  ]
+}

@@ -143,6 +143,8 @@ function NewPropertyForm({ onDone }) {
     title: "", description: "", price_monthly: "", city: "", zone: "", property_type: "Garsonieră",
     rooms: "1", surface_sqm: "", deposit: "", available_from: "", images: "", ai_video_url: "",
     latitude: "", longitude: "", owner_name: "",
+    transaction_type: "RENT", building_year: "", total_floors: "", phone: "", whatsapp_phone: "",
+    seller_role: "Proprietar",
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -190,6 +192,13 @@ function NewPropertyForm({ onDone }) {
         rooms: Number(form.rooms),
         surface_sqm: Number(form.surface_sqm) || null,
         deposit: Number(form.deposit) || null,
+        transaction_type: form.transaction_type || "RENT",
+        building_year: form.building_year ? Number(form.building_year) : null,
+        total_floors: form.total_floors ? Number(form.total_floors) : null,
+        phone: form.phone || "",
+        whatsapp_phone: form.whatsapp_phone || "",
+        seller_role: form.seller_role || "Proprietar",
+        approval_status: "APPROVED",
         furnished: true,
         pet_friendly: false,
         parking: false,
@@ -247,6 +256,18 @@ function NewPropertyForm({ onDone }) {
         <input value={form.owner_name} onChange={(e) => setForm((f) => ({ ...f, owner_name: e.target.value }))} placeholder={t("f_owner")} className={inputCls} />
         <input type="number" value={form.latitude} onChange={(e) => setForm((f) => ({ ...f, latitude: e.target.value }))} placeholder={t("f_lat")} className={inputCls} />
         <input type="number" value={form.longitude} onChange={(e) => setForm((f) => ({ ...f, longitude: e.target.value }))} placeholder={t("f_lng")} className={inputCls} />
+        <select value={form.transaction_type} onChange={(e) => setForm((f) => ({ ...f, transaction_type: e.target.value }))} className={inputCls}>
+          <option value="RENT">Închiriere</option>
+          <option value="SALE">Vânzare</option>
+        </select>
+        <select value={form.seller_role} onChange={(e) => setForm((f) => ({ ...f, seller_role: e.target.value }))} className={inputCls}>
+          <option value="Proprietar">Proprietar</option>
+          <option value="Agent">Agent</option>
+        </select>
+        <input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} placeholder="Telefon (ex: 0759...)" className={inputCls} />
+        <input value={form.whatsapp_phone} onChange={(e) => setForm((f) => ({ ...f, whatsapp_phone: e.target.value }))} placeholder="WhatsApp (ex: 40759...)" className={inputCls} />
+        <input type="number" value={form.building_year} onChange={(e) => setForm((f) => ({ ...f, building_year: e.target.value }))} placeholder="An construcție" className={inputCls} />
+        <input type="number" value={form.total_floors} onChange={(e) => setForm((f) => ({ ...f, total_floors: e.target.value }))} placeholder="Total etaje clădire" className={inputCls} />
       </div>
 
       <textarea value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder={t("f_desc")} rows={3} className={`mt-3 ${inputCls}`} />

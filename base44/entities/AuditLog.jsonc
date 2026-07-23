@@ -1,0 +1,40 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "title": "AuditLog",
+  "properties": {
+    "actor_id": {
+      "type": "string",
+      "title": "Actor ID"
+    },
+    "actor_name": {
+      "type": "string",
+      "title": "Nume actor"
+    },
+    "actor_role": {
+      "type": "string",
+      "title": "Rol actor"
+    },
+    "action": {
+      "type": "string",
+      "title": "Ac\u021biune (approve/reject/delete/moderate)"
+    },
+    "target_type": {
+      "type": "string",
+      "title": "Tip \u021binint (property/comment/user)"
+    },
+    "target_id": {
+      "type": "string",
+      "title": "ID \u021binint"
+    },
+    "detail": {
+      "type": "string",
+      "title": "Detaliu"
+    }
+  },
+  "required": [
+    "actor_id",
+    "action",
+    "target_type"
+  ]
+}

@@ -13,7 +13,16 @@
     },
     "price_monthly": {
       "type": "number",
-      "title": "Pre\u021b lunar"
+      "title": "Pre\u021b"
+    },
+    "transaction_type": {
+      "type": "string",
+      "enum": [
+        "RENT",
+        "SALE"
+      ],
+      "default": "RENT",
+      "title": "Tip tranzac\u021bie"
     },
     "currency": {
       "type": "string",
@@ -45,10 +54,6 @@
       "type": "string",
       "title": "Zona / Cartier"
     },
-    "landmark": {
-      "type": "string",
-      "title": "Punct de interes / Metrou"
-    },
     "property_type": {
       "type": "string",
       "enum": [
@@ -57,7 +62,9 @@
         "3 Camere",
         "4+ Camere",
         "Cas\u0103",
-        "Studio"
+        "Studio",
+        "Teren",
+        "Spa\u021biu Comercial"
       ],
       "title": "Tip proprietate"
     },
@@ -72,6 +79,14 @@
     "floor": {
       "type": "string",
       "title": "Etaj"
+    },
+    "total_floors": {
+      "type": "number",
+      "title": "Total etaje cl\u0103dire"
+    },
+    "building_year": {
+      "type": "number",
+      "title": "An construc\u021bie"
     },
     "deposit": {
       "type": "number",
@@ -91,6 +106,30 @@
       "type": "boolean",
       "default": false,
       "title": "Parcare"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Facilit\u0103\u021bi"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Telefon contact"
+    },
+    "whatsapp_phone": {
+      "type": "string",
+      "title": "WhatsApp (digital interna\u021bional)"
+    },
+    "seller_role": {
+      "type": "string",
+      "enum": [
+        "Proprietar",
+        "Agent"
+      ],
+      "default": "Proprietar",
+      "title": "Rol v\u00e2nz\u0103tor"
     },
     "available_from": {
       "type": "string",
@@ -139,6 +178,16 @@
       ],
       "default": "Activ",
       "title": "Status"
+    },
+    "approval_status": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "APPROVED",
+        "REJECTED"
+      ],
+      "default": "PENDING",
+      "title": "Aprobare anun\u021b"
     },
     "featured": {
       "type": "boolean",

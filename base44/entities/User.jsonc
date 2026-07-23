@@ -1,17 +1,38 @@
 {
+  "name": "User",
+  "type": "object",
+  "title": "User",
   "properties": {
     "role": {
       "type": "string",
-      "description": "The role of the user in the app",
       "enum": [
+        "SUPER_ADMIN",
+        "ADMIN",
+        "AGENT",
+        "PROPRIETAR",
+        "SUPPORT",
         "admin",
         "user"
-      ]
+      ],
+      "default": "user",
+      "title": "Rol"
+    },
+    "is_verified": {
+      "type": "boolean",
+      "default": false,
+      "title": "Verificat"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Telefon"
+    },
+    "whatsapp_phone": {
+      "type": "string",
+      "title": "WhatsApp"
+    },
+    "avatar_url": {
+      "type": "string",
+      "title": "Avatar URL"
     }
-  },
-  "required": [
-    "role"
-  ],
-  "name": "User",
-  "type": "object"
+  }
 }

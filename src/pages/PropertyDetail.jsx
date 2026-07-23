@@ -15,13 +15,16 @@ L.Icon.Default.mergeOptions({
 import { useCountry } from "@/components/CountryContext";
 import AITourPlayer from "@/components/AITourPlayer";
 import ShareableStoryCard from "@/components/ShareableStoryCard";
+import PhoneReveal from "@/components/PhoneReveal";
+import PropertyPOI from "@/components/PropertyPOI";
+import PropertyComments from "@/components/PropertyComments";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
-  Calendar, ShieldCheck, FileText, CheckCircle2, ChevronLeft, Send,
+  Calendar, ShieldCheck, FileText, CheckCircle2, ChevronLeft, Send, Phone,
 } from "lucide-react";
 
 const DEMO_VIDEO = "https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-modern-living-room-41558-large.mp4";
@@ -256,6 +259,21 @@ export default function PropertyDetail() {
                 <MapPreview lat={p.latitude} lng={p.longitude} title={p.title} />
               </div>
             )}
+
+            {/* POINTS OF INTEREST */}
+            <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-emerald" />
+                <h3 className="font-heading text-lg font-bold text-navy">Puncte de interes în zonă</h3>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">Generate automat pentru cartierul {p.zone}, {p.city}.</p>
+              <div className="mt-4">
+                <PropertyPOI zone={p.zone} city={p.city} />
+              </div>
+            </div>
+
+            {/* COMMENTS */}
+            <PropertyComments property={p} />
           </div>
 
           {/* RIGHT */}
@@ -268,6 +286,10 @@ export default function PropertyDetail() {
               <p className="mt-1 text-xs text-muted-foreground">{t("contact_sub")}</p>
 
               <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+                <div className="rounded-xl bg-emerald-soft/40 p-3">
+                  <p className="mb-2 flex items-center gap-1 text-xs font-bold text-emerald"><Phone className="h-3.5 w-3.5" /> Contact vânzător</p>
+                  <PhoneReveal phone={p.phone} whatsappPhone={p.whatsapp_phone} />
+                </div>
                 <input required value={form.name} onChange={(e) => handleChange("name", e.target.value)} placeholder={t("ph_name")} className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
                 <input required type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)} placeholder={t("ph_email")} className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
                 <input value={form.phone} onChange={(e) => handleChange("phone", e.target.value)} placeholder={t("ph_phone")} className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />

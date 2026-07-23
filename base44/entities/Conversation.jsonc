@@ -1,0 +1,40 @@
+{
+  "name": "Conversation",
+  "type": "object",
+  "title": "Conversation",
+  "properties": {
+    "property_id": {
+      "type": "string",
+      "title": "Property ID"
+    },
+    "property_title": {
+      "type": "string",
+      "title": "Titlu proprietate"
+    },
+    "buyer_id": {
+      "type": "string",
+      "title": "Buyer ID"
+    },
+    "buyer_name": {
+      "type": "string",
+      "title": "Nume cump\u0103r\u0103tor"
+    },
+    "seller_id": {
+      "type": "string",
+      "title": "Seller ID"
+    },
+    "seller_name": {
+      "type": "string",
+      "title": "Nume v\u00e2nz\u0103tor"
+    },
+    "last_message": {
+      "type": "string",
+      "title": "Ultimul mesaj"
+    }
+  },
+  "required": [
+    "property_id",
+    "buyer_id",
+    "seller_id"
+  ]
+}
