@@ -26,9 +26,10 @@
         "ADMIN",
         "AGENT",
         "PROPRIETAR",
-        "SUPPORT"
+        "SUPPORT",
+        "USER"
       ],
-      "default": "PROPRIETAR",
+      "default": "USER",
       "title": "Rol utilizator"
     },
     "avatar_url": {

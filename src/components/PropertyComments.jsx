@@ -13,6 +13,7 @@ const ROLE_BADGE = {
   ADMIN: { label: "Admin", cls: "bg-navy text-emerald" },
   AGENT: { label: "Agent", cls: "bg-blue-600 text-white" },
   PROPRIETAR: { label: "Proprietar", cls: "bg-emerald text-white" },
+  USER: { label: "Utilizator", cls: "bg-secondary text-foreground" },
   SUPPORT: { label: "Support", cls: "bg-secondary text-foreground" },
 };
 
@@ -40,12 +41,25 @@ export default function PropertyComments({ property }) {
   const [replyTo, setReplyTo] = useState(null);
   const [replyContent, setReplyContent] = useState("");
   const [replyPosting, setReplyPosting] = useState(false);
+  const [verifiedOwners, setVerifiedOwners] = useState(() => new Set());
 
   const load = async () => {
     try {
-      const list = await base44.entities.Comment.filter({ property_id: property.id }, "-created_date", 100);
+      const [list, approved] = await Promise.all([
+        base44.entities.Comment.filter({ property_id: property.id }, "-created_date", 100),
+        base44.entities.Property.filter({ approval_status: "APPROVED" }, "-created_date", 500),
+      ]);
       setComments(list);
+      setVerifiedOwners(new Set(approved.map((p) => p.created_by_id).filter(Boolean)));
     } catch (e) { setComments([]); }
+  };
+
+  // Rolul afișat: admin/agent/support din rolul platformei; altfel Proprietar
+  // doar dacă utilizatorul are cel puțin un anunț aprobat, altfel Utilizator.
+  const roleFor = (role, userId) => {
+    const r = (role || "USER").toUpperCase();
+    if (["SUPER_ADMIN", "ADMIN", "AGENT", "SUPPORT"].includes(r)) return r;
+    return verifiedOwners.has(userId) ? "PROPRIETAR" : "USER";
   };
   useEffect(() => { load(); }, [property.id]);
 
@@ -60,7 +74,7 @@ export default function PropertyComments({ property }) {
       await base44.entities.Comment.create({
         property_id: property.id, property_title: property.title,
         user_id: user.id, user_name: user.full_name || user.email,
-        user_role: (user.role || "PROPRIETAR").toUpperCase(),
+        user_role: roleFor(user.role, user.id),
         avatar_url: user.avatar_url || "", content: content.trim(), likes: [],
       });
       setContent(""); load(); toast({ title: "Comentariu adăugat" });
@@ -76,7 +90,7 @@ export default function PropertyComments({ property }) {
       await base44.entities.Comment.create({
         property_id: property.id, property_title: property.title,
         user_id: user.id, user_name: user.full_name || user.email,
-        user_role: (user.role || "PROPRIETAR").toUpperCase(),
+        user_role: roleFor(user.role, user.id),
         avatar_url: user.avatar_url || "", content: replyContent.trim(), parent_id: parentId, likes: [],
       });
       setReplyContent(""); setReplyTo(null); load();
@@ -106,12 +120,13 @@ export default function PropertyComments({ property }) {
   const topLevel = (comments || []).filter((c) => !c.parent_id);
   const repliesOf = (parentId) => (comments || []).filter((c) => c.parent_id === parentId);
 
-  const renderBadge = (role) => {
-    const r = (role || "PROPRIETAR").toUpperCase();
-    const badge = ROLE_BADGE[r] || ROLE_BADGE.PROPRIETAR;
+  const renderBadge = (role, userId) => {
+    const r = roleFor(role, userId);
+    const badge = ROLE_BADGE[r] || ROLE_BADGE.USER;
+    const Icon = r === "PROPRIETAR" ? BadgeCheck : ["SUPER_ADMIN", "ADMIN", "AGENT", "SUPPORT"].includes(r) ? ShieldCheck : null;
     return (
       <span className={cn("flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold", badge.cls)}>
-        {badge.label === "Proprietar" ? <BadgeCheck className="h-3 w-3" /> : <ShieldCheck className="h-3 w-3" />} {badge.label}
+        {Icon && <Icon className="h-3 w-3" />} {badge.label}
       </span>
     );
   };
@@ -127,7 +142,7 @@ export default function PropertyComments({ property }) {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-semibold text-navy dark:text-foreground">{name}</span>
-              {renderBadge(c.user_role)}
+              {renderBadge(c.user_role, c.user_id)}
               <span className="ml-auto text-[10px] text-muted-foreground">{new Date(c.created_date).toLocaleDateString("ro-RO")}</span>
             </div>
             <p className="mt-1 text-sm text-foreground/80">{c.content}</p>
