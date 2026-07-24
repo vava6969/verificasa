@@ -20,19 +20,21 @@ export default function Admin() {
   const [audit, setAudit] = useState(null);
   const [users, setUsers] = useState(null);
   const [userSearch, setUserSearch] = useState("");
+  const [inspections, setInspections] = useState(null);
 
   const isAllowed = isAuthenticated && user && ADMIN_ROLES.includes((user.role || "").toUpperCase());
   const isSuper = (user?.role || "").toUpperCase() === "SUPER_ADMIN";
 
   const load = async () => {
     try {
-      const [props, cmts, logs, usrs] = await Promise.all([
+      const [props, cmts, logs, usrs, insp] = await Promise.all([
         base44.entities.Property.list("-created_date", 100),
         base44.entities.Comment.list("-created_date", 50),
         base44.entities.AuditLog.list("-created_date", 50),
         base44.entities.User.list("-created_date", 100),
+        base44.entities.InspectionRequest.list("-created_date", 50),
       ]);
-      setProperties(props); setComments(cmts); setAudit(logs); setUsers(usrs);
+      setProperties(props); setComments(cmts); setAudit(logs); setUsers(usrs); setInspections(insp);
     } catch (e) {
       setProperties([]); setComments([]); setAudit([]); setUsers([]);
     }
@@ -138,7 +140,7 @@ export default function Admin() {
       </div>
 
       <div className="mt-6 flex flex-wrap gap-2">
-        {[["pending","În așteptare"],["all","Toate anunțurile"],["comments","Comentarii"],["users","Utilizatori"],["audit","Audit log"]].map(([k,label]) => (
+        {[["pending","În așteptare"],["all","Toate anunțurile"],["comments","Comentarii"],["users","Utilizatori"],["inspectii","Inspecții"],["audit","Audit log"]].map(([k,label]) => (
           <button key={k} onClick={() => setTab(k)} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${tab === k ? "bg-navy text-emerald" : "border border-border bg-white text-foreground/70 hover:border-emerald/50 dark:bg-card"}`}>
             {label}{k === "users" && users ? ` (${users.length})` : ""}
           </button>
@@ -146,7 +148,25 @@ export default function Admin() {
       </div>
 
       <div className="mt-6">
-        {tab === "audit" ? (
+        {tab === "inspectii" ? (
+          <div className="space-y-2">
+            {(inspections || []).length === 0 ? <p className="text-sm text-muted-foreground">Nicio solicitare de inspecție.</p> :
+              inspections.map((r) => (
+                <div key={r.id} className="rounded-xl border border-border bg-white p-4 dark:bg-card">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <p className="font-heading font-bold text-navy dark:text-foreground">{r.name} <span className="text-xs font-normal text-muted-foreground">· {r.role}</span></p>
+                      <p className="text-xs text-muted-foreground">{r.email} · {r.phone || "fără tel"}</p>
+                    </div>
+                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${r.status === "Nou" ? "bg-blue-50 text-blue-700" : r.status === "Contactat" ? "bg-mint-soft text-navy" : "bg-secondary text-muted-foreground"}`}>{r.status}</span>
+                  </div>
+                  {r.address_or_url && <p className="mt-1 text-xs text-muted-foreground">📍 {r.address_or_url}</p>}
+                  {r.package_interest && <p className="text-xs text-muted-foreground">Pachet: {r.package_interest}</p>}
+                  {r.message && <p className="mt-1 text-sm text-foreground/80">{r.message}</p>}
+                </div>
+              ))}
+          </div>
+        ) : tab === "audit" ? (
           <div className="space-y-2">
             {(audit || []).length === 0 ? <p className="text-sm text-muted-foreground">Nicio acțiune înregistrată.</p> :
               audit.map((a) => (

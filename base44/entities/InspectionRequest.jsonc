@@ -1,0 +1,56 @@
+{
+  "name": "InspectionRequest",
+  "type": "object",
+  "title": "InspectionRequest",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Nume"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "title": "Email"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Telefon"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "Proprietar",
+        "Chiria\u0219/Cump\u0103r\u0103tor",
+        "Agent"
+      ],
+      "default": "Proprietar",
+      "title": "Rol"
+    },
+    "address_or_url": {
+      "type": "string",
+      "title": "Adres\u0103 / Link anun\u021b"
+    },
+    "package_interest": {
+      "type": "string",
+      "title": "Pachet de interes"
+    },
+    "message": {
+      "type": "string",
+      "title": "Mesaj"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Nou",
+        "Contactat",
+        "\u00cenchis"
+      ],
+      "default": "Nou",
+      "title": "Status"
+    }
+  },
+  "required": [
+    "name",
+    "email"
+  ]
+}

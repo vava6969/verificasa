@@ -162,6 +162,16 @@ export default function PropertyCard({ property }) {
           )}
         </div>
 
+        {/* Facilități verificate */}
+        {(p.internet_speed_mbps || p.noise_db != null || p.light_orientation || p.water_pressure_ok) && (
+          <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
+            {p.internet_speed_mbps && <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-0.5 font-semibold text-emerald">📶 {p.internet_speed_mbps}Mbps</span>}
+            {p.noise_db != null && p.noise_db <= 45 && <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-0.5 font-semibold text-emerald">🔊 Liniștit</span>}
+            {p.light_orientation && <span className="flex items-center gap-1 rounded-full bg-gold-soft px-2 py-0.5 font-semibold text-gold-deep dark:text-gold">☀️ {p.light_orientation}</span>}
+            {p.water_pressure_ok && <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-0.5 font-semibold text-emerald">💧 Apă OK</span>}
+          </div>
+        )}
+
         {/* Price */}
         <div className="mt-3 flex items-end justify-between border-t border-border/60 pt-3">
           <div>

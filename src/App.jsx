@@ -22,6 +22,7 @@ import Settings from '@/pages/Settings';
 import Messages from '@/pages/Messages';
 import Saved from '@/pages/Saved';
 import SavedSearches from '@/pages/SavedSearches';
+import About from '@/pages/About';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 const AuthenticatedApp = () => {
@@ -57,6 +58,7 @@ const AuthenticatedApp = () => {
       <Route element={<Layout />}>
         <Route path="/" element={<Landing />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/about" element={<About />} />
         <Route path="/property/:id" element={<PropertyDetail />} />
         <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
           <Route path="/owner" element={<Owner />} />

@@ -285,6 +285,18 @@ export default function PropertyDetail() {
                 </p>
               </div>
 
+                {(p.internet_speed_mbps || p.noise_db != null || p.light_orientation || p.water_pressure_ok) && (
+                  <div className="mt-4 rounded-xl border border-border bg-secondary/40 p-4">
+                    <p className="mb-2 text-xs font-bold uppercase tracking-wide text-foreground/60">Facilități verificate</p>
+                    <div className="flex flex-wrap gap-2">
+                      {p.internet_speed_mbps && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald">📶 Internet {p.internet_speed_mbps} Mbps</span>}
+                      {p.noise_db != null && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald">🔊 Zgomot {p.noise_db} dB</span>}
+                      {p.light_orientation && <span className="flex items-center gap-1.5 rounded-full bg-gold-soft px-3 py-1 text-xs font-semibold text-gold-deep dark:text-gold">☀️ Orientare {p.light_orientation}</span>}
+                      {p.water_pressure_ok && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald">💧 Presiune apă OK</span>}
+                    </div>
+                  </div>
+                )}
+
               <h2 className="mt-6 font-heading text-lg font-bold text-navy">{t("desc_h")}</h2>
               <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{p.description}</p>
             </div>

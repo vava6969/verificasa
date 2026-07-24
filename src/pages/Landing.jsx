@@ -5,6 +5,9 @@ import { useCountry } from "@/components/CountryContext";
 import SearchBar from "@/components/SearchBar";
 import PropertyCard from "@/components/PropertyCard";
 import HeroPhoto from "@/components/HeroPhoto";
+import LaunchCountdown from "@/components/LaunchCountdown";
+import InspectieModal from "@/components/InspectieModal";
+import ListeazaPopup from "@/components/ListeazaPopup";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -15,18 +18,18 @@ import {
 const VALUE_PROPS = [
   {
     icon: Video,
-    title: "Tururi AI & Video",
-    desc: "Explorează proprietatea realist din telefon — tururi video ghidate generate din poze, cameră cu cameră.",
+    title: "Tur Interactiv AI 360°",
+    desc: "Explorează proprietatea ca și cum ai fi acolo. Te plimbi virtual prin fiecare colț al apartamentului direct din telefon sau laptop, economisind timp prețios.",
   },
   {
     icon: ShieldCheck,
-    title: "Verificare pe Teren",
-    desc: "Un agent VerifiCasa inspectează fizic locul. Primești un raport cu zgomot (dB), orientare, presiune apă, acte.",
+    title: "Verificare Fizică pe Teren",
+    desc: "Agentul VerifiCasa inspectează personal proprietatea. Primești un raport clar despre stare, zgomot, presiunea apei și acte, pentru transparență 100%.",
   },
   {
     icon: Lock,
-    title: "Garanții Protejate & Comisioane Corecte",
-    desc: "Garanția VerifiCasa (fără depozit mare) și comision corect pentru chiriași pe proprietățile selectate.",
+    title: "Comisioane Corecte & Siguranță",
+    desc: "Fără taxe ascunse sau garanții exagerate. Oferim condiții transparente și un pachet avantajos atât pentru vânzare, cât și pentru închiriere.",
   },
 ];
 
@@ -39,6 +42,8 @@ const COMFORT_CHIPS = [
 export default function Landing() {
   const { country } = useCountry();
   const [properties, setProperties] = useState(null);
+  const [showInspectie, setShowInspectie] = useState(false);
+  const [showListeaza, setShowListeaza] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -92,6 +97,9 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* COUNTDOWN BANNER */}
+      <LaunchCountdown />
+
       {/* VALUE PROPOSITION BAR */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-5 md:grid-cols-3">
@@ -142,21 +150,24 @@ export default function Landing() {
           <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-emerald/20 blur-2xl" />
           <div className="relative max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-white/10 px-3 py-1 text-xs font-semibold text-gold">
-              <ShieldCheck className="h-3.5 w-3.5" /> Inspecție pe teren
+              <ShieldCheck className="h-3.5 w-3.5" /> Pentru Proprietari
             </span>
-            <h2 className="mt-4 font-heading text-3xl font-bold leading-tight">Solicită o Inspecție VerifiCasa</h2>
+            <h2 className="mt-4 font-heading text-3xl font-bold leading-tight">Ești proprietar? Închiriază sau vinde fără bătăi de cap!</h2>
             <p className="mt-3 text-white/75">
-              Proprietar sau viitor chiriaș? Trimite link-ul unui anunț (ORLX, Storia, etc.) și un agent
-              VerifiCasa inspectează fizic locația — raport descărcabil cu zgomot, orientare, presiune apă și verificare acte.
+              Noi ne ocupăm de verificarea pe teren, turul virtual 360° și selectarea clienților potriviți, astfel încât tu să nu pierzi timp cu vizionări inutile.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button asChild className="gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
-                <Link to="/owner"><ShieldCheck className="h-4 w-4" /> Solicită Inspecție</Link>
+              <Button onClick={() => setShowInspectie(true)} className="gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
+                <ShieldCheck className="h-4 w-4" /> Solicită Inspecție
               </Button>
-              <Button asChild variant="outline" className="gap-1.5 rounded-full border-white/30 bg-white/5 text-white hover:bg-white/10">
-                <Link to="/owner"><FileText className="h-4 w-4" /> Listează proprietate</Link>
+              <Button onClick={() => setShowListeaza(true)} variant="outline" className="gap-1.5 rounded-full border-white/30 bg-white/5 text-white hover:bg-white/10">
+                <FileText className="h-4 w-4" /> Listează proprietate
               </Button>
             </div>
+
+            <p className="mt-5 text-xs text-white/55">
+              Detaliile legate de pachete, comisioane și contracte se discută direct cu agenții noștri VerifiCasa pe WhatsApp sau Email.
+            </p>
 
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
@@ -173,6 +184,9 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      <InspectieModal open={showInspectie} onClose={() => setShowInspectie(false)} />
+      <ListeazaPopup open={showListeaza} onClose={() => setShowListeaza(false)} />
     </div>
   );
 }

@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Camera, Sparkles, Eye, MessageSquare, FileText, TrendingUp, Upload, Plus, Download,
+  Camera, Sparkles, Eye, MessageSquare, FileText, TrendingUp, Upload, Plus, Download, Wifi, Volume2, Sun, Droplet,
 } from "lucide-react";
 
 export default function Owner() {
@@ -39,9 +39,8 @@ export default function Owner() {
 
   const STAT_CARDS = [
     { icon: FileText, label: t("s_active"), value: properties?.length ?? "—" },
-    { icon: Eye, label: t("s_views"), value: totalViews },
+    { icon: Eye, label: "Total Vizionări Anunțuri", value: totalViews },
     { icon: MessageSquare, label: t("s_inq"), value: inquiries.length },
-    { icon: TrendingUp, label: t("s_mon"), value: country === "UK" ? "Landlord" : "30-50%" },
   ];
 
   return (
@@ -57,7 +56,7 @@ export default function Owner() {
           </Button>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-3">
           {STAT_CARDS.map((s, i) => (
             <div key={i} className="rounded-2xl border border-border bg-white p-5 shadow-soft">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-mint-soft">
@@ -148,8 +147,16 @@ function NewPropertyForm({ onDone }) {
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [chips, setChips] = useState({ wifi: false, noise: false, light: false, water: false });
 
   const zones = useMemo(() => getZones(country, form.city), [country, form.city]);
+
+  const CHIP_OPTS = [
+    { key: "wifi", icon: Wifi, emoji: "📶", label: "Internet / Wi-Fi" },
+    { key: "noise", icon: Volume2, emoji: "🔊", label: "Zonă liniștită" },
+    { key: "light", icon: Sun, emoji: "☀️", label: "Orientare / Luminozitate" },
+    { key: "water", icon: Droplet, emoji: "💧", label: "Presiune apă / Utilități verificate" },
+  ];
 
   const handleFile = async (e) => {
     const files = Array.from(e.target.files || []);
@@ -213,6 +220,16 @@ function NewPropertyForm({ onDone }) {
         status: "Activ",
         featured: true,
         views_count: 0,
+        internet_speed_mbps: chips.wifi ? 100 : null,
+        noise_db: chips.noise ? 35 : null,
+        light_orientation: chips.light ? "Sud" : "",
+        water_pressure_ok: chips.water,
+        features: [
+          ...(chips.wifi ? ["📶 Internet / Wi-Fi"] : []),
+          ...(chips.noise ? ["🔊 Zonă liniștită"] : []),
+          ...(chips.light ? ["☀️ Orientare Sud"] : []),
+          ...(chips.water ? ["💧 Presiune apă OK"] : []),
+        ],
       });
       toast({ title: t("created_title"), description: t("created_desc") });
       onDone();
@@ -231,9 +248,9 @@ function NewPropertyForm({ onDone }) {
     <form onSubmit={handleSubmit} className="mt-6 rounded-2xl border border-border bg-white p-6 shadow-soft">
       <div className="flex items-center gap-2">
         <Camera className="h-5 w-5 text-mint" />
-        <h3 className="font-heading text-lg font-bold text-navy">{t("new_prop_h")}</h3>
+        <h3 className="font-heading text-lg font-bold text-navy">Publică anunțul tău pe VerifiCasa</h3>
       </div>
-      <p className="mt-1 text-xs text-muted-foreground">{t("new_prop_d")}</p>
+      <p className="mt-1 text-sm text-muted-foreground">Încarcă fotografiile proprietății tale, iar noi te vom contacta pentru a-ți propune pachetul ideal de promovare și realizarea turului interactiv 360°.</p>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder={t("f_title")} className={inputCls} />
@@ -271,6 +288,23 @@ function NewPropertyForm({ onDone }) {
       </div>
 
       <textarea value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder={t("f_desc")} rows={3} className={`mt-3 ${inputCls}`} />
+
+      {/* Facilități verificate */}
+      <div className="mt-3">
+        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-foreground/60">Facilități verificate (apă în preview și în pagina anunțului)</p>
+        <div className="flex flex-wrap gap-2">
+          {CHIP_OPTS.map((c) => (
+            <button
+              type="button"
+              key={c.key}
+              onClick={() => setChips((s) => ({ ...s, [c.key]: !s[c.key] }))}
+              className={`flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-semibold transition ${chips[c.key] ? "border-emerald bg-emerald text-white shadow-soft" : "border-border bg-white text-foreground/70 hover:border-emerald/50 dark:bg-card"}`}
+            >
+              <span>{c.emoji}</span> {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="mt-3">
         <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-secondary/20 px-4 py-6 text-sm text-muted-foreground transition hover:border-mint hover:text-navy">

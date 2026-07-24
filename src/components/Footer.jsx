@@ -3,10 +3,7 @@ import { Mail, Phone, MapPin, ShieldCheck, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import VerifiCasaLogo from "@/components/VerifiCasaLogo";
 
-const COVERAGE = [
-  "București", "Cluj-Napoca", "Timișoara", "Iași", "Brașov",
-  "Constanța", "Sibiu", "Oradea", "Craiova", "Iași",
-];
+const COVERAGE_TEXT = "Acoperire în Iași și Huși. Planificăm să ne extindem în toată România!";
 
 export default function Footer() {
   return (
@@ -28,10 +25,10 @@ export default function Footer() {
             <h4 className="font-heading text-sm font-semibold uppercase tracking-wider text-gold">Platformă</h4>
             <ul className="mt-4 space-y-2.5 text-sm text-white/60">
               <li><Link to="/search" className="hover:text-emerald">Caută chirii</Link></li>
+              <li><Link to="/about" className="hover:text-emerald">Despre Noi</Link></li>
               <li><Link to="/search?ai=1" className="hover:text-emerald">Tururi AI & Video</Link></li>
               <li><Link to="/search?field=1" className="hover:text-emerald">Verificat pe Teren</Link></li>
               <li><Link to="/owner" className="hover:text-emerald">Pentru Proprietari</Link></li>
-              <li><Link to="/owner" className="hover:text-emerald">Solicită o Inspecție</Link></li>
             </ul>
           </div>
 
@@ -52,8 +49,8 @@ export default function Footer() {
               <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-emerald" /> +40 21 123 4567</li>
               <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-emerald" /> București, România 🇷🇴</li>
             </ul>
-            <p className="mt-4 flex items-center gap-2 text-xs text-white/40">
-              <FileText className="h-3.5 w-3.5" /> Acoperire: {COVERAGE.join(" · ")}
+            <p className="mt-4 flex items-start gap-2 text-xs font-semibold text-white/70">
+              <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald" /> {COVERAGE_TEXT}
             </p>
           </div>
         </div>
