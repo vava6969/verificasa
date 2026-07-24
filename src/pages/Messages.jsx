@@ -30,6 +30,14 @@ export default function Messages() {
     loadConversations();
   }, [isAuthenticated, user?.id]);
 
+  // Reîmprospătează lista de conversații în timp real (mesaj nou sau conversație nouă)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const unsubM = base44.entities.Message.subscribe(() => loadConversations());
+    const unsubC = base44.entities.Conversation.subscribe(() => loadConversations());
+    return () => { unsubM && unsubM(); unsubC && unsubC(); };
+  }, [isAuthenticated, user?.id]);
+
   const active = (conversations || []).find((c) => c.id === selectedId) || null;
 
   useEffect(() => {
@@ -92,7 +100,7 @@ export default function Messages() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         {/* List */}
-        <div className="lg:col-span-1">
+        <div className={`lg:col-span-1 ${selectedId ? "hidden lg:block" : ""}`}>
           <div className="rounded-2xl border border-border bg-white p-2 shadow-soft">
             {conversations === null ? (
               <div className="space-y-2 p-2"><Skeleton className="h-14 w-full rounded-xl" /><Skeleton className="h-14 w-full rounded-xl" /></div>
@@ -113,7 +121,7 @@ export default function Messages() {
         </div>
 
         {/* Thread */}
-        <div className="lg:col-span-2">
+        <div className={`lg:col-span-2 ${selectedId ? "" : "hidden lg:block"}`}>
           <div className="flex h-[70vh] flex-col rounded-2xl border border-border bg-white shadow-soft">
             {!active ? (
               <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
@@ -124,6 +132,9 @@ export default function Messages() {
             ) : (
               <>
                 <div className="border-b border-border p-4">
+                  <button onClick={() => setParams({})} className="mb-2 flex items-center gap-1 text-xs text-muted-foreground hover:text-navy lg:hidden">
+                    <ArrowLeft className="h-3.5 w-3.5" /> Înapoi la conversații
+                  </button>
                   <Link to={`/property/${active.property_id}`} className="font-heading text-base font-bold text-navy hover:text-emerald">
                     {active.property_title || "Proprietate"}
                   </Link>
