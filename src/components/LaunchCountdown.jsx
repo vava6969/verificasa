@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Rocket } from "lucide-react";
+import { useCountry } from "@/components/CountryContext";
 
 const TARGET = new Date("2026-08-28T10:00:00");
 
@@ -16,9 +17,10 @@ function diff() {
 }
 
 export default function LaunchCountdown() {
-  const [t, setT] = useState(diff());
+  const { t } = useCountry();
+  const [time, setTime] = useState(diff());
   useEffect(() => {
-    const id = setInterval(() => setT(diff()), 1000);
+    const id = setInterval(() => setTime(diff()), 1000);
     return () => clearInterval(id);
   }, []);
 
@@ -38,18 +40,18 @@ export default function LaunchCountdown() {
         <div className="relative flex flex-col items-center gap-6 text-center lg:flex-row lg:justify-between lg:text-left">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-emerald px-3 py-1 text-xs font-bold text-white shadow-soft">
-              <Rocket className="h-3.5 w-3.5" /> Lansare Beta
+              <Rocket className="h-3.5 w-3.5" /> {t("countdown_badge")}
             </span>
-            <h2 className="mt-3 font-heading text-2xl font-extrabold text-navy dark:text-foreground sm:text-3xl">Pornim oficial pe 28 August 2026, ora 10:00</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Adevărate închirieri verificate, fără surprize.</p>
+            <h2 className="mt-3 font-heading text-2xl font-extrabold text-navy dark:text-foreground sm:text-3xl">{t("countdown_h")}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t("countdown_d")}</p>
           </div>
 
           <div className="flex items-center gap-3 sm:gap-4">
-            {unit(t.days, "Zile")}
+            {unit(time.days, t("countdown_days"))}
             <span className="font-heading text-2xl font-bold text-emerald sm:text-3xl">:</span>
-            {unit(t.hours, "Ore")}
+            {unit(time.hours, t("countdown_hours"))}
             <span className="font-heading text-2xl font-bold text-emerald sm:text-3xl">:</span>
-            {unit(t.mins, "Minute")}
+            {unit(time.mins, t("countdown_mins"))}
           </div>
 
           <Link
@@ -57,7 +59,7 @@ export default function LaunchCountdown() {
             className="group relative inline-flex items-center gap-2 rounded-full gradient-emerald px-6 py-3 font-bold text-white shadow-glow transition animate-bounce hover:scale-105"
           >
             <span className="absolute inset-0 rounded-full bg-emerald blur-md opacity-60 group-hover:opacity-90 transition" />
-            <span className="relative">Află mai multe</span>
+            <span className="relative">{t("countdown_btn")}</span>
           </Link>
         </div>
       </div>

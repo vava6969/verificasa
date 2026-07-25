@@ -13,7 +13,7 @@ import { Image } from "@/components/ui/image";
 
 // Premium listing card inspired by Storia/OLX.
 export default function PropertyCard({ property }) {
-  const { currency, formatPrice, t } = useCountry();
+  const { currency, formatPrice, t, lang } = useCountry();
   const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -25,6 +25,7 @@ export default function PropertyCard({ property }) {
   const isVideo = p.verification_level === "video_ai" || !!p.ai_video_url;
   const seller = p.seller_role || (p.owner_verified ? "Proprietar" : "Agent");
   const isProprietar = seller === "Proprietar";
+  const sellerLabel = isProprietar ? t("pc_seller_landlord") : t("pc_seller_agent");
 
   const eur = formatPrice(p.price_monthly, p.currency, "EUR");
   const ron = formatPrice(p.price_monthly, p.currency, "RON");
@@ -32,9 +33,9 @@ export default function PropertyCard({ property }) {
   const secondary = currency === "EUR" ? ron : eur;
 
   const FAIRNESS = {
-    sub_piata: { label: "Sub preț", cls: "bg-emerald-soft text-emerald", icon: TrendingDown },
-    corect: { label: "Preț corect", cls: "bg-gold-soft text-gold-deep", icon: BadgePercent },
-    peste_medie: { label: "Peste medie", cls: "bg-destructive/10 text-destructive", icon: TrendingUp },
+    sub_piata: { labelKey: "pc_price_below", cls: "bg-emerald-soft text-emerald", icon: TrendingDown },
+    corect: { labelKey: "pc_price_fair", cls: "bg-gold-soft text-gold-deep", icon: BadgePercent },
+    peste_medie: { labelKey: "pc_price_above", cls: "bg-destructive/10 text-destructive", icon: TrendingUp },
   };
   const fairness = p.price_fairness ? FAIRNESS[p.price_fairness] : null;
 
@@ -52,13 +53,14 @@ export default function PropertyCard({ property }) {
       const conv = await startConversation(user, p);
       navigate(`/messages?c=${conv.id}`);
     } catch (err) {
-      toast({ title: "Eroare la mesaj", variant: "destructive" });
+      toast({ title: t("pc_err_msg"), variant: "destructive" });
     }
   };
 
   const waPhone = (p.whatsapp_phone || p.phone || "").replace(/\D/g, "");
   const callPhone = (p.phone || "").replace(/\D/g, "");
   const hasPhone = !!callPhone && callPhone.length >= 6;
+  const dateLocale = lang === "en" ? "en-GB" : "ro-RO";
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-glow dark:bg-card">
@@ -81,10 +83,10 @@ export default function PropertyCard({ property }) {
         {/* Slider controls */}
         {images.length > 1 && (
           <>
-            <button onClick={(e) => go(e, -1)} className="absolute left-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-slate-800 shadow-soft backdrop-blur transition hover:bg-white" aria-label="Anterior">
+            <button onClick={(e) => go(e, -1)} className="absolute left-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-slate-800 shadow-soft backdrop-blur transition hover:bg-white" aria-label={t("pc_prev")}>
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <button onClick={(e) => go(e, 1)} className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-slate-800 shadow-soft backdrop-blur transition hover:bg-white" aria-label="Următor">
+            <button onClick={(e) => go(e, 1)} className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-slate-800 shadow-soft backdrop-blur transition hover:bg-white" aria-label={t("pc_next")}>
               <ChevronRight className="h-4 w-4" />
             </button>
             <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1">
@@ -99,17 +101,17 @@ export default function PropertyCard({ property }) {
         <div className="absolute left-3 top-3 flex flex-col gap-1.5">
           {isVerified && (
             <span className="flex items-center gap-1 rounded-full bg-emerald px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
-              <ShieldCheck className="h-3.5 w-3.5" /> Verificat
+              <ShieldCheck className="h-3.5 w-3.5" /> {t("pc_verified")}
             </span>
           )}
           {p.commission_free && (
             <span className="flex items-center gap-1 rounded-full bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
-              <BadgePercent className="h-3 w-3" /> Comision 0%
+              <BadgePercent className="h-3 w-3" /> {t("pc_com0")}
             </span>
           )}
           {p.pet_friendly && (
             <span className="flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold text-slate-800 backdrop-blur">
-              <PawPrint className="h-3 w-3" /> Pet Friendly
+              <PawPrint className="h-3 w-3" /> {t("pc_pet_btn")}
             </span>
           )}
         </div>
@@ -117,9 +119,9 @@ export default function PropertyCard({ property }) {
         {/* Favorite */}
         <button
           type="button"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); toast({ title: isAuthenticated ? "Salvează din pagina anunțului" : "Conectează-te pentru a salva" }); toDetail(); }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); toast({ title: isAuthenticated ? t("pc_save_hint") : t("pc_save_auth") }); toDetail(); }}
           className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-soft backdrop-blur transition hover:text-rose-500"
-          aria-label="Salvează"
+          aria-label={t("pc_save_label")}
         >
           <Heart className="h-4 w-4" />
         </button>
@@ -127,12 +129,12 @@ export default function PropertyCard({ property }) {
         {/* Seller role badge + date */}
         <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
           <span className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold text-white shadow-soft ${isProprietar ? "bg-emerald" : "bg-blue-600"}`}>
-            <Building2 className="h-3 w-3" /> {seller}
+            <Building2 className="h-3 w-3" /> {sellerLabel}
           </span>
         </div>
         {p.created_date && (
           <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-white/85 px-2 py-0.5 text-[10px] font-semibold text-slate-700 backdrop-blur">
-            <Calendar className="h-3 w-3" /> {new Date(p.created_date).toLocaleDateString("ro-RO")}
+            <Calendar className="h-3 w-3" /> {new Date(p.created_date).toLocaleDateString(dateLocale)}
           </span>
         )}
       </div>
@@ -148,7 +150,7 @@ export default function PropertyCard({ property }) {
         <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-foreground/70">
           {p.rooms != null && <span className="flex items-center gap-1"><BedDouble className="h-3.5 w-3.5 text-emerald" /> {p.rooms} {t("sep_rooms")}</span>}
           {p.surface_sqm != null && <span className="flex items-center gap-1"><Maximize className="h-3.5 w-3.5 text-emerald" /> {p.surface_sqm} mp</span>}
-          {p.floor && <span className="flex items-center gap-1"><Building2 className="h-3.5 w-3.5 text-emerald" /> Etaj {p.floor}</span>}
+          {p.floor && <span className="flex items-center gap-1"><Building2 className="h-3.5 w-3.5 text-emerald" /> {t("pc_floor")} {p.floor}</span>}
           {p.building_year && <span className="flex items-center gap-1 text-foreground/60"><Calendar className="h-3.5 w-3.5" /> {p.building_year}</span>}
         </div>
 
@@ -158,7 +160,7 @@ export default function PropertyCard({ property }) {
           {hasPhone ? (
             <a href={`tel:${callPhone}`} onClick={(e) => e.stopPropagation()} className="font-semibold text-navy hover:text-emerald dark:text-foreground">{p.phone}</a>
           ) : (
-            <span className="flex items-center gap-1 italic text-muted-foreground"><PhoneOff className="h-3 w-3" /> Fără telefon</span>
+            <span className="flex items-center gap-1 italic text-muted-foreground"><PhoneOff className="h-3 w-3" /> {t("pc_no_phone")}</span>
           )}
         </div>
 
@@ -166,20 +168,20 @@ export default function PropertyCard({ property }) {
         {(p.internet_speed_mbps || p.noise_db != null || p.light_orientation || p.water_pressure_ok) && (
           <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
             {p.internet_speed_mbps && <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-0.5 font-semibold text-emerald">📶 {p.internet_speed_mbps}Mbps</span>}
-            {p.noise_db != null && p.noise_db <= 45 && <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-0.5 font-semibold text-emerald">🔊 Liniștit</span>}
+            {p.noise_db != null && p.noise_db <= 45 && <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-0.5 font-semibold text-emerald">🔊 {t("pc_quiet")}</span>}
             {p.light_orientation && <span className="flex items-center gap-1 rounded-full bg-gold-soft px-2 py-0.5 font-semibold text-gold-deep dark:text-gold">☀️ {p.light_orientation}</span>}
-            {p.water_pressure_ok && <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-0.5 font-semibold text-emerald">💧 Apă OK</span>}
+            {p.water_pressure_ok && <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-0.5 font-semibold text-emerald">💧 {t("pc_water_ok")}</span>}
           </div>
         )}
 
         {/* Price */}
         <div className="mt-3 flex items-end justify-between border-t border-border/60 pt-3">
           <div>
-            <p className="font-heading text-xl font-bold text-navy dark:text-foreground">{primary}<span className="text-xs font-medium text-muted-foreground">/{p.transaction_type === "SALE" ? "" : "lună"}</span></p>
+            <p className="font-heading text-xl font-bold text-navy dark:text-foreground">{primary}<span className="text-xs font-medium text-muted-foreground">{p.transaction_type === "SALE" ? "" : t("pc_permonth")}</span></p>
             <p className="text-[11px] text-muted-foreground">≈ {secondary}</p>
             {fairness && (
               <span className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${fairness.cls}`}>
-                <fairness.icon className="h-3 w-3" /> {fairness.label}
+                <fairness.icon className="h-3 w-3" /> {t(fairness.labelKey)}
               </span>
             )}
           </div>
@@ -190,21 +192,21 @@ export default function PropertyCard({ property }) {
       {/* Contact buttons */}
       <div className="grid grid-cols-3 gap-1.5 px-4 pb-4">
         {waPhone && (
-          <a href={`https://wa.me/${waPhone}?text=${encodeURIComponent(`Bună, sunt interesat de anunțul "${p.title}" pe VerifiCasa.`)}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="flex items-center justify-center gap-1 rounded-xl bg-emerald px-2 py-2 text-xs font-bold text-white transition hover:opacity-90">
+          <a href={`https://wa.me/${waPhone}?text=${encodeURIComponent(t("pc_wa_msg", { title: p.title }))}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="flex items-center justify-center gap-1 rounded-xl bg-emerald px-2 py-2 text-xs font-bold text-white transition hover:opacity-90">
             WhatsApp
           </a>
         )}
         {hasPhone ? (
           <a href={`tel:${callPhone}`} onClick={(e) => e.stopPropagation()} className="flex items-center justify-center gap-1 rounded-xl border border-emerald/40 px-2 py-2 text-xs font-bold text-emerald transition hover:bg-emerald-soft">
-            <Phone className="h-3.5 w-3.5" /> Sună
+            <Phone className="h-3.5 w-3.5" /> {t("pc_call")}
           </a>
         ) : (
           <span className="flex items-center justify-center gap-1 rounded-xl border border-border px-2 py-2 text-xs font-bold text-muted-foreground">
-            <PhoneOff className="h-3.5 w-3.5" /> Sună
+            <PhoneOff className="h-3.5 w-3.5" /> {t("pc_call")}
           </span>
         )}
         <button onClick={handleMessage} className="flex items-center justify-center gap-1 rounded-xl bg-navy px-2 py-2 text-xs font-bold text-emerald transition hover:opacity-90">
-          <MessageCircle className="h-3.5 w-3.5" /> Mesaj
+          <MessageCircle className="h-3.5 w-3.5" /> {t("pc_message")}
         </button>
       </div>
     </div>
