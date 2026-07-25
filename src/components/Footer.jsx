@@ -3,6 +3,7 @@ import { Mail, Phone, MapPin, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCountry } from "@/components/CountryContext";
 import VerifiCasaLogo from "@/components/VerifiCasaLogo";
+import LegalBadges from "@/components/LegalBadges";
 
 export default function Footer() {
   const { t } = useCountry();
@@ -37,6 +38,7 @@ export default function Footer() {
               <li className="flex items-start gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald" />{t("footer_privacy")}</li>
               <li className="flex items-start gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald" />{t("footer_guarantee")}</li>
             </ul>
+            <LegalBadges />
           </div>
 
           <div>
