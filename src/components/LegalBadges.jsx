@@ -1,25 +1,24 @@
 import React from "react";
 import { ExternalLink } from "lucide-react";
-import { Image } from "@/components/ui/image";
 
 /**
  * Legal compliance badges for the footer (ANPC SAL + EU ODR).
- * Small, transparent-looking clickable images that blend with the dark navy footer.
+ * Small, transparent, clickable cards that blend with the dark navy footer.
  */
-const badges = [
-  {
-    href: "https://anpc.ro/ce-este-sal/",
-    src: "https://media.base44.com/images/public/6a5ef7d63008cd71560dfe14/3c60c8818_image.png",
-    alt: "ANPC · Soluționarea alternativă a litigiilor",
-  },
-  {
-    href: "https://consumer-redress.ec.europa.eu/site-relocation_en",
-    src: "https://media.base44.com/images/public/6a5ef7d63008cd71560dfe14/73106bd1d_image.png",
-    alt: "Soluționarea online a litigiilor (ODR · UE)",
-  },
-];
-
 export default function LegalBadges() {
+  const badges = [
+    {
+      href: "https://anpc.ro/ce-este-sal/",
+      tag: "ANPC",
+      line: "Soluționarea alternativă a litigiilor",
+    },
+    {
+      href: "https://consumer-redress.ec.europa.eu/site-relocation_en",
+      tag: "ODR · UE",
+      line: "Soluționarea online a litigiilor",
+    },
+  ];
+
   return (
     <div className="mt-5 space-y-2.5">
       {badges.map((b) => (
@@ -28,15 +27,19 @@ export default function LegalBadges() {
           href={b.href}
           target="_blank"
           rel="noopener noreferrer"
-          title={b.alt}
-          className="group block w-44 overflow-hidden rounded-lg border border-white/15 bg-white/95 opacity-90 transition hover:opacity-100 hover:border-emerald/60 hover:shadow-soft"
+          className="group flex items-center justify-between gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-left transition hover:border-emerald/60 hover:bg-white/10"
         >
-          <Image
-            src={b.src}
-            alt={b.alt}
-            fittingType="fit"
-            className="w-full"
-          />
+          <span className="flex flex-col leading-tight">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gold">
+              {b.tag}
+            </span>
+            <span className="text-[11px] font-semibold text-white/75">
+              {b.line}
+            </span>
+          </span>
+          <span className="flex shrink-0 items-center gap-1 rounded-full bg-emerald/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white transition group-hover:bg-emerald">
+            Detalii <ExternalLink className="h-3 w-3" />
+          </span>
         </a>
       ))}
     </div>
