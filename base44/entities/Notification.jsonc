@@ -1,0 +1,46 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "title": "Notification",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "title": "Recipient user ID"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "comment",
+        "reply",
+        "like",
+        "message",
+        "property",
+        "system"
+      ],
+      "default": "system",
+      "title": "Tip notificare"
+    },
+    "text": {
+      "type": "string",
+      "title": "Text"
+    },
+    "link": {
+      "type": "string",
+      "title": "Link"
+    },
+    "actor_name": {
+      "type": "string",
+      "title": "Autor"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false,
+      "title": "Citit"
+    }
+  },
+  "required": [
+    "user_id",
+    "type",
+    "text"
+  ]
+}

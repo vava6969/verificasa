@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
+import { createNotification } from "@/lib/notifications";
 import { MessageSquare, ShieldCheck, BadgeCheck, Lock, Heart, Reply, Send, Trash2 } from "lucide-react";
 
 const ROLE_BADGE = {
@@ -63,6 +64,13 @@ export default function PropertyComments({ property }) {
   };
   useEffect(() => { load(); }, [property.id]);
 
+  // Reîmprospătare în timp real: când oricine adaugă/editează/șterge un comentariu,
+  // lista se reîncarcă automat (fără refresh), atât pentru cel care scrie, cât și pentru cel care citește.
+  useEffect(() => {
+    const unsub = base44.entities.Comment.subscribe(() => load());
+    return () => { try { unsub && unsub(); } catch { /* noop */ } };
+  }, [property.id]);
+
   const canPost = isAuthenticated && user?.is_verified;
 
   const submitComment = async (e) => {
@@ -77,6 +85,16 @@ export default function PropertyComments({ property }) {
         user_role: roleFor(user.role, user.id),
         avatar_url: user.avatar_url || "", content: content.trim(), likes: [],
       });
+      const actor = user.full_name || user.email;
+      if (property.created_by_id && property.created_by_id !== user.id) {
+        createNotification({
+          userId: property.created_by_id,
+          type: "comment",
+          text: `${actor} a comentat la anunțul „${property.title}".`,
+          link: `/property/${property.id}`,
+          actorName: actor,
+        });
+      }
       setContent(""); load(); toast({ title: "Comentariu adăugat" });
     } catch (err) { toast({ title: "Eroare la comentariu", variant: "destructive" }); }
     finally { setPosting(false); }
@@ -93,6 +111,25 @@ export default function PropertyComments({ property }) {
         user_role: roleFor(user.role, user.id),
         avatar_url: user.avatar_url || "", content: replyContent.trim(), parent_id: parentId, likes: [],
       });
+      const actor = user.full_name || user.email;
+      const parent = (comments || []).find((x) => x.id === parentId);
+      if (parent && parent.user_id && parent.user_id !== user.id) {
+        createNotification({
+          userId: parent.user_id,
+          type: "reply",
+          text: `${actor} a răspuns comentariului tău la „${property.title}".`,
+          link: `/property/${property.id}`,
+          actorName: actor,
+        });
+      } else if (property.created_by_id && property.created_by_id !== user.id) {
+        createNotification({
+          userId: property.created_by_id,
+          type: "reply",
+          text: `${actor} a răspuns la un comentariu la „${property.title}".`,
+          link: `/property/${property.id}`,
+          actorName: actor,
+        });
+      }
       setReplyContent(""); setReplyTo(null); load();
     } catch (err) { toast({ title: "Eroare la răspuns", variant: "destructive" }); }
     finally { setReplyPosting(false); }
@@ -104,7 +141,18 @@ export default function PropertyComments({ property }) {
     const has = likes.includes(user.id);
     const next = has ? likes.filter((id) => id !== user.id) : [...likes, user.id];
     setComments((cs) => (cs || []).map((x) => (x.id === c.id ? { ...x, likes: next } : x)));
-    try { await base44.entities.Comment.update(c.id, { likes: next }); }
+    try {
+      await base44.entities.Comment.update(c.id, { likes: next });
+      if (!has && c.user_id && c.user_id !== user.id) {
+        createNotification({
+          userId: c.user_id,
+          type: "like",
+          text: `${user.full_name || user.email} a apreciat comentariul tău la „${property.title}".`,
+          link: `/property/${property.id}`,
+          actorName: user.full_name || user.email,
+        });
+      }
+    }
     catch (e) { setComments((cs) => (cs || []).map((x) => (x.id === c.id ? { ...x, likes } : x))); toast({ title: "Eroare la like", variant: "destructive" }); }
   };
 

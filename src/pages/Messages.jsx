@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useSearchParams, Link, Navigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import { createNotification } from "@/lib/notifications";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -74,6 +75,16 @@ export default function Messages() {
         content: text.trim(),
       });
       await base44.entities.Conversation.update(active.id, { last_message: text.trim() });
+      const recipient = active.buyer_id === user.id ? active.seller_id : active.buyer_id;
+      if (recipient && recipient !== user.id) {
+        createNotification({
+          userId: recipient,
+          type: "message",
+          text: `Ai un mesaj nou de la ${user.full_name || user.email}.`,
+          link: `/messages?c=${active.id}`,
+          actorName: user.full_name || user.email,
+        });
+      }
       setText("");
       setMessages((m) => [...(m || []), { id: "tmp" + Date.now(), sender_id: user.id, sender_name: user.full_name, content: text.trim(), created_date: new Date().toISOString() }]);
       loadConversations();

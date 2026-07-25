@@ -7,7 +7,7 @@ import PropertyCard from "@/components/PropertyCard";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, SlidersHorizontal, ArrowDownUp, BookmarkPlus } from "lucide-react";
+import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, SlidersHorizontal, ArrowDownUp, BookmarkPlus, RefreshCw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // VerifiCasa verification filters — each applies a real-property predicate.
@@ -55,9 +55,23 @@ export default function SearchPage() {
   const typeParam = params.get("type");
 
   const cities = useMemo(() => getCities(country), [country]);
-  const [cityFilter, setCityFilter] = useState(cityParam || "");
+  const cityFilter = cityParam || "";
   const zones = useMemo(() => getZones(country, cityFilter), [country, cityFilter]);
-  const [zoneFilter, setZoneFilter] = useState(zoneParam || "");
+  const zoneFilter = zoneParam || "";
+
+  // Selectorii de oraș/zonă actualizează direct URL-ul, deci rezultatele se
+  // re-filtrează instant, în timp real — fără refresh. Plus buton de recautare.
+  const updateCity = (val) => setParams((prev) => {
+    const next = new URLSearchParams(prev);
+    if (val) next.set("city", val); else next.delete("city");
+    next.delete("zone");
+    return next;
+  }, { replace: true });
+  const updateZone = (val) => setParams((prev) => {
+    const next = new URLSearchParams(prev);
+    if (val) next.set("zone", val); else next.delete("zone");
+    return next;
+  }, { replace: true });
 
   const [activeFilters, setActiveFilters] = useState(() => {
     const s = new Set();
@@ -65,11 +79,24 @@ export default function SearchPage() {
     return s;
   });
 
+  const [refreshing, setRefreshing] = useState(false);
+  const fetchProperties = async () => {
+    setRefreshing(true);
+    try {
+      const all = await base44.entities.Property.list("-created_date", 200);
+      setProperties(all);
+    } catch (e) {
+      setProperties([]);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const all = await base44.entities.Property.list("-created_date", 100);
+        const all = await base44.entities.Property.list("-created_date", 200);
         if (cancelled) return;
         setProperties(all);
       } catch (e) {
@@ -95,8 +122,6 @@ export default function SearchPage() {
     if (p.country !== "RO") return false;
     if (cityParam && !p.city?.toLowerCase().includes(cityParam.toLowerCase())) return false;
     if (zoneParam && !p.zone?.toLowerCase().includes(zoneParam.toLowerCase())) return false;
-    if (cityFilter && !p.city?.toLowerCase().includes(cityFilter.toLowerCase())) return false;
-    if (zoneFilter && !p.zone?.toLowerCase().includes(zoneFilter.toLowerCase())) return false;
     if (typeParam && p.property_type !== typeParam) return false;
     for (const f of VERIF_FILTERS) {
       if (activeFilters.has(f.key) && !f.test(p)) return false;
@@ -145,16 +170,21 @@ export default function SearchPage() {
             {found} {found === 1 ? "proprietate găsită" : "proprietăți găsite"}
           </p>
         </div>
-        <Button onClick={saveSearch} variant="outline" className="gap-1.5 border-emerald/40 text-emerald hover:bg-emerald-soft">
-          <BookmarkPlus className="h-4 w-4" /> Salvează căutarea
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={fetchProperties} variant="outline" disabled={refreshing} className="gap-1.5 border-emerald/40 text-emerald hover:bg-emerald-soft">
+            <RefreshCw className="h-4 w-4" /> {refreshing ? "Caut..." : "Caută din nou"}
+          </Button>
+          <Button onClick={saveSearch} variant="outline" className="gap-1.5 border-gold/40 text-gold-deep hover:bg-gold-soft">
+            <BookmarkPlus className="h-4 w-4" /> Salvează căutarea
+          </Button>
+        </div>
       </div>
 
       {/* City / zone selectors */}
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <select
           value={cityFilter}
-          onChange={(e) => { setCityFilter(e.target.value); setZoneFilter(""); }}
+          onChange={(e) => updateCity(e.target.value)}
           className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium outline-none focus:border-emerald"
         >
           <option value="">Oraș</option>
@@ -162,7 +192,7 @@ export default function SearchPage() {
         </select>
         <select
           value={zoneFilter}
-          onChange={(e) => setZoneFilter(e.target.value)}
+          onChange={(e) => updateZone(e.target.value)}
           disabled={!cityFilter}
           className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium outline-none focus:border-emerald disabled:opacity-50"
         >
