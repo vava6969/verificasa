@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   User, Plus, Home, LogOut, Heart, MessageCircle, Settings, ShieldCheck,
-  LayoutDashboard, Bookmark, Search, ChevronDown,
+  LayoutDashboard, Bookmark, Search, ChevronDown, Globe, Check,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
@@ -51,33 +51,38 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2.5">
-          <div className="hidden flex-col gap-1 sm:flex">
-            <div className="flex items-center rounded-full border border-border bg-white p-0.5 shadow-soft dark:bg-navy">
-              {["EUR", "RON"].map((cur) => (
-                <button
-                  key={cur}
-                  onClick={() => setCurrency(cur)}
-                  className={`rounded-full px-3 py-1 text-xs font-bold transition ${currency === cur ? "bg-navy text-white dark:bg-emerald" : "text-foreground/60 hover:text-navy"}`}
-                >
-                  <span className="mr-1">{cur === "EUR" ? "🇬🇧" : "🇷🇴"}</span>{cur}
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center rounded-full border border-border bg-white p-0.5 shadow-soft dark:bg-navy">
-              {[
-                { code: "ro", label: "RO", flag: "🇷🇴" },
-                { code: "en", label: "EN", flag: "🇬🇧" },
-              ].map((l) => (
-                <button
-                  key={l.code}
-                  onClick={() => setLang(l.code)}
-                  className={`rounded-full px-3 py-1 text-xs font-bold transition ${lang === l.code ? "bg-navy text-white dark:bg-emerald" : "text-foreground/60 hover:text-navy"}`}
-                >
-                  <span className="mr-1">{l.flag}</span>{l.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-1.5 rounded-full border border-border bg-white px-3 py-1.5 text-xs font-bold text-navy shadow-soft transition hover:border-emerald/50 dark:bg-navy dark:text-foreground">
+                <Globe className="h-4 w-4 text-emerald" />
+                <span>{currency === "EUR" ? "🇬🇧" : "🇷🇴"} {currency}</span>
+                <span className="text-muted-foreground">·</span>
+                <span>{lang === "ro" ? "🇷🇴" : "🇬🇧"} {lang.toUpperCase()}</span>
+                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuLabel className="text-xs text-muted-foreground">{t("hdr_currency")}</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => setCurrency("EUR")} className="cursor-pointer font-semibold">
+                <span className="mr-2">🇬🇧</span> EUR
+                {currency === "EUR" && <Check className="ml-auto h-4 w-4 text-emerald" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setCurrency("RON")} className="cursor-pointer font-semibold">
+                <span className="mr-2">🇷🇴</span> RON
+                {currency === "RON" && <Check className="ml-auto h-4 w-4 text-emerald" />}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="text-xs text-muted-foreground">{t("hdr_language")}</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => setLang("ro")} className="cursor-pointer font-semibold">
+                <span className="mr-2">🇷🇴</span> RO
+                {lang === "ro" && <Check className="ml-auto h-4 w-4 text-emerald" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLang("en")} className="cursor-pointer font-semibold">
+                <span className="mr-2">🇬🇧</span> EN
+                {lang === "en" && <Check className="ml-auto h-4 w-4 text-emerald" />}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <ThemeToggle />
 
