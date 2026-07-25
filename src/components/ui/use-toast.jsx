@@ -1,48 +1,40 @@
-// Inspired by react-hot-toast library
+// Toast system with 5s auto-close + framer-motion exit effect + a always-visible
+// close button. Inspired by react-hot-toast.
 import { useState, useEffect } from "react";
 
 const TOAST_LIMIT = 20;
-const TOAST_REMOVE_DELAY = 5000;
+const AUTO_CLOSE_MS = 5000; // disappear automatically after 5 seconds
 
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
   UPDATE_TOAST: "UPDATE_TOAST",
-  DISMISS_TOAST: "DISMISS_TOAST",
   REMOVE_TOAST: "REMOVE_TOAST",
 };
 
 let count = 0;
-
 function genId() {
   count = (count + 1) % Number.MAX_VALUE;
   return count.toString();
 }
 
-const toastTimeouts = new Map();
+const toastTimers = new Map();
 
-const addToRemoveQueue = (toastId) => {
-  if (toastTimeouts.has(toastId)) {
-    return;
+function clearAutoClose(toastId) {
+  const t = toastTimers.get(toastId);
+  if (t) {
+    clearTimeout(t);
+    toastTimers.delete(toastId);
   }
+}
 
-  const timeout = setTimeout(() => {
-    toastTimeouts.delete(toastId);
-    dispatch({
-      type: actionTypes.REMOVE_TOAST,
-      toastId,
-    });
-  }, TOAST_REMOVE_DELAY);
-
-  toastTimeouts.set(toastId, timeout);
-};
-
-const _clearFromRemoveQueue = (toastId) => {
-  const timeout = toastTimeouts.get(toastId);
-  if (timeout) {
-    clearTimeout(timeout);
-    toastTimeouts.delete(toastId);
-  }
-};
+function scheduleAutoClose(toastId) {
+  clearAutoClose(toastId);
+  const t = setTimeout(() => {
+    toastTimers.delete(toastId);
+    dispatch({ type: actionTypes.REMOVE_TOAST, toastId });
+  }, AUTO_CLOSE_MS);
+  toastTimers.set(toastId, t);
+}
 
 export const reducer = (state, action) => {
   switch (action.type) {
@@ -60,67 +52,44 @@ export const reducer = (state, action) => {
         ),
       };
 
-    case actionTypes.DISMISS_TOAST: {
-      const { toastId } = action;
-
-      // ! Side effects ! - This could be extracted into a dismissToast() action,
-      // but I'll keep it here for simplicity
-      if (toastId) {
-        addToRemoveQueue(toastId);
-      } else {
-        state.toasts.forEach((toast) => {
-          addToRemoveQueue(toast.id);
-        });
-      }
-
-      return {
-        ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === toastId || toastId === undefined
-            ? {
-                ...t,
-                open: false,
-              }
-            : t
-        ),
-      };
-    }
     case actionTypes.REMOVE_TOAST:
       if (action.toastId === undefined) {
-        return {
-          ...state,
-          toasts: [],
-        };
+        toastTimers.forEach((t) => clearTimeout(t));
+        toastTimers.clear();
+        return { ...state, toasts: [] };
       }
+      clearAutoClose(action.toastId);
       return {
         ...state,
         toasts: state.toasts.filter((t) => t.id !== action.toastId),
       };
+
+    default:
+      return state;
   }
 };
 
 const listeners = [];
-
 let memoryState = { toasts: [] };
 
 function dispatch(action) {
   memoryState = reducer(memoryState, action);
-  listeners.forEach((listener) => {
-    listener(memoryState);
-  });
+  listeners.forEach((listener) => listener(memoryState));
 }
 
 function toast({ ...props }) {
   const id = genId();
 
-  const update = (props) =>
+  const update = (p) =>
     dispatch({
       type: actionTypes.UPDATE_TOAST,
-      toast: { ...props, id },
+      toast: { ...p, id },
     });
 
-  const dismiss = () =>
-    dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id });
+  const dismiss = () => {
+    clearAutoClose(id);
+    dispatch({ type: actionTypes.REMOVE_TOAST, toastId: id });
+  };
 
   dispatch({
     type: actionTypes.ADD_TOAST,
@@ -128,17 +97,13 @@ function toast({ ...props }) {
       ...props,
       id,
       open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss();
-      },
     },
   });
 
-  return {
-    id,
-    dismiss,
-    update,
-  };
+  // auto-close after 5 seconds (framer-motion plays the exit effect)
+  scheduleAutoClose(id);
+
+  return { id, dismiss, update };
 }
 
 function useToast() {
@@ -157,7 +122,10 @@ function useToast() {
   return {
     ...state,
     toast,
-    dismiss: (toastId) => dispatch({ type: actionTypes.DISMISS_TOAST, toastId }),
+    dismiss: (toastId) => {
+      clearAutoClose(toastId);
+      dispatch({ type: actionTypes.REMOVE_TOAST, toastId });
+    },
   };
 }
 

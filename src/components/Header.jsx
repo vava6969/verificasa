@@ -45,17 +45,12 @@ export default function Header() {
         <nav className="hidden items-center gap-6 md:flex">
           <Link to="/" className="text-sm font-semibold text-foreground/80 transition hover:text-emerald">{t("hdr_home")}</Link>
           <Link to="/about" className="text-sm font-semibold text-foreground/80 transition hover:text-emerald">{t("hdr_about")}</Link>
-          {CITY_LINKS.map((c) => (
-            <Link key={c.city} to={`/search?city=${encodeURIComponent(c.city)}`} className="text-sm font-medium text-foreground/70 transition hover:text-emerald">
-              {t(c.labelKey)}
-            </Link>
-          ))}
         </nav>
 
         <div className="flex items-center gap-2.5">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-1.5 rounded-full border border-border bg-white px-3 py-1.5 text-xs font-bold text-navy shadow-soft transition hover:border-emerald/50 dark:bg-navy dark:text-foreground">
+              <button className="flex h-9 items-center gap-1.5 rounded-full border border-border bg-white px-3 text-xs font-bold text-navy shadow-soft transition hover:border-emerald/50 dark:bg-navy dark:text-foreground">
                 <Globe className="h-4 w-4 text-emerald" />
                 <span>{currency === "EUR" ? "🇬🇧" : "🇷🇴"} {currency}</span>
                 <span className="text-muted-foreground">·</span>
@@ -96,7 +91,7 @@ export default function Header() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="relative flex items-center gap-2 rounded-full border border-border bg-white px-3 py-1.5 text-sm font-semibold text-navy shadow-soft transition hover:border-emerald/50 dark:bg-navy dark:text-foreground">
+                  <button className="relative flex h-9 items-center gap-2 rounded-full border border-border bg-white px-3 text-sm font-semibold text-navy shadow-soft transition hover:border-emerald/50 dark:bg-navy dark:text-foreground">
                     {user?.avatar_url ? (
                       <UIImage src={user.avatar_url} fittingType="fill" className="h-7 w-7 rounded-full object-cover" />
                     ) : (
@@ -156,9 +151,6 @@ export default function Header() {
       <div className="flex items-center gap-5 overflow-x-auto border-t border-border/50 px-4 py-2 md:hidden">
         <Link to="/" className="whitespace-nowrap text-xs font-bold text-emerald">{t("hdr_home")}</Link>
         <Link to="/about" className="whitespace-nowrap text-xs font-semibold text-foreground/70">{t("hdr_about")}</Link>
-        {CITY_LINKS.map((c) => (
-          <Link key={c.city} to={`/search?city=${encodeURIComponent(c.city)}`} className="whitespace-nowrap text-xs font-semibold text-foreground/70">{t(c.labelKey)}</Link>
-        ))}
         {isAuthenticated && <Link to="/my-properties" className="whitespace-nowrap text-xs font-semibold text-foreground/70">{t("hdr_myprops")}</Link>}
       </div>
     </header>

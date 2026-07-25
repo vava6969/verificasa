@@ -119,6 +119,7 @@ export default function SearchPage() {
   };
 
   let filtered = (properties || []).filter((p) => {
+    if (p.approval_status !== "APPROVED") return false;
     if (p.country !== "RO") return false;
     if (cityParam && !p.city?.toLowerCase().includes(cityParam.toLowerCase())) return false;
     if (zoneParam && !p.zone?.toLowerCase().includes(zoneParam.toLowerCase())) return false;

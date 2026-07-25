@@ -56,10 +56,9 @@ export default function LaunchCountdown() {
 
           <Link
             to="/about"
-            className="group relative inline-flex items-center gap-2 rounded-full gradient-emerald px-6 py-3 font-bold text-white shadow-glow transition animate-bounce hover:scale-105"
+            className="inline-flex items-center gap-2 rounded-full bg-emerald px-6 py-3 font-bold text-white shadow-soft transition hover:bg-emerald/90 hover:shadow-glow active:scale-[1.02]"
           >
-            <span className="absolute inset-0 rounded-full bg-emerald blur-md opacity-60 group-hover:opacity-90 transition" />
-            <span className="relative">{t("countdown_btn")}</span>
+            <Rocket className="h-4 w-4" /> {t("countdown_btn")}
           </Link>
         </div>
       </div>

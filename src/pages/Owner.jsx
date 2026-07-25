@@ -94,6 +94,7 @@ export default function Owner() {
                   <div className="flex items-center gap-4 text-xs">
                     <span className="flex items-center gap-1 text-muted-foreground"><Eye className="h-3.5 w-3.5" /> {p.views_count || 0}</span>
                     <span className={`flex items-center gap-1 ${p.ai_video_url ? "text-mint" : "text-muted-foreground"}`}><Sparkles className="h-3.5 w-3.5" /> {p.ai_video_url ? t("ai_active") : t("ai_none")}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${p.approval_status === "APPROVED" ? "bg-mint-soft text-navy" : "bg-amber-100 text-amber-700"}`}>{p.approval_status === "APPROVED" ? "Aprobat" : "În așteptare"}</span>
                     <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${p.status === "Activ" ? "bg-mint-soft text-navy" : "bg-secondary text-muted-foreground"}`}>{p.status}</span>
                   </div>
                   <Button variant="outline" size="sm" className="gap-1"><Download className="h-3.5 w-3.5" /> {t("contract_pdf")}</Button>
@@ -205,20 +206,20 @@ function NewPropertyForm({ onDone }) {
         phone: form.phone || "",
         whatsapp_phone: form.whatsapp_phone || "",
         seller_role: form.seller_role || "Proprietar",
-        approval_status: "APPROVED",
+        approval_status: "PENDING",
         furnished: true,
         pet_friendly: false,
         parking: false,
         available_from: form.available_from || null,
         images: form.images ? form.images.split(",") : [],
-        ai_video_url: form.ai_video_url || (form.images ? demoVideo : ""),
+        ai_video_url: form.ai_video_url || "",
         latitude: form.latitude ? Number(form.latitude) : null,
         longitude: form.longitude ? Number(form.longitude) : null,
         owner_name: form.owner_name || "Proprietar",
-        owner_verified: true,
-        ai_tour_verified: !!form.images,
+        owner_verified: false,
+        ai_tour_verified: false,
         status: "Activ",
-        featured: true,
+        featured: false,
         views_count: 0,
         internet_speed_mbps: chips.wifi ? 100 : null,
         noise_db: chips.noise ? 35 : null,
@@ -231,7 +232,7 @@ function NewPropertyForm({ onDone }) {
           ...(chips.water ? ["💧 Presiune apă OK"] : []),
         ],
       });
-      toast({ title: t("created_title"), description: t("created_desc") });
+      toast({ title: "Anunț trimis spre aprobare", description: "Un administrator îl va verifica în curând. Va apărea în lista publică după aprobare." });
       onDone();
     } catch (err) {
       toast({ title: t("save_err"), variant: "destructive" });

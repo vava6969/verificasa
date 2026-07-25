@@ -45,7 +45,7 @@ export default function Landing() {
     return () => { cancelled = true; };
   }, [country]);
 
-  const display = (properties || []).slice(0, 6);
+    const display = (properties || []).filter((p) => p.approval_status === "APPROVED").slice(0, 6);
 
   return (
     <div>

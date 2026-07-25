@@ -23,7 +23,7 @@ export default function ThemeToggle({ withLabel = false }) {
     <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className={cn(
-        "flex items-center gap-2 rounded-full border border-border bg-white px-3 py-1.5 text-sm font-semibold transition hover:border-emerald/50",
+        "flex h-9 items-center gap-2 rounded-full border border-border bg-white px-3 text-sm font-semibold transition hover:border-emerald/50",
         isDark && "bg-navy text-white border-navy hover:border-emerald"
       )}
       aria-label="Comută temă"

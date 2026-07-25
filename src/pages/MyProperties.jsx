@@ -89,6 +89,7 @@ export default function MyProperties() {
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" /> {p.views_count || 0}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${p.approval_status === "APPROVED" ? "bg-emerald-soft text-emerald" : "bg-amber-100 text-amber-700"}`}>{p.approval_status === "APPROVED" ? "Aprobat" : "În așteptare"}</span>
                   <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${p.status === "Activ" ? "bg-emerald-soft text-emerald" : "bg-secondary text-muted-foreground"}`}>{p.status}</span>
                 </div>
                 <div className="flex items-center gap-2">

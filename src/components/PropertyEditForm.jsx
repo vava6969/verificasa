@@ -52,6 +52,7 @@ export default function PropertyEditForm({ property, onDone }) {
         pet_friendly: form.pet_friendly,
         parking: form.parking,
         status: form.status,
+        ai_video_url: property.ai_video_url || "",
       });
       toast({ title: "Anunț actualizat" });
       onDone();
