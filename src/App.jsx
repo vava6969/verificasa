@@ -23,6 +23,8 @@ import Messages from '@/pages/Messages';
 import Saved from '@/pages/Saved';
 import SavedSearches from '@/pages/SavedSearches';
 import About from '@/pages/About';
+import Terms from '@/pages/Terms';
+import Privacy from '@/pages/Privacy';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 const AuthenticatedApp = () => {
@@ -59,6 +61,8 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<Landing />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/about" element={<About />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/property/:id" element={<PropertyDetail />} />
         <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
           <Route path="/owner" element={<Owner />} />

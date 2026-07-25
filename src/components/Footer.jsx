@@ -1,5 +1,5 @@
 import React from "react";
-import { Mail, Phone, MapPin, ShieldCheck } from "lucide-react";
+import { Mail, MapPin, ShieldCheck, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCountry } from "@/components/CountryContext";
 import VerifiCasaLogo from "@/components/VerifiCasaLogo";
@@ -34,9 +34,8 @@ export default function Footer() {
             <h4 className="font-heading text-sm font-semibold uppercase tracking-wider text-gold">{t("f_legal")}</h4>
             <ul className="mt-4 space-y-2.5 text-sm text-white/60">
               <li className="flex items-start gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald" />{t("footer_anpc")}</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald" />{t("footer_terms")}</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald" />{t("footer_privacy")}</li>
-              <li className="flex items-start gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald" />{t("footer_guarantee")}</li>
+              <li><Link to="/terms" className="hover:text-emerald">{t("footer_terms")}</Link></li>
+              <li><Link to="/privacy" className="hover:text-emerald">{t("footer_privacy")}</Link></li>
             </ul>
             <LegalBadges />
           </div>
@@ -45,7 +44,10 @@ export default function Footer() {
             <h4 className="font-heading text-sm font-semibold uppercase tracking-wider text-gold">{t("f_contact")}</h4>
             <ul className="mt-4 space-y-2.5 text-sm text-white/60">
               <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-emerald" /> hello@verificasa.ro</li>
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-emerald" /> +40 21 123 4567</li>
+              <li className="flex items-center gap-2">
+                <Instagram className="h-4 w-4 text-emerald" />
+                <a href="https://instagram.com/verificasaro" target="_blank" rel="noopener noreferrer" className="hover:text-emerald">@verificasaro</a>
+              </li>
               <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-emerald" /> București, România 🇷🇴</li>
             </ul>
             <p className="mt-4 flex items-start gap-2 text-xs font-semibold text-white/70">
