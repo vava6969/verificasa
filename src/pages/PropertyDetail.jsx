@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
+import { createNotification } from "@/lib/notifications";
 
 const DEMO_VIDEO = "https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-modern-living-room-41558-large.mp4";
 const DEMO_FALLBACK = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4";
@@ -144,6 +145,16 @@ export default function PropertyDetail() {
       } else {
         await base44.entities.SavedProperty.create({ user_id: user.id, property_id: p.id });
         setSaved(true); toast({ title: "Anunț salvat" });
+        // „Like la postare": notificăm proprietarul că cineva și-a apreciat/salvat anunțul
+        if (p.created_by_id && p.created_by_id !== user.id) {
+          createNotification({
+            userId: p.created_by_id,
+            type: "like",
+            text: `${user.full_name || user.email} și-a apreciat (salvat) anunțul tău „${p.title}".`,
+            link: `/property/${p.id}`,
+            actorName: user.full_name || user.email,
+          });
+        }
       }
     } catch (e) { toast({ title: "Eroare", variant: "destructive" }); }
   };

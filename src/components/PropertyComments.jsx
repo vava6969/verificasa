@@ -86,15 +86,22 @@ export default function PropertyComments({ property }) {
         avatar_url: user.avatar_url || "", content: content.trim(), likes: [],
       });
       const actor = user.full_name || user.email;
-      if (property.created_by_id && property.created_by_id !== user.id) {
+      // Notificăm proprietarul + toți ceilalți care au interacționat deja cu anunțul
+      const recipients = new Set();
+      if (property.created_by_id && property.created_by_id !== user.id) recipients.add(property.created_by_id);
+      (comments || []).forEach((c) => { if (c.user_id && c.user_id !== user.id) recipients.add(c.user_id); });
+      recipients.forEach((rid) => {
+        const isOwner = rid === property.created_by_id;
         createNotification({
-          userId: property.created_by_id,
+          userId: rid,
           type: "comment",
-          text: `${actor} a comentat la anunțul „${property.title}".`,
+          text: isOwner
+            ? `${actor} a comentat la anunțul tău „${property.title}".`
+            : `${actor} a comentat la „${property.title}", un anunț pe care l-ai urmărit.`,
           link: `/property/${property.id}`,
           actorName: actor,
         });
-      }
+      });
       setContent(""); load(); toast({ title: "Comentariu adăugat" });
     } catch (err) { toast({ title: "Eroare la comentariu", variant: "destructive" }); }
     finally { setPosting(false); }
