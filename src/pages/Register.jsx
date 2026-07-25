@@ -9,6 +9,25 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
 import { toast } from "@/components/ui/use-toast";
+import { motion } from "framer-motion";
+
+const HERO_HOUSE_URL =
+  "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=80";
+
+// Fundal cu o casă modernă, opacitate scăzută și zoom lent pentru un look interactiv.
+const RegisterBackground = () => (
+  <>
+    <motion.img
+      src={HERO_HOUSE_URL}
+      alt=""
+      className="h-full w-full object-cover opacity-20"
+      initial={{ scale: 1 }}
+      animate={{ scale: 1.08 }}
+      transition={{ duration: 14, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
+    />
+    <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/20 to-background" />
+  </>
+);
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -76,6 +95,7 @@ export default function Register() {
         icon={Mail}
         title="Verify your email"
         subtitle={`We sent a code to ${email}`}
+        background={<RegisterBackground />}
       >
         {error && (
           <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
@@ -129,6 +149,7 @@ export default function Register() {
       icon={UserPlus}
       title="Create your account"
       subtitle="Sign up to get started"
+      background={<RegisterBackground />}
       footer={
         <>
           Already have an account?{" "}
