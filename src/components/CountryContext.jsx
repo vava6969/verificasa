@@ -22,7 +22,14 @@ export function CountryProvider({ children }) {
     if (typeof window !== "undefined") localStorage.setItem("vc_currency", currency);
   }, [currency]);
 
-  const lang = "ro";
+  const [lang, setLang] = useState(() => {
+    if (typeof window !== "undefined") return localStorage.getItem("vc_lang") || "ro";
+    return "ro";
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") localStorage.setItem("vc_lang", lang);
+  }, [lang]);
 
   const legalInfo = useMemo(
     () => ({
@@ -56,7 +63,7 @@ export function CountryProvider({ children }) {
   const t = useMemo(() => makeT(lang), [lang]);
 
   const value = useMemo(
-    () => ({ country, setCountry, currency, setCurrency, lang, t, legalInfo, convert, formatPrice }),
+    () => ({ country, setCountry, currency, setCurrency, lang, setLang, t, legalInfo, convert, formatPrice }),
     [country, currency, lang, t, legalInfo, convert, formatPrice]
   );
 

@@ -23,7 +23,7 @@ const CITY_LINKS = [
 const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 
 export default function Header() {
-  const { currency, setCurrency } = useCountry();
+  const { currency, setCurrency, lang, setLang } = useCountry();
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const greeting = user?.full_name || user?.email || "utilizator";
@@ -51,16 +51,32 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2.5">
-          <div className="hidden items-center rounded-full border border-border bg-white p-0.5 shadow-soft sm:flex dark:bg-navy">
-            {["EUR", "RON"].map((cur) => (
-              <button
-                key={cur}
-                onClick={() => setCurrency(cur)}
-                className={`rounded-full px-3 py-1 text-xs font-bold transition ${currency === cur ? "bg-navy text-white dark:bg-emerald" : "text-foreground/60 hover:text-navy"}`}
-              >
-                <span className="mr-1">{cur === "EUR" ? "🇬🇧" : "🇷🇴"}</span>{cur}
-              </button>
-            ))}
+          <div className="hidden flex-col gap-1 sm:flex">
+            <div className="flex items-center rounded-full border border-border bg-white p-0.5 shadow-soft dark:bg-navy">
+              {["EUR", "RON"].map((cur) => (
+                <button
+                  key={cur}
+                  onClick={() => setCurrency(cur)}
+                  className={`rounded-full px-3 py-1 text-xs font-bold transition ${currency === cur ? "bg-navy text-white dark:bg-emerald" : "text-foreground/60 hover:text-navy"}`}
+                >
+                  <span className="mr-1">{cur === "EUR" ? "🇬🇧" : "🇷🇴"}</span>{cur}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center rounded-full border border-border bg-white p-0.5 shadow-soft dark:bg-navy">
+              {[
+                { code: "ro", label: "RO", flag: "🇷🇴" },
+                { code: "en", label: "EN", flag: "🇬🇧" },
+              ].map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => setLang(l.code)}
+                  className={`rounded-full px-3 py-1 text-xs font-bold transition ${lang === l.code ? "bg-navy text-white dark:bg-emerald" : "text-foreground/60 hover:text-navy"}`}
+                >
+                  <span className="mr-1">{l.flag}</span>{l.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <ThemeToggle />
