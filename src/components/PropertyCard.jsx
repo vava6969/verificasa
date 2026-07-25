@@ -3,13 +3,15 @@ import { useNavigate } from "react-router-dom";
 import {
   Play, MapPin, Maximize, BedDouble, ShieldCheck, PawPrint, BadgePercent,
   TrendingDown, TrendingUp, Heart, Eye, Building2, Phone, MessageCircle,
-  ChevronLeft, ChevronRight, Calendar, PhoneOff,
+  ChevronLeft, ChevronRight, Calendar, PhoneOff, Clock,
 } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { startConversation } from "@/lib/conversations";
 import { Image } from "@/components/ui/image";
+import { formatDistanceToNowStrict } from "date-fns";
+import { ro, enGB } from "date-fns/locale";
 
 // Premium listing card inspired by Storia/OLX.
 export default function PropertyCard({ property }) {
@@ -61,6 +63,9 @@ export default function PropertyCard({ property }) {
   const callPhone = (p.phone || "").replace(/\D/g, "");
   const hasPhone = !!callPhone && callPhone.length >= 6;
   const dateLocale = lang === "en" ? "en-GB" : "ro-RO";
+  const postedAgo = p.created_date
+    ? formatDistanceToNowStrict(new Date(p.created_date), { addSuffix: true, locale: lang === "en" ? enGB : ro })
+    : "";
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-glow dark:bg-card">
@@ -134,7 +139,7 @@ export default function PropertyCard({ property }) {
         </div>
         {p.created_date && (
           <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-white/85 px-2 py-0.5 text-[10px] font-semibold text-slate-700 backdrop-blur">
-            <Calendar className="h-3 w-3" /> {new Date(p.created_date).toLocaleDateString(dateLocale)}
+            <Calendar className="h-3 w-3" /> {new Date(p.created_date).toLocaleString(dateLocale, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
           </span>
         )}
       </div>
@@ -145,6 +150,11 @@ export default function PropertyCard({ property }) {
         <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
           <MapPin className="h-3 w-3 shrink-0" /> <span className="truncate">{p.zone}, {p.city}</span>
         </p>
+        {postedAgo && (
+          <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+            <Clock className="h-3 w-3 text-emerald" /> {lang === "en" ? `Posted ${postedAgo}` : `A fost postat ${postedAgo}`}
+          </p>
+        )}
 
         {/* Specs */}
         <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-foreground/70">

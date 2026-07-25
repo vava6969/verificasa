@@ -187,7 +187,7 @@ function NewPropertyForm({ onDone }) {
     setSaving(true);
     try {
       const demoVideo = "https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-modern-living-room-41558-large.mp4";
-      await base44.entities.Property.create({
+      const created = await base44.entities.Property.create({
         title: form.title,
         description: form.description,
         price_monthly: Number(form.price_monthly),
@@ -232,6 +232,13 @@ function NewPropertyForm({ onDone }) {
           ...(chips.water ? ["💧 Presiune apă OK"] : []),
         ],
       });
+      try {
+        base44.functions.invoke("NotifyAdminsOnNewProperty", {
+          property_id: created.id,
+          title: form.title,
+          owner_name: form.owner_name || "",
+        }).catch(() => {});
+      } catch (_) {}
       toast({ title: "Anunț trimis spre aprobare", description: "Un administrator îl va verifica în curând. Va apărea în lista publică după aprobare." });
       onDone();
     } catch (err) {

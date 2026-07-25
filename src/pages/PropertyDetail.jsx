@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
@@ -49,6 +49,7 @@ export default function PropertyDetail() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [saved, setSaved] = useState(false);
+  const viewedRef = useRef(new Set());
 
   useEffect(() => {
     let cancelled = false;
@@ -68,7 +69,12 @@ export default function PropertyDetail() {
       try {
         const p = await base44.entities.Property.get(id);
         if (cancelled) return;
-        setProperty(p);
+        const shouldInc = !viewedRef.current.has(id);
+        if (shouldInc) viewedRef.current.add(id);
+        setProperty(shouldInc ? { ...p, views_count: (p.views_count || 0) + 1 } : p);
+        if (shouldInc) {
+          base44.functions.invoke("IncrementViews", { property_id: id }).catch(() => {});
+        }
       } catch (e) {
         if (cancelled) setProperty(null);
       } finally {
