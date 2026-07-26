@@ -205,9 +205,29 @@ export default function PropertyDetail() {
             <button onClick={() => setTab("gallery")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "gallery" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
               {t("tab_gallery")} ({images.length})
             </button>
+            <button onClick={() => setTab("3d")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "3d" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+              <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5" /> {t("tab_3d")} · TEST</span>
+            </button>
           </div>
 
-          {tab === "ai" ? (
+          {tab === "3d" ? (
+            <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-soft">
+              <div className="flex items-center justify-between border-b border-border bg-gold-soft/60 px-3 py-2">
+                <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-gold-deep">
+                  <Sparkles className="h-3.5 w-3.5" /> {t("tab_3d")} · TEST
+                </span>
+                <span className="text-[11px] text-muted-foreground">Matterport embed</span>
+              </div>
+              <iframe
+                src="https://my.matterport.com/show/?m=Zf8HnTwFvBM&play=1&ts=0"
+                title="Tur 3D Matterport"
+                className="aspect-video w-full"
+                allowFullScreen
+                allow="xr-spatial-tracking; fullscreen; autoplay"
+                frameBorder="0"
+              />
+            </div>
+          ) : tab === "ai" ? (
             <div className="relative overflow-hidden rounded-2xl border border-border bg-navy-deep shadow-soft">
               <video autoPlay muted loop playsInline poster={images[0]} className="aspect-video w-full object-cover">
                 <source src={p.ai_video_url || DEMO_VIDEO} type="video/mp4" />
