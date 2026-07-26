@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
-import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText } from "lucide-react";
+import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil } from "lucide-react";
+import PropertyEditForm from "@/components/PropertyEditForm";
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 const ROLE_OPTIONS = ["PROPRIETAR", "AGENT", "ADMIN", "SUPER_ADMIN", "SUPPORT", "user"];
@@ -21,6 +22,7 @@ export default function Admin() {
   const [users, setUsers] = useState(null);
   const [userSearch, setUserSearch] = useState("");
   const [inspections, setInspections] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
   const isAllowed = isAuthenticated && user && ADMIN_ROLES.includes((user.role || "").toUpperCase());
   const isSuper = (user?.role || "").toUpperCase() === "SUPER_ADMIN";
@@ -255,7 +257,11 @@ export default function Admin() {
             {(tab === "pending" ? pending : all).length === 0 ? (
               properties === null ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-2xl" />) :
               <p className="text-sm text-muted-foreground">{tab === "pending" ? "Niciun anunț în așteptare. 🎉" : "Niciun anunț."}</p>
-            ) : (tab === "pending" ? pending : all).map((p) => (
+            ) : (tab === "pending" ? pending : all).map((p) => {
+              if (editingId === p.id) {
+                return <PropertyEditForm key={p.id} property={p} onDone={() => { setEditingId(null); load(); }} />;
+              }
+              return (
               <div key={p.id} className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card">
                 <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-secondary">
                   {p.images?.[0] && <UIImage src={p.images[0]} fittingType="fill" className="h-full w-full" />}
@@ -265,12 +271,14 @@ export default function Admin() {
                   <p className="text-xs text-muted-foreground">{p.zone}, {p.city} · {p.property_type} · {p.price_monthly} € · <span className={p.approval_status === "APPROVED" ? "text-emerald font-semibold" : "text-amber-600 font-semibold"}>{p.approval_status || "PENDING"}</span></p>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setEditingId(p.id)} className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft"><Pencil className="h-3.5 w-3.5" /> Editează</Button>
                   {p.approval_status !== "APPROVED" && <Button size="sm" onClick={() => setApproval(p, "APPROVED")} className="gap-1 bg-emerald text-white"><Check className="h-3.5 w-3.5" /> Aprobă</Button>}
                   {p.approval_status === "APPROVED" && <Button size="sm" variant="outline" onClick={() => setApproval(p, "REJECTED")} className="gap-1 border-amber-400 text-amber-700"><X className="h-3.5 w-3.5" /> Retrage</Button>}
                   <Button size="sm" variant="outline" onClick={() => delProperty(p)} className="gap-1 border-destructive/30 text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /></Button>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
