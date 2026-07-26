@@ -52,30 +52,30 @@ export default function Header() {
             <DropdownMenuTrigger asChild>
               <button className="flex h-9 items-center gap-1.5 rounded-full border border-border bg-white px-3 text-xs font-bold text-navy shadow-soft transition hover:border-emerald/50 dark:bg-navy dark:text-foreground">
                 <Globe className="h-4 w-4 text-emerald" />
-                <span>{currency === "EUR" ? "🇬🇧" : "🇷🇴"} {currency}</span>
+                <span>💰 {currency === "EUR" ? "🇪🇺" : "🇷🇴"} {currency}</span>
                 <span className="text-muted-foreground">·</span>
-                <span>{lang === "ro" ? "🇷🇴" : "🇬🇧"} {lang.toUpperCase()}</span>
+                <span>🗣️ {lang === "ro" ? "🇷🇴" : "🇬🇧"} {lang.toUpperCase()}</span>
                 <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuLabel className="text-xs text-muted-foreground">{t("hdr_currency")}</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-xs text-muted-foreground">💰 {t("hdr_currency")}</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => setCurrency("EUR")} className="cursor-pointer font-semibold">
-                <span className="mr-2">🇬🇧</span> EUR
+                <span className="mr-2">🇪🇺 💶</span> EUR
                 {currency === "EUR" && <Check className="ml-auto h-4 w-4 text-emerald" />}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setCurrency("RON")} className="cursor-pointer font-semibold">
-                <span className="mr-2">🇷🇴</span> RON
+                <span className="mr-2">🇷🇴 💵</span> RON
                 {currency === "RON" && <Check className="ml-auto h-4 w-4 text-emerald" />}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel className="text-xs text-muted-foreground">{t("hdr_language")}</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-xs text-muted-foreground">🗣️ {t("hdr_language")}</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => setLang("ro")} className="cursor-pointer font-semibold">
-                <span className="mr-2">🇷🇴</span> RO
+                <span className="mr-2">🇷🇴</span> Română
                 {lang === "ro" && <Check className="ml-auto h-4 w-4 text-emerald" />}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setLang("en")} className="cursor-pointer font-semibold">
-                <span className="mr-2">🇬🇧</span> EN
+                <span className="mr-2">🇬🇧</span> English
                 {lang === "en" && <Check className="ml-auto h-4 w-4 text-emerald" />}
               </DropdownMenuItem>
             </DropdownMenuContent>

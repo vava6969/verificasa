@@ -11,9 +11,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   Camera, Sparkles, Eye, MessageSquare, FileText, TrendingUp, Upload, Plus, Download, Wifi, Volume2, Sun, Droplet,
 } from "lucide-react";
+import OwnerCharts from "@/components/OwnerCharts";
 
 export default function Owner() {
-  const { country, t } = useCountry();
+  const { country, t, lang } = useCountry();
   const { user } = useAuth();
   const { toast } = useToast();
   const [properties, setProperties] = useState(null);
@@ -68,6 +69,8 @@ export default function Owner() {
             </div>
           ))}
         </div>
+
+        <OwnerCharts ownerId={user?.id} lang={lang} />
 
         {showForm && <NewPropertyForm onDone={() => { setShowForm(false); load(); }} />}
 

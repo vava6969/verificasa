@@ -13,9 +13,19 @@ Deno.serve(async (req) => {
       return Response.json({ error: "property_id required" }, { status: 400 });
     }
 
-    const fetched = await base44.asServiceRole.entities.Property.get(propertyId);
+    const svc = base44.asServiceRole;
+    const fetched = await svc.entities.Property.get(propertyId);
     const next = (fetched.views_count || 0) + 1;
-    await base44.asServiceRole.entities.Property.update(propertyId, { views_count: next });
+    await svc.entities.Property.update(propertyId, { views_count: next });
+    // Log a per-month view event (best-effort) so the Owner Dashboard can
+    // chart views evolution over time. Failures here must never break the
+    // counter increment.
+    try {
+      await svc.entities.ViewEvent.create({
+        property_id: propertyId,
+        property_title: fetched.title || "",
+      });
+    } catch (_) { /* ignore */ }
     return Response.json({ ok: true, views_count: next });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });

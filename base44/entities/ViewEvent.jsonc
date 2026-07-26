@@ -1,0 +1,18 @@
+{
+  "name": "ViewEvent",
+  "type": "object",
+  "title": "ViewEvent",
+  "properties": {
+    "property_id": {
+      "type": "string",
+      "title": "Property ID"
+    },
+    "property_title": {
+      "type": "string",
+      "title": "Titlu proprietate"
+    }
+  },
+  "required": [
+    "property_id"
+  ]
+}
