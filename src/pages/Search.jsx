@@ -7,12 +7,12 @@ import PropertyCard from "@/components/PropertyCard";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, SlidersHorizontal, ArrowDownUp, BookmarkPlus, RefreshCw } from "lucide-react";
+import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, SlidersHorizontal, ArrowDownUp, BookmarkPlus, RotateCcw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // VerifiCasa verification filters — each applies a real-property predicate.
 const VERIF_FILTERS = [
-  { key: "ai", label: "Tur AI Inclus", icon: Sparkles, test: (p) => !!p.ai_video_url },
+  { key: "ai", label: "Tur 3D Inclus", icon: Sparkles, test: (p) => !!p.tour_3d_url || !!p.ai_video_url || !!p.ai_tour_verified },
   { key: "field", label: "Verificat pe Teren", icon: ShieldCheck, test: (p) => p.verification_level === "field_certified" },
   { key: "pet", label: "Pet Friendly", icon: PawPrint, test: (p) => !!p.pet_friendly },
   { key: "nofee", label: "Fără Comision", icon: BadgePercent, test: (p) => !!p.commission_free },
@@ -79,19 +79,6 @@ export default function SearchPage() {
     return s;
   });
 
-  const [refreshing, setRefreshing] = useState(false);
-  const fetchProperties = async () => {
-    setRefreshing(true);
-    try {
-      const all = await base44.entities.Property.list("-created_date", 200);
-      setProperties(all);
-    } catch (e) {
-      setProperties([]);
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -157,6 +144,13 @@ export default function SearchPage() {
     } catch (e) { toast({ title: "Eroare la salvare", variant: "destructive" }); }
   };
 
+  const resetFilters = () => {
+    setBudget(""); setRoomsMin(""); setSurfaceMin("");
+    setFurnished(false); setSwap(false); setFairness(""); setSort("");
+    setActiveFilters(new Set());
+    setParams(new URLSearchParams(), { replace: true });
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
@@ -172,8 +166,8 @@ export default function SearchPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={fetchProperties} variant="outline" disabled={refreshing} className="gap-1.5 border-emerald/40 text-emerald hover:bg-emerald-soft">
-            <RefreshCw className="h-4 w-4" /> {refreshing ? "Caut..." : "Caută din nou"}
+          <Button onClick={resetFilters} variant="outline" className="gap-1.5 border-emerald/40 text-emerald hover:bg-emerald-soft">
+            <RotateCcw className="h-4 w-4" /> Șterge filtrele
           </Button>
           <Button onClick={saveSearch} variant="outline" className="gap-1.5 border-gold/40 text-gold-deep hover:bg-gold-soft">
             <BookmarkPlus className="h-4 w-4" /> Salvează căutarea

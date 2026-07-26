@@ -150,6 +150,7 @@ function NewPropertyForm({ onDone }) {
     latitude: "", longitude: "", owner_name: "",
     transaction_type: "RENT", building_year: "", total_floors: "", phone: "", whatsapp_phone: "",
     seller_role: "Proprietar",
+    parking: false, pet_friendly: false, commission_free: false, guarantee: false,
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -218,8 +219,10 @@ function NewPropertyForm({ onDone }) {
         seller_role: form.seller_role || "Proprietar",
         approval_status: "PENDING",
         furnished: true,
-        pet_friendly: false,
-        parking: false,
+        pet_friendly: form.pet_friendly,
+        parking: form.parking,
+        commission_free: form.commission_free,
+        deposit_option: form.guarantee ? "verificasa_guarantee" : "standard",
         available_from: form.available_from || null,
         images: form.images ? form.images.split(",") : [],
         ai_video_url: form.ai_video_url || "",
@@ -323,6 +326,34 @@ function NewPropertyForm({ onDone }) {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Opțiuni care apar în filtrele de căutare */}
+      <div className="mt-3">
+        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-foreground/60">Opțiuni (apar automat în filtrele de căutare)</p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { key: "parking", emoji: "🅿️", label: "Parcare" },
+            { key: "pet_friendly", emoji: "🐾", label: "Pet Friendly" },
+            { key: "commission_free", emoji: "🆓", label: "Fără Comision" },
+            { key: "guarantee", emoji: "🛡️", label: "Garanție 0 (VerifiCasa)" },
+          ].map((c) => (
+            <button
+              type="button"
+              key={c.key}
+              onClick={() => setForm((s) => ({ ...s, [c.key]: !s[c.key] }))}
+              className={`flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-semibold transition ${form[c.key] ? "border-emerald bg-emerald text-white shadow-soft" : "border-border bg-white text-foreground/70 hover:border-emerald/50 dark:bg-card"}`}
+            >
+              <span>{c.emoji}</span> {c.label}
+            </button>
+          ))}
+        </div>
+        <input
+          value={form.ai_video_url}
+          onChange={(e) => setForm((f) => ({ ...f, ai_video_url: e.target.value }))}
+          placeholder="Link Tur 3D / Video (opțional)"
+          className={`mt-2 ${inputCls}`}
+        />
       </div>
 
       <div className="mt-3">
