@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   User, Plus, Home, LogOut, Heart, MessageCircle, Settings, ShieldCheck,
-  LayoutDashboard, Bookmark, Search, ChevronDown, Globe, Check, Bell,
+  LayoutDashboard, Bookmark, Search, ChevronDown, Globe, Check, Bell, Moon, Sun,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
@@ -79,6 +79,27 @@ export default function Header() {
     </DropdownMenu>
   );
 
+  // Inline theme toggle rendered inside the account dropdown.
+  const ThemeMenuItem = () => {
+    const [theme, setTheme] = useState(() => (typeof window !== "undefined" && localStorage.getItem("vc_theme")) || "light");
+    const isDark = theme === "dark";
+    return (
+      <DropdownMenuItem
+        className="cursor-pointer font-semibold"
+        onClick={() => {
+          const next = isDark ? "light" : "dark";
+          setTheme(next);
+          localStorage.setItem("vc_theme", next);
+          if (next === "dark") document.documentElement.classList.add("dark");
+          else document.documentElement.classList.remove("dark");
+        }}
+      >
+        {isDark ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
+        {isDark ? "Tema deschisă" : "Tema întunecată"}
+      </DropdownMenuItem>
+    );
+  };
+
   // Shared profile dropdown trigger + content (used in both desktop and mobile rows).
   const ProfileMenu = ({ mobile = false }) => (
     <DropdownMenu>
@@ -123,6 +144,28 @@ export default function Header() {
           </>
         )}
         <DropdownMenuSeparator />
+        <DropdownMenuLabel className="text-xs text-muted-foreground">Preferințe cont</DropdownMenuLabel>
+        <ThemeMenuItem />
+        <DropdownMenuLabel className="text-xs text-muted-foreground">💰 {t("hdr_currency")}</DropdownMenuLabel>
+        <DropdownMenuItem onClick={() => setCurrency("EUR")} className="cursor-pointer font-semibold">
+          <span className="mr-2">🇪🇺 💶</span> EUR
+          {currency === "EUR" && <Check className="ml-auto h-4 w-4 text-emerald" />}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setCurrency("RON")} className="cursor-pointer font-semibold">
+          <span className="mr-2">🇷🇴 💵</span> RON
+          {currency === "RON" && <Check className="ml-auto h-4 w-4 text-emerald" />}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel className="text-xs text-muted-foreground">🗣️ {t("hdr_language")}</DropdownMenuLabel>
+        <DropdownMenuItem onClick={() => setLang("ro")} className="cursor-pointer font-semibold">
+          <span className="mr-2">🇷🇴</span> Română
+          {lang === "ro" && <Check className="ml-auto h-4 w-4 text-emerald" />}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setLang("en")} className="cursor-pointer font-semibold">
+          <span className="mr-2">🇬🇧</span> English
+          {lang === "en" && <Check className="ml-auto h-4 w-4 text-emerald" />}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => logout()}><LogOut className="mr-2 h-4 w-4" /> {t("hdr_logout")}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -145,10 +188,10 @@ export default function Header() {
             <Link to="/about" className="text-sm font-semibold text-foreground/80 transition hover:text-emerald">{t("hdr_about")}</Link>
           </nav>
 
-          {/* Top-right actions — desktop keeps full buttons, mobile keeps only currency + theme. */}
+          {/* Top-right actions — desktop keeps currency + theme; mobile reaches them via the account menu. */}
           <div className="flex items-center gap-2.5">
-            <CurrencySwitch compact />
-            <ThemeToggle />
+            <div className="hidden md:block"><CurrencySwitch /></div>
+            <div className="hidden md:block"><ThemeToggle /></div>
 
             {isAuthenticated ? (
               <>
