@@ -4,6 +4,7 @@ import {
   Play, MapPin, Maximize, BedDouble, ShieldCheck, PawPrint, BadgePercent,
   TrendingDown, TrendingUp, Heart, Eye, Building2, Phone, MessageCircle,
   ChevronLeft, ChevronRight, Calendar, PhoneOff, Clock,
+  UserCircle2,
 } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
@@ -150,9 +151,13 @@ export default function PropertyCard({ property }) {
         <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
           <MapPin className="h-3 w-3 shrink-0" /> <span className="truncate">{p.zone}, {p.city}</span>
         </p>
-        {postedAgo && (
+        {p.created_date && (
           <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
-            <Clock className="h-3 w-3 text-emerald" /> {lang === "en" ? `Posted ${postedAgo}` : `A fost postat ${postedAgo}`}
+            <UserCircle2 className="h-3 w-3 shrink-0 text-emerald" />
+            <span className="truncate font-medium text-foreground/70">{p.posted_by_name || p.owner_name || "VerifiCasa"}</span>
+            <span className="text-foreground/40">·</span>
+            <Clock className="h-3 w-3 shrink-0 text-emerald" />
+            {lang === "en" ? `Posted ${postedAgo}` : `A fost postat ${postedAgo}`}
           </p>
         )}
 

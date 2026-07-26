@@ -137,6 +137,7 @@ export default function Owner() {
 
 function NewPropertyForm({ onDone }) {
   const { country, t } = useCountry();
+  const { user } = useAuth();
   const { toast } = useToast();
   const cities = useMemo(() => getCities(country), [country]);
   const [form, setForm] = useState({
@@ -216,6 +217,7 @@ function NewPropertyForm({ onDone }) {
         latitude: form.latitude ? Number(form.latitude) : null,
         longitude: form.longitude ? Number(form.longitude) : null,
         owner_name: form.owner_name || "Proprietar",
+        posted_by_name: user?.full_name || form.owner_name || "VerifiCasa",
         owner_verified: false,
         ai_tour_verified: false,
         status: "Activ",

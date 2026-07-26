@@ -159,6 +159,10 @@
       "type": "string",
       "title": "Nume proprietar"
     },
+    "posted_by_name": {
+      "type": "string",
+      "title": "Autor postare (cine a publicat)"
+    },
     "owner_verified": {
       "type": "boolean",
       "default": false,
