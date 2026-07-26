@@ -7,7 +7,6 @@ import {
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuLabel,
-  DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
@@ -145,32 +144,7 @@ export default function Header() {
           </>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger><Settings className="mr-2 h-4 w-4" /> Preferințe cont</DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="w-52">
-            <ThemeMenuItem />
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-xs text-muted-foreground">💰 {t("hdr_currency")}</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => setCurrency("EUR")} className="cursor-pointer py-1.5">
-              <span className="mr-2">🇪🇺 💶</span> EUR
-              {currency === "EUR" && <Check className="ml-auto h-4 w-4 text-emerald" />}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setCurrency("RON")} className="cursor-pointer py-1.5">
-              <span className="mr-2">🇷🇴 💵</span> RON
-              {currency === "RON" && <Check className="ml-auto h-4 w-4 text-emerald" />}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-xs text-muted-foreground">🗣️ {t("hdr_language")}</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => setLang("ro")} className="cursor-pointer py-1.5">
-              <span className="mr-2">🇷🇴</span> Română
-              {lang === "ro" && <Check className="ml-auto h-4 w-4 text-emerald" />}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setLang("en")} className="cursor-pointer py-1.5">
-              <span className="mr-2">🇬🇧</span> English
-              {lang === "en" && <Check className="ml-auto h-4 w-4 text-emerald" />}
-            </DropdownMenuItem>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
+        <DropdownMenuItem onClick={() => navigate("/account")}><Settings className="mr-2 h-4 w-4" /> Preferințe cont</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => logout()}><LogOut className="mr-2 h-4 w-4" /> {t("hdr_logout")}</DropdownMenuItem>
       </DropdownMenuContent>
