@@ -125,4 +125,16 @@
   .dark .bg-white { background-color: hsl(var(--card)); }
   .dark .text-navy { color: hsl(var(--foreground)); }
   .dark .bg-gold.text-navy { color: hsl(var(--accent-foreground)); }
+
+  /* Status badges that hardcode light Tailwind palettes become unreadable
+     on the dark page — darken their backgrounds and lighten their text. */
+  .dark .bg-amber-100 { background-color: hsl(36 45% 22%); }
+  .dark .bg-amber-50  { background-color: hsl(36 40% 18%); }
+  .dark .text-amber-700 { color: hsl(38 85% 72%); }
+  .dark .bg-blue-50   { background-color: hsl(220 40% 20%); }
+  .dark .text-blue-700 { color: hsl(214 85% 74%); }
+  .dark .bg-emerald-soft, .dark .bg-mint-soft { background-color: hsl(152 40% 16%); }
+
+  /* Gradient buttons keep dark text on the bright green in both themes. */
+  .dark .gradient-mint.text-navy, .dark .gradient-emerald.text-navy { color: hsl(217 24% 14%); }
 }
