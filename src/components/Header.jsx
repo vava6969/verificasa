@@ -52,10 +52,10 @@ export default function Header() {
             <DropdownMenuTrigger asChild>
               <button className="flex h-9 items-center gap-1.5 rounded-full border border-border bg-white px-3 text-xs font-bold text-navy shadow-soft transition hover:border-emerald/50 dark:bg-navy dark:text-foreground">
                 <Globe className="h-4 w-4 text-emerald" />
-                <span>💰 {currency === "EUR" ? "🇪🇺" : "🇷🇴"} {currency}</span>
-                <span className="text-muted-foreground">·</span>
-                <span>🗣️ {lang === "ro" ? "🇷🇴" : "🇬🇧"} {lang.toUpperCase()}</span>
-                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="hidden md:inline">💰 {currency === "EUR" ? "🇪🇺" : "🇷🇴"} {currency}</span>
+                <span className="hidden md:inline text-muted-foreground">·</span>
+                <span className="hidden md:inline">🗣️ {lang === "ro" ? "🇷🇴" : "🇬🇧"} {lang.toUpperCase()}</span>
+                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
