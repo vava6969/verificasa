@@ -135,6 +135,12 @@
   .dark .text-blue-700 { color: hsl(214 85% 74%); }
   .dark .bg-emerald-soft, .dark .bg-mint-soft { background-color: hsl(152 40% 16%); }
 
+  /* Native <select> dropdown popups inherit the page's light text but render
+     on the OS's white popup in dark mode → invisible options. Tell the
+     browser to render native controls dark so the popup matches. */
+  .dark select { color-scheme: dark; }
+  .dark select option { background-color: hsl(var(--card)); color: hsl(var(--foreground)); }
+
   /* Gradient buttons keep dark text on the bright green in both themes. */
   .dark .gradient-mint.text-navy, .dark .gradient-emerald.text-navy { color: hsl(217 24% 14%); }
 }
