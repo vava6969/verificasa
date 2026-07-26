@@ -84,7 +84,7 @@ export default function Header() {
       <DropdownMenuTrigger asChild>
         <button className="relative flex h-9 items-center gap-2 rounded-full border border-border bg-white px-2.5 text-sm font-semibold text-navy shadow-soft transition hover:border-emerald/50 dark:bg-navy dark:text-foreground">
           {user?.avatar_url ? (
-            <UIImage src={user.avatar_url} fittingType="fill" className="h-7 w-7 rounded-full object-cover" />
+            <img src={user.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
           ) : (
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-soft text-emerald">
               <User className="h-4 w-4" />
@@ -169,13 +169,18 @@ export default function Header() {
         </div>
 
         {/* Mobile compact action row — small buttons so they never overflow. */}
-        <div className="flex items-center justify-between gap-2 border-t border-border/50 py-2 md:hidden">
+        <div className="flex items-center justify-between gap-2 border-t border-border/50 py-1.5 md:hidden">
+          <div className="flex items-center gap-4">
+            <Link to="/" className="whitespace-nowrap text-xs font-bold text-emerald">{t("hdr_home")}</Link>
+            <Link to="/about" className="whitespace-nowrap text-xs font-semibold text-foreground/70">{t("hdr_about")}</Link>
+            {isAuthenticated && <Link to="/my-properties" className="whitespace-nowrap text-xs font-semibold text-foreground/70">{t("hdr_myprops")}</Link>}
+          </div>
           <div className="flex items-center gap-1.5">
             <ThemeToggle />
             {isAuthenticated ? (
               <>
-                <Link to="/owner" className="flex h-8 items-center gap-1 rounded-full bg-emerald px-2.5 text-[11px] font-bold text-white shadow-soft">
-                  <Plus className="h-3.5 w-3.5" /> {t("hdr_add")}
+                <Link to="/owner" className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald text-white shadow-soft" aria-label={t("hdr_add")}>
+                  <Plus className="h-4 w-4" />
                 </Link>
                 <ProfileMenu mobile />
               </>
@@ -189,11 +194,6 @@ export default function Header() {
                 <Link to="/register"><Heart className="h-3.5 w-3.5" /> {t("hdr_register")}</Link>
               </Button>
             )}
-          </div>
-          <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-1">
-            <Link to="/" className="whitespace-nowrap text-xs font-bold text-emerald">{t("hdr_home")}</Link>
-            <Link to="/about" className="whitespace-nowrap text-xs font-semibold text-foreground/70">{t("hdr_about")}</Link>
-            {isAuthenticated && <Link to="/my-properties" className="whitespace-nowrap text-xs font-semibold text-foreground/70">{t("hdr_myprops")}</Link>}
           </div>
         </div>
       </div>
