@@ -151,7 +151,7 @@ export const STR = {
     pc_com: "Comision redus",
     // Property detail
     back_results: "Înapoi la rezultate",
-    tab_ai: "Tur 3D",
+    tab_ai: "Tur Video",
     tab_gallery: "Galerie",
     stat_rooms: "Camere",
     stat_area: "Suprafață",
@@ -496,7 +496,7 @@ export const STR = {
     pc_0fees: "0 Fees",
     pc_com: "Low fee",
     back_results: "Back to results",
-    tab_ai: "3D Tour",
+    tab_ai: "Video Tour",
     tab_gallery: "Gallery",
     stat_rooms: "Rooms",
     stat_area: "Area",

@@ -139,6 +139,7 @@ export default function Header() {
 
           <nav className="hidden items-center gap-6 md:flex">
             <Link to="/" className="text-sm font-semibold text-foreground/80 transition hover:text-emerald">{t("hdr_home")}</Link>
+            <Link to="/search" className="text-sm font-semibold text-foreground/80 transition hover:text-emerald">{t("sb_btn")}</Link>
             <Link to="/about" className="text-sm font-semibold text-foreground/80 transition hover:text-emerald">{t("hdr_about")}</Link>
           </nav>
 
@@ -171,9 +172,11 @@ export default function Header() {
         <div className="flex items-center justify-between gap-2 border-t border-border/50 py-1.5 md:hidden">
           <nav className="flex items-center gap-3.5 overflow-x-auto whitespace-nowrap">
             <Link to="/" className="text-xs font-bold text-emerald">{t("hdr_home")}</Link>
+            <Link to="/search" className="text-xs font-semibold text-foreground/70">{t("sb_btn")}</Link>
             <Link to="/about" className="text-xs font-semibold text-foreground/70">{t("hdr_about")}</Link>
             {isAuthenticated && <Link to="/my-properties" className="text-xs font-semibold text-foreground/70">{t("hdr_myprops")}</Link>}
             {isAuthenticated && <Link to="/messages" className="text-xs font-semibold text-foreground/70">{t("hdr_messages")}</Link>}
+            {isAuthenticated && <Link to="/saved" className="text-xs font-semibold text-foreground/70">{t("hdr_saved")}</Link>}
           </nav>
           <div className="flex items-center gap-1.5 shrink-0">
             {isAuthenticated ? (
