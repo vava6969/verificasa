@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
@@ -150,6 +151,7 @@ function NewPropertyForm({ onDone }) {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [chips, setChips] = useState({ wifi: false, noise: false, light: false, water: false });
+  const [agreed, setAgreed] = useState(false);
 
   const zones = useMemo(() => getZones(country, form.city), [country, form.city]);
 
@@ -183,6 +185,10 @@ function NewPropertyForm({ onDone }) {
     e.preventDefault();
     if (!form.title || !form.price_monthly || !form.city) {
       toast({ title: t("complete_fields"), variant: "destructive" });
+      return;
+    }
+    if (!agreed) {
+      toast({ title: t("agree_error"), variant: "destructive" });
       return;
     }
     setSaving(true);
@@ -324,6 +330,21 @@ function NewPropertyForm({ onDone }) {
         </label>
         {form.images && <p className="mt-1 text-xs text-mint">{t("uploaded_n", { n: form.images.split(",").length })}</p>}
       </div>
+
+      <label className="mt-4 flex items-start gap-2 text-sm text-muted-foreground">
+        <input
+          type="checkbox"
+          checked={agreed}
+          onChange={(e) => setAgreed(e.target.checked)}
+          className="mt-0.5 h-4 w-4 rounded border-border accent-emerald"
+        />
+        <span className="leading-relaxed">
+          {t("agree_prefix")}{" "}
+          <Link to="/terms" className="font-semibold text-emerald hover:underline">{t("agree_terms_link")}</Link>{" "}
+          {t("agree_and")}{" "}
+          <Link to="/privacy" className="font-semibold text-emerald hover:underline">{t("agree_privacy_link")}</Link>.
+        </span>
+      </label>
 
       <div className="mt-4 flex items-center gap-2">
         <Button type="submit" disabled={saving || uploading} className="gradient-mint text-navy shadow-soft hover:opacity-90">

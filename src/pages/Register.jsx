@@ -38,12 +38,21 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
   const [otpCode, setOtpCode] = useState("");
+  const [agreed, setAgreed] = useState(false);
+  const lang = (typeof window !== "undefined" && localStorage.getItem("vc_lang")) || "ro";
+  const L = lang === "en"
+    ? { agreeError: "You must accept the Terms & Conditions and Privacy Policy", prefix: "I agree to", terms: "Terms & Conditions", and: "and", privacy: "Privacy Policy" }
+    : { agreeError: "Trebuie să accepți Termenii și Condițiile și Politica de Confidențialitate", prefix: "Sunt de acord cu", terms: "Termenii și Condițiile", and: "și", privacy: "Politica de Confidențialitate" };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      return;
+    }
+    if (!agreed) {
+      setError(L.agreeError);
       return;
     }
     setLoading(true);
@@ -246,6 +255,21 @@ export default function Register() {
               required
             />
           </div>
+        </div>
+        <div className="flex items-start gap-2 text-sm">
+          <input
+            id="agree"
+            type="checkbox"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-border accent-emerald"
+          />
+          <label htmlFor="agree" className="text-muted-foreground leading-relaxed">
+            {L.prefix}{" "}
+            <Link to="/terms" className="text-primary font-medium hover:underline">{L.terms}</Link>{" "}
+            {L.and}{" "}
+            <Link to="/privacy" className="text-primary font-medium hover:underline">{L.privacy}</Link>.
+          </label>
         </div>
         <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
           {loading ? (

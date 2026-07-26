@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { CountryProvider } from "@/components/CountryContext";
 import ScrollToTop from "@/components/ScrollToTop";
 import InstagramPopup from "@/components/InstagramPopup";
+import CookieBanner from "@/components/CookieBanner";
 
 export default function Layout() {
   return (
@@ -17,6 +18,7 @@ export default function Layout() {
         </main>
         <Footer />
         <InstagramPopup />
+        <CookieBanner />
       </div>
     </CountryProvider>
   );

@@ -8,6 +8,7 @@ import HeroPhoto from "@/components/HeroPhoto";
 import LaunchCountdown from "@/components/LaunchCountdown";
 import InspectieModal from "@/components/InspectieModal";
 import ListeazaPopup from "@/components/ListeazaPopup";
+import BetaBanner from "@/components/BetaBanner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -49,6 +50,7 @@ export default function Landing() {
 
   return (
     <div>
+      <BetaBanner />
       {/* HERO */}
       <section className="relative min-h-[660px] overflow-hidden">
         <HeroPhoto />
