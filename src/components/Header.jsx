@@ -32,8 +32,10 @@ export default function Header() {
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      if (y > 140 && y > lastY.current + 6) setHidden(true);
-      else if (y < lastY.current - 6) setHidden(false);
+      // Always visible at the very top of the page.
+      if (y < 8) { setHidden(false); lastY.current = y; return; }
+      if (y > lastY.current + 4) setHidden(true);
+      else if (y < lastY.current - 4) setHidden(false);
       lastY.current = y;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -127,7 +129,7 @@ export default function Header() {
   );
 
   return (
-    <header className={`sticky top-0 z-50 w-full border-b border-border/60 bg-white/85 backdrop-blur-xl transition-transform duration-300 dark:bg-navy-deep/85 ${hidden ? "-translate-y-full" : "translate-y-0"}`}>
+    <header className={`sticky top-0 z-50 w-full border-b border-border/60 bg-white/85 backdrop-blur-xl transition-all duration-300 ease-out dark:bg-navy-deep/85 ${hidden ? "-translate-y-[calc(100%+4px)] opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           <Link to="/" className="flex items-center gap-3 shrink-0">
