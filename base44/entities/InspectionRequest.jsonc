@@ -47,6 +47,11 @@
       ],
       "default": "Nou",
       "title": "Status"
+    },
+    "description": {
+      "type": "string",
+      "title": "Descriere",
+      "maxLength": 1000
     }
   },
   "required": [

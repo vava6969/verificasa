@@ -14,6 +14,11 @@
     "query_string": {
       "type": "string",
       "title": "Query string (URL params)"
+    },
+    "description": {
+      "type": "string",
+      "title": "Descriere",
+      "maxLength": 1000
     }
   },
   "required": [

@@ -21,15 +21,20 @@
     },
     "target_type": {
       "type": "string",
-      "title": "Tip \u021binint (property/comment/user)"
+      "title": "Tip \u021bint (property/comment/user)"
     },
     "target_id": {
       "type": "string",
-      "title": "ID \u021binint"
+      "title": "ID \u021bint"
     },
     "detail": {
       "type": "string",
       "title": "Detaliu"
+    },
+    "description": {
+      "type": "string",
+      "title": "Descriere",
+      "maxLength": 1000
     }
   },
   "required": [

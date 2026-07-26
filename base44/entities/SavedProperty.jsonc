@@ -10,6 +10,11 @@
     "property_id": {
       "type": "string",
       "title": "Property ID"
+    },
+    "description": {
+      "type": "string",
+      "title": "Descriere",
+      "maxLength": 1000
     }
   },
   "required": [

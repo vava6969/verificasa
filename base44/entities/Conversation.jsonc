@@ -30,6 +30,11 @@
     "last_message": {
       "type": "string",
       "title": "Ultimul mesaj"
+    },
+    "description": {
+      "type": "string",
+      "title": "Descriere",
+      "maxLength": 1000
     }
   },
   "required": [
