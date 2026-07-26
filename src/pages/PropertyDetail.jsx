@@ -17,6 +17,7 @@ L.Icon.Default.mergeOptions({
 import { useCountry } from "@/components/CountryContext";
 import AITourPlayer from "@/components/AITourPlayer";
 import ShareableStoryCard from "@/components/ShareableStoryCard";
+import PropertyEditForm from "@/components/PropertyEditForm";
 import PhoneReveal from "@/components/PhoneReveal";
 import PropertyPOI from "@/components/PropertyPOI";
 import PropertyComments from "@/components/PropertyComments";
@@ -27,7 +28,7 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
   Calendar, ShieldCheck, FileText, CheckCircle2, ChevronLeft, Send, Phone,
-  Heart, MessageCircle, UserCircle2, Clock,
+  Heart, MessageCircle, UserCircle2, Clock, Pencil,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
@@ -51,6 +52,7 @@ export default function PropertyDetail() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [saved, setSaved] = useState(false);
+  const [editing, setEditing] = useState(false);
   const viewedRef = useRef(new Set());
 
   useEffect(() => {
@@ -143,6 +145,8 @@ export default function PropertyDetail() {
 
   const p = property;
   const images = p.images?.length ? p.images : [];
+  const isAdmin = user && ["SUPER_ADMIN", "ADMIN"].includes((user.role || "").toUpperCase());
+  const canEdit = !!user && (isAdmin || (user.id && p.created_by_id === user.id));
 
   const toggleSave = async () => {
     if (!user) { navigate("/login"); return; }
@@ -258,6 +262,16 @@ export default function PropertyDetail() {
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
           {/* LEFT */}
           <div className="space-y-6 lg:col-span-2">
+            {editing && (
+              <PropertyEditForm
+                property={p}
+                isAdmin={isAdmin}
+                onDone={async () => {
+                  setEditing(false);
+                  try { const np = await base44.entities.Property.get(id); setProperty(np); } catch {}
+                }}
+              />
+            )}
             <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -275,6 +289,16 @@ export default function PropertyDetail() {
                       <span className="text-foreground/40">·</span>
                       {formatDistanceToNowStrict(new Date(p.created_date), { addSuffix: true, locale: lang === "en" ? enGB : ro })}
                     </p>
+                  )}
+                  {p.approved_by_name && (
+                    <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-emerald">
+                      <BadgeCheck className="h-3.5 w-3.5" /> Aprobat de {p.approved_by_name}{p.approved_date ? ` · ${new Date(p.approved_date).toLocaleString("ro-RO", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}` : ""}
+                    </p>
+                  )}
+                  {canEdit && (
+                    <Button variant="outline" size="sm" onClick={() => setEditing(true)} className="mt-2 gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft">
+                      <Pencil className="h-3.5 w-3.5" /> Editează anunțul
+                    </Button>
                   )}
                 </div>
                 <div className="text-right">
@@ -314,7 +338,7 @@ export default function PropertyDetail() {
 
               <div className="mt-4 rounded-xl bg-mint-soft/60 p-3">
                 <p className="flex items-center gap-2 text-xs font-semibold text-navy">
-                  <ShieldCheck className="h-4 w-4" /> {legalInfo.tenantFee} · {legalInfo.legal1}
+                  <ShieldCheck className="h-4 w-4" /> {legalInfo.tenantFee}
                 </p>
               </div>
 

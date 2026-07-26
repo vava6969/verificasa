@@ -54,7 +54,17 @@ export default function Admin() {
 
   const setApproval = async (p, status) => {
     try {
-      await base44.entities.Property.update(p.id, { approval_status: status });
+      const patch = { approval_status: status };
+      if (status === "APPROVED") {
+        patch.approved_by_id = user.id;
+        patch.approved_by_name = user.full_name || user.email;
+        patch.approved_date = new Date().toISOString();
+      } else {
+        patch.approved_by_id = null;
+        patch.approved_by_name = null;
+        patch.approved_date = null;
+      }
+      await base44.entities.Property.update(p.id, patch);
       toast({ title: `Anunț ${status === "APPROVED" ? "aprobat" : "respins"}` });
       log(status === "APPROVED" ? "approve" : "reject", "property", p.id, p.title);
       load();

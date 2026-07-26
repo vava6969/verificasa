@@ -193,6 +193,19 @@
       "default": "PENDING",
       "title": "Aprobare anun\u021b"
     },
+    "approved_by_id": {
+      "type": "string",
+      "title": "Aprobat de (ID admin)"
+    },
+    "approved_by_name": {
+      "type": "string",
+      "title": "Aprobat de (nume admin)"
+    },
+    "approved_date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Data aprob\u0103rii"
+    },
     "featured": {
       "type": "boolean",
       "default": false,
