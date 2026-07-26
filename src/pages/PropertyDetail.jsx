@@ -34,9 +34,6 @@ import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
 import { createNotification } from "@/lib/notifications";
 
-const DEMO_VIDEO = "https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-modern-living-room-41558-large.mp4";
-const DEMO_FALLBACK = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4";
-
 export default function PropertyDetail() {
   const { id } = useParams();
   const { country, formatPrice, t, legalInfo, lang } = useCountry();
@@ -198,11 +195,6 @@ export default function PropertyDetail() {
         {/* HERO */}
         <div className="mt-4">
           <div className="mb-3 flex items-center gap-2">
-            {p.ai_tour_verified && (
-              <button onClick={() => setTab("ai")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "ai" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
-                <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5" /> {t("tab_ai")}</span>
-              </button>
-            )}
             <button onClick={() => setTab("gallery")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "gallery" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
               {t("tab_gallery")} ({images.length})
             </button>
@@ -223,22 +215,6 @@ export default function PropertyDetail() {
                 allow="xr-spatial-tracking; fullscreen; autoplay"
                 frameBorder="0"
               />
-            </div>
-          ) : tab === "ai" ? (
-            <div className="relative overflow-hidden rounded-2xl border border-border bg-navy-deep shadow-soft">
-              <video autoPlay muted loop playsInline poster={images[0]} className="aspect-video w-full object-cover">
-                <source src={p.ai_video_url || DEMO_VIDEO} type="video/mp4" />
-                <source src={DEMO_FALLBACK} type="video/mp4" />
-              </video>
-              {/* subtle controls overlay */}
-              <div className="absolute left-3 top-3">
-                <span className="flex items-center gap-1 rounded-full bg-navy/80 px-2.5 py-1 text-[11px] font-semibold text-mint backdrop-blur">
-                  <Sparkles className="h-3 w-3" /> {t("aip_badge")}
-                </span>
-              </div>
-              <div className="pointer-events-none absolute bottom-3 left-3">
-                <p className="text-sm font-semibold text-white drop-shadow">{p.title}</p>
-              </div>
             </div>
           ) : (
             <div
