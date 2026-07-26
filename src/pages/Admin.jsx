@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
-import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck } from "lucide-react";
+import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText } from "lucide-react";
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 const ROLE_OPTIONS = ["PROPRIETAR", "AGENT", "ADMIN", "SUPER_ADMIN", "SUPPORT", "user"];
@@ -139,12 +139,46 @@ export default function Admin() {
         <Button variant="outline" onClick={load} className="gap-1.5"><RefreshCw className="h-4 w-4" /> Reîncarcă</Button>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-2">
-        {[["pending","În așteptare"],["all","Toate anunțurile"],["comments","Comentarii"],["users","Utilizatori"],["inspectii","Inspecții"],["audit","Audit log"]].map(([k,label]) => (
-          <button key={k} onClick={() => setTab(k)} className={`rounded-full px-4 py-2 text-sm font-semibold transition ${tab === k ? "bg-navy text-emerald" : "border border-border bg-white text-foreground/70 hover:border-emerald/50 dark:bg-card"}`}>
-            {label}{k === "users" && users ? ` (${users.length})` : ""}
-          </button>
-        ))}
+      <div className="mt-6 space-y-3">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/70">Prioritare</span>
+          <div className="h-px flex-1 bg-border" />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { k: "pending", label: "Proprietăți în așteptare", icon: Clock, count: pending.length, tone: "amber" },
+            { k: "users", label: "Utilizatori", icon: Users, count: (users || []).length, tone: "emerald" },
+            { k: "inspectii", label: "Cereri de inspecție", icon: ClipboardList, count: (inspections || []).length, tone: "emerald" },
+          ].map((t) => {
+            const Active = t.icon;
+            const active = tab === t.k;
+            return (
+              <button key={t.k} onClick={() => setTab(t.k)} className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${active ? "bg-navy text-white" : "border border-border bg-white text-foreground/70 hover:border-emerald/50 dark:bg-card"}`}>
+                <Active className={`h-4 w-4 ${active ? "text-emerald" : t.tone === "amber" ? "text-amber-500" : "text-emerald"}`} /> {t.label}
+                {t.count > 0 && <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${active ? "bg-emerald/20 text-emerald" : t.tone === "amber" ? "bg-amber-50 text-amber-700" : "bg-emerald-soft text-emerald"}`}>{t.count}</span>}
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex items-center gap-2 pt-1">
+          <span className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/70">Gestionare</span>
+          <div className="h-px flex-1 bg-border" />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { k: "all", label: "Toate anunțurile", icon: Building2 },
+            { k: "comments", label: "Comentarii", icon: MessageSquare },
+            { k: "audit", label: "Audit log", icon: FileText },
+          ].map((t) => {
+            const Active = t.icon;
+            const active = tab === t.k;
+            return (
+              <button key={t.k} onClick={() => setTab(t.k)} className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition ${active ? "bg-navy text-white" : "border border-border bg-white text-foreground/60 hover:border-emerald/40 dark:bg-card"}`}>
+                <Active className="h-3.5 w-3.5" /> {t.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="mt-6">
