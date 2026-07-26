@@ -12,7 +12,6 @@ import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useNotifications } from "@/hooks/useNotifications";
 import { Button } from "@/components/ui/button";
-import { Image as UIImage } from "@/components/ui/image";
 import VerifiCasaLogo from "@/components/VerifiCasaLogo";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -50,8 +49,8 @@ export default function Header() {
           <span className="hidden md:inline">💰 {currency === "EUR" ? "🇪🇺" : "🇷🇴"} {currency}</span>
           <span className="hidden md:inline text-muted-foreground">·</span>
           <span className="hidden md:inline">🗣️ {lang === "ro" ? "🇷🇴" : "🇬🇧"} {lang.toUpperCase()}</span>
-          {compact && <span className="md:hidden">{currency}</span>}
-          <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          <span className="md:hidden">{currency === "EUR" ? "💶" : "💵"}</span>
+          <ChevronDown className="hidden h-3.5 w-3.5 shrink-0 text-muted-foreground md:inline" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-52">
@@ -145,8 +144,8 @@ export default function Header() {
 
           {/* Top-right actions — desktop keeps full buttons, mobile keeps only currency + theme. */}
           <div className="flex items-center gap-2.5">
-            <CurrencySwitch />
-            <div className="hidden md:block"><ThemeToggle /></div>
+            <CurrencySwitch compact />
+            <ThemeToggle />
 
             {isAuthenticated ? (
               <>
@@ -168,15 +167,15 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile compact action row — small buttons so they never overflow. */}
+        {/* Mobile compact action row — nav links left, action group right. */}
         <div className="flex items-center justify-between gap-2 border-t border-border/50 py-1.5 md:hidden">
-          <div className="flex items-center gap-4">
-            <Link to="/" className="whitespace-nowrap text-xs font-bold text-emerald">{t("hdr_home")}</Link>
-            <Link to="/about" className="whitespace-nowrap text-xs font-semibold text-foreground/70">{t("hdr_about")}</Link>
-            {isAuthenticated && <Link to="/my-properties" className="whitespace-nowrap text-xs font-semibold text-foreground/70">{t("hdr_myprops")}</Link>}
-          </div>
-          <div className="flex items-center gap-1.5">
-            <ThemeToggle />
+          <nav className="flex items-center gap-3.5 overflow-x-auto whitespace-nowrap">
+            <Link to="/" className="text-xs font-bold text-emerald">{t("hdr_home")}</Link>
+            <Link to="/about" className="text-xs font-semibold text-foreground/70">{t("hdr_about")}</Link>
+            {isAuthenticated && <Link to="/my-properties" className="text-xs font-semibold text-foreground/70">{t("hdr_myprops")}</Link>}
+            {isAuthenticated && <Link to="/messages" className="text-xs font-semibold text-foreground/70">{t("hdr_messages")}</Link>}
+          </nav>
+          <div className="flex items-center gap-1.5 shrink-0">
             {isAuthenticated ? (
               <>
                 <Link to="/owner" className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald text-white shadow-soft" aria-label={t("hdr_add")}>
@@ -188,11 +187,6 @@ export default function Header() {
               <Link to="/login" className="flex h-8 items-center gap-1 rounded-full border border-border bg-white px-2.5 text-[11px] font-bold text-foreground/80 dark:bg-navy dark:border-navy">
                 <User className="h-3.5 w-3.5" /> {t("hdr_login")}
               </Link>
-            )}
-            {!isAuthenticated && (
-              <Button asChild className="h-8 rounded-full bg-emerald px-2.5 text-[11px] font-bold text-white shadow-soft hover:bg-emerald/90">
-                <Link to="/register"><Heart className="h-3.5 w-3.5" /> {t("hdr_register")}</Link>
-              </Button>
             )}
           </div>
         </div>
