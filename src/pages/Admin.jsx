@@ -119,7 +119,7 @@ export default function Admin() {
         ai_tour_verified: next,
         verification_level: next ? "video_ai" : (p.verification_level === "video_ai" ? "unverified" : p.verification_level),
       });
-      toast({ title: next ? "Tur AI activat ✓" : "Tur AI retras" });
+      toast({ title: next ? "Tur 3D activat ✓" : "Tur 3D retras" });
       log(next ? "enable_ai_tour" : "disable_ai_tour", "property", p.id, p.title);
       load();
     } catch (e) { toast({ title: "Eroare", variant: "destructive" }); }
@@ -282,7 +282,7 @@ export default function Admin() {
               <p className="text-sm text-muted-foreground">{tab === "pending" ? "Niciun anunț în așteptare. 🎉" : "Niciun anunț."}</p>
             ) : (tab === "pending" ? pending : all).map((p) => {
               if (editingId === p.id) {
-                return <PropertyEditForm key={p.id} property={p} onDone={() => { setEditingId(null); load(); }} />;
+                return <PropertyEditForm key={p.id} property={p} isAdmin onDone={() => { setEditingId(null); load(); }} />;
               }
               return (
               <div key={p.id} className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card">
@@ -297,7 +297,7 @@ export default function Admin() {
                   <Button size="sm" variant="outline" onClick={() => setEditingId(p.id)} className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft"><Pencil className="h-3.5 w-3.5" /> Editează</Button>
                   {p.approval_status !== "APPROVED" && <Button size="sm" onClick={() => setApproval(p, "APPROVED")} className="gap-1 bg-emerald text-white"><Check className="h-3.5 w-3.5" /> Aprobă</Button>}
                   {p.approval_status === "APPROVED" && <Button size="sm" variant="outline" onClick={() => setApproval(p, "REJECTED")} className="gap-1 border-amber-400 text-amber-700"><X className="h-3.5 w-3.5" /> Retrage</Button>}
-                  <Button size="sm" variant="outline" onClick={() => toggleAiTour(p)} className={`gap-1 ${p.ai_tour_verified ? "border-emerald bg-emerald text-white hover:bg-emerald/90" : "border-emerald/40 text-emerald hover:bg-emerald-soft"}`}><Sparkles className="h-3.5 w-3.5" /> {p.ai_tour_verified ? "Tur AI ✓" : "+ Tur AI"}</Button>
+                  <Button size="sm" variant="outline" onClick={() => toggleAiTour(p)} className={`gap-1 ${p.ai_tour_verified ? "border-emerald bg-emerald text-white hover:bg-emerald/90" : "border-emerald/40 text-emerald hover:bg-emerald-soft"}`}><Sparkles className="h-3.5 w-3.5" /> {p.ai_tour_verified ? "Tur 3D ✓" : "+ Tur 3D"}</Button>
                   <Button size="sm" variant="outline" onClick={() => delProperty(p)} className="gap-1 border-destructive/30 text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /></Button>
                 </div>
               </div>

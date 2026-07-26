@@ -28,7 +28,7 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
   Calendar, ShieldCheck, FileText, CheckCircle2, ChevronLeft, Send, Phone,
-  Heart, MessageCircle, UserCircle2, Clock, Pencil,
+  Heart, MessageCircle, UserCircle2, Clock, Pencil, Box,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
@@ -54,6 +54,7 @@ export default function PropertyDetail() {
   const [saved, setSaved] = useState(false);
   const [editing, setEditing] = useState(false);
   const viewedRef = useRef(new Set());
+  const touchStartX = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -205,32 +206,23 @@ export default function PropertyDetail() {
             <button onClick={() => setTab("gallery")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "gallery" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
               {t("tab_gallery")} ({images.length})
             </button>
-            <button onClick={() => setTab("3d")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "3d" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
-              <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5" /> {t("tab_3d")} · TEST</span>
-            </button>
+            {p.tour_3d_url && (
+              <button onClick={() => setTab("3d")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "3d" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+                <span className="flex items-center gap-1.5"><Box className="h-3.5 w-3.5" /> {t("tab_3d")}</span>
+              </button>
+            )}
           </div>
 
           {tab === "3d" ? (
-            <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-soft">
-              <div className="flex items-center justify-between border-b border-border bg-gold-soft/60 px-3 py-2">
-                <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-gold-deep">
-                  <Sparkles className="h-3.5 w-3.5" /> {t("tab_3d")} · TEST
-                </span>
-                <span className="text-[11px] text-muted-foreground">Matterport embed</span>
-              </div>
+            <div className="overflow-hidden rounded-2xl border border-border bg-navy-deep shadow-soft">
               <iframe
-                src="https://my.matterport.com/show/?m=Zf8HnTwFvBM&play=1&ts=0&brand=0&gt=DoubleClick&hr=60&wh=0"
-                title="Tur 3D Matterport"
+                src={p.tour_3d_url}
+                title="Tur 3D"
                 className="aspect-video w-full"
                 allowFullScreen
                 allow="xr-spatial-tracking; fullscreen; autoplay"
                 frameBorder="0"
               />
-              {/* Overlay VerifiCasa peste branding Matterport */}
-              <div className="pointer-events-none absolute bottom-2 right-2 flex items-center gap-1.5 rounded-full bg-navy/90 px-3 py-1.5 shadow-glow backdrop-blur">
-                <span className="h-3.5 w-3.5 rounded-full bg-gradient-to-br from-mint to-emerald" />
-                <span className="font-heading text-xs font-bold tracking-tight text-white">VerifiCasa</span>
-              </div>
             </div>
           ) : tab === "ai" ? (
             <div className="relative overflow-hidden rounded-2xl border border-border bg-navy-deep shadow-soft">
@@ -249,7 +241,18 @@ export default function PropertyDetail() {
               </div>
             </div>
           ) : (
-            <div className="overflow-hidden rounded-2xl border border-border bg-white">
+            <div
+              className="overflow-hidden rounded-2xl border border-border bg-white select-none"
+              onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+              onTouchEnd={(e) => {
+                if (touchStartX.current == null) return;
+                const dx = e.changedTouches[0].clientX - touchStartX.current;
+                if (Math.abs(dx) > 50 && images.length > 1) {
+                  setActiveImage((i) => (i + (dx < 0 ? 1 : -1) + images.length) % images.length);
+                }
+                touchStartX.current = null;
+              }}
+            >
               {images[activeImage] ? (
                 <Image src={images[activeImage]} alt={p.title} fittingType="fill" className="aspect-video w-full" />
               ) : (
@@ -342,6 +345,11 @@ export default function PropertyDetail() {
                 {p.ai_tour_verified && (
                   <span className="flex items-center gap-1 rounded-full bg-navy px-3 py-1 text-xs font-semibold text-mint">
                     <Sparkles className="h-3.5 w-3.5" /> {t("badge_aitour_v")}
+                  </span>
+                )}
+                {p.tour_3d_url && (
+                  <span className="flex items-center gap-1 rounded-full bg-navy px-3 py-1 text-xs font-semibold text-mint ring-1 ring-mint/40">
+                    <Box className="h-3.5 w-3.5" /> {t("tab_3d")}
                   </span>
                 )}
                 {p.pet_friendly && (

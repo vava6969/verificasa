@@ -12,7 +12,7 @@ import BetaBanner from "@/components/BetaBanner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  ShieldCheck, ArrowRight, Video, FileText, Lock, TrainFront, Volume2, Wifi, CheckCircle2, Home,
+  ShieldCheck, ArrowRight, Video, FileText, Lock, Home,
 } from "lucide-react";
 
 export default function Landing() {
@@ -26,12 +26,6 @@ export default function Landing() {
     { icon: ShieldCheck, title: t("vp2_t"), desc: t("vp2_d") },
     { icon: Lock, title: t("vp3_t"), desc: t("vp3_d") },
   ];
-  const comfortChips = [
-    { icon: TrainFront, label: t("comfort_metro") },
-    { icon: Volume2, label: t("comfort_noise") },
-    { icon: Wifi, label: t("comfort_wifi") },
-  ];
-
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -74,13 +68,6 @@ export default function Landing() {
             <SearchBar />
           </div>
 
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs font-medium text-white/70">
-            {comfortChips.map((c, i) => (
-              <span key={i} className="flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/80 backdrop-blur-md">
-                <c.icon className="h-3.5 w-3.5 text-emerald" /> {c.label}
-              </span>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -134,7 +121,9 @@ export default function Landing() {
       {/* SOLICITĂ O INSPECȚIE CTA */}
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl gradient-navy p-8 text-white shadow-soft sm:p-12">
-          <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-emerald/20 blur-2xl" />
+          <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-emerald/20 blur-2xl animate-blob" />
+          <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-gold/20 blur-2xl animate-blob" style={{ animationDelay: "2.5s" }} />
+          <div className="absolute right-1/3 -bottom-8 h-32 w-32 rounded-full bg-emerald/15 blur-2xl animate-blob" style={{ animationDelay: "4s" }} />
           <div className="relative max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-white/10 px-3 py-1 text-xs font-semibold text-gold">
               <ShieldCheck className="h-3.5 w-3.5" /> {t("owner_badge")}
@@ -154,13 +143,13 @@ export default function Landing() {
 
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                { icon: ShieldCheck, label: t("b_verified") },
-                { icon: Volume2, label: t("b_measure") },
-                { icon: FileText, label: t("b_report") },
-                { icon: CheckCircle2, label: t("b_docs") },
+                { emoji: "🛡️", label: t("b_verified") },
+                { emoji: "📐", label: t("b_measure") },
+                { emoji: "📄", label: t("b_report") },
+                { emoji: "✅", label: t("b_docs") },
               ].map((b, i) => (
                 <div key={i} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-semibold text-white/80">
-                  <b.icon className="h-4 w-4 text-emerald" /> {b.label}
+                  <span className="text-base leading-none">{b.emoji}</span> {b.label}
                 </div>
               ))}
             </div>

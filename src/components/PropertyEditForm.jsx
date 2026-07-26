@@ -42,6 +42,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
     owner_name: property.owner_name || "",
     seller_role: property.seller_role || "Proprietar",
     ai_video_url: property.ai_video_url || "",
+    tour_3d_url: property.tour_3d_url || "",
     monthly_utilities_estimate: property.monthly_utilities_estimate ?? "",
     maintenance_fee: property.maintenance_fee ?? "",
     deposit_option: property.deposit_option || "standard",
@@ -111,6 +112,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         payload.owner_verified = form.owner_verified;
         payload.ai_tour_verified = form.ai_tour_verified;
         payload.verification_level = form.verification_level;
+        payload.tour_3d_url = form.tour_3d_url;
       }
       await base44.entities.Property.update(property.id, payload);
       toast({ title: "Anunț actualizat" });
@@ -220,7 +222,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       </div>
 
       {/* Costuri & tur AI */}
-      <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Costuri & Tur AI</p>
+      <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Costuri & Tur 3D</p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Field label="Estimare utilități/lună"><input type="number" value={form.monthly_utilities_estimate} onChange={(e) => upd("monthly_utilities_estimate", e.target.value)} className={inputCls} /></Field>
         <Field label="Întreținere/lună"><input type="number" value={form.maintenance_fee} onChange={(e) => upd("maintenance_fee", e.target.value)} className={inputCls} /></Field>
@@ -234,7 +236,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
             {FAIRNESS.map((f) => <option key={f.v} value={f.v}>{f.label}</option>)}
           </select>
         </Field>
-        <Field label="Tur AI / Video URL">
+        <Field label="Tur Video URL">
           <input value={form.ai_video_url} onChange={(e) => upd("ai_video_url", e.target.value)} placeholder="https://..." className={inputCls} />
         </Field>
       </div>
@@ -250,7 +252,10 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
               </select>
             </Field>
             <label className="flex items-center gap-2 self-end pb-2"><input type="checkbox" checked={form.owner_verified} onChange={(e) => upd("owner_verified", e.target.checked)} /> Proprietar verificat</label>
-            <label className="flex items-center gap-2 self-end pb-2"><input type="checkbox" checked={form.ai_tour_verified} onChange={(e) => upd("ai_tour_verified", e.target.checked)} /> Activare badge Tur AI</label>
+            <label className="flex items-center gap-2 self-end pb-2"><input type="checkbox" checked={form.ai_tour_verified} onChange={(e) => upd("ai_tour_verified", e.target.checked)} /> Activare badge Tur 3D</label>
+            <Field label="Link Tur 3D (Matterport — doar admin)">
+              <input value={form.tour_3d_url} onChange={(e) => upd("tour_3d_url", e.target.value)} placeholder="https://my.matterport.com/show/?m=..." className={inputCls} />
+            </Field>
           </div>
         </>
       )}

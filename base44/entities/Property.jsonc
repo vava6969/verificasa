@@ -147,6 +147,10 @@
       "type": "string",
       "title": "Tur AI / Video URL"
     },
+    "tour_3d_url": {
+      "type": "string",
+      "title": "Link Tur 3D (Matterport \u2014 setat de admin)"
+    },
     "latitude": {
       "type": "number",
       "title": "Latitudine"

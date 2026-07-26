@@ -13,7 +13,7 @@ export default function Layout() {
       <ScrollToTop />
       <div className="flex min-h-screen flex-col overflow-x-clip bg-background">
         <Header />
-        <main className="flex-1">
+        <main className="flex-1 overflow-x-hidden">
           <Outlet />
         </main>
         <Footer />

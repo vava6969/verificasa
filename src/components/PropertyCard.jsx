@@ -4,7 +4,7 @@ import {
   Play, MapPin, Maximize, BedDouble, ShieldCheck, PawPrint, BadgePercent,
   TrendingDown, TrendingUp, Heart, Eye, Building2, Phone, MessageCircle,
   ChevronLeft, ChevronRight, Calendar, PhoneOff, Clock,
-  UserCircle2,
+  UserCircle2, Box,
 } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
@@ -108,6 +108,11 @@ export default function PropertyCard({ property }) {
           {isVerified && (
             <span className="flex items-center gap-1 rounded-full bg-emerald px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
               <ShieldCheck className="h-3.5 w-3.5" /> {t("pc_verified")}
+            </span>
+          )}
+          {p.tour_3d_url && (
+            <span className="flex items-center gap-1 rounded-full bg-navy px-2.5 py-1 text-[11px] font-bold text-mint shadow-soft ring-1 ring-mint/40">
+              <Box className="h-3.5 w-3.5" /> {t("tab_3d")}
             </span>
           )}
           {p.commission_free && (
