@@ -219,7 +219,7 @@ export default function PropertyDetail() {
                 <span className="text-[11px] text-muted-foreground">Matterport embed</span>
               </div>
               <iframe
-                src="https://my.matterport.com/show/?m=Zf8HnTwFvBM&play=1&ts=0"
+                src="https://my.matterport.com/show/?m=Zf8HnTwFvBM&play=1&ts=0&brand=0&gt=DoubleClick&hr=60&wh=0"
                 title="Tur 3D Matterport"
                 className="aspect-video w-full"
                 allowFullScreen
