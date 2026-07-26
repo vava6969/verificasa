@@ -226,6 +226,11 @@ export default function PropertyDetail() {
                 allow="xr-spatial-tracking; fullscreen; autoplay"
                 frameBorder="0"
               />
+              {/* Overlay VerifiCasa peste branding Matterport */}
+              <div className="pointer-events-none absolute bottom-2 right-2 flex items-center gap-1.5 rounded-full bg-navy/90 px-3 py-1.5 shadow-glow backdrop-blur">
+                <span className="h-3.5 w-3.5 rounded-full bg-gradient-to-br from-mint to-emerald" />
+                <span className="font-heading text-xs font-bold tracking-tight text-white">VerifiCasa</span>
+              </div>
             </div>
           ) : tab === "ai" ? (
             <div className="relative overflow-hidden rounded-2xl border border-border bg-navy-deep shadow-soft">
