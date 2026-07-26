@@ -20,7 +20,7 @@ export default function ShareableStoryCard({ property, className = "" }) {
   const qr = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=0&data=${encodeURIComponent(url)}`;
 
   const isField = p.verification_level === "field_certified";
-  const isVideo = p.verification_level === "video_ai" || !!p.ai_video_url;
+  const isVideo = !!p.ai_tour_verified;
 
   const chips = [];
   if (p.rooms != null) chips.push(`${p.rooms} camere`);

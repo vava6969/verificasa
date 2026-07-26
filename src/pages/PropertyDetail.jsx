@@ -4,6 +4,8 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { base44 } from "@/api/base44Client";
+import { formatDistanceToNowStrict } from "date-fns";
+import { ro, enGB } from "date-fns/locale";
 
 // Fix default marker icon for bundled leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -25,7 +27,7 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
   Calendar, ShieldCheck, FileText, CheckCircle2, ChevronLeft, Send, Phone,
-  Heart, MessageCircle,
+  Heart, MessageCircle, UserCircle2, Clock,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
@@ -36,7 +38,7 @@ const DEMO_FALLBACK = "https://commondatastorage.googleapis.com/gtv-videos-bucke
 
 export default function PropertyDetail() {
   const { id } = useParams();
-  const { country, formatPrice, t, legalInfo } = useCountry();
+  const { country, formatPrice, t, legalInfo, lang } = useCountry();
   const { toast } = useToast();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -72,7 +74,7 @@ export default function PropertyDetail() {
         const shouldInc = !viewedRef.current.has(id);
         if (shouldInc) viewedRef.current.add(id);
         setProperty(shouldInc ? { ...p, views_count: (p.views_count || 0) + 1 } : p);
-        if (p.ai_tour_verified) setTab("ai");
+        setTab(p.ai_tour_verified ? "ai" : "gallery");
         if (shouldInc) {
           base44.functions.invoke("IncrementViews", { property_id: id }).catch(() => {});
         }
@@ -263,6 +265,17 @@ export default function PropertyDetail() {
                   <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                     <MapPin className="h-4 w-4" /> {p.zone}, {p.city}, {p.country === "UK" ? "United Kingdom" : "România"}
                   </p>
+                  {p.created_date && (
+                    <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                      <UserCircle2 className="h-3.5 w-3.5 text-emerald" />
+                      <span className="font-medium text-foreground/70">{p.posted_by_name || p.owner_name || "VerifiCasa"}</span>
+                      <span className="text-foreground/40">·</span>
+                      <Clock className="h-3.5 w-3.5 text-emerald" />
+                      {new Date(p.created_date).toLocaleString("ro-RO", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                      <span className="text-foreground/40">·</span>
+                      {formatDistanceToNowStrict(new Date(p.created_date), { addSuffix: true, locale: lang === "en" ? enGB : ro })}
+                    </p>
+                  )}
                 </div>
                 <div className="text-right">
                   <p className="font-heading text-2xl font-bold text-navy">{formatPrice(p.price_monthly, p.currency)}</p>
