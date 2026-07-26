@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 // VerifiCasa verification filters — each applies a real-property predicate.
 const VERIF_FILTERS = [
   { key: "ai", label: "Tur 3D Inclus", icon: Sparkles, test: (p) => !!p.tour_3d_url || !!p.ai_video_url || !!p.ai_tour_verified },
-  { key: "field", label: "Verificat pe Teren", icon: ShieldCheck, test: (p) => p.verification_level === "field_certified" },
+  { key: "field", label: "Verificat pe Teren", icon: ShieldCheck, test: (p) => p.owner_verified || p.verification_level === "field_certified" || p.ai_tour_verified },
   { key: "pet", label: "Pet Friendly", icon: PawPrint, test: (p) => !!p.pet_friendly },
   { key: "nofee", label: "Fără Comision", icon: BadgePercent, test: (p) => !!p.commission_free },
   { key: "garant0", label: "Garanție 0", icon: Lock, test: (p) => p.deposit_option === "verificasa_guarantee" },
