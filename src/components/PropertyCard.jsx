@@ -24,8 +24,8 @@ export default function PropertyCard({ property }) {
   const images = p.images?.length ? p.images : [];
   const [idx, setIdx] = useState(0);
 
-  const isVerified = p.owner_verified || p.verification_level === "field_certified" || p.verification_level === "video_ai" || !!p.ai_video_url;
-  const isVideo = p.verification_level === "video_ai" || !!p.ai_video_url;
+  const isVerified = p.owner_verified || p.verification_level === "field_certified" || p.ai_tour_verified;
+  const isVideo = !!p.ai_tour_verified;
   const seller = p.seller_role || (p.owner_verified ? "Proprietar" : "Agent");
   const isProprietar = seller === "Proprietar";
   const sellerLabel = isProprietar ? t("pc_seller_landlord") : t("pc_seller_agent");

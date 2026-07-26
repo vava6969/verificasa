@@ -41,7 +41,7 @@ export default function PropertyDetail() {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
-  const [tab, setTab] = useState("ai");
+  const [tab, setTab] = useState("gallery");
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: "", email: "", phone: "", occupation: "", estimated_income: "", move_date: "", message: "", preferred_visit_date: "",
@@ -72,6 +72,7 @@ export default function PropertyDetail() {
         const shouldInc = !viewedRef.current.has(id);
         if (shouldInc) viewedRef.current.add(id);
         setProperty(shouldInc ? { ...p, views_count: (p.views_count || 0) + 1 } : p);
+        if (p.ai_tour_verified) setTab("ai");
         if (shouldInc) {
           base44.functions.invoke("IncrementViews", { property_id: id }).catch(() => {});
         }
@@ -190,9 +191,11 @@ export default function PropertyDetail() {
         {/* HERO */}
         <div className="mt-4">
           <div className="mb-3 flex items-center gap-2">
-            <button onClick={() => setTab("ai")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "ai" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
-              <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5" /> {t("tab_ai")}</span>
-            </button>
+            {p.ai_tour_verified && (
+              <button onClick={() => setTab("ai")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "ai" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+                <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5" /> {t("tab_ai")}</span>
+              </button>
+            )}
             <button onClick={() => setTab("gallery")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "gallery" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
               {t("tab_gallery")} ({images.length})
             </button>

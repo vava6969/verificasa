@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
-import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil } from "lucide-react";
+import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil, Sparkles } from "lucide-react";
 import PropertyEditForm from "@/components/PropertyEditForm";
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
@@ -100,6 +100,19 @@ export default function Admin() {
       log("delete", "user", u.id, u.email);
       load();
     } catch (e) { toast({ title: "Eroare la ștergere", variant: "destructive" }); }
+  };
+
+  const toggleAiTour = async (p) => {
+    try {
+      const next = !p.ai_tour_verified;
+      await base44.entities.Property.update(p.id, {
+        ai_tour_verified: next,
+        verification_level: next ? "video_ai" : (p.verification_level === "video_ai" ? "unverified" : p.verification_level),
+      });
+      toast({ title: next ? "Tur AI activat ✓" : "Tur AI retras" });
+      log(next ? "enable_ai_tour" : "disable_ai_tour", "property", p.id, p.title);
+      load();
+    } catch (e) { toast({ title: "Eroare", variant: "destructive" }); }
   };
 
   const verifyUser = async (u, val) => {
@@ -274,6 +287,7 @@ export default function Admin() {
                   <Button size="sm" variant="outline" onClick={() => setEditingId(p.id)} className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft"><Pencil className="h-3.5 w-3.5" /> Editează</Button>
                   {p.approval_status !== "APPROVED" && <Button size="sm" onClick={() => setApproval(p, "APPROVED")} className="gap-1 bg-emerald text-white"><Check className="h-3.5 w-3.5" /> Aprobă</Button>}
                   {p.approval_status === "APPROVED" && <Button size="sm" variant="outline" onClick={() => setApproval(p, "REJECTED")} className="gap-1 border-amber-400 text-amber-700"><X className="h-3.5 w-3.5" /> Retrage</Button>}
+                  <Button size="sm" variant="outline" onClick={() => toggleAiTour(p)} className={`gap-1 ${p.ai_tour_verified ? "border-emerald bg-emerald text-white hover:bg-emerald/90" : "border-emerald/40 text-emerald hover:bg-emerald-soft"}`}><Sparkles className="h-3.5 w-3.5" /> {p.ai_tour_verified ? "Tur AI ✓" : "+ Tur AI"}</Button>
                   <Button size="sm" variant="outline" onClick={() => delProperty(p)} className="gap-1 border-destructive/30 text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /></Button>
                 </div>
               </div>
