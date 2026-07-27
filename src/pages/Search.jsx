@@ -7,7 +7,7 @@ import PropertyCard from "@/components/PropertyCard";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, SlidersHorizontal, ArrowDownUp, BookmarkPlus, RotateCcw } from "lucide-react";
+import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, SlidersHorizontal, ArrowDownUp, BookmarkPlus, RotateCcw, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // VerifiCasa verification filters — each applies a real-property predicate.
@@ -36,6 +36,10 @@ const SORT_OPTIONS = [
   { value: "price_desc", label: "Preț descrescător" },
 ];
 
+// Normalize text for diacritics-insensitive fuzzy matching so "Pacurari" matches
+// "Păcurari", "Husi" matches "Huși", etc. — independent of how users type zones.
+const norm = (s) => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
 export default function SearchPage() {
   const { country } = useCountry();
   const { user, isAuthenticated } = useAuth();
@@ -53,6 +57,12 @@ export default function SearchPage() {
   const cityParam = params.get("city");
   const zoneParam = params.get("zone");
   const typeParam = params.get("type");
+  const qParam = params.get("q") || "";
+  const setQ = (v) => setParams((prev) => {
+    const next = new URLSearchParams(prev);
+    if (v) next.set("q", v); else next.delete("q");
+    return next;
+  }, { replace: true });
 
   const cities = useMemo(() => getCities(country), [country]);
   const cityFilter = cityParam || "";
@@ -108,9 +118,13 @@ export default function SearchPage() {
   let filtered = (properties || []).filter((p) => {
     if (p.approval_status !== "APPROVED") return false;
     if (p.country !== "RO") return false;
-    if (cityParam && !p.city?.toLowerCase().includes(cityParam.toLowerCase())) return false;
-    if (zoneParam && !p.zone?.toLowerCase().includes(zoneParam.toLowerCase())) return false;
+    if (cityParam && !norm(p.city).includes(norm(cityParam))) return false;
+    if (zoneParam && !norm(`${p.zone || ""} ${p.landmark || ""}`).includes(norm(zoneParam))) return false;
     if (typeParam && p.property_type !== typeParam) return false;
+    if (qParam) {
+      const hay = norm([p.title, p.zone, p.city, p.landmark, p.description, p.property_type].join(" "));
+      if (!hay.includes(norm(qParam))) return false;
+    }
     for (const f of VERIF_FILTERS) {
       if (activeFilters.has(f.key) && !f.test(p)) return false;
     }
@@ -156,12 +170,13 @@ export default function SearchPage() {
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-heading text-2xl font-bold text-navy">
-            {cityParam || zoneParam || typeParam ? "Rezultate căutare" : "Toate proprietățile"}
+            {cityParam || zoneParam || typeParam || qParam ? "Rezultate căutare" : "Toate proprietățile"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {cityParam && `Oraș: ${cityParam} · `}
             {zoneParam && `Zona: ${zoneParam} · `}
             {typeParam && `Tip: ${typeParam} · `}
+            {qParam && `Căutare: "${qParam}" · `}
             {found} {found === 1 ? "proprietate găsită" : "proprietăți găsite"}
           </p>
         </div>
@@ -194,6 +209,15 @@ export default function SearchPage() {
           <option value="">Zona</option>
           {zones.map((z) => <option key={z} value={z}>{z}</option>)}
         </select>
+        <div className="relative min-w-[220px] flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={qParam}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Caută după titlu, cartier, reper (ex: Pacurari, liceu)..."
+            className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald"
+          />
+        </div>
       </div>
 
       {/* Verification quick filters + budget */}

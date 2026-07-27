@@ -58,6 +58,10 @@
       "type": "string",
       "title": "Zona / Cartier"
     },
+    "landmark": {
+      "type": "string",
+      "title": "Punct de reper / Strad\u0103"
+    },
     "property_type": {
       "type": "string",
       "enum": [

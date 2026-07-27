@@ -26,6 +26,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
     transaction_type: property.transaction_type || "RENT",
     city: property.city || "",
     zone: property.zone || "",
+    landmark: property.landmark || "",
     property_type: property.property_type || "Garsonieră",
     rooms: property.rooms ?? 1,
     surface_sqm: property.surface_sqm ?? "",
@@ -82,6 +83,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         price_monthly: Number(form.price_monthly),
         city: form.city,
         zone: form.zone,
+        landmark: form.landmark,
         property_type: form.property_type,
         rooms: form.rooms ? Number(form.rooms) : null,
         surface_sqm: numOrNull(form.surface_sqm),
@@ -177,6 +179,9 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
             <option value="">Zonă</option>
             {zones.map((z) => <option key={z} value={z}>{z}</option>)}
           </select>
+        </Field>
+        <Field label="Punct de reper / Stradă">
+          <input value={form.landmark} onChange={(e) => upd("landmark", e.target.value)} placeholder="ex: lângă Liceul Agricol" className={inputCls} />
         </Field>
       </div>
 

@@ -146,7 +146,7 @@ function NewPropertyForm({ onDone }) {
   const { toast } = useToast();
   const cities = useMemo(() => getCities(country), [country]);
   const [form, setForm] = useState({
-    title: "", description: "", price_monthly: "", city: "", zone: "", property_type: "Garsonieră",
+    title: "", description: "", price_monthly: "", city: "", zone: "", landmark: "", property_type: "Garsonieră",
     rooms: "1", surface_sqm: "", deposit: "", available_from: "", images: "", ai_video_url: "",
     latitude: "", longitude: "", owner_name: "",
     transaction_type: "RENT", building_year: "", total_floors: "", phone: "", whatsapp_phone: "",
@@ -210,6 +210,7 @@ function NewPropertyForm({ onDone }) {
         county: getCounty(form.city),
         city: form.city,
         zone: form.zone,
+        landmark: form.landmark || "",
         property_type: form.property_type,
         rooms: Number(form.rooms),
         surface_sqm: Number(form.surface_sqm) || null,
@@ -290,6 +291,7 @@ function NewPropertyForm({ onDone }) {
           <option value="">{t("f_zone")}</option>
           {zones.map((z) => <option key={z} value={z}>{z}</option>)}
         </select>
+        <input value={form.landmark} onChange={(e) => setForm((f) => ({ ...f, landmark: e.target.value }))} placeholder="Punct de reper / Stradă (ex: lângă Liceul Agricol)" className={inputCls} />
         <input type="number" value={form.price_monthly} onChange={(e) => setForm((f) => ({ ...f, price_monthly: e.target.value }))} placeholder={t("f_price")} className={inputCls} />
         <input type="number" value={form.deposit} onChange={(e) => setForm((f) => ({ ...f, deposit: e.target.value }))} placeholder={t("f_deposit")} className={inputCls} />
         <input type="number" value={form.rooms} onChange={(e) => setForm((f) => ({ ...f, rooms: e.target.value }))} placeholder={t("f_rooms")} className={inputCls} />

@@ -17,6 +17,7 @@ L.Icon.Default.mergeOptions({
 import { useCountry } from "@/components/CountryContext";
 import AITourPlayer from "@/components/AITourPlayer";
 import ShareableStoryCard from "@/components/ShareableStoryCard";
+import PropertyBrochure from "@/components/PropertyBrochure";
 import PropertyEditForm from "@/components/PropertyEditForm";
 import PhoneReveal from "@/components/PhoneReveal";
 import PropertyPOI from "@/components/PropertyPOI";
@@ -275,9 +276,10 @@ export default function PropertyDetail() {
           ))}
         </div>
 
-        {/* Shareable story card generator (under the announcement) */}
-        <div className="mt-4 mx-auto max-w-md">
+        {/* Shareable story card + PDF brochure generator (under the announcement) */}
+        <div className="mt-4 mx-auto max-w-md space-y-2">
           <ShareableStoryCard property={p} />
+          <PropertyBrochure property={p} />
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
@@ -298,7 +300,7 @@ export default function PropertyDetail() {
                 <div>
                   <h1 className="font-heading text-2xl font-bold text-navy sm:text-3xl">{p.title}</h1>
                   <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4" /> {p.zone}, {p.city}, {p.country === "UK" ? "United Kingdom" : "România"}
+                    <MapPin className="h-4 w-4" /> {p.zone}, {p.city}{p.landmark ? ` · 📍 ${p.landmark}` : ""}, {p.country === "UK" ? "United Kingdom" : "România"}
                   </p>
                   {p.created_date && (
                     <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
