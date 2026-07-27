@@ -110,6 +110,22 @@ export default function PropertyDetail() {
         preferred_visit_date: form.preferred_visit_date || null,
         status: "Nou",
       });
+      try {
+        await base44.functions.invoke("NotifyOnNewInquiry", {
+          inquiry: {
+            property_id: property.id,
+            property_title: property.title,
+            name: form.name,
+            email: form.email,
+            phone: form.phone,
+            occupation: form.occupation,
+            estimated_income: form.estimated_income ? Number(form.estimated_income) : null,
+            move_date: form.move_date || null,
+            message: form.message,
+            preferred_visit_date: form.preferred_visit_date || null,
+          },
+        });
+      } catch (_) { /* email/notification is best-effort; don't block the user */ }
       toast({ title: t("submit_sent"), description: t("submit_sent_desc") });
       setForm({ name: "", email: "", phone: "", occupation: "", estimated_income: "", move_date: "", message: "", preferred_visit_date: "" });
     } catch (err) {
