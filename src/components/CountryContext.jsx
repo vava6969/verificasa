@@ -36,6 +36,7 @@ export function CountryProvider({ children }) {
       legal1: "Conform ANPC · Protecția Consumatorului",
       legal2: "Inspecții fizice verificate",
       commission: "Comision corect · 0% chiriași pe selectate",
+      tenantFee: "Fără comision chiriași · Protecție consumator",
     }),
     []
   );
