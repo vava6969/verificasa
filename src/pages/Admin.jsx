@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
-import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil, Sparkles, History, Flag, ClipboardCheck } from "lucide-react";
+import {
+  ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck,
+  Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil,
+  Sparkles, History, Flag, ClipboardCheck,
+} from "lucide-react";
 import PropertyEditForm from "@/components/PropertyEditForm";
 import PropertyLogs from "@/components/PropertyLogs";
 import AdminReports from "@/components/AdminReports";
@@ -45,11 +49,13 @@ export default function Admin() {
         base44.entities.Inquiry.list("-created_date", 50),
         base44.entities.Report.list("-created_date", 100),
       ]);
-      setProperties(props); setComments(cmts); setAudit(logs); setUsers(usrs); setInspections(insp); setInquiries(inq); setReports(reps);
-    } catch (e) {
+      setProperties(props); setComments(cmts); setAudit(logs); setUsers(usrs);
+      setInspections(insp); setInquiries(inq); setReports(reps);
+    } catch {
       setProperties([]); setComments([]); setAudit([]); setUsers([]); setInquiries([]); setReports([]);
     }
   };
+
   useEffect(() => { if (isAllowed) load(); }, [isAllowed]);
 
   const log = async (action, target_type, target_id, detail) => {
@@ -69,62 +75,55 @@ export default function Admin() {
         patch.approved_by_name = user.full_name || user.email;
         patch.approved_date = new Date().toISOString();
       } else {
-        patch.approved_by_id = null;
-        patch.approved_by_name = null;
-        patch.approved_date = null;
+        patch.approved_by_id = null; patch.approved_by_name = null; patch.approved_date = null;
       }
       await base44.entities.Property.update(p.id, patch);
-      toast({ title: `Anunț ${status === "APPROVED" ? "aprobat" : "respins"}` });
+      toast({ title: status === "APPROVED" ? "Anunt aprobat" : "Anunt respins" });
       log(status === "APPROVED" ? "approve" : "reject", "property", p.id, p.title);
-      try {
-        base44.functions.invoke("NotifyOnPropertyDecision", {
-          property_id: p.id,
-          decision: status,
-        }).catch(() => {});
-      } catch (_) {}
+      try { base44.functions.invoke("NotifyOnPropertyDecision", { property_id: p.id, decision: status }).catch(() => {}); } catch {}
       load();
-    } catch (e) { toast({ title: "Eroare", variant: "destructive" }); }
+    } catch { toast({ title: "Eroare", variant: "destructive" }); }
   };
 
   const delProperty = async (p) => {
-    if (!confirm(`Ștergi definitiv „${p.title}"?`)) return;
+    if (!confirm("Stergi definitiv acest anunt?")) return;
     try {
       await base44.entities.Property.delete(p.id);
-      toast({ title: "Anunț șters" });
+      toast({ title: "Anunt sters" });
       log("delete", "property", p.id, p.title);
       load();
-    } catch (e) { toast({ title: "Eroare la ștergere", variant: "destructive" }); }
+    } catch { toast({ title: "Eroare la stergere", variant: "destructive" }); }
   };
 
   const delComment = async (c) => {
-    if (!confirm("Ștergi comentariul?")) return;
+    if (!confirm("Stergi comentariul?")) return;
     try {
       await base44.entities.Comment.delete(c.id);
-      toast({ title: "Comentariu șters" });
+      toast({ title: "Comentariu sters" });
       log("moderate", "comment", c.id, c.content?.slice(0, 40));
       load();
-    } catch (e) { toast({ title: "Eroare", variant: "destructive" }); }
+    } catch { toast({ title: "Eroare", variant: "destructive" }); }
   };
 
   const changeRole = async (u, role) => {
-    if (u.id === user.id && role !== user.role) { toast({ title: "Nu poți schimba propriul rol aici", variant: "destructive" }); return; }
+    if (u.id === user.id && role !== user.role) { toast({ title: "Nu poti schimba propriul rol", variant: "destructive" }); return; }
     try {
       await base44.entities.User.update(u.id, { role });
-      toast({ title: `Rol actualizat: ${role}` });
-      log("role_change", "user", u.id, `${u.email} → ${role}`);
+      toast({ title: "Rol actualizat: " + role });
+      log("role_change", "user", u.id, u.email + " to " + role);
       load();
-    } catch (e) { toast({ title: "Eroare la actualizare rol", variant: "destructive" }); }
+    } catch { toast({ title: "Eroare", variant: "destructive" }); }
   };
 
   const delUser = async (u) => {
-    if (u.id === user.id) { toast({ title: "Nu poți șterge propriul cont", variant: "destructive" }); return; }
-    if (!confirm(`Ștergi utilizatorul ${u.email}?`)) return;
+    if (u.id === user.id) { toast({ title: "Nu poti sterge propriul cont", variant: "destructive" }); return; }
+    if (!confirm("Stergi utilizatorul " + u.email + "?")) return;
     try {
       await base44.entities.User.delete(u.id);
-      toast({ title: "Utilizator șters" });
+      toast({ title: "Utilizator sters" });
       log("delete", "user", u.id, u.email);
       load();
-    } catch (e) { toast({ title: "Eroare la ștergere", variant: "destructive" }); }
+    } catch { toast({ title: "Eroare", variant: "destructive" }); }
   };
 
   const toggleAiTour = async (p) => {
@@ -134,28 +133,28 @@ export default function Admin() {
         ai_tour_verified: next,
         verification_level: next ? "video_ai" : (p.verification_level === "video_ai" ? "unverified" : p.verification_level),
       });
-      toast({ title: next ? "Tur 3D activat ✓" : "Tur 3D retras" });
+      toast({ title: next ? "Tur 3D activat" : "Tur 3D retras" });
       log(next ? "enable_ai_tour" : "disable_ai_tour", "property", p.id, p.title);
       load();
-    } catch (e) { toast({ title: "Eroare", variant: "destructive" }); }
+    } catch { toast({ title: "Eroare", variant: "destructive" }); }
   };
 
   const verifyUser = async (u, val) => {
     try {
       await base44.entities.User.update(u.id, { is_verified: val });
-      toast({ title: val ? "Utilizator verificat" : "Verificare retrasă" });
+      toast({ title: val ? "Utilizator verificat" : "Verificare retrasa" });
       log("verify", "user", u.id, u.email);
       load();
-    } catch (e) { toast({ title: "Eroare", variant: "destructive" }); }
+    } catch { toast({ title: "Eroare", variant: "destructive" }); }
   };
 
   if (isAuthenticated && !isAllowed) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <ShieldAlert className="mx-auto h-10 w-10 text-destructive" />
-        <h1 className="mt-3 font-heading text-2xl font-bold text-navy dark:text-foreground">Acces restricționat</h1>
+        <h1 className="mt-3 font-heading text-2xl font-bold text-navy dark:text-foreground">Acces restrictionat</h1>
         <p className="mt-1 text-sm text-muted-foreground">Doar administratorii pot accesa acest panou.</p>
-        <Button asChild className="mt-4 bg-emerald text-white"><Link to="/">Înapoi acasă</Link></Button>
+        <Button asChild className="mt-4 bg-emerald text-white"><Link to="/">Inapoi acasa</Link></Button>
       </div>
     );
   }
@@ -171,185 +170,318 @@ export default function Admin() {
     return (u.email || "").toLowerCase().includes(q) || (u.full_name || "").toLowerCase().includes(q);
   });
 
+  const PTABS = [
+    { k: "pending",            label: "In asteptare", icon: Clock,          count: pending.length,                                                 tone: "amber" },
+    { k: "users",              label: "Utilizatori",  icon: Users,           count: (users || []).length,                                           tone: "emerald" },
+    { k: "inspectii",          label: "Inspectii",    icon: ClipboardList,   count: (inspections || []).length,                                     tone: "emerald" },
+    { k: "rapoarte",           label: "Sesizari",     icon: Flag,            count: (reports || []).filter((r) => r.status === "PENDING").length,   tone: "rose" },
+    { k: "rapoarte_rezolvate", label: "Rezolvate",    icon: ClipboardCheck,  count: (reports || []).filter((r) => r.status !== "PENDING").length,   tone: "emerald" },
+  ];
+  const GTABS = [
+    { k: "all",      label: "Toate anunturile",   icon: Building2 },
+    { k: "comments", label: "Comentarii",          icon: MessageSquare },
+    { k: "audit",    label: "Audit log",           icon: FileText },
+    { k: "loguri",   label: "Loguri proprietate",  icon: History },
+  ];
+
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <div className="min-h-screen bg-[#f4f6f9] dark:bg-background">
+      {/* Top bar */}
+      <div className="border-b border-border bg-white dark:bg-card shadow-sm">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-navy">
+              <ShieldAlert className="h-5 w-5 text-emerald" />
+            </div>
+            <div>
+              <h1 className="font-heading text-xl font-bold text-navy dark:text-foreground">Admin Panel</h1>
+              <p className="text-xs text-muted-foreground">
+                Moderare anunturi{isSuper ? " · Super Admin" : ""}
+              </p>
+            </div>
+          </div>
+          <Button variant="outline" onClick={load} className="gap-1.5 rounded-full text-sm">
+            <RefreshCw className="h-4 w-4" /> Reincarca
+          </Button>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+        {/* Stat cards */}
+        <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            { label: "In asteptare",  value: pending.length,                                                 cls: "text-amber-600", bg: "bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-700/40" },
+            { label: "Utilizatori",   value: (users || []).length,                                           cls: "text-emerald",   bg: "bg-emerald-soft border-emerald/20 dark:bg-emerald-950/30" },
+            { label: "Sesizari",      value: (reports || []).filter((r) => r.status === "PENDING").length,  cls: "text-rose-600",  bg: "bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-700/40" },
+            { label: "Total anunturi", value: all.length,                                                    cls: "text-navy dark:text-foreground", bg: "bg-white border-border dark:bg-card" },
+          ].map((s) => (
+            <div key={s.label} className={"rounded-2xl border px-4 py-3 shadow-sm " + s.bg}>
+              <p className={"text-2xl font-bold font-heading " + s.cls}>{s.value}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{s.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Tab nav */}
+        <div className="mb-5 rounded-2xl border border-border bg-white dark:bg-card shadow-sm overflow-hidden">
+          <div className="px-4 pt-4 pb-2">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Prioritare</p>
+            <div className="flex flex-wrap gap-1.5">
+              {PTABS.map((t) => {
+                const Ico = t.icon;
+                const isActive = tab === t.k;
+                return (
+                  <button
+                    key={t.k}
+                    onClick={() => setTab(t.k)}
+                    className={"flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-semibold transition " +
+                      (isActive ? "bg-navy text-white shadow-sm" : "text-foreground/70 hover:bg-secondary/60")}
+                  >
+                    <Ico className={"h-4 w-4 " + (isActive ? "text-emerald" : t.tone === "rose" ? "text-rose-500" : t.tone === "amber" ? "text-amber-500" : "text-emerald")} />
+                    {t.label}
+                    {t.count > 0 && (
+                      <span className={"rounded-full px-1.5 py-0.5 text-[10px] font-bold " +
+                        (isActive ? "bg-white/20 text-white" :
+                         t.tone === "rose" ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400" :
+                         t.tone === "amber" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" :
+                         "bg-emerald-soft text-emerald")}>
+                        {t.count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="mx-4 border-t border-border" />
+          <div className="px-4 pt-3 pb-4">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Gestionare</p>
+            <div className="flex flex-wrap gap-1.5">
+              {GTABS.map((t) => {
+                const Ico = t.icon;
+                const isActive = tab === t.k;
+                return (
+                  <button
+                    key={t.k}
+                    onClick={() => setTab(t.k)}
+                    className={"flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-medium transition " +
+                      (isActive ? "bg-secondary text-foreground font-semibold" : "text-foreground/60 hover:bg-secondary/50")}
+                  >
+                    <Ico className="h-3.5 w-3.5" /> {t.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Tab content */}
         <div>
-          <h1 className="font-heading text-3xl font-bold text-navy dark:text-foreground">Admin Panel</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Moderează anunțuri, comentarii și utilizatori {isSuper && "· Super Admin"}</p>
-        </div>
-        <Button variant="outline" onClick={load} className="gap-1.5"><RefreshCw className="h-4 w-4" /> Reîncarcă</Button>
-      </div>
-
-      <div className="mt-6 space-y-3">
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/70">Prioritare</span>
-          <div className="h-px flex-1 bg-border" />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {[
-            { k: "pending", label: "Proprietăți în așteptare", icon: Clock, count: pending.length, tone: "amber" },
-            { k: "users", label: "Utilizatori", icon: Users, count: (users || []).length, tone: "emerald" },
-            { k: "inspectii", label: "Cereri de inspecție", icon: ClipboardList, count: (inspections || []).length, tone: "emerald" },
-            { k: "rapoarte", label: "Sesizări / Rapoarte", icon: Flag, count: (reports || []).filter((r) => r.status === "PENDING").length, tone: "amber" },
-            { k: "rapoarte_rezolvate", label: "Sesizări rezolvate", icon: ClipboardCheck, count: (reports || []).filter((r) => r.status !== "PENDING").length, tone: "emerald" },
-          ].map((t) => {
-            const Active = t.icon;
-            const active = tab === t.k;
-            return (
-              <button key={t.k} onClick={() => setTab(t.k)} className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${active ? "bg-navy text-white" : "border border-border bg-white text-foreground/70 hover:border-emerald/50 dark:bg-card"}`}>
-                <Active className={`h-4 w-4 ${active ? "text-emerald" : t.tone === "amber" ? "text-amber-500" : "text-emerald"}`} /> {t.label}
-                {t.count > 0 && <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${active ? "bg-emerald/20 text-emerald" : t.tone === "amber" ? "bg-amber-50 text-amber-700" : "bg-emerald-soft text-emerald"}`}>{t.count}</span>}
-              </button>
-            );
-          })}
-        </div>
-        <div className="flex items-center gap-2 pt-1">
-          <span className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground/70">Gestionare</span>
-          <div className="h-px flex-1 bg-border" />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {[
-            { k: "all", label: "Toate anunțurile", icon: Building2 },
-            { k: "comments", label: "Comentarii", icon: MessageSquare },
-            { k: "audit", label: "Audit log", icon: FileText },
-            { k: "loguri", label: "Loguri pe proprietate", icon: History },
-          ].map((t) => {
-            const Active = t.icon;
-            const active = tab === t.k;
-            return (
-              <button key={t.k} onClick={() => setTab(t.k)} className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition ${active ? "bg-navy text-white" : "border border-border bg-white text-foreground/60 hover:border-emerald/40 dark:bg-card"}`}>
-                <Active className="h-3.5 w-3.5" /> {t.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="mt-6">
-        {tab === "inspectii" ? (
-          <div className="space-y-2">
-            {(inspections || []).length === 0 ? <p className="text-sm text-muted-foreground">Nicio solicitare de inspecție.</p> :
-              inspections.map((r) => (
+          {tab === "inspectii" ? (
+            <div className="space-y-2">
+              {(inspections || []).length === 0 ? (
+                <p className="text-sm text-muted-foreground">Nicio solicitare de inspectie.</p>
+              ) : inspections.map((r) => (
                 <div key={r.id} className="rounded-xl border border-border bg-white p-4 dark:bg-card">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
-                      <p className="font-heading font-bold text-navy dark:text-foreground">{r.name} <span className="text-xs font-normal text-muted-foreground">· {r.role}</span></p>
-                      <p className="text-xs text-muted-foreground">{r.email} · {r.phone || "fără tel"}</p>
+                      <p className="font-heading font-bold text-navy dark:text-foreground">
+                        {r.name} <span className="text-xs font-normal text-muted-foreground">· {r.role}</span>
+                      </p>
+                      <p className="text-xs text-muted-foreground">{r.email} · {r.phone || "fara tel"}</p>
                     </div>
-                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${r.status === "Nou" ? "bg-blue-50 text-blue-700" : r.status === "Contactat" ? "bg-mint-soft text-navy" : "bg-secondary text-muted-foreground"}`}>{r.status}</span>
+                    <span className={"rounded-full px-2.5 py-0.5 text-[11px] font-semibold " +
+                      (r.status === "Nou" ? "bg-blue-50 text-blue-700" :
+                       r.status === "Contactat" ? "bg-mint-soft text-navy" :
+                       "bg-secondary text-muted-foreground")}>
+                      {r.status}
+                    </span>
                   </div>
-                  {r.address_or_url && <p className="mt-1 text-xs text-muted-foreground">📍 {r.address_or_url}</p>}
+                  {r.address_or_url && <p className="mt-1 text-xs text-muted-foreground">Adresa: {r.address_or_url}</p>}
                   {r.package_interest && <p className="text-xs text-muted-foreground">Pachet: {r.package_interest}</p>}
                   {r.message && <p className="mt-1 text-sm text-foreground/80">{r.message}</p>}
                 </div>
               ))}
-          </div>
-        ) : tab === "audit" ? (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="relative max-w-sm flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input value={auditSearch} onChange={(e) => setAuditSearch(e.target.value)} placeholder="Caută după ID, autor sau acțiune..." className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card" />
-              </div>
             </div>
-            {(() => {
-              const as = (auditSearch || "").toLowerCase();
-              const src = (audit || []).filter((a) => !as || [a.actor_name, a.action, a.target_type, a.target_id, codeById.get(a.target_id), a.detail].filter(Boolean).join(" ").toLowerCase().includes(as));
-              if (src.length === 0) return <p className="text-sm text-muted-foreground">Nicio acțiune găsită.</p>;
-              return src.map((a) => (
-                <div key={a.id} className="flex items-center justify-between rounded-xl border border-border bg-white p-3 text-sm dark:bg-card">
-                  <span><b className="text-navy dark:text-foreground">{a.actor_name}</b> <span className="text-muted-foreground">· {a.action} · {a.target_type}{a.target_id ? ` · Cod: ${codeById.get(a.target_id) || a.target_id.slice(0, 8)}` : ""}{a.detail ? ` · ${a.detail}` : ""}</span></span>
-                  <span className="text-xs text-muted-foreground">{new Date(a.created_date).toLocaleString("ro-RO")}</span>
-                </div>
-              ));
-            })()}
-          </div>
-        ) : tab === "loguri" ? (
-          <PropertyLogs properties={properties || []} audit={audit || []} comments={comments || []} inquiries={inquiries || []} />
-        ) : tab === "rapoarte" ? (
-          <AdminReports reports={(reports || []).filter((r) => r.status === "PENDING")} properties={properties || []} onReload={load} />
-        ) : tab === "rapoarte_rezolvate" ? (
-          <AdminResolvedReports reports={(reports || []).filter((r) => r.status !== "PENDING")} />
-        ) : tab === "users" ? (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="relative max-w-sm flex-1">
+
+          ) : tab === "audit" ? (
+            <div className="space-y-2">
+              <div className="relative max-w-sm">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input value={userSearch} onChange={(e) => setUserSearch(e.target.value)} placeholder="Caută după nume sau email..." className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card" />
+                <input
+                  value={auditSearch}
+                  onChange={(e) => setAuditSearch(e.target.value)}
+                  placeholder="Cauta dupa ID, autor sau actiune..."
+                  className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card"
+                />
               </div>
-            </div>
-            {users === null ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-2xl" />) :
-            filteredUsers.length === 0 ? <p className="text-sm text-muted-foreground">Niciun utilizator găsit.</p> :
-            filteredUsers.map((u) => (
-              <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-soft text-emerald"><Users className="h-5 w-5" /></span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-heading font-bold text-navy dark:text-foreground">{u.full_name || u.email}</p>
-                  <p className="truncate text-xs text-muted-foreground">{u.email}{u.is_verified ? " · · Verificat ✓" : " · Neverificat"}</p>
-                </div>
-                <select value={u.role || "user"} onChange={(e) => changeRole(u, e.target.value)} disabled={u.id === user.id} className="rounded-full border border-border bg-white px-3 py-1.5 text-xs font-semibold outline-none focus:border-emerald disabled:opacity-60 dark:bg-card">
-                  {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
-                </select>
-                <Button size="sm" variant="outline" onClick={() => verifyUser(u, !u.is_verified)} className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft">
-                  <ShieldCheck className="h-3.5 w-3.5" /> {u.is_verified ? "Retrage" : "Verifică"}
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => delUser(u)} className="gap-1 border-destructive/30 text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /></Button>
-              </div>
-            ))}
-          </div>
-        ) : tab === "comments" ? (
-          <div className="space-y-2">
-            {(comments || []).length === 0 ? <p className="text-sm text-muted-foreground">Niciun comentariu.</p> :
-              comments.map((c) => (
-                <div key={c.id} className="rounded-xl border border-border bg-white p-3 dark:bg-card">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm"><b className="text-navy dark:text-foreground">{c.user_name}</b> <span className="text-xs text-muted-foreground">· {c.user_role} · pe {c.property_title}</span></span>
-                    <Button variant="outline" size="sm" onClick={() => delComment(c)} className="gap-1 border-destructive/30 text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /> Șterge</Button>
+              {(() => {
+                const as = (auditSearch || "").toLowerCase();
+                const src = (audit || []).filter((a) =>
+                  !as || [a.actor_name, a.action, a.target_type, a.target_id, codeById.get(a.target_id), a.detail]
+                    .filter(Boolean).join(" ").toLowerCase().includes(as)
+                );
+                if (src.length === 0) return <p className="text-sm text-muted-foreground">Nicio actiune gasita.</p>;
+                return src.map((a) => (
+                  <div key={a.id} className="flex items-center justify-between rounded-xl border border-border bg-white p-3 text-sm dark:bg-card">
+                    <span>
+                      <b className="text-navy dark:text-foreground">{a.actor_name}</b>
+                      <span className="text-muted-foreground">
+                        {" · "}{a.action}{" · "}{a.target_type}
+                        {a.target_id ? " · Cod: " + (codeById.get(a.target_id) || a.target_id.slice(0, 8)) : ""}
+                        {a.detail ? " · " + a.detail : ""}
+                      </span>
+                    </span>
+                    <span className="text-xs text-muted-foreground">{new Date(a.created_date).toLocaleString("ro-RO")}</span>
                   </div>
-                  <p className="mt-1 text-sm text-foreground/80">{c.content}</p>
-                </div>
-              ))}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="relative max-w-sm flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input value={propSearch} onChange={(e) => setPropSearch(e.target.value)} placeholder="Caută după titlu sau ID proprietate..." className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card" />
-              </div>
+                ));
+              })()}
             </div>
-            {(() => {
-              const ps = (propSearch || "").toLowerCase();
-              const src = (tab === "pending" ? pending : all).filter((p) => !ps || (p.title || "").toLowerCase().includes(ps) || (p.id || "").toLowerCase().includes(ps));
-              if (src.length === 0) return properties === null ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-2xl" />) : <p className="text-sm text-muted-foreground">{tab === "pending" ? "Niciun anunț în așteptare. 🎉" : "Niciun anunț găsit."}</p>;
-              return src.map((p) => {
-              if (editingId === p.id) {
-                return <PropertyEditForm key={p.id} property={p} isAdmin onDone={() => { setEditingId(null); load(); }} />;
-              }
-              return (
-              <div key={p.id} className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card">
-                <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-secondary">
-                  {p.images?.[0] && <UIImage src={p.images[0]} fittingType="fill" className="h-full w-full" />}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-heading font-bold text-navy line-clamp-1 dark:text-foreground">{p.title}</p>
-                  <p className="text-xs text-muted-foreground">{p.zone}, {p.city} · {p.property_type} · {p.price_monthly} € · <span className={p.approval_status === "APPROVED" ? "text-emerald font-semibold" : "text-amber-600 font-semibold"}>{p.approval_status || "PENDING"}</span></p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground/70">Cod: <span className="font-mono select-all font-semibold text-foreground/60">{p.property_code || p.id}</span></p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button size="sm" variant="outline" onClick={() => setEditingId(p.id)} className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft"><Pencil className="h-3.5 w-3.5" /> Editează</Button>
-                  {p.approval_status !== "APPROVED" && <Button size="sm" onClick={() => setApproval(p, "APPROVED")} className="gap-1 bg-emerald text-white"><Check className="h-3.5 w-3.5" /> Aprobă</Button>}
-                  {p.approval_status === "APPROVED" && <Button size="sm" variant="outline" onClick={() => setApproval(p, "REJECTED")} className="gap-1 border-amber-400 text-amber-700"><X className="h-3.5 w-3.5" /> Retrage</Button>}
-                  <Button size="sm" variant="outline" onClick={() => toggleAiTour(p)} className={`gap-1 ${p.ai_tour_verified ? "border-emerald bg-emerald text-white hover:bg-emerald/90" : "border-emerald/40 text-emerald hover:bg-emerald-soft"}`}><Sparkles className="h-3.5 w-3.5" /> {p.ai_tour_verified ? "Tur 3D ✓" : "+ Tur 3D"}</Button>
-                  <Button size="sm" variant="outline" onClick={() => delProperty(p)} className="gap-1 border-destructive/30 text-destructive hover:bg-destructive/10"><Trash2 className="h-3.5 w-3.5" /></Button>
-                </div>
+
+          ) : tab === "loguri" ? (
+            <PropertyLogs properties={properties || []} audit={audit || []} comments={comments || []} inquiries={inquiries || []} />
+
+          ) : tab === "rapoarte" ? (
+            <AdminReports reports={(reports || []).filter((r) => r.status === "PENDING")} properties={properties || []} onReload={load} />
+
+          ) : tab === "rapoarte_rezolvate" ? (
+            <AdminResolvedReports reports={(reports || []).filter((r) => r.status !== "PENDING")} />
+
+          ) : tab === "users" ? (
+            <div className="space-y-3">
+              <div className="relative max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  value={userSearch}
+                  onChange={(e) => setUserSearch(e.target.value)}
+                  placeholder="Cauta dupa nume sau email..."
+                  className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card"
+                />
               </div>
-              );
-            });
-          })()}
-          </div>
-        )}
+              {users === null
+                ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-2xl" />)
+                : filteredUsers.length === 0
+                ? <p className="text-sm text-muted-foreground">Niciun utilizator gasit.</p>
+                : filteredUsers.map((u) => (
+                  <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-soft text-emerald">
+                      <Users className="h-5 w-5" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-heading font-bold text-navy dark:text-foreground">{u.full_name || u.email}</p>
+                      <p className="truncate text-xs text-muted-foreground">{u.email} · {u.is_verified ? "Verificat" : "Neverificat"}</p>
+                    </div>
+                    <select
+                      value={u.role || "user"}
+                      onChange={(e) => changeRole(u, e.target.value)}
+                      disabled={u.id === user.id}
+                      className="rounded-full border border-border bg-white px-3 py-1.5 text-xs font-semibold outline-none focus:border-emerald disabled:opacity-60 dark:bg-card"
+                    >
+                      {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+                    </select>
+                    <Button size="sm" variant="outline" onClick={() => verifyUser(u, !u.is_verified)} className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft">
+                      <ShieldCheck className="h-3.5 w-3.5" /> {u.is_verified ? "Retrage" : "Verifica"}
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => delUser(u)} className="gap-1 border-destructive/30 text-destructive hover:bg-destructive/10">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                ))}
+            </div>
+
+          ) : tab === "comments" ? (
+            <div className="space-y-2">
+              {(comments || []).length === 0
+                ? <p className="text-sm text-muted-foreground">Niciun comentariu.</p>
+                : comments.map((c) => (
+                  <div key={c.id} className="rounded-xl border border-border bg-white p-3 dark:bg-card">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">
+                        <b className="text-navy dark:text-foreground">{c.user_name}</b>
+                        <span className="text-xs text-muted-foreground"> · {c.user_role} · pe {c.property_title}</span>
+                      </span>
+                      <Button variant="outline" size="sm" onClick={() => delComment(c)} className="gap-1 border-destructive/30 text-destructive hover:bg-destructive/10">
+                        <Trash2 className="h-3.5 w-3.5" /> Sterge
+                      </Button>
+                    </div>
+                    <p className="mt-1 text-sm text-foreground/80">{c.content}</p>
+                  </div>
+                ))}
+            </div>
+
+          ) : (
+            // pending + all
+            <div className="space-y-3">
+              <div className="relative max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  value={propSearch}
+                  onChange={(e) => setPropSearch(e.target.value)}
+                  placeholder="Cauta dupa titlu sau ID..."
+                  className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card"
+                />
+              </div>
+              {(() => {
+                const ps = (propSearch || "").toLowerCase();
+                const src = (tab === "pending" ? pending : all).filter(
+                  (p) => !ps || (p.title || "").toLowerCase().includes(ps) || (p.id || "").toLowerCase().includes(ps)
+                );
+                if (src.length === 0) {
+                  return properties === null
+                    ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-2xl" />)
+                    : <p className="text-sm text-muted-foreground">{tab === "pending" ? "Niciun anunt in asteptare." : "Niciun anunt gasit."}</p>;
+                }
+                return src.map((p) => {
+                  if (editingId === p.id) {
+                    return <PropertyEditForm key={p.id} property={p} isAdmin onDone={() => { setEditingId(null); load(); }} />;
+                  }
+                  return (
+                    <div key={p.id} className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card">
+                      <div className="h-16 w-24 shrink-0 overflow-hidden rounded-xl bg-secondary">
+                        {p.images?.[0] && <UIImage src={p.images[0]} fittingType="fill" className="h-full w-full" />}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-heading font-bold text-navy line-clamp-1 dark:text-foreground">{p.title}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {p.zone}, {p.city} · {p.property_type} · {p.price_monthly}
+                          {" · "}
+                          <span className={p.approval_status === "APPROVED" ? "font-semibold text-emerald" : "font-semibold text-amber-600"}>
+                            {p.approval_status || "PENDING"}
+                          </span>
+                        </p>
+                        <p className="mt-0.5 text-[11px] text-muted-foreground/70">
+                          Cod: <span className="select-all font-mono font-semibold text-foreground/60">{p.property_code || p.id}</span>
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Button size="sm" variant="outline" onClick={() => setEditingId(p.id)} className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft">
+                          <Pencil className="h-3.5 w-3.5" /> Editeaza
+                        </Button>
+                        {p.approval_status !== "APPROVED" && (
+                          <Button size="sm" onClick={() => setApproval(p, "APPROVED")} className="gap-1 bg-emerald text-white">
+                            <Check className="h-3.5 w-3.5" /> Aproba
+                          </Button>
+                        )}
+                        {p.approval_status === "APPROVED" && (
+                          <Button size="sm" variant="outline" onClick={() => setApproval(p, "REJECTED")} className="gap-1 border-amber-400 text-amber-700">
+                            <X className="h-3.5 w-3.5" /> Retrage
+                          </Button>
+                        )}
+                        <Button size="sm" variant="outline" onClick={() => toggleAiTour(p)}
+                          className={"gap-1 " + (p.ai_tour_verified ? "border-emerald bg-emerald text-white hover:bg-emerald/90" : "border-emerald/40 text-emerald hover:bg-emerald-soft")}>
+                          <Sparkles className="h-3.5 w-3.5" /> {p.ai_tour_verified ? "Tur 3D" : "+ Tur 3D"}
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => delProperty(p)} className="gap-1 border-destructive/30 text-destructive hover:bg-destructive/10">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

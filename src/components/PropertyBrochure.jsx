@@ -7,23 +7,28 @@ import { LOGO_URL } from "@/components/VerifiCasaLogo";
 import { useToast } from "@/components/ui/use-toast";
 
 const C = {
-  navy: [27, 34, 44],
-  gold: [197, 160, 89],
-  emerald: [0, 168, 89],
-  mute: [90, 98, 112],
-  light: [240, 241, 243],
-  white: [255, 255, 255],
-  ink: [33, 33, 39],
+  navy:    [27,  34,  44],
+  navyMid: [40,  52,  68],
+  gold:    [197, 160, 89],
+  emerald: [0,   168, 89],
+  mute:    [110, 120, 136],
+  light:   [245, 246, 248],
+  white:   [255, 255, 255],
+  ink:     [30,  32,  38],
+  border:  [220, 224, 230],
+  bg:      [252, 253, 254],
 };
 
-// jsPDF's built-in Helvetica only encodes CP1252, which lacks Romanian
-// diacritics (a, s, t). Strip them to ASCII so the PDF text renders cleanly.
-const S = (s) => (s == null ? "" : String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+// Strip Romanian diacritics → ASCII so Helvetica renders cleanly
+const S = (s) =>
+  s == null ? "" : String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
 const verifLabel = (p) =>
-  p.verification_level === "field_certified" ? "Pe teren (Certified)"
-    : p.ai_tour_verified ? "Video & AI"
-    : "Ne verificat";
+  p.verification_level === "field_certified"
+    ? "Certificat pe teren"
+    : p.ai_tour_verified
+    ? "Video & AI verificat"
+    : "Neverificat";
 
 async function urlToDataURL(url) {
   try {
@@ -41,14 +46,17 @@ async function urlToDataURL(url) {
   }
 }
 
-const imgFmt = (d) =>
-  d.startsWith("data:image/png") ? "PNG"
-    : d.startsWith("data:image/jpeg") || d.startsWith("data:image/jpg") ? "JPEG"
+const fmt = (d) =>
+  d?.startsWith("data:image/png")
+    ? "PNG"
+    : d?.startsWith("data:image/jpeg") || d?.startsWith("data:image/jpg")
+    ? "JPEG"
     : "PNG";
 
-// Elegant multi-page PDF brochure (A4) with a navy header band, cover gallery,
-// full property specs, features, description and a QR code linking to the live
-// listing — a printable handout a visitor (or agent) can take offline.
+function drawRoundedRect(doc, x, y, w, h, r, style = "F") {
+  doc.roundedRect(x, y, w, h, r, r, style);
+}
+
 export default function PropertyBrochure({ property, className = "" }) {
   const { formatPrice } = useCountry();
   const { toast } = useToast();
@@ -60,151 +68,263 @@ export default function PropertyBrochure({ property, className = "" }) {
     setBusy(true);
     try {
       const doc = new jsPDF({ unit: "mm", format: "a4" });
-      const W = 210, H = 297, M = 14, cw = W - M * 2;
-      const fill = (c) => doc.setFillColor(c[0], c[1], c[2]);
-      const txt = (c) => doc.setTextColor(c[0], c[1], c[2]);
-      const draw = (c) => doc.setDrawColor(c[0], c[1], c[2]);
+      const W = 210, H = 297, M = 16, cw = W - M * 2;
       let y = 0;
 
-      // ---------- Header band ----------
-      fill(C.navy); doc.rect(0, 0, W, 24, "F");
-      let lx = M;
-      const logo = await urlToDataURL(LOGO_URL);
-      if (logo) { try { doc.addImage(logo, "PNG", M, 6, 12, 12); } catch {} lx = M + 16; }
-      txt(C.white); doc.setFont("helvetica", "bold"); doc.setFontSize(16);
-      doc.text(S("VerifiCasa"), lx, 13);
-      txt(C.gold); doc.setFont("helvetica", "normal"); doc.setFontSize(8);
-      doc.text(S("Inspectii & Verificari Imobiliare"), lx, 17.5);
-      txt([200, 200, 200]); doc.setFontSize(8);
-      doc.text(new Date().toLocaleDateString("ro-RO"), W - M, 13, { align: "right" });
-      y = 32;
+      const setFill = (c) => doc.setFillColor(c[0], c[1], c[2]);
+      const setTxt  = (c) => doc.setTextColor(c[0], c[1], c[2]);
+      const setDraw = (c) => doc.setDrawColor(c[0], c[1], c[2]);
+      const setLw   = (w) => doc.setLineWidth(w);
 
-      // ---------- Title + location ----------
-      txt(C.navy); doc.setFont("helvetica", "bold"); doc.setFontSize(17);
+      // ── PAGE BACKGROUND ──────────────────────────────────────────────────
+      setFill(C.bg); doc.rect(0, 0, W, H, "F");
+
+      // ── HEADER (navy gradient simulation) ────────────────────────────────
+      setFill(C.navy);  doc.rect(0, 0, W, 32, "F");
+      setFill(C.navyMid); doc.rect(0, 28, W, 6, "F"); // soft bottom fade
+
+      // Logo
+      const logo = await urlToDataURL(LOGO_URL);
+      let logoRight = M;
+      if (logo) {
+        try { doc.addImage(logo, "PNG", M, 7, 14, 14); } catch {}
+        logoRight = M + 18;
+      }
+
+      // Brand name
+      doc.setFont("helvetica", "bold"); doc.setFontSize(17);
+      setTxt(C.white);
+      doc.text("VerifiCasa", logoRight, 16);
+
+      // Tagline
+      doc.setFont("helvetica", "normal"); doc.setFontSize(8);
+      setTxt(C.gold);
+      doc.text("Inspectii & Verificari Imobiliare", logoRight, 21.5);
+
+      // Date — top right
+      doc.setFont("helvetica", "normal"); doc.setFontSize(7.5);
+      setTxt([190, 200, 210]);
+      doc.text(new Date().toLocaleDateString("ro-RO"), W - M, 15, { align: "right" });
+
+      // Gold accent line at header bottom
+      setFill(C.gold); doc.rect(0, 32, W, 1.5, "F");
+      y = 42;
+
+      // ── TITLE BLOCK ───────────────────────────────────────────────────────
+      doc.setFont("helvetica", "bold"); doc.setFontSize(18);
+      setTxt(C.ink);
       const titleLines = doc.splitTextToSize(S(p.title || "Proprietate"), cw);
       doc.text(titleLines, M, y);
-      y += titleLines.length * 6.2 + 1;
+      y += titleLines.length * 7 + 1;
 
-      txt(C.mute); doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-      const locParts = [p.zone, p.city, "Romania"].filter(Boolean).join(", ");
+      // Location + property code
+      const locParts = [p.zone, p.city, p.county, "Romania"].filter(Boolean).join(", ");
+      doc.setFont("helvetica", "normal"); doc.setFontSize(9.5);
+      setTxt(C.mute);
       doc.text(S(locParts), M, y); y += 5;
-      if (p.landmark) { doc.text(S(`Reper: ${p.landmark}`), M, y); y += 5; }
-      doc.setFontSize(8.5);
-      doc.text(S(`Cod Proprietate: ${p.property_code || p.id}`), M, y); y += 8;
+      if (p.landmark) {
+        doc.setFontSize(8.5);
+        doc.text(S("Reper: " + p.landmark), M, y); y += 4.5;
+      }
+      // Property code badge
+      doc.setFontSize(8); setTxt(C.mute);
+      const codeStr = S("Cod Proprietate: " + (p.property_code || p.id?.slice(0, 8) || "—"));
+      const codePillW = doc.getTextWidth(codeStr) + 6;
+      setFill(C.border);
+      drawRoundedRect(doc, M, y - 3.5, codePillW, 5.5, 1, "F");
+      setTxt(C.navyMid);
+      doc.text(codeStr, M + 3, y + 0.5);
+      y += 9;
 
-      // ---------- Price pill ----------
-      const priceLbl = S(`${formatPrice(p.price_monthly, p.currency)}/luna`);
+      // ── PRICE PILL ────────────────────────────────────────────────────────
+      const priceTxt = S(formatPrice(p.price_monthly, p.currency) + "/luna");
       doc.setFont("helvetica", "bold"); doc.setFontSize(14);
-      const pw = doc.getTextWidth(priceLbl) + 8;
-      fill(C.emerald); doc.roundedRect(M, y, pw, 9, 1.5, 1.5, "F");
-      txt(C.white); doc.text(priceLbl, M + 4, y + 6.2);
-      y += 14;
+      const priceW = doc.getTextWidth(priceTxt) + 12;
+      setFill(C.emerald);
+      drawRoundedRect(doc, M, y, priceW, 10, 2, "F");
+      setTxt(C.white);
+      doc.text(priceTxt, M + 6, y + 7);
 
-      // ---------- Cover + thumbnails ----------
+      // Cost total pill (if utilities set)
+      if (p.monthly_utilities_estimate) {
+        const total = (p.price_monthly || 0) + (p.monthly_utilities_estimate || 0) + (p.maintenance_fee || 0);
+        const totalTxt = S("Total lunar: ~" + formatPrice(total, p.currency));
+        doc.setFontSize(9); doc.setFont("helvetica", "normal");
+        const totalW = doc.getTextWidth(totalTxt) + 10;
+        setFill(C.light); setDraw(C.border); setLw(0.2);
+        drawRoundedRect(doc, M + priceW + 4, y + 1, totalW, 8, 1.5, "FD");
+        setTxt(C.navyMid);
+        doc.text(totalTxt, M + priceW + 9, y + 6.5);
+      }
+      y += 16;
+
+      // ── COVER IMAGE (full-width, rounded) ────────────────────────────────
       const imgs = (p.images || []).slice(0, 4);
-      if (imgs.length) {
-        const ch = 58;
-        const cover = await urlToDataURL(imgs[0]);
-        if (cover) {
-          try { doc.addImage(cover, imgFmt(cover), M, y, cw, ch); } catch {}
-        } else { fill(C.light); doc.rect(M, y, cw, ch, "F"); }
-        draw(C.navy); doc.setLineWidth(0.3); doc.rect(M, y, cw, ch);
-        y += ch + 4;
+      if (imgs.length > 0) {
+        const coverH = 65;
+        const coverData = await urlToDataURL(imgs[0]);
+        if (coverData) {
+          try {
+            // Draw white rounded card background
+            setFill(C.white); setDraw(C.border); setLw(0.3);
+            drawRoundedRect(doc, M - 1, y - 1, cw + 2, coverH + 2, 3, "FD");
+            doc.addImage(coverData, fmt(coverData), M, y, cw, coverH);
+          } catch {}
+        } else {
+          setFill(C.light); setDraw(C.border); setLw(0.3);
+          drawRoundedRect(doc, M, y, cw, coverH, 3, "FD");
+          setTxt(C.mute); doc.setFontSize(8);
+          doc.text(S("Fotografie indisponibila"), W / 2, y + coverH / 2, { align: "center" });
+        }
+        y += coverH + 5;
+
+        // Thumbnails row (up to 3)
         const thumbs = imgs.slice(1, 4);
-        if (thumbs.length) {
-          const tw = (cw - (thumbs.length - 1) * 3) / thumbs.length;
+        if (thumbs.length > 0) {
+          const th = 28, tw = (cw - (thumbs.length - 1) * 3) / thumbs.length;
           let tx = M;
           for (const tu of thumbs) {
             const td = await urlToDataURL(tu);
-            if (td) { try { doc.addImage(td, imgFmt(td), tx, y, tw, 24); } catch {} }
-            else { fill(C.light); doc.rect(tx, y, tw, 24, "F"); }
-            draw(C.mute); doc.rect(tx, y, tw, 24);
+            setFill(C.light); setDraw(C.border); setLw(0.2);
+            drawRoundedRect(doc, tx, y, tw, th, 2, "FD");
+            if (td) {
+              try { doc.addImage(td, fmt(td), tx, y, tw, th); } catch {}
+            }
             tx += tw + 3;
           }
-          y += 28;
+          y += th + 6;
         }
       }
 
-      // ---------- Specs grid ----------
+      // ── SPECS TABLE (card) ────────────────────────────────────────────────
       const specs = [
-        ["Tip proprietate", p.property_type],
-        ["Camere", p.rooms != null ? String(p.rooms) : "-"],
-        ["Suprafata", p.surface_sqm != null ? `${p.surface_sqm} mp` : "-"],
-        ["Etaj", p.floor || "-"],
-        ["An constructie", p.building_year ? String(p.building_year) : "-"],
-        ["Total etaje", p.total_floors != null ? String(p.total_floors) : "-"],
-        ["Depozit", p.deposit != null ? formatPrice(p.deposit, p.currency) : "-"],
-        ["Disponibil", p.available_from ? new Date(p.available_from).toLocaleDateString("ro-RO") : "Imediat"],
-        ["Mobilat", p.furnished ? "Da" : "Nu"],
-        ["Parcare", p.parking ? "Da" : "Nu"],
-        ["Pet friendly", p.pet_friendly ? "Da" : "Nu"],
-        ["Comision", p.commission_free ? "Fara comision" : "Standard"],
-        ["Garantie", p.deposit_option === "verificasa_guarantee" ? "VerifiCasa (0)" : "Standard"],
-        ["Verificare", verifLabel(p)],
+        ["Tip proprietate", p.property_type || "—"],
+        ["Camere",          p.rooms != null ? String(p.rooms) : "—"],
+        ["Suprafata",       p.surface_sqm != null ? `${p.surface_sqm} mp` : "—"],
+        ["Etaj",            p.floor || "—"],
+        ["An constructie",  p.building_year ? String(p.building_year) : "—"],
+        ["Total etaje",     p.total_floors != null ? String(p.total_floors) : "—"],
+        ["Depozit",         p.deposit != null ? S(formatPrice(p.deposit, p.currency)) : "—"],
+        ["Disponibil",      p.available_from ? new Date(p.available_from).toLocaleDateString("ro-RO") : "Imediat"],
+        ["Mobilat",         p.furnished ? "Da" : "Nu"],
+        ["Parcare",         p.parking ? "Da" : "Nu"],
+        ["Pet friendly",    p.pet_friendly ? "Da" : "Nu"],
+        ["Comision",        p.commission_free ? "Fara comision" : "Standard"],
+        ["Garantie",        p.deposit_option === "verificasa_guarantee" ? "VerifiCasa Guarantee" : "Standard"],
+        ["Verificare",      verifLabel(p)],
       ];
-      const block = (title, render) => {
-        if (y > H - 70) { doc.addPage(); y = 20; }
-        txt(C.navy); doc.setFont("helvetica", "bold"); doc.setFontSize(11);
-        doc.text(S(title), M, y); y += 6;
-        render();
+
+      const sectionCard = (title, renderFn, estimatedH) => {
+        if (y + estimatedH > H - 45) { doc.addPage(); setFill(C.bg); doc.rect(0, 0, W, H, "F"); y = 20; }
+        // Card background
+        setFill(C.white); setDraw(C.border); setLw(0.25);
+        // We'll size after render; for now start
+        const cardY = y;
+
+        // Section title
+        setFill(C.navy); doc.rect(M, y, cw, 8, "F");
+        doc.setFont("helvetica", "bold"); doc.setFontSize(9.5);
+        setTxt(C.white);
+        doc.text(S(title), M + 5, y + 5.5);
+        y += 11;
+
+        renderFn();
+        y += 4;
+
+        // Draw card border around the whole section
+        setDraw(C.border); setLw(0.25);
+        doc.rect(M, cardY, cw, y - cardY);
       };
-      block("Detalii proprietate", () => {
-        doc.setFontSize(9);
+
+      sectionCard("DETALII PROPRIETATE", () => {
         const colW = cw / 2;
-        specs.forEach((s, i) => {
-          const col = i % 2, row = Math.floor(i / 2);
-          const sx = M + col * colW;
-          const sy = y + row * 6;
-          txt(C.mute); doc.setFont("helvetica", "normal");
-          doc.text(S(`${s[0]}:`), sx, sy);
-          txt(C.ink); doc.setFont("helvetica", "bold");
-          doc.text(S(String(s[1] || "-")), sx + 42, sy);
-        });
-        y += Math.ceil(specs.length / 2) * 6 + 3;
-      });
-
-      if (p.features?.length) {
-        block("Facilitati", () => {
-          doc.setFont("helvetica", "normal"); doc.setFontSize(8.8);
-          txt(C.ink);
-          const lines = doc.splitTextToSize(S(p.features.join("  -  ")), cw);
-          doc.text(lines, M, y);
-          y += lines.length * 4.6 + 3;
-        });
-      }
-
-      if (p.description) {
-        block("Descriere", () => {
-          doc.setFont("helvetica", "normal"); doc.setFontSize(9.2);
-          txt(C.ink);
-          const lines = doc.splitTextToSize(S(p.description), cw);
-          let dy = y;
-          for (const ln of lines) {
-            if (dy > H - 40) { doc.addPage(); dy = 20; }
-            doc.text(ln, M, dy);
-            dy += 4.8;
+        const rows = Math.ceil(specs.length / 2);
+        for (let row = 0; row < rows; row++) {
+          const isShaded = row % 2 === 1;
+          if (isShaded) { setFill([247, 248, 250]); doc.rect(M, y, cw, 6, "F"); }
+          for (let col = 0; col < 2; col++) {
+            const idx = row * 2 + col;
+            if (idx >= specs.length) continue;
+            const sx = M + col * colW + 3;
+            doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); setTxt(C.mute);
+            doc.text(S(specs[idx][0] + ":"), sx, y + 4.2);
+            doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); setTxt(C.ink);
+            doc.text(S(String(specs[idx][1] || "—")), sx + 44, y + 4.2);
           }
-          y = dy + 4;
-        });
+          y += 6;
+        }
+      }, specs.length * 3.5 + 20);
+
+      y += 4;
+
+      // ── FEATURES ─────────────────────────────────────────────────────────
+      if (p.features?.length) {
+        const featuresList = p.features.map((f) => S(f));
+        const perRow = 3;
+        const rows = Math.ceil(featuresList.length / perRow);
+        sectionCard("FACILITATI", () => {
+          for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < perRow; c++) {
+              const fi = featuresList[r * perRow + c];
+              if (!fi) continue;
+              const fx = M + 3 + c * (cw / perRow);
+              // small bullet dot
+              setFill(C.emerald); doc.circle(fx + 1.5, y + 3, 1, "F");
+              doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); setTxt(C.ink);
+              doc.text(fi, fx + 4, y + 4.2);
+            }
+            y += 6;
+          }
+        }, rows * 7 + 20);
+        y += 4;
       }
 
-      // ---------- Footer with QR ----------
-      const fy = H - 36;
-      fill(C.navy); doc.rect(0, fy, W, 36, "F");
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=0&data=${encodeURIComponent(listingUrl)}`;
-      const qr = await urlToDataURL(qrUrl);
-      if (qr) { try { doc.addImage(qr, "PNG", M, fy + 5, 26, 26); } catch {} }
-      txt(C.white); doc.setFont("helvetica", "bold"); doc.setFontSize(12);
-      doc.text(S("Vezi anuntul online"), M + 33, fy + 12);
-      txt(C.gold); doc.setFont("helvetica", "normal"); doc.setFontSize(9);
-      doc.text(listingUrl, M + 33, fy + 18);
-      txt([210, 210, 210]); doc.setFontSize(7.5);
-      doc.text(S("Scaneaza pentru tur virtual si contact direct cu proprietarul."), M + 33, fy + 25);
+      // ── DESCRIPTION ──────────────────────────────────────────────────────
+      if (p.description) {
+        const descLines = doc.splitTextToSize(S(p.description), cw - 10);
+        const descH = descLines.length * 4.8 + 22;
+        sectionCard("DESCRIERE", () => {
+          doc.setFont("helvetica", "normal"); doc.setFontSize(9); setTxt(C.ink);
+          for (const ln of descLines) {
+            if (y > H - 50) { doc.addPage(); setFill(C.bg); doc.rect(0, 0, W, H, "F"); y = 20; }
+            doc.text(ln, M + 5, y + 4);
+            y += 4.8;
+          }
+        }, descH);
+      }
 
-      doc.save(`brosura-verificasa-${S(p.property_code || p.id || "proprietate")}.pdf`);
-      toast({ title: "Broșură PDF generată", description: "Fișierul a fost descărcat." });
+      // ── FOOTER ───────────────────────────────────────────────────────────
+      const fy = H - 40;
+      // gold accent top of footer
+      setFill(C.gold); doc.rect(0, fy, W, 1.5, "F");
+      setFill(C.navy); doc.rect(0, fy + 1.5, W, 40, "F");
+
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=4&color=1B222C&data=${encodeURIComponent(listingUrl)}`;
+      const qr = await urlToDataURL(qrUrl);
+      if (qr) {
+        // White bg for QR
+        setFill(C.white); drawRoundedRect(doc, M, fy + 4, 28, 28, 2, "F");
+        try { doc.addImage(qr, "PNG", M + 1, fy + 5, 26, 26); } catch {}
+      }
+
+      doc.setFont("helvetica", "bold"); doc.setFontSize(11); setTxt(C.white);
+      doc.text(S("Vizualizeaza anuntul online"), M + 33, fy + 12);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); setTxt(C.gold);
+      doc.text(listingUrl, M + 33, fy + 19);
+      doc.setFontSize(7.5); setTxt([180, 190, 200]);
+      doc.text(S("Scaneaza codul QR pentru tur virtual si contact direct cu proprietarul."), M + 33, fy + 26);
+
+      // VerifiCasa branding bottom right
+      doc.setFont("helvetica", "bold"); doc.setFontSize(8); setTxt(C.gold);
+      doc.text("VerifiCasa", W - M, fy + 35, { align: "right" });
+      doc.setFont("helvetica", "normal"); doc.setFontSize(6.5); setTxt([150, 160, 175]);
+      doc.text(S("verificasa.site · Inspectii & Verificari Imobiliare"), W - M, fy + 39, { align: "right" });
+
+      doc.save(`brosura-verificasa-${S(p.property_code || p.id?.slice(0, 8) || "prop")}.pdf`);
+      toast({ title: "Broșură generată ✓", description: "PDF-ul a fost descărcat." });
     } catch (e) {
-      toast({ title: "Generare eșuată", description: "Încearcă din nou.", variant: "destructive" });
+      console.error(e);
+      toast({ title: "Eroare la generare", description: String(e?.message || e), variant: "destructive" });
     } finally {
       setBusy(false);
     }
