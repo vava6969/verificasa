@@ -3,6 +3,10 @@
   "type": "object",
   "title": "Property",
   "properties": {
+    "property_code": {
+      "type": "number",
+      "title": "Cod proprietate unic"
+    },
     "title": {
       "type": "string",
       "title": "Titlu"

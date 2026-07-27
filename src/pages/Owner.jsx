@@ -12,6 +12,7 @@ import {
   Camera, Sparkles, Eye, MessageSquare, FileText, TrendingUp, Upload, Plus, Download, Wifi, Volume2, Sun, Droplet,
 } from "lucide-react";
 import OwnerCharts from "@/components/OwnerCharts";
+import { generateUniquePropertyCode } from "@/lib/propertyCode";
 
 export default function Owner() {
   const { country, t, lang } = useCountry();
@@ -198,7 +199,9 @@ function NewPropertyForm({ onDone }) {
     setSaving(true);
     try {
       const demoVideo = "https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-modern-living-room-41558-large.mp4";
+      const property_code = await generateUniquePropertyCode();
       const created = await base44.entities.Property.create({
+        property_code,
         title: form.title,
         description: form.description,
         price_monthly: Number(form.price_monthly),

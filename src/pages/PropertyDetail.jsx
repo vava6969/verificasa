@@ -311,7 +311,7 @@ export default function PropertyDetail() {
                     </p>
                   )}
                   <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground/70">
-                    ID proprietate: <span className="font-mono select-all">{p.id}</span>
+                    Cod Proprietate: <span className="font-mono select-all font-semibold text-foreground/80">{p.property_code || p.id}</span>
                   </p>
                   {p.approved_by_name && (
                     <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-emerald">

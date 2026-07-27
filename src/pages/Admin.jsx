@@ -159,6 +159,8 @@ export default function Admin() {
 
   const pending = (properties || []).filter((p) => p.approval_status !== "APPROVED");
   const all = properties || [];
+  const codeById = new Map();
+  all.forEach((p) => codeById.set(p.id, p.property_code));
   const filteredUsers = (users || []).filter((u) => {
     const q = userSearch.toLowerCase();
     if (!q) return true;
@@ -247,11 +249,11 @@ export default function Admin() {
             </div>
             {(() => {
               const as = (auditSearch || "").toLowerCase();
-              const src = (audit || []).filter((a) => !as || [a.actor_name, a.action, a.target_type, a.target_id, a.detail].filter(Boolean).join(" ").toLowerCase().includes(as));
+              const src = (audit || []).filter((a) => !as || [a.actor_name, a.action, a.target_type, a.target_id, codeById.get(a.target_id), a.detail].filter(Boolean).join(" ").toLowerCase().includes(as));
               if (src.length === 0) return <p className="text-sm text-muted-foreground">Nicio acțiune găsită.</p>;
               return src.map((a) => (
                 <div key={a.id} className="flex items-center justify-between rounded-xl border border-border bg-white p-3 text-sm dark:bg-card">
-                  <span><b className="text-navy dark:text-foreground">{a.actor_name}</b> <span className="text-muted-foreground">· {a.action} · {a.target_type}{a.target_id ? ` · ID: ${a.target_id.slice(0, 8)}…` : ""}{a.detail ? ` · ${a.detail}` : ""}</span></span>
+                  <span><b className="text-navy dark:text-foreground">{a.actor_name}</b> <span className="text-muted-foreground">· {a.action} · {a.target_type}{a.target_id ? ` · Cod: ${codeById.get(a.target_id) || a.target_id.slice(0, 8)}` : ""}{a.detail ? ` · ${a.detail}` : ""}</span></span>
                   <span className="text-xs text-muted-foreground">{new Date(a.created_date).toLocaleString("ro-RO")}</span>
                 </div>
               ));
@@ -323,7 +325,7 @@ export default function Admin() {
                 <div className="min-w-0 flex-1">
                   <p className="font-heading font-bold text-navy line-clamp-1 dark:text-foreground">{p.title}</p>
                   <p className="text-xs text-muted-foreground">{p.zone}, {p.city} · {p.property_type} · {p.price_monthly} € · <span className={p.approval_status === "APPROVED" ? "text-emerald font-semibold" : "text-amber-600 font-semibold"}>{p.approval_status || "PENDING"}</span></p>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground/70">ID: <span className="font-mono select-all">{p.id}</span></p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground/70">Cod: <span className="font-mono select-all font-semibold text-foreground/60">{p.property_code || p.id}</span></p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button size="sm" variant="outline" onClick={() => setEditingId(p.id)} className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft"><Pencil className="h-3.5 w-3.5" /> Editează</Button>
