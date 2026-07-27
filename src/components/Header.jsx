@@ -135,7 +135,7 @@ export default function Header() {
         <DropdownMenuItem onClick={() => navigate("/searches")}><Search className="mr-2 h-4 w-4" /> {t("hdr_searches")}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/my-reports")}><Flag className="mr-2 h-4 w-4" /> Rapoartele mele</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate("/owner")}><Plus className="mr-2 h-4 w-4" /> {t("hdr_add_listing")}</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate("/owner?nou=1")}><Plus className="mr-2 h-4 w-4" /> {t("hdr_add_listing")}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/my-properties")}><Home className="mr-2 h-4 w-4" /> {t("hdr_myprops")}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/settings")}><Settings className="mr-2 h-4 w-4" /> {t("hdr_settings")}</DropdownMenuItem>
         {canAdmin && (
@@ -177,7 +177,7 @@ export default function Header() {
             {isAuthenticated ? (
               <>
                 <Button asChild className="hidden rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 md:flex">
-                  <Link to="/owner"><Plus className="h-4 w-4" /> {t("hdr_add")}</Link>
+                  <Link to="/owner?nou=1"><Plus className="h-4 w-4" /> {t("hdr_add")}</Link>
                 </Button>
                 <div className="hidden md:block"><ProfileMenu /></div>
               </>
@@ -207,7 +207,7 @@ export default function Header() {
           <div className="flex items-center gap-1.5 shrink-0">
             {isAuthenticated ? (
               <>
-                <Link to="/owner" className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald text-white shadow-soft" aria-label={t("hdr_add")}>
+                <Link to="/owner?nou=1" className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald text-white shadow-soft" aria-label={t("hdr_add")}>
                   <Plus className="h-4 w-4" />
                 </Link>
                 <ProfileMenu mobile />

@@ -12,7 +12,7 @@ import BetaBanner from "@/components/BetaBanner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  ShieldCheck, ArrowRight, Video, FileText, Lock, Home,
+  ShieldCheck, ArrowRight, Video, FileText, Lock, Home, Plus,
 } from "lucide-react";
 
 export default function Landing() {
@@ -68,6 +68,9 @@ export default function Landing() {
             <SearchBar />
           </div>
 
+          <Button asChild className="mt-6 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
+            <Link to="/owner?nou=1"><Plus className="h-4 w-4" /> {t("hdr_add")}</Link>
+          </Button>
         </div>
       </section>
 

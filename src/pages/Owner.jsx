@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
@@ -21,6 +21,20 @@ export default function Owner() {
   const [properties, setProperties] = useState(null);
   const [inquiries, setInquiries] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const formRef = useRef(null);
+
+  // Auto-open the form when the user came from a "Adaugă Anunț" link with ?nou=1
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("nou") === "1") setShowForm(true);
+  }, []);
+
+  // Smooth-scroll to the form whenever it becomes visible.
+  useEffect(() => {
+    if (showForm && formRef.current) {
+      formRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [showForm]);
 
   const load = async () => {
     if (!user?.id) return;
@@ -73,7 +87,11 @@ export default function Owner() {
 
         <OwnerCharts ownerId={user?.id} lang={lang} />
 
-        {showForm && <NewPropertyForm onDone={() => { setShowForm(false); load(); }} />}
+        {showForm && (
+          <div ref={formRef}>
+            <NewPropertyForm onDone={() => { setShowForm(false); load(); }} />
+          </div>
+        )}
 
         {/* PROPERTIES */}
         <div className="mt-8">
