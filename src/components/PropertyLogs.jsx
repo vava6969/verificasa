@@ -8,6 +8,10 @@ const ACTION_LABELS = {
   moderate: "Moderare",
   enable_ai_tour: "Tur 3D activat",
   disable_ai_tour: "Tur 3D retras",
+  report_property: "Sesizare proprietate",
+  report_comment: "Sesizare comentariu",
+  resolve_report: "Raport rezolvat",
+  reject_report: "Raport respins",
 };
 
 const relTime = (iso) => {

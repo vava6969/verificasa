@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   User, Plus, Home, LogOut, Heart, MessageCircle, Settings, ShieldCheck,
-  LayoutDashboard, Bookmark, Search, ChevronDown, Globe, Check, Bell, Moon, Sun,
+  LayoutDashboard, Bookmark, Search, ChevronDown, Globe, Check, Bell, Moon, Sun, Flag,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
@@ -133,6 +133,7 @@ export default function Header() {
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/saved")}><Bookmark className="mr-2 h-4 w-4" /> {t("hdr_saved")}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/searches")}><Search className="mr-2 h-4 w-4" /> {t("hdr_searches")}</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate("/my-reports")}><Flag className="mr-2 h-4 w-4" /> Rapoartele mele</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate("/owner")}><Plus className="mr-2 h-4 w-4" /> {t("hdr_add_listing")}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/my-properties")}><Home className="mr-2 h-4 w-4" /> {t("hdr_myprops")}</DropdownMenuItem>

@@ -21,6 +21,7 @@ import PropertyEditForm from "@/components/PropertyEditForm";
 import PhoneReveal from "@/components/PhoneReveal";
 import PropertyPOI from "@/components/PropertyPOI";
 import PropertyComments from "@/components/PropertyComments";
+import ReportModal from "@/components/ReportModal";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -323,6 +324,9 @@ export default function PropertyDetail() {
                       <Pencil className="h-3.5 w-3.5" /> Editează anunțul
                     </Button>
                   )}
+                  <div className="mt-2">
+                    <ReportModal targetType="property" targetId={p.id} targetTitle={p.title} variant="outline" size="sm" className="border-border" />
+                  </div>
                 </div>
                 <div className="text-right">
                   <p className="font-heading text-2xl font-bold text-navy">{formatPrice(p.price_monthly, p.currency)}</p>

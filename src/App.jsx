@@ -27,6 +27,7 @@ import Terms from '@/pages/Terms';
 import Privacy from '@/pages/Privacy';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Account from '@/pages/Account';
+import MyReports from '@/pages/MyReports';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -74,6 +75,7 @@ const AuthenticatedApp = () => {
           <Route path="/searches" element={<SavedSearches />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/my-reports" element={<MyReports />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />

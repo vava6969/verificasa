@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { createNotification } from "@/lib/notifications";
+import ReportModal from "@/components/ReportModal";
 import { MessageSquare, ShieldCheck, BadgeCheck, Lock, Heart, Reply, Send, Trash2 } from "lucide-react";
 
 const ROLE_BADGE = {
@@ -219,8 +220,9 @@ export default function PropertyComments({ property }) {
                   <Reply className="h-3.5 w-3.5" /> Răspunde
                 </button>
               )}
+              <ReportModal targetType="comment" targetId={c.id} targetTitle={(c.content || "").slice(0, 80)} variant="ghost" className="ml-auto" />
               {isAdmin && (
-                <button onClick={() => deleteComment(c)} className="ml-auto flex items-center gap-1 text-xs font-semibold text-muted-foreground transition hover:text-destructive">
+                <button onClick={() => deleteComment(c)} className="flex items-center gap-1 text-xs font-semibold text-muted-foreground transition hover:text-destructive">
                   <Trash2 className="h-3.5 w-3.5" /> Șterge
                 </button>
               )}
