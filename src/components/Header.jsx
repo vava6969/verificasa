@@ -141,7 +141,7 @@ export default function Header() {
         <DropdownMenuItem onClick={() => navigate("/searches")}><Search className="mr-2 h-4 w-4" /> {t("hdr_searches")}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/my-reports")}><Flag className="mr-2 h-4 w-4" /> Rapoartele mele</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => window.open("/owner?nou=1", "_blank", "noopener,noreferrer")}><Plus className="mr-2 h-4 w-4" /> {t("hdr_add_listing")}</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => window.open("/post-property", "_blank", "noopener,noreferrer")}><Plus className="mr-2 h-4 w-4" /> {t("hdr_add_listing")}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/my-properties")}><Home className="mr-2 h-4 w-4" /> {t("hdr_myprops")}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/settings")}><Settings className="mr-2 h-4 w-4" /> {t("hdr_settings")}</DropdownMenuItem>
         {canAdmin && (
@@ -183,7 +183,7 @@ export default function Header() {
             {isAuthenticated ? (
               <>
                 <Button asChild className="hidden rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 md:flex">
-                  <a href="/owner?nou=1" target="_blank" rel="noopener noreferrer"><Plus className="h-4 w-4" /> {t("hdr_add")}</a>
+                  <a href="/post-property" target="_blank" rel="noopener noreferrer"><Plus className="h-4 w-4" /> {t("hdr_add")}</a>
                 </Button>
                 <div className="hidden md:block"><ProfileMenu /></div>
               </>
@@ -213,7 +213,7 @@ export default function Header() {
           <div className="flex items-center gap-1.5 shrink-0">
             {isAuthenticated ? (
               <>
-                <a href="/owner?nou=1" target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald text-white shadow-soft" aria-label={t("hdr_add")}>
+                <a href="/post-property" target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald text-white shadow-soft" aria-label={t("hdr_add")}>
                   <Plus className="h-4 w-4" />
                 </a>
                 <ProfileMenu mobile />

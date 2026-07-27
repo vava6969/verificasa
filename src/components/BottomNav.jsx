@@ -39,7 +39,10 @@ export default function BottomNav() {
   const items = [
     { icon: Home, label: t("hdr_home"), path: "/", onClick: guard("/") },
     { icon: Heart, label: t("hdr_saved"), path: "/saved", onClick: guard("/saved") },
-    { icon: Plus, label: t("hdr_add"), path: "/owner", onClick: guard("/owner"), primary: true },
+    { icon: Plus, label: t("hdr_add"), path: "/post-property", onClick: () => {
+      if (!isAuthenticated) { navigate("/login"); return; }
+      window.open("/post-property", "_blank", "noopener,noreferrer");
+    }, primary: true },
     { icon: MessageCircle, label: t("hdr_messages"), path: "/messages", onClick: guard("/messages"), badge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null },
     { icon: User, label: isAuthenticated ? t("hdr_myaccount") : t("hdr_login"), path: isAuthenticated ? "/account" : "/login", onClick: guard(isAuthenticated ? "/account" : "/login") },
   ];

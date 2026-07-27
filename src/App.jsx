@@ -28,6 +28,7 @@ import Privacy from '@/pages/Privacy';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Account from '@/pages/Account';
 import MyReports from '@/pages/MyReports';
+import PostProperty from '@/pages/PostProperty';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -77,6 +78,9 @@ const AuthenticatedApp = () => {
           <Route path="/account" element={<Account />} />
           <Route path="/my-reports" element={<MyReports />} />
         </Route>
+      </Route>
+      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route path="/post-property" element={<PostProperty />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

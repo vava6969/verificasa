@@ -59,7 +59,7 @@ export default function MyProperties() {
           <p className="mt-1 text-sm text-muted-foreground">Gestionează anunțurile pe care le-ai postat.</p>
         </div>
         <Button asChild className="bg-emerald text-white hover:bg-emerald/90">
-          <Link to="/owner"><Plus className="h-4 w-4" /> Adaugă Anunț</Link>
+          <a href="/post-property" target="_blank" rel="noopener noreferrer"><Plus className="h-4 w-4" /> Adaugă Anunț</a>
         </Button>
       </div>
 
@@ -71,7 +71,7 @@ export default function MyProperties() {
           <p className="mt-4 font-heading text-xl font-bold text-navy">Nu ai adăugat niciun anunț încă.</p>
           <p className="mt-1 text-sm text-muted-foreground">Postează prima ta proprietate în câteva minute.</p>
           <Button asChild className="mt-5 bg-emerald text-white hover:bg-emerald/90">
-            <Link to="/owner"><Plus className="h-4 w-4" /> Adaugă Anunț</Link>
+            <a href="/post-property" target="_blank" rel="noopener noreferrer"><Plus className="h-4 w-4" /> Adaugă Anunț</a>
           </Button>
         </div>
       ) : (

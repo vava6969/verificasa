@@ -161,7 +161,7 @@ export default function Owner() {
   );
 }
 
-function NewPropertyForm({ onDone }) {
+export function NewPropertyForm({ onDone }) {
   const { country, t } = useCountry();
   const { user } = useAuth();
   const { toast } = useToast();
