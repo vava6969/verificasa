@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, MessageCircle, Bell, Bookmark, Search, Plus, Home,
@@ -17,6 +17,17 @@ export default function Account() {
   const { user, logout } = useAuth();
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
+
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    // On mobile the profile header pushes the menu grid below the fold;
+    // auto-scroll the options section into view so the menu is visible.
+    const t = setTimeout(() => {
+      menuRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
+    return () => clearTimeout(t);
+  }, []);
 
   const role = (user?.role || "").toUpperCase();
   const canAdmin = ADMIN_ROLES.includes(role);
@@ -58,7 +69,7 @@ export default function Account() {
       </div>
 
       {/* Account options grid */}
-      <section className="mb-8">
+      <section ref={menuRef} className="mb-8 scroll-mt-20">
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">{t("hdr_myaccount")}</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {options.map((opt) => {
