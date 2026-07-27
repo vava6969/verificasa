@@ -23,6 +23,21 @@ const C = {
 const S = (s) =>
   s == null ? "" : String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
+// Strip emojis and other non-latin glyphs that jsPDF's default Helvetica font
+// cannot render (they show up as garbled mojibake like "Ø=P"). Keeps latin
+// letters, digits, punctuation and whitespace only.
+const stripGlyphs = (s) =>
+  s == null
+    ? ""
+    : String(s)
+        .replace(
+          /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}\u{E000}-\u{F8FF}\u{1F1E6}-\u{1F1FF}\u{2300}-\u{23FF}]/gu,
+          ""
+        )
+        .replace(/\s+/g, " ")
+        .trim();
+const SC = (s) => S(stripGlyphs(s));
+
 const verifLabel = (p) =>
   p.verification_level === "field_certified"
     ? "Certificat pe teren"
@@ -31,6 +46,31 @@ const verifLabel = (p) =>
     : "Neverificat";
 
 async function urlToDataURL(url) {
+  // Prefer a <canvas> approach: load the image with crossOrigin so it can be
+  // drawn to a canvas and re-encoded via toDataURL. This works for CDNs that
+  // send `Access-Control-Allow-Origin` but block `fetch()` reader access.
+  // Falls back to fetch+blob if the canvas approach throws.
+  try {
+    const fromCanvas = await new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.naturalWidth || 600;
+          canvas.height = img.naturalHeight || 400;
+          canvas.getContext("2d").drawImage(img, 0, 0);
+          resolve(canvas.toDataURL("image/jpeg", 0.85));
+        } catch {
+          resolve(null);
+        }
+      };
+      img.onerror = () => resolve(null);
+      img.src = url;
+    });
+    if (fromCanvas) return fromCanvas;
+  } catch {}
+
   try {
     const res = await fetch(url, { mode: "cors" });
     if (!res.ok) return null;
@@ -113,7 +153,7 @@ export default function PropertyBrochure({ property, className = "" }) {
       // ── TITLE BLOCK ───────────────────────────────────────────────────────
       doc.setFont("helvetica", "bold"); doc.setFontSize(18);
       setTxt(C.ink);
-      const titleLines = doc.splitTextToSize(S(p.title || "Proprietate"), cw);
+      const titleLines = doc.splitTextToSize(SC(p.title || "Proprietate"), cw);
       doc.text(titleLines, M, y);
       y += titleLines.length * 7 + 1;
 
@@ -121,10 +161,10 @@ export default function PropertyBrochure({ property, className = "" }) {
       const locParts = [p.zone, p.city, p.county, "Romania"].filter(Boolean).join(", ");
       doc.setFont("helvetica", "normal"); doc.setFontSize(9.5);
       setTxt(C.mute);
-      doc.text(S(locParts), M, y); y += 5;
+      doc.text(SC(locParts), M, y); y += 5;
       if (p.landmark) {
         doc.setFontSize(8.5);
-        doc.text(S("Reper: " + p.landmark), M, y); y += 4.5;
+        doc.text(SC("Reper: " + p.landmark), M, y); y += 4.5;
       }
       // Property code badge
       doc.setFontSize(8); setTxt(C.mute);
@@ -259,7 +299,7 @@ export default function PropertyBrochure({ property, className = "" }) {
 
       // ── FEATURES ─────────────────────────────────────────────────────────
       if (p.features?.length) {
-        const featuresList = p.features.map((f) => S(f));
+        const featuresList = p.features.map((f) => SC(f));
         const perRow = 3;
         const rows = Math.ceil(featuresList.length / perRow);
         sectionCard("FACILITATI", () => {
@@ -281,7 +321,7 @@ export default function PropertyBrochure({ property, className = "" }) {
 
       // ── DESCRIPTION ──────────────────────────────────────────────────────
       if (p.description) {
-        const descLines = doc.splitTextToSize(S(p.description), cw - 10);
+        const descLines = doc.splitTextToSize(SC(p.description), cw - 10);
         const descH = descLines.length * 4.8 + 22;
         sectionCard("DESCRIERE", () => {
           doc.setFont("helvetica", "normal"); doc.setFontSize(9); setTxt(C.ink);
