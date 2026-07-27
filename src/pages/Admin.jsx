@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
-import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil, Sparkles, History, Flag } from "lucide-react";
+import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil, Sparkles, History, Flag, ClipboardCheck } from "lucide-react";
 import PropertyEditForm from "@/components/PropertyEditForm";
 import PropertyLogs from "@/components/PropertyLogs";
 import AdminReports from "@/components/AdminReports";
+import AdminResolvedReports from "@/components/AdminResolvedReports";
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 const ROLE_OPTIONS = ["PROPRIETAR", "AGENT", "ADMIN", "SUPER_ADMIN", "SUPPORT", "user"];
@@ -191,6 +192,7 @@ export default function Admin() {
             { k: "users", label: "Utilizatori", icon: Users, count: (users || []).length, tone: "emerald" },
             { k: "inspectii", label: "Cereri de inspecție", icon: ClipboardList, count: (inspections || []).length, tone: "emerald" },
             { k: "rapoarte", label: "Sesizări / Rapoarte", icon: Flag, count: (reports || []).filter((r) => r.status === "PENDING").length, tone: "amber" },
+            { k: "rapoarte_rezolvate", label: "Sesizări rezolvate", icon: ClipboardCheck, count: (reports || []).filter((r) => r.status !== "PENDING").length, tone: "emerald" },
           ].map((t) => {
             const Active = t.icon;
             const active = tab === t.k;
@@ -266,7 +268,9 @@ export default function Admin() {
         ) : tab === "loguri" ? (
           <PropertyLogs properties={properties || []} audit={audit || []} comments={comments || []} inquiries={inquiries || []} />
         ) : tab === "rapoarte" ? (
-          <AdminReports reports={reports || []} properties={properties || []} onReload={load} />
+          <AdminReports reports={(reports || []).filter((r) => r.status === "PENDING")} properties={properties || []} onReload={load} />
+        ) : tab === "rapoarte_rezolvate" ? (
+          <AdminResolvedReports reports={(reports || []).filter((r) => r.status !== "PENDING")} />
         ) : tab === "users" ? (
           <div className="space-y-3">
             <div className="flex items-center gap-2">
