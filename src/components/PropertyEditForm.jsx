@@ -241,9 +241,6 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
             {FAIRNESS.map((f) => <option key={f.v} value={f.v}>{f.label}</option>)}
           </select>
         </Field>
-        <Field label="Tur Video URL">
-          <input value={form.ai_video_url} onChange={(e) => upd("ai_video_url", e.target.value)} placeholder="https://..." className={inputCls} />
-        </Field>
       </div>
 
       {/* Badge-uri & verificări — admin only */}
@@ -260,6 +257,9 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
             <label className="flex items-center gap-2 self-end pb-2"><input type="checkbox" checked={form.ai_tour_verified} onChange={(e) => upd("ai_tour_verified", e.target.checked)} /> Activare badge Tur 3D</label>
             <Field label="Link Tur 3D (Matterport — doar admin)">
               <input value={form.tour_3d_url} onChange={(e) => upd("tour_3d_url", e.target.value)} placeholder="https://my.matterport.com/show/?m=..." className={inputCls} />
+            </Field>
+            <Field label="Tur Video URL">
+              <input value={form.ai_video_url} onChange={(e) => upd("ai_video_url", e.target.value)} placeholder="https://..." className={inputCls} />
             </Field>
           </div>
         </>

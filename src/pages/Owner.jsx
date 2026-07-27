@@ -165,11 +165,10 @@ export function NewPropertyForm({ onDone }) {
   const { country, t } = useCountry();
   const { user } = useAuth();
   const { toast } = useToast();
-  const isAdmin = (user?.role || "").toLowerCase() === "admin";
   const cities = useMemo(() => getCities(country), [country]);
   const [form, setForm] = useState({
     title: "", description: "", price_monthly: "", city: "", zone: "", landmark: "", property_type: "Garsonieră",
-    rooms: "1", surface_sqm: "", floor: "", deposit: "", available_from: "", images: "", ai_video_url: "",
+    rooms: "1", surface_sqm: "", floor: "", deposit: "", available_from: "", images: "",
     latitude: "", longitude: "", owner_name: "",
     transaction_type: "RENT", building_year: "", total_floors: "", phone: "", whatsapp_phone: "",
     seller_role: "Proprietar",
@@ -281,7 +280,7 @@ export function NewPropertyForm({ onDone }) {
         deposit_option: form.guarantee ? "verificasa_guarantee" : "standard",
         available_from: form.available_from || null,
         images: form.images ? form.images.split(",") : [],
-        ai_video_url: isAdmin ? (form.ai_video_url || "") : "",
+        ai_video_url: "",
         latitude: form.latitude ? Number(form.latitude) : null,
         longitude: form.longitude ? Number(form.longitude) : null,
         owner_name: form.owner_name || "Proprietar",
@@ -446,14 +445,6 @@ export function NewPropertyForm({ onDone }) {
             </button>
           ))}
         </div>
-        {isAdmin && (
-          <input
-            value={form.ai_video_url}
-            onChange={(e) => setForm((f) => ({ ...f, ai_video_url: e.target.value }))}
-            placeholder="Link Tur 3D / Video (opțional · admin)"
-            className={`mt-2 ${inputCls}`}
-          />
-        )}
       </div>
 
       <div className="mt-3">
