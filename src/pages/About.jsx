@@ -35,7 +35,7 @@ export default function About() {
         <div className="absolute -bottom-20 -right-10 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
         <div className="relative mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
           <motion.span initial="hidden" animate="show" variants={fadeUp} className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-white/10 px-4 py-1.5 text-xs font-semibold text-gold backdrop-blur-md">
-            <Sparkles className="h-3.5 w-3.5" /> VerifiCasa · Agenție imobiliară & platformă PropTech
+            <Sparkles className="h-3.5 w-3.5" /> VerifiCasa · Agenție imobiliară
           </motion.span>
           <motion.h1 initial="hidden" animate="show" variants={fadeUp} className="mt-6 font-heading text-4xl font-extrabold leading-tight sm:text-5xl">
             Chirii & vânzări verificate, fără surprize.

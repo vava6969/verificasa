@@ -165,6 +165,7 @@ function NewPropertyForm({ onDone }) {
   const { country, t } = useCountry();
   const { user } = useAuth();
   const { toast } = useToast();
+  const isAdmin = (user?.role || "").toLowerCase() === "admin";
   const cities = useMemo(() => getCities(country), [country]);
   const [form, setForm] = useState({
     title: "", description: "", price_monthly: "", city: "", zone: "", landmark: "", property_type: "Garsonieră",
@@ -280,7 +281,7 @@ function NewPropertyForm({ onDone }) {
         deposit_option: form.guarantee ? "verificasa_guarantee" : "standard",
         available_from: form.available_from || null,
         images: form.images ? form.images.split(",") : [],
-        ai_video_url: form.ai_video_url || "",
+        ai_video_url: isAdmin ? (form.ai_video_url || "") : "",
         latitude: form.latitude ? Number(form.latitude) : null,
         longitude: form.longitude ? Number(form.longitude) : null,
         owner_name: form.owner_name || "Proprietar",
@@ -363,7 +364,15 @@ function NewPropertyForm({ onDone }) {
         <input required type="number" value={form.rooms} onChange={(e) => setForm((f) => ({ ...f, rooms: e.target.value }))} placeholder={t("f_rooms") + " *"} className={inputCls} />
         <input required type="number" value={form.surface_sqm} onChange={(e) => setForm((f) => ({ ...f, surface_sqm: e.target.value }))} placeholder={t("f_surface") + " *"} className={inputCls} />
         <input required value={form.floor} onChange={(e) => setForm((f) => ({ ...f, floor: e.target.value }))} placeholder="Etaj (ex: 3, Parter, Demisol) *" className={inputCls} />
-        <input type="date" value={form.available_from} onChange={(e) => setForm((f) => ({ ...f, available_from: e.target.value }))} placeholder={t("f_avail")} className={inputCls} />
+        <input
+          type={form.available_from ? "date" : "text"}
+          value={form.available_from}
+          onChange={(e) => setForm((f) => ({ ...f, available_from: e.target.value }))}
+          onFocus={(e) => { if (!form.available_from) { e.target.type = "date"; } }}
+          onBlur={(e) => { if (!form.available_from) e.target.type = "text"; }}
+          placeholder={t("f_avail") + " (apasă pentru calendar)"}
+          className={inputCls}
+        />
         <input value={form.owner_name} onChange={(e) => setForm((f) => ({ ...f, owner_name: e.target.value }))} placeholder={t("f_owner")} className={inputCls} />
         <input type="number" value={form.latitude} onChange={(e) => setForm((f) => ({ ...f, latitude: e.target.value }))} placeholder={t("f_lat")} className={inputCls} />
         <input type="number" value={form.longitude} onChange={(e) => setForm((f) => ({ ...f, longitude: e.target.value }))} placeholder={t("f_lng")} className={inputCls} />
@@ -437,12 +446,14 @@ function NewPropertyForm({ onDone }) {
             </button>
           ))}
         </div>
-        <input
-          value={form.ai_video_url}
-          onChange={(e) => setForm((f) => ({ ...f, ai_video_url: e.target.value }))}
-          placeholder="Link Tur 3D / Video (opțional)"
-          className={`mt-2 ${inputCls}`}
-        />
+        {isAdmin && (
+          <input
+            value={form.ai_video_url}
+            onChange={(e) => setForm((f) => ({ ...f, ai_video_url: e.target.value }))}
+            placeholder="Link Tur 3D / Video (opțional · admin)"
+            className={`mt-2 ${inputCls}`}
+          />
+        )}
       </div>
 
       <div className="mt-3">
