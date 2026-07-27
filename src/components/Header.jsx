@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   User, Plus, Home, LogOut, Heart, MessageCircle, Settings, ShieldCheck,
   LayoutDashboard, Bookmark, Search, ChevronDown, Globe, Check, Bell, Moon, Sun, Flag,
@@ -22,6 +22,12 @@ export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const { unreadCount } = useNotifications();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isActive = (to) => location.pathname === to || (to !== "/" && location.pathname.startsWith(to));
+  const navItemCls = (to) =>
+    `text-sm font-semibold transition hover:text-emerald ${isActive(to) ? "text-emerald" : "text-foreground/80"}`;
+  const navItemClsMobile = (to) =>
+    `text-xs font-bold transition ${isActive(to) ? "text-emerald" : "text-foreground/70"}`;
   const greeting = user?.full_name || user?.email || (lang === "en" ? "user" : "utilizator");
   const role = (user?.role || "").toUpperCase();
   const canAdmin = ADMIN_ROLES.includes(role);
@@ -135,7 +141,7 @@ export default function Header() {
         <DropdownMenuItem onClick={() => navigate("/searches")}><Search className="mr-2 h-4 w-4" /> {t("hdr_searches")}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/my-reports")}><Flag className="mr-2 h-4 w-4" /> Rapoartele mele</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate("/owner?nou=1")}><Plus className="mr-2 h-4 w-4" /> {t("hdr_add_listing")}</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => window.open("/owner?nou=1", "_blank", "noopener,noreferrer")}><Plus className="mr-2 h-4 w-4" /> {t("hdr_add_listing")}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/my-properties")}><Home className="mr-2 h-4 w-4" /> {t("hdr_myprops")}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/settings")}><Settings className="mr-2 h-4 w-4" /> {t("hdr_settings")}</DropdownMenuItem>
         {canAdmin && (
@@ -164,9 +170,9 @@ export default function Header() {
           </Link>
 
           <nav className="hidden items-center gap-6 md:flex">
-            <Link to="/" className="text-sm font-semibold text-foreground/80 transition hover:text-emerald">{t("hdr_home")}</Link>
-            <Link to="/search" className="text-sm font-semibold text-foreground/80 transition hover:text-emerald">{t("sb_btn")}</Link>
-            <Link to="/about" className="text-sm font-semibold text-foreground/80 transition hover:text-emerald">{t("hdr_about")}</Link>
+            <Link to="/" className={navItemCls("/")}>{t("hdr_home")}</Link>
+            <Link to="/search" className={navItemCls("/search")}>{t("sb_btn")}</Link>
+            <Link to="/about" className={navItemCls("/about")}>{t("hdr_about")}</Link>
           </nav>
 
           {/* Top-right actions — desktop keeps currency + theme; mobile reaches them via the account menu. */}
@@ -177,7 +183,7 @@ export default function Header() {
             {isAuthenticated ? (
               <>
                 <Button asChild className="hidden rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 md:flex">
-                  <Link to="/owner?nou=1"><Plus className="h-4 w-4" /> {t("hdr_add")}</Link>
+                  <a href="/owner?nou=1" target="_blank" rel="noopener noreferrer"><Plus className="h-4 w-4" /> {t("hdr_add")}</a>
                 </Button>
                 <div className="hidden md:block"><ProfileMenu /></div>
               </>
@@ -197,19 +203,19 @@ export default function Header() {
         {/* Mobile compact action row — nav links left, action group right. */}
         <div className="flex items-center justify-between gap-2 border-t border-border/50 py-1.5 md:hidden">
           <nav className="flex items-center gap-3.5 overflow-x-auto whitespace-nowrap">
-            <Link to="/" className="text-xs font-bold text-emerald">{t("hdr_home")}</Link>
-            <Link to="/search" className="text-xs font-semibold text-foreground/70">{t("sb_btn")}</Link>
-            <Link to="/about" className="text-xs font-semibold text-foreground/70">{t("hdr_about")}</Link>
-            {isAuthenticated && <Link to="/my-properties" className="text-xs font-semibold text-foreground/70">{t("hdr_myprops")}</Link>}
-            {isAuthenticated && <Link to="/messages" className="text-xs font-semibold text-foreground/70">{t("hdr_messages")}</Link>}
-            {isAuthenticated && <Link to="/saved" className="text-xs font-semibold text-foreground/70">{t("hdr_saved")}</Link>}
+            <Link to="/" className={navItemClsMobile("/")}>{t("hdr_home")}</Link>
+            <Link to="/search" className={navItemClsMobile("/search")}>{t("sb_btn")}</Link>
+            <Link to="/about" className={navItemClsMobile("/about")}>{t("hdr_about")}</Link>
+            {isAuthenticated && <Link to="/my-properties" className={navItemClsMobile("/my-properties")}>{t("hdr_myprops")}</Link>}
+            {isAuthenticated && <Link to="/messages" className={navItemClsMobile("/messages")}>{t("hdr_messages")}</Link>}
+            {isAuthenticated && <Link to="/saved" className={navItemClsMobile("/saved")}>{t("hdr_saved")}</Link>}
           </nav>
           <div className="flex items-center gap-1.5 shrink-0">
             {isAuthenticated ? (
               <>
-                <Link to="/owner?nou=1" className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald text-white shadow-soft" aria-label={t("hdr_add")}>
+                <a href="/owner?nou=1" target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald text-white shadow-soft" aria-label={t("hdr_add")}>
                   <Plus className="h-4 w-4" />
-                </Link>
+                </a>
                 <ProfileMenu mobile />
               </>
             ) : (

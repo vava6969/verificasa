@@ -152,9 +152,12 @@ export default function PropertyCard({ property }) {
 
       {/* Body */}
       <div onClick={toDetail} className="flex flex-1 cursor-pointer flex-col p-4">
-        <h3 className="font-heading text-base font-bold leading-snug text-navy line-clamp-1 dark:text-foreground">{p.title}</h3>
+        <h3 className="font-heading text-base font-bold leading-snug text-navy line-clamp-1 dark:text-foreground">{p.title || <span className="italic text-muted-foreground/70">{t("info_missing")}</span>}</h3>
         <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-          <MapPin className="h-3 w-3 shrink-0" /> <span className="truncate">{p.zone}, {p.city}</span>
+          <MapPin className="h-3 w-3 shrink-0" />
+          <span className="truncate">
+            {p.zone || p.city ? `${p.zone ? p.zone + ", " : ""}${p.city || ""}` : <span className="italic text-muted-foreground/70">{t("info_missing")}</span>}
+          </span>
         </p>
         {p.created_date && (
           <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">

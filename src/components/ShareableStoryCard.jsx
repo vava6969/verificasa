@@ -44,9 +44,9 @@ export default function ShareableStoryCard({ property, className = "" }) {
       a.href = dataUrl;
       a.download = `verificasa-${p.id || "proprietate"}.png`;
       a.click();
-      toast({ title: "Card generat", description: "Imaginea a fost descărcată — o poți partaja pe Instagram/WhatsApp." });
+      toast({ title: "Card descărcat", description: "Imaginea a fost descărcată — o poți partaja pe Instagram/WhatsApp." });
     } catch (e) {
-      toast({ title: "Generare eșuată", description: "Încearcă din nou.", variant: "destructive" });
+      toast({ title: "Eroare la descărcare", description: "Încearcă din nou.", variant: "destructive" });
     } finally {
       setBusy(false);
     }
@@ -61,7 +61,7 @@ export default function ShareableStoryCard({ property, className = "" }) {
         className="w-full gap-1.5 border-emerald/40 text-emerald hover:bg-emerald-soft"
       >
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
-        {busy ? "Generez..." : "Generează Card Partajabil"}
+        {busy ? "Se creează..." : "Descarcă Card Partajabil"}
       </Button>
 
       {/* Offscreen card rendered for html2canvas capture */}

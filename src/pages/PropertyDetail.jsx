@@ -389,7 +389,9 @@ export default function PropertyDetail() {
                 )}
 
               <h2 className="mt-6 font-heading text-lg font-bold text-navy">{t("desc_h")}</h2>
-              <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{p.description}</p>
+              <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                {p.description || <span className="italic text-muted-foreground/70">{t("info_missing")}</span>}
+              </p>
             </div>
 
             {/* MAP */}

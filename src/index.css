@@ -141,6 +141,13 @@
   .dark select { color-scheme: dark; }
   .dark select option { background-color: hsl(var(--card)); color: hsl(var(--foreground)); }
 
+  /* Native <input> popups (date, time, color) inherit the OS light theme, so in
+     dark mode the selected value/date text renders as dark-on-dark and stays
+     invisible until the picker is opened. Tell the browser to render all
+     native input controls in dark so the value text stays legible. */
+  .dark input { color-scheme: dark; }
+  .dark textarea { color-scheme: dark; }
+
   /* Gradient buttons keep dark text on the bright green in both themes. */
   .dark .gradient-mint.text-navy, .dark .gradient-emerald.text-navy { color: hsl(217 24% 14%); }
 }
