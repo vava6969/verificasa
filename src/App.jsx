@@ -26,6 +26,7 @@ import About from '@/pages/About';
 import Terms from '@/pages/Terms';
 import Privacy from '@/pages/Privacy';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { CountryProvider } from '@/components/CountryContext';
 import Account from '@/pages/Account';
 import MyReports from '@/pages/MyReports';
 import PostProperty from '@/pages/PostProperty';
@@ -80,7 +81,7 @@ const AuthenticatedApp = () => {
         </Route>
       </Route>
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
-        <Route path="/post-property" element={<PostProperty />} />
+        <Route path="/post-property" element={<CountryProvider><PostProperty /></CountryProvider>} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
