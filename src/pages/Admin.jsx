@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
-import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil, Sparkles } from "lucide-react";
+import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil, Sparkles, History } from "lucide-react";
 import PropertyEditForm from "@/components/PropertyEditForm";
+import PropertyLogs from "@/components/PropertyLogs";
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 const ROLE_OPTIONS = ["PROPRIETAR", "AGENT", "ADMIN", "SUPER_ADMIN", "SUPPORT", "user"];
@@ -22,6 +23,7 @@ export default function Admin() {
   const [users, setUsers] = useState(null);
   const [userSearch, setUserSearch] = useState("");
   const [inspections, setInspections] = useState(null);
+  const [inquiries, setInquiries] = useState(null);
   const [editingId, setEditingId] = useState(null);
 
   const isAllowed = isAuthenticated && user && ADMIN_ROLES.includes((user.role || "").toUpperCase());
@@ -29,16 +31,17 @@ export default function Admin() {
 
   const load = async () => {
     try {
-      const [props, cmts, logs, usrs, insp] = await Promise.all([
+      const [props, cmts, logs, usrs, insp, inq] = await Promise.all([
         base44.entities.Property.list("-created_date", 100),
         base44.entities.Comment.list("-created_date", 50),
         base44.entities.AuditLog.list("-created_date", 50),
         base44.entities.User.list("-created_date", 100),
         base44.entities.InspectionRequest.list("-created_date", 50),
+        base44.entities.Inquiry.list("-created_date", 50),
       ]);
-      setProperties(props); setComments(cmts); setAudit(logs); setUsers(usrs); setInspections(insp);
+      setProperties(props); setComments(cmts); setAudit(logs); setUsers(usrs); setInspections(insp); setInquiries(inq);
     } catch (e) {
-      setProperties([]); setComments([]); setAudit([]); setUsers([]);
+      setProperties([]); setComments([]); setAudit([]); setUsers([]); setInquiries([]);
     }
   };
   useEffect(() => { if (isAllowed) load(); }, [isAllowed]);
@@ -200,6 +203,7 @@ export default function Admin() {
             { k: "all", label: "Toate anunțurile", icon: Building2 },
             { k: "comments", label: "Comentarii", icon: MessageSquare },
             { k: "audit", label: "Audit log", icon: FileText },
+            { k: "loguri", label: "Loguri pe proprietate", icon: History },
           ].map((t) => {
             const Active = t.icon;
             const active = tab === t.k;
@@ -241,6 +245,8 @@ export default function Admin() {
                 </div>
               ))}
           </div>
+        ) : tab === "loguri" ? (
+          <PropertyLogs properties={properties || []} audit={audit || []} comments={comments || []} inquiries={inquiries || []} />
         ) : tab === "users" ? (
           <div className="space-y-3">
             <div className="flex items-center gap-2">
