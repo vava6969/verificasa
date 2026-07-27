@@ -30,7 +30,7 @@ export default function Landing() {
     let cancelled = false;
     (async () => {
       try {
-        const all = await base44.entities.Property.list("-created_date", 100);
+        const all = await base44.entities.Property.list("-views_count", 100);
         if (cancelled) return;
         setProperties(all.filter((p) => p.country === "RO"));
       } catch (e) {
@@ -40,7 +40,7 @@ export default function Landing() {
     return () => { cancelled = true; };
   }, [country]);
 
-    const display = (properties || []).filter((p) => p.approval_status === "APPROVED").slice(0, 6);
+    const display = (properties || []).filter((p) => p.approval_status === "APPROVED").slice(0, 4);
 
   return (
     <div>
@@ -99,7 +99,7 @@ export default function Landing() {
             <p className="text-xs font-bold uppercase tracking-wider text-emerald">{t("featured_kicker")}</p>
             <h2 className="mt-1 font-heading text-2xl font-bold text-navy sm:text-3xl">{t("featured_h")}</h2>
           </div>
-          <Link to="/search" className="hidden items-center gap-1 text-sm font-semibold text-emerald hover:underline sm:flex">
+          <Link to="/search" className="flex items-center gap-1 text-sm font-semibold text-emerald hover:underline">
             {t("view_all")} <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -117,6 +117,14 @@ export default function Landing() {
         ) : (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {display.map((p) => <PropertyCard key={p.id} property={p} />)}
+          </div>
+        )}
+
+        {display.length > 0 && (
+          <div className="mt-8 flex justify-center">
+            <Button asChild className="gap-2 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
+              <Link to="/search">{t("view_all")} <ArrowRight className="h-4 w-4" /></Link>
+            </Button>
           </div>
         )}
       </section>

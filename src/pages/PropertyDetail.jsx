@@ -321,12 +321,15 @@ export default function PropertyDetail() {
                       <BadgeCheck className="h-3.5 w-3.5" /> Aprobat de {p.approved_by_name}{p.approved_date ? ` · ${new Date(p.approved_date).toLocaleString("ro-RO", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}` : ""}
                     </p>
                   )}
-                  {canEdit && (
-                    <Button variant="outline" size="sm" onClick={() => setEditing(true)} className="mt-2 gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft">
-                      <Pencil className="h-3.5 w-3.5" /> Editează anunțul
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <Button size="sm" onClick={toggleSave} className="gap-1.5 bg-emerald text-white shadow-soft hover:bg-emerald/90">
+                      <Heart className={`h-4 w-4 ${saved ? "fill-white" : ""}`} /> {saved ? "Salvat" : "Salvează"}
                     </Button>
-                  )}
-                  <div className="mt-2">
+                    {canEdit && (
+                      <Button variant="outline" size="sm" onClick={() => setEditing(true)} className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft">
+                        <Pencil className="h-3.5 w-3.5" /> Editează
+                      </Button>
+                    )}
                     <ReportModal targetType="property" targetId={p.id} targetTitle={p.title} variant="outline" size="sm" className="border-border" />
                   </div>
                 </div>
@@ -430,14 +433,9 @@ export default function PropertyDetail() {
               </div>
               <p className="mt-1 text-xs text-muted-foreground">{t("contact_sub")}</p>
 
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <Button type="button" variant="outline" onClick={toggleSave} className="gap-1.5">
-                  <Heart className={`h-4 w-4 ${saved ? "fill-rose-500 text-rose-500" : ""}`} /> {saved ? "Salvat" : "Salvează"}
-                </Button>
-                <Button type="button" onClick={handleMessage} className="gap-1.5 bg-navy text-emerald hover:opacity-90">
-                  <MessageCircle className="h-4 w-4" /> Mesaj
-                </Button>
-              </div>
+              <Button type="button" onClick={handleMessage} className="mt-3 w-full gap-1.5 bg-navy text-emerald hover:opacity-90">
+                <MessageCircle className="h-4 w-4" /> Mesaj
+              </Button>
 
               <form onSubmit={handleSubmit} className="mt-4 space-y-3">
                 <div className="rounded-xl bg-emerald-soft/40 p-3">

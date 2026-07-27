@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Play, MapPin, Maximize, BedDouble, ShieldCheck, PawPrint, BadgePercent,
-  TrendingDown, TrendingUp, Heart, Eye, Building2, Phone, MessageCircle,
+  TrendingDown, TrendingUp, Eye, Building2, Phone, MessageCircle,
   ChevronLeft, ChevronRight, Calendar, PhoneOff, Clock,
   UserCircle2, Box,
 } from "lucide-react";
@@ -127,15 +127,6 @@ export default function PropertyCard({ property }) {
           )}
         </div>
 
-        {/* Favorite */}
-        <button
-          type="button"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); toast({ title: isAuthenticated ? t("pc_save_hint") : t("pc_save_auth") }); toDetail(); }}
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-soft backdrop-blur transition hover:text-rose-500"
-          aria-label={t("pc_save_label")}
-        >
-          <Heart className="h-4 w-4" />
-        </button>
 
         {/* Seller role badge + date */}
         <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
