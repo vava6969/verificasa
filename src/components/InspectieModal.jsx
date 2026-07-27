@@ -26,6 +26,9 @@ export default function InspectieModal({ open, onClose }) {
     setSending(true);
     try {
       await base44.entities.InspectionRequest.create({ ...form, status: "Nou" });
+      try {
+        base44.functions.invoke("NotifyOnInspectionRequest", { request: { ...form } }).catch(() => {});
+      } catch (_) {}
       toast({ title: t("ins_sent_t"), description: t("ins_sent_d") });
       setForm({ name: "", email: "", phone: "", role: "Proprietar", address_or_url: "", package_interest: "", message: "" });
       onClose();

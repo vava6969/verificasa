@@ -67,6 +67,12 @@ export default function Admin() {
       await base44.entities.Property.update(p.id, patch);
       toast({ title: `Anunț ${status === "APPROVED" ? "aprobat" : "respins"}` });
       log(status === "APPROVED" ? "approve" : "reject", "property", p.id, p.title);
+      try {
+        base44.functions.invoke("NotifyOnPropertyDecision", {
+          property_id: p.id,
+          decision: status,
+        }).catch(() => {});
+      } catch (_) {}
       load();
     } catch (e) { toast({ title: "Eroare", variant: "destructive" }); }
   };

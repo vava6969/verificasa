@@ -1,41 +1,51 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+// #7 — Anunț nou în așteptarea moderării → email + notificare către admini.
+import { client, getAdmins, sendVC, notifyMany, APP_URL } from "../../shared/email.js";
 
-Deno.serve(async (req) => {
+export default async function(req) {
   try {
-    const base44 = createClientFromRequest(req);
+    const base44 = await client(req);
 
-    // Called right after a user posts a new property. We fan-out a
-    // "approval pending" notification to every admin so they can
-    // approve / reject the listing from the Admin panel.
     let body = {};
     try { body = await req.json(); } catch (_) { body = {}; }
-    const propertyId = body.property_id;
     const title = body.title || "Anunț nou";
-    const ownerName = body.owner_name || "Un utilizator";
-    if (!propertyId) {
+    const authorName = body.author_name || body.owner_name || "Un utilizator";
+    const submittedDate = body.submitted_date || new Date().toISOString().slice(0, 10);
+    if (!body.property_id) {
       return Response.json({ error: "property_id required" }, { status: 400 });
     }
 
-    const users = await base44.asServiceRole.entities.User.list();
-    const adminRoles = ["ADMIN", "admin", "SUPER_ADMIN", "super_admin"];
-    const admins = (users || []).filter((u) => adminRoles.includes(u.role));
+    const admins = await getAdmins(base44);
 
+    const subject = `⚠️ Anunț nou în așteptarea moderării — VerifiCasa`;
+    const emailBody = [
+      `Salut, Admin!`,
+      ``,
+      `Un utilizator tocmai a publicat o proprietate nouă care necesită verificare manuală în Admin Panel:`,
+      ``,
+      `🏠 Titlu: ${title}`,
+      `👤 Autor: ${authorName}`,
+      `📅 Data trimiterii: ${submittedDate}`,
+      ``,
+      `🔍 Acțiune necesară: Verificare detalii și aprobare/respingere.`,
+      ``,
+      `👉 Deschide Panoul de Admin: ${APP_URL}/admin`,
+    ].join("\n");
+
+    let emailed = 0;
     let notified = 0;
+    for (const a of admins) {
+      if (await sendVC(base44, { to: a.email, subject, body: emailBody })) emailed += 1;
+    }
     if (admins.length) {
-      const notes = admins.map((a) => ({
-        user_id: a.id,
-        type: "property",
-        text: `Anunț nou „${title}" așteaptă aprobarea ta.`,
-        link: "/admin",
-        actor_name: ownerName,
-        read: false,
-      }));
-      await base44.asServiceRole.entities.Notification.bulkCreate(notes);
-      notified = notes.length;
+      notified = await notifyMany(base44, admins.map((a) => ({
+        user_id: a.id, type: "property",
+        text: `Anunț nou „${title}” așteaptă aprobarea ta.`,
+        link: "/admin", actor_name: authorName, read: false,
+      })));
     }
 
-    return Response.json({ ok: true, notified });
+    return Response.json({ ok: true, emailed, notified, admins: admins.length });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

@@ -102,6 +102,15 @@ export default function PropertyComments({ property }) {
           actorName: actor,
         });
       });
+      try {
+        base44.functions.invoke("NotifyOnComment", {
+          property_id: property.id,
+          property_title: property.title,
+          author_name: actor,
+          commenter_id: user.id,
+          content: content.trim(),
+        }).catch(() => {});
+      } catch (_) {}
       setContent(""); load(); toast({ title: "Comentariu adăugat" });
     } catch (err) { toast({ title: "Eroare la comentariu", variant: "destructive" }); }
     finally { setPosting(false); }

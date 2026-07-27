@@ -1,8 +1,10 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+// #5 — Cerere nouă de închiriere → email + notificare către proprietarul
+// anunțului (dacă e utilizator înregistrat) și către admini.
+import { client, getAdmins, sendVC, notify, notifyMany, getUserById, getPropertyById, APP_URL } from "../../shared/email.js";
 
 export default async function(req) {
   try {
-    const base44 = createClientFromRequest(req);
+    const base44 = await client(req);
 
     let body = {};
     try { body = await req.json(); } catch (_) { body = {}; }
@@ -17,67 +19,52 @@ export default async function(req) {
     const moveDate = inquiry.move_date || body.move_date || "—";
     const visitDate = inquiry.preferred_visit_date || body.preferred_visit_date || "—";
     const message = inquiry.message || body.message || "—";
-    const appUrl = body.app_url || "https://app.base44.com";
-
     if (!propertyId) {
       return Response.json({ error: "property_id required" }, { status: 400 });
     }
 
-    const users = await base44.asServiceRole.entities.User.list();
-    const adminRoles = ["ADMIN", "admin", "SUPER_ADMIN", "super_admin"];
-    const admins = (users || []).filter((u) => adminRoles.includes(u.role));
+    // Resolve the property owner (registered user) for in-app notification.
+    const property = await getPropertyById(base44, propertyId);
+    const ownerId = (property && property.created_by_id) || body.owner_id || null;
+    const owner = await getUserById(base44, ownerId);
+
+    const subject = `🔔 Cerere nouă de închiriere — ${propertyTitle}`;
+    const bodyText = [
+      `Salut!`,
+      ``,
+      `Ai primit o cerere nouă de la un chiriaș pentru o proprietate listată pe platformă:`,
+      ``,
+      `🏠 Proprietate: ${propertyTitle}`,
+      `👤 Nume: ${name}`,
+      `📧 Email: ${email}`,
+      `📞 Telefon: ${phone}`,
+      `💼 Ocupație: ${occupation}`,
+      ...(income ? [`💰 Venit estimat lunar: ${income} RON`] : []),
+      `📅 Data mutării: ${moveDate}`,
+      `👁️ Data vizionării preferată: ${visitDate}`,
+      `💬 Mesaj: „${message}"`,
+      ``,
+      `👉 Vezi și gestionează cererea din panoul tău: ${APP_URL}/my-properties`,
+    ].join("\n");
 
     let emailed = 0;
     let notified = 0;
 
-    const subject = `Cerere nouă de închiriere — ${propertyTitle}`;
-    const bodyText = [
-      `Ai primit o cerere nouă de la un chiriaș pentru ${propertyTitle}.`,
-      ``,
-      `Nume: ${name}`,
-      `Email: ${email}`,
-      `Telefon: ${phone || "—"}`,
-      `Ocupație: ${occupation || "—"}`,
-      income ? `Venit estimat lunar: ${income}` : null,
-      `Data mutării: ${moveDate || "—"}`,
-      `Data vizionării preferată: ${visitDate || "—"}`,
-      ``,
-      `Mesaj:`,
-      message || "—",
-      ``,
-      `Vezi și gestionează cererea din panoul tău: ${appUrl}`,
-    ].filter(Boolean).join("\n");
+    if (owner && owner.email) {
+      if (await sendVC(base44, { to: owner.email, subject, body: bodyText })) emailed += 1;
+      if (await notify(base44, { user_id: owner.id, type: "message", text: `Cerere nouă de la ${name} pentru „${propertyTitle}".`, link: "/my-properties", actor_name: name })) notified += 1;
+    }
 
-    const notes = [];
+    // Always notify admins too (they manage the platform and the inquiry).
+    const admins = await getAdmins(base44);
     for (const a of admins) {
-      try {
-        await base44.asServiceRole.integrations.Core.SendEmail({
-          to: a.email,
-          subject,
-          body: bodyText,
-          from_name: "VerifiCasa",
-        });
-        emailed += 1;
-      } catch (e) {
-        // Email delivery to this admin failed (e.g. not a registered user) —
-        // continue; the in-app notification still reaches them.
-      }
-      notes.push({
-        user_id: a.id,
-        type: "message",
-        text: `Cerere nouă de la ${name} pentru „${propertyTitle}".`,
-        link: "/my-properties",
-        actor_name: name,
-        read: false,
-      });
+      if (await sendVC(base44, { to: a.email, subject, body: bodyText })) emailed += 1;
     }
+    notified += await notifyMany(base44, admins.map((a) => ({
+      user_id: a.id, type: "message", text: `Cerere nouă de la ${name} pentru „${propertyTitle}".`, link: "/admin", actor_name: name, read: false,
+    })));
 
-    if (notes.length) {
-      await base44.asServiceRole.entities.Notification.bulkCreate(notes);
-      notified = notes.length;
-    }
-
-    return Response.json({ ok: true, emailed, notified, admins: admins.length });
+    return Response.json({ ok: true, emailed, notified });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
