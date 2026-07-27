@@ -43,7 +43,7 @@ export default function Footer() {
           <div>
             <h4 className="font-heading text-sm font-semibold uppercase tracking-wider text-gold">{t("f_contact")}</h4>
             <ul className="mt-4 space-y-2.5 text-sm text-white/60">
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-emerald" /> hello@verificasa.ro</li>
+              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-emerald" /> birou@verificasa.site</li>
               <li className="flex items-center gap-2">
                 <Instagram className="h-4 w-4 text-emerald" />
                 <a href="https://instagram.com/verificasaro" target="_blank" rel="noopener noreferrer" className="hover:text-emerald">@verificasaro</a>
