@@ -260,7 +260,9 @@ function NewPropertyForm({ onDone }) {
       toast({ title: "Anunț trimis spre aprobare", description: "Un administrator îl va verifica în curând. Va apărea în lista publică după aprobare." });
       onDone();
     } catch (err) {
-      toast({ title: t("save_err"), variant: "destructive" });
+      console.error("[Owner] create failed:", err);
+      const detail = err?.message || (typeof err === "string" ? err : "Eroare necunoscută");
+      toast({ title: t("save_err"), description: detail, variant: "destructive" });
     } finally {
       setSaving(false);
     }
