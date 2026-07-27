@@ -2,10 +2,7 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Bell, MessageCircle, Heart, MessageSquare, CheckCheck } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
-import { useAuth } from "@/lib/AuthContext";
 import { cn } from "@/lib/utils";
-
-const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 
 const ICON = {
   comment: MessageSquare,
@@ -30,13 +27,6 @@ function timeAgo(dateStr) {
 
 export default function NotificationsPanel() {
   const { notifications, unreadCount, markAllRead, loading } = useNotifications();
-  const { user } = useAuth();
-  const isAdmin = ADMIN_ROLES.includes((user?.role || "").toUpperCase());
-  const accent = isAdmin ? "text-rose-500" : "text-emerald";
-  const iconBg = isAdmin ? "bg-rose-500" : "bg-emerald";
-  const unreadCard = isAdmin
-    ? "border-rose-300 bg-rose-50 dark:border-rose-400/30 dark:bg-rose-950/40"
-    : "border-emerald/30 bg-emerald-soft/40";
 
   // Marchează tot ca citit la scurt timp după deschiderea panoului.
   useEffect(() => {
@@ -50,7 +40,7 @@ export default function NotificationsPanel() {
     <section className="mt-6 rounded-2xl border border-border bg-white p-6 shadow-soft dark:bg-card">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Bell className={`h-5 w-5 ${accent}`} />
+          <Bell className="h-5 w-5 text-emerald" />
           <h2 className="font-heading text-lg font-bold text-navy dark:text-foreground">Notificări</h2>
           {unreadCount > 0 && (
             <span className="rounded-full bg-rose-500 px-2 py-0.5 text-[10px] font-bold text-white">
@@ -61,7 +51,7 @@ export default function NotificationsPanel() {
         {unreadCount > 0 && (
           <button
             onClick={markAllRead}
-            className={`flex items-center gap-1 text-xs font-semibold ${accent} hover:underline`}
+            className="flex items-center gap-1 text-xs font-semibold text-emerald hover:underline"
           >
             <CheckCheck className="h-4 w-4" /> Marchează ca citit
           </button>
@@ -81,22 +71,25 @@ export default function NotificationsPanel() {
         ) : (
           notifications.map((n) => {
             const Icon = ICON[n.type] || Bell;
+            // Admin-destined notifications (moderation/review alerts) use link "/admin";
+            // everything else is addressed to a regular user / owner / agent.
+            const isForAdmin = n.link === "/admin";
+            const circle = isForAdmin ? "bg-rose-500" : "bg-emerald";
+            const card = n.read
+              ? "border-border bg-secondary/20"
+              : isForAdmin
+                ? "border-rose-300 bg-rose-50 dark:border-rose-400/30 dark:bg-rose-950/40"
+                : "border-emerald/30 bg-emerald-soft/40";
+            const dot = isForAdmin ? "bg-rose-500" : "bg-emerald";
             const body = (
-              <div
-                className={cn(
-                  "flex items-start gap-3 rounded-xl border px-3 py-3 transition",
-                  n.read
-                    ? "border-border bg-secondary/20"
-                    : unreadCard
-                )}
-              >
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${iconBg} text-white`}>
+              <div className={cn("flex items-start gap-3 rounded-xl border px-3 py-3 transition", card)}>
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${circle} text-white`}>
                   <Icon className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-foreground/85">{n.text}</p>
                   <div className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
-                    {!n.read && <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />}
+                    {!n.read && <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />}
                     <span>{n.actor_name}</span>
                     <span>·</span>
                     <span>{timeAgo(n.created_date)}</span>
