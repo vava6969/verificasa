@@ -310,6 +310,9 @@ export default function PropertyDetail() {
                       {formatDistanceToNowStrict(new Date(p.created_date), { addSuffix: true, locale: lang === "en" ? enGB : ro })}
                     </p>
                   )}
+                  <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground/70">
+                    ID proprietate: <span className="font-mono select-all">{p.id}</span>
+                  </p>
                   {p.approved_by_name && (
                     <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-emerald">
                       <BadgeCheck className="h-3.5 w-3.5" /> Aprobat de {p.approved_by_name}{p.approved_date ? ` · ${new Date(p.approved_date).toLocaleString("ro-RO", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}` : ""}

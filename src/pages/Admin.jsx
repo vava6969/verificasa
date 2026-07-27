@@ -25,6 +25,8 @@ export default function Admin() {
   const [inspections, setInspections] = useState(null);
   const [inquiries, setInquiries] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [propSearch, setPropSearch] = useState("");
+  const [auditSearch, setAuditSearch] = useState("");
 
   const isAllowed = isAuthenticated && user && ADMIN_ROLES.includes((user.role || "").toUpperCase());
   const isSuper = (user?.role || "").toUpperCase() === "SUPER_ADMIN";
@@ -237,13 +239,23 @@ export default function Admin() {
           </div>
         ) : tab === "audit" ? (
           <div className="space-y-2">
-            {(audit || []).length === 0 ? <p className="text-sm text-muted-foreground">Nicio acțiune înregistrată.</p> :
-              audit.map((a) => (
+            <div className="flex items-center gap-2">
+              <div className="relative max-w-sm flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input value={auditSearch} onChange={(e) => setAuditSearch(e.target.value)} placeholder="Caută după ID, autor sau acțiune..." className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card" />
+              </div>
+            </div>
+            {(() => {
+              const as = (auditSearch || "").toLowerCase();
+              const src = (audit || []).filter((a) => !as || [a.actor_name, a.action, a.target_type, a.target_id, a.detail].filter(Boolean).join(" ").toLowerCase().includes(as));
+              if (src.length === 0) return <p className="text-sm text-muted-foreground">Nicio acțiune găsită.</p>;
+              return src.map((a) => (
                 <div key={a.id} className="flex items-center justify-between rounded-xl border border-border bg-white p-3 text-sm dark:bg-card">
-                  <span><b className="text-navy dark:text-foreground">{a.actor_name}</b> <span className="text-muted-foreground">· {a.action} · {a.target_type}{a.detail ? ` · ${a.detail}` : ""}</span></span>
+                  <span><b className="text-navy dark:text-foreground">{a.actor_name}</b> <span className="text-muted-foreground">· {a.action} · {a.target_type}{a.target_id ? ` · ID: ${a.target_id.slice(0, 8)}…` : ""}{a.detail ? ` · ${a.detail}` : ""}</span></span>
                   <span className="text-xs text-muted-foreground">{new Date(a.created_date).toLocaleString("ro-RO")}</span>
                 </div>
-              ))}
+              ));
+            })()}
           </div>
         ) : tab === "loguri" ? (
           <PropertyLogs properties={properties || []} audit={audit || []} comments={comments || []} inquiries={inquiries || []} />
@@ -289,10 +301,17 @@ export default function Admin() {
           </div>
         ) : (
           <div className="space-y-3">
-            {(tab === "pending" ? pending : all).length === 0 ? (
-              properties === null ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-2xl" />) :
-              <p className="text-sm text-muted-foreground">{tab === "pending" ? "Niciun anunț în așteptare. 🎉" : "Niciun anunț."}</p>
-            ) : (tab === "pending" ? pending : all).map((p) => {
+            <div className="flex items-center gap-2">
+              <div className="relative max-w-sm flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input value={propSearch} onChange={(e) => setPropSearch(e.target.value)} placeholder="Caută după titlu sau ID proprietate..." className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card" />
+              </div>
+            </div>
+            {(() => {
+              const ps = (propSearch || "").toLowerCase();
+              const src = (tab === "pending" ? pending : all).filter((p) => !ps || (p.title || "").toLowerCase().includes(ps) || (p.id || "").toLowerCase().includes(ps));
+              if (src.length === 0) return properties === null ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-2xl" />) : <p className="text-sm text-muted-foreground">{tab === "pending" ? "Niciun anunț în așteptare. 🎉" : "Niciun anunț găsit."}</p>;
+              return src.map((p) => {
               if (editingId === p.id) {
                 return <PropertyEditForm key={p.id} property={p} isAdmin onDone={() => { setEditingId(null); load(); }} />;
               }
@@ -304,6 +323,7 @@ export default function Admin() {
                 <div className="min-w-0 flex-1">
                   <p className="font-heading font-bold text-navy line-clamp-1 dark:text-foreground">{p.title}</p>
                   <p className="text-xs text-muted-foreground">{p.zone}, {p.city} · {p.property_type} · {p.price_monthly} € · <span className={p.approval_status === "APPROVED" ? "text-emerald font-semibold" : "text-amber-600 font-semibold"}>{p.approval_status || "PENDING"}</span></p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground/70">ID: <span className="font-mono select-all">{p.id}</span></p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button size="sm" variant="outline" onClick={() => setEditingId(p.id)} className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft"><Pencil className="h-3.5 w-3.5" /> Editează</Button>
@@ -314,7 +334,8 @@ export default function Admin() {
                 </div>
               </div>
               );
-            })}
+            });
+          })()}
           </div>
         )}
       </div>
