@@ -151,7 +151,7 @@ export default function Header() {
           </>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate("/account")}><Settings className="mr-2 h-4 w-4" /> Preferințe cont</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => { document.getElementById("account-menu")?.scrollIntoView({ behavior: "smooth", block: "start" }); navigate("/account#account-menu"); }}><Settings className="mr-2 h-4 w-4" /> Preferințe cont</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => logout()}><LogOut className="mr-2 h-4 w-4" /> {t("hdr_logout")}</DropdownMenuItem>
       </DropdownMenuContent>

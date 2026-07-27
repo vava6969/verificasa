@@ -44,7 +44,7 @@ export default function BottomNav() {
       window.open("/post-property", "_blank", "noopener,noreferrer");
     }, primary: true },
     { icon: MessageCircle, label: t("hdr_messages"), path: "/messages", onClick: guard("/messages"), badge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null },
-    { icon: User, label: isAuthenticated ? t("hdr_myaccount") : t("hdr_login"), path: isAuthenticated ? "/account" : "/login", onClick: guard(isAuthenticated ? "/account" : "/login") },
+    { icon: User, label: isAuthenticated ? t("hdr_myaccount") : t("hdr_login"), path: isAuthenticated ? "/account" : "/login", onClick: () => { if (isAuthenticated) { document.getElementById("account-menu")?.scrollIntoView({ behavior: "smooth", block: "start" }); navigate("/account#account-menu"); } else navigate("/login"); } },
   ];
 
   const isActive = (path) => {
