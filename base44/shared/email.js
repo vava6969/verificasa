@@ -4,7 +4,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 
 const ADMIN_ROLES = ["ADMIN", "admin", "SUPER_ADMIN", "super_admin"];
 export const FROM_NAME = "VerifiCasa";
-export const APP_URL = "https://app.base44.com";
+export const APP_URL = "https://verificasa.site";
 
 export async function client(req) {
   return createClientFromRequest(req);
