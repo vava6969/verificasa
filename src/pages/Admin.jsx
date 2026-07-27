@@ -266,7 +266,7 @@ export default function Admin() {
         ) : tab === "loguri" ? (
           <PropertyLogs properties={properties || []} audit={audit || []} comments={comments || []} inquiries={inquiries || []} />
         ) : tab === "rapoarte" ? (
-          <AdminReports reports={reports || []} />
+          <AdminReports reports={reports || []} properties={properties || []} onReload={load} />
         ) : tab === "users" ? (
           <div className="space-y-3">
             <div className="flex items-center gap-2">

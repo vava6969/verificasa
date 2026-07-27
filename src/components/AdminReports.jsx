@@ -4,7 +4,8 @@ import { base44 } from "@/api/base44Client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Flag, Eye, AlertTriangle } from "lucide-react";
+import { Flag, Eye, AlertTriangle, Pencil } from "lucide-react";
+import PropertyEditForm from "@/components/PropertyEditForm";
 
 const STATUS_TONE = {
   PENDING: "bg-amber-50 text-amber-700",
@@ -16,9 +17,10 @@ const STATUS_LABEL = { PENDING: "În așteptare", RESOLVED: "Rezolvat", REJECTED
 // Admin moderation panel for reported properties & comments. Each row links
 // to the target, shows who reported + when, and exposes a resolve/reject
 // flow with an optional auto-action on the target + message to the reporter.
-export default function AdminReports({ reports = [] }) {
+export default function AdminReports({ reports = [], properties = [], onReload }) {
   const { toast } = useToast();
   const [resolvingId, setResolvingId] = useState(null);
+  const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({
     status: "RESOLVED", note: "", auto_action: "none", send_email: false, resolved_date: "",
   });
@@ -98,12 +100,35 @@ export default function AdminReports({ reports = [] }) {
                 <Link to={`/property/${r.target_id}`}><Eye className="h-3.5 w-3.5" /> Vezi anunț</Link>
               </Button>
             )}
+            {r.target_type === "property" && properties.find((p) => p.id === r.target_id) && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setEditingId(editingId === r.target_id ? null : r.target_id)}
+                className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft"
+              >
+                <Pencil className="h-3.5 w-3.5" /> {editingId === r.target_id ? "Închide editarea" : "Editează"}
+              </Button>
+            )}
             {r.status === "PENDING" && (
               <Button size="sm" variant="outline" onClick={() => open(r)} className="gap-1 border-amber-400 text-amber-700">
                 <AlertTriangle className="h-3.5 w-3.5" /> Procesează
               </Button>
             )}
           </div>
+
+          {editingId === r.target_id && r.target_type === "property" && (() => {
+            const prop = properties.find((p) => p.id === r.target_id);
+            return prop ? (
+              <div className="mt-3">
+                <PropertyEditForm
+                  property={prop}
+                  isAdmin
+                  onDone={() => { setEditingId(null); onReload && onReload(); }}
+                />
+              </div>
+            ) : null;
+          })()}
 
           {resolvingId === r.id && (
             <div className="mt-3 space-y-2 rounded-xl border border-border bg-secondary/20 p-3">
