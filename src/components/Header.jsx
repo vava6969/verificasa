@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   User, Plus, Home, LogOut, Heart, MessageCircle, Settings, ShieldCheck,
@@ -32,17 +32,14 @@ export default function Header() {
   const role = (user?.role || "").toUpperCase();
   const canAdmin = ADMIN_ROLES.includes(role);
 
-  // Hide the entire header on scroll-down, reveal on scroll-up.
+  // Top menu only appears at the very top of the page — hidden anywhere else
+  // (no reveal on scroll-up), so users must scroll all the way up to reach it.
   const [hidden, setHidden] = useState(false);
-  const lastY = useRef(0);
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      // Always visible at the very top of the page.
-      if (y < 8) { setHidden(false); lastY.current = y; return; }
-      if (y > lastY.current + 4) setHidden(true);
-      else if (y < lastY.current - 4) setHidden(false);
-      lastY.current = y;
+      if (y < 8) setHidden(false);
+      else setHidden(true);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);

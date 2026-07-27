@@ -1,32 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Home, Heart, Plus, MessageCircle, User } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useNotifications } from "@/hooks/useNotifications";
 
-// Mobile bottom navigation bar (OLX-style). Hides on scroll-down, reveals on
-// scroll-up — same interaction pattern as the top Header.
+// Mobile bottom navigation bar (OLX-style). Stays fixed and always visible
+// regardless of scroll position — items & structure unchanged.
 export default function BottomNav() {
   const { t } = useCountry();
   const { isAuthenticated } = useAuth();
   const { unreadCount } = useNotifications();
   const location = useLocation();
   const navigate = useNavigate();
-  const [hidden, setHidden] = useState(false);
-  const lastY = useRef(0);
-
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      if (y < 8) { setHidden(false); lastY.current = y; return; }
-      if (y > lastY.current + 4) setHidden(true);
-      else if (y < lastY.current - 4) setHidden(false);
-      lastY.current = y;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   const guard = (path) => () => {
     if (!isAuthenticated && ["/owner", "/messages", "/saved"].includes(path)) {
@@ -54,7 +40,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className={`fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-7xl items-stretch justify-around border-t border-border/60 bg-white/90 px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-4px_18px_-8px_rgb(27_34_44/0.18)] backdrop-blur-xl transition-all duration-300 ease-out md:hidden dark:bg-navy-deep/90 ${hidden ? "translate-y-[calc(100%+8px)] opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}
+      className="fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-7xl items-stretch justify-around border-t border-border/60 bg-white/90 px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-4px_18px_-8px_rgb(27_34_44/0.18)] backdrop-blur-xl md:hidden dark:bg-navy-deep/90"
       aria-label="Navigare rapidă"
     >
       {items.map((it) => {
