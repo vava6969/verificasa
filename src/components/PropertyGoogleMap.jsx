@@ -42,12 +42,18 @@ function loadScript(key) {
  * - Altfel, geocodăm landmarkul / zona cu Google Geocoder → locație
  *   aproximativă, etichetată clar ca atare.
  */
-export default function PropertyGoogleMap({ lat, lng, title, query, t }) {
+export default function PropertyGoogleMap({ lat, lng, title, landmark, zone, city, t }) {
   const hasCoords =
     lat != null && lng != null && !Number.isNaN(+lat) && !Number.isNaN(+lng);
+  const query = [landmark, zone, city, "România"].filter(Boolean).join(", ");
+  // Adresa scrisă (landmark = stradă aleasă din Google Maps) e sursa de adevăr:
+  // o geocodăm mereu, ca harta să corespundă cu ce vede utilizatorul în header.
+  // Lat/lng vechi/păstrate pot fi învechite (ex: anunț mutat din Iași în Huși),
+  // deci le folosim doar când nu există un landmark.
+  const useGeocode = !!landmark || !hasCoords;
   const containerRef = useRef(null);
   const [status, setStatus] = useState("loading"); // loading | ok | error
-  const [approx, setApprox] = useState(!hasCoords);
+  const [exact, setExact] = useState(!!landmark || hasCoords);
 
   useEffect(() => {
     let alive = true;
@@ -63,10 +69,10 @@ export default function PropertyGoogleMap({ lat, lng, title, query, t }) {
         if (!alive || !containerRef.current) return;
         const g = window.google.maps;
 
-        const renderAt = (position) => {
+        const renderAt = (position, isExact) => {
           const map = new g.Map(containerRef.current, {
             center: position,
-            zoom: hasCoords ? 16 : 14,
+            zoom: isExact ? 16 : 14,
             mapTypeControl: false,
             streetViewControl: true,
             fullscreenControl: true,
@@ -74,31 +80,29 @@ export default function PropertyGoogleMap({ lat, lng, title, query, t }) {
             gestureHandling: "cooperative",
           });
           new g.Marker({ position, map, title });
+          setExact(isExact);
+          setStatus("ok");
         };
 
-        if (hasCoords) {
-          renderAt({ lat: +lat, lng: +lng });
-          setApprox(false);
-          setStatus("ok");
-        } else {
+        if (useGeocode) {
           const geocoder = new g.Geocoder();
           geocoder.geocode({ address: query }, (results, status) => {
             if (!alive) return;
             if (status === "OK" && results && results[0]) {
-              renderAt(results[0].geometry.location);
-              setApprox(true);
-              setStatus("ok");
+              renderAt(results[0].geometry.location, !!landmark);
             } else {
               setStatus("error");
             }
           });
+        } else {
+          renderAt({ lat: +lat, lng: +lng }, true);
         }
       } catch {
         if (alive) setStatus("error");
       }
     })();
     return () => { alive = false; };
-  }, [lat, lng, query, title, hasCoords]);
+  }, [lat, lng, query, title, landmark, useGeocode]);
 
   return (
     <div className="relative h-72 w-full">
@@ -116,7 +120,7 @@ export default function PropertyGoogleMap({ lat, lng, title, query, t }) {
       {status === "ok" && (
         <div className="pointer-events-none absolute left-3 bottom-2 z-10 flex max-w-[88%] items-start gap-1 rounded-lg bg-white/95 px-2 py-1.5 text-[11px] font-medium text-emerald shadow-soft dark:bg-card/95">
           <MapPin className="mt-0.5 h-3 w-3 shrink-0" />
-          <span>{approx ? t("map_approx") : t("map_exact")}</span>
+          <span>{exact ? t("map_exact") : t("map_approx")}</span>
         </div>
       )}
     </div>

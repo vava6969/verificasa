@@ -436,7 +436,9 @@ export default function PropertyDetail() {
                 lat={p.latitude}
                 lng={p.longitude}
                 title={p.title}
-                query={[p.landmark, p.zone, p.city, "România"].filter(Boolean).join(", ")}
+                landmark={p.landmark}
+                zone={p.zone}
+                city={p.city}
                 t={t}
               />
             </div>
