@@ -451,7 +451,7 @@ export default function PropertyDetail() {
               </div>
               <p className="mt-1 text-xs text-muted-foreground">{t("poi_section_sub", { zone: p.zone, city: p.city })}</p>
               <div className="mt-4">
-                <PropertyPOI zone={p.zone} city={p.city} />
+                <PropertyPOI lat={p.latitude} lng={p.longitude} landmark={p.landmark} zone={p.zone} city={p.city} />
               </div>
             </div>
 
