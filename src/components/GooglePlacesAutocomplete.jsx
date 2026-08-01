@@ -115,7 +115,7 @@ export default function GooglePlacesAutocomplete({
         ref={inputRef}
         type="text"
         defaultValue={value || ""}
-        onChange={(e) => onChange?.(e.target.value)}
+        onBlur={(e) => onChange?.(e.target.value)}
         placeholder={placeholder}
         autoComplete="off"
         className={`${className} pl-9`}
