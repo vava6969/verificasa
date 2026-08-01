@@ -64,6 +64,10 @@ export default function Landing() {
             {t("hero_sub")}
           </p>
 
+          <p className="mt-4 max-w-2xl rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white/75 backdrop-blur-md sm:text-base">
+            {t("hero_purpose")}
+          </p>
+
           <div className="mt-8 w-full max-w-4xl">
             <SearchBar />
           </div>

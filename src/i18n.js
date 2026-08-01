@@ -511,6 +511,8 @@ export const STR = {
     lb_link_copied: "Link copiat ✓",
     similar_h: "Proprietăți similare în zonă",
     similar_sub: "Recomandări din {city} și apropiere",
+    hero_purpose: "VerifiCasa este o platformă imobiliară pentru închirieri sigure și transparente în România (Iași și Huși). Combină tururi 3D immersive, inspecții fizice verificate de agenți și garanții care protejează chiriașul și proprietarul — ca să închiriezi fără surprize neplăcute.",
+    app_name: "VerifiCasa",
   },
   en: {
     nav_rent: "Rent",
@@ -985,6 +987,8 @@ export const STR = {
     lb_link_copied: "Link copied ✓",
     similar_h: "Similar properties nearby",
     similar_sub: "Recommendations in {city} and nearby",
+    hero_purpose: "VerifiCasa is a real-estate platform for safe, transparent rentals in Romania (Iași and Huși). It combines immersive 3D tours, agent-verified physical inspections and guarantees that protect both tenant and landlord — so you can rent with no nasty surprises.",
+    app_name: "VerifiCasa",
   },
 };
 
