@@ -29,7 +29,7 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
   Calendar, ShieldCheck, FileText, CheckCircle2, ChevronLeft, ChevronRight, Send, Phone,
-  Heart, MessageCircle, UserCircle2, Clock, Pencil, Box,
+  Heart, MessageCircle, UserCircle2, Clock, Pencil, Box, Loader2,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
@@ -432,15 +432,23 @@ export default function PropertyDetail() {
             </div>
 
             {/* MAP */}
-            {p.latitude && p.longitude && (
-              <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-soft">
-                <div className="border-b border-border p-4">
-                  <h3 className="font-heading font-bold text-navy">{t("map_h")}</h3>
-                  <p className="text-xs text-muted-foreground">{t("map_sub")}</p>
-                </div>
-                <MapPreview lat={p.latitude} lng={p.longitude} title={p.title} />
+            <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-soft">
+              <div className="border-b border-border p-4">
+                <h3 className="font-heading font-bold text-navy">{t("map_h")}</h3>
+                <p className="text-xs text-muted-foreground">{t("map_sub")}</p>
+                <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-emerald">
+                  <MapPin className="h-3 w-3" />
+                  {p.latitude && p.longitude ? t("map_exact") : t("map_approx")}
+                </p>
               </div>
-            )}
+              <MapPreview
+                lat={p.latitude}
+                lng={p.longitude}
+                title={p.title}
+                query={[p.zone, p.city, "România"].filter(Boolean).join(", ")}
+                t={t}
+              />
+            </div>
 
             {/* POINTS OF INTEREST */}
             <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
@@ -508,15 +516,62 @@ export default function PropertyDetail() {
   );
 }
 
-function MapPreview({ lat, lng, title }) {
+function MapPreview({ lat, lng, title, query, t }) {
+  const hasCoords = lat != null && lng != null && !Number.isNaN(+lat) && !Number.isNaN(+lng);
+  const [coords, setCoords] = useState(hasCoords ? [+lat, +lng] : null);
+  const [loading, setLoading] = useState(!hasCoords);
+  const [error, setError] = useState(false);
+
+  // Dacă proprietarul a folosit adresa din Google Maps → marker exact.
+  // Altfel geocodăm zona/cartierul prin OpenStreetMap (Nominatim) și
+  // arătăm centrul zonei ca locație aproximativă.
+  useEffect(() => {
+    if (hasCoords) return;
+    let alive = true;
+    setLoading(true);
+    setError(false);
+    (async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query || "")}`,
+          { headers: { "Accept-Language": "ro,en" } }
+        );
+        const data = await res.json();
+        if (!alive) return;
+        if (data && data[0]) {
+          setCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
+        } else {
+          setError(true);
+        }
+      } catch {
+        if (alive) setError(true);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, [hasCoords, query]);
+
   return (
     <div className="h-72 w-full">
-      <MapContainer center={[lat, lng]} zoom={14} style={{ height: "100%", width: "100%" }}>
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap' />
-        <Marker position={[lat, lng]}>
-          <Popup>{title}</Popup>
-        </Marker>
-      </MapContainer>
+      {loading && (
+        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t("map_load")}
+        </div>
+      )}
+      {!loading && error && (
+        <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
+          {t("map_unavail")}
+        </div>
+      )}
+      {!loading && !error && coords && (
+        <MapContainer center={coords} zoom={hasCoords ? 15 : 13} style={{ height: "100%", width: "100%" }}>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap' />
+          <Marker position={coords}>
+            <Popup>{hasCoords ? title : `${title} — ${t("map_approx")}`}</Popup>
+          </Marker>
+        </MapContainer>
+      )}
     </div>
   );
 }
