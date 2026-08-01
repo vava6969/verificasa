@@ -39,6 +39,11 @@ function fmtDist(km) {
   if (km < 1) return `${Math.round(km * 1000)} m`;
   return `${km.toFixed(1)} km`;
 }
+// Fără diacritice, lowercase — pentru potrivire oraș în `vicinity`.
+function norm(s) {
+  return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+const RADII = [5000, 10000, 20000];
 
 async function geocode(key, address) {
   const r = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${key}`);
@@ -50,8 +55,8 @@ async function geocode(key, address) {
   return null;
 }
 
-async function nearby(key, loc, type) {
-  const r = await fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${loc.lat},${loc.lng}&radius=${RADIUS_M}&type=${type}&key=${key}`);
+async function nearbyR(key, loc, type, radius) {
+  const r = await fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${loc.lat},${loc.lng}&radius=${radius}&type=${type}&key=${key}`);
   const j = await r.json();
   if (j.status === "OK") return j.results || [];
   return [];
@@ -81,18 +86,26 @@ export default function PropertyPOI({ lat, lng, landmark, zone, city }) {
         if (!myLoc) { if (alive) { setItems({}); setLoading(false); } return; }
 
         const out = {};
+        const cityNorm = city ? norm(city) : "";
+        const inCity = (r) => !cityNorm || norm(r.vicinity).includes(cityNorm);
         await Promise.all(CATS_CONFIG.map(async (c) => {
-          const perType = await Promise.all(c.types.map((ty) => nearby(key, myLoc, ty)));
           const seen = new Set();
-          const dedup = [];
-          for (const r of perType.flat()) {
-            const loc = r.geometry?.location;
-            if (!loc || !r.place_id || seen.has(r.place_id)) continue;
-            seen.add(r.place_id);
-            dedup.push({ name: r.name, dist: haversineKm(myLoc, { lat: loc.lat, lng: loc.lng }) });
+          const collected = [];
+          let filled = false;
+          // Lărgim raza progresiv, dar păstrăm doar rezultate din același oraș.
+          for (const radius of RADII) {
+            const perType = await Promise.all(c.types.map((ty) => nearbyR(key, myLoc, ty, radius)));
+            for (const r of perType.flat()) {
+              const loc = r.geometry?.location;
+              if (!loc || !r.place_id || seen.has(r.place_id) || !inCity(r)) continue;
+              seen.add(r.place_id);
+              collected.push({ name: r.name, dist: haversineKm(myLoc, { lat: loc.lat, lng: loc.lng }) });
+            }
+            collected.sort((a, b) => a.dist - b.dist);
+            if (collected.length >= 3) { filled = true; break; }
           }
-          dedup.sort((a, b) => a.dist - b.dist);
-          out[c.key] = dedup.slice(0, 3);
+          // Dacă am <3 la razele totuși (rar în orașe mici), păstrăm ce avem.
+          out[c.key] = filled ? collected.slice(0, 3) : collected.slice(0, 3);
         }));
 
         if (alive) { setItems(out); setLoading(false); }
