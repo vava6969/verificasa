@@ -86,26 +86,22 @@ export default function PropertyPOI({ lat, lng, landmark, zone, city }) {
         if (!myLoc) { if (alive) { setItems({}); setLoading(false); } return; }
 
         const out = {};
-        const cityNorm = city ? norm(city) : "";
-        const inCity = (r) => !cityNorm || norm(r.vicinity).includes(cityNorm);
         await Promise.all(CATS_CONFIG.map(async (c) => {
           const seen = new Set();
           const collected = [];
-          let filled = false;
-          // Lărgim raza progresiv, dar păstrăm doar rezultate din același oraș.
+          // Lărgim raza progresiv (max 20km) ca să acoperim tot orașul.
           for (const radius of RADII) {
             const perType = await Promise.all(c.types.map((ty) => nearbyR(key, myLoc, ty, radius)));
             for (const r of perType.flat()) {
               const loc = r.geometry?.location;
-              if (!loc || !r.place_id || seen.has(r.place_id) || !inCity(r)) continue;
+              if (!loc || !r.place_id || seen.has(r.place_id)) continue;
               seen.add(r.place_id);
               collected.push({ name: r.name, dist: haversineKm(myLoc, { lat: loc.lat, lng: loc.lng }) });
             }
             collected.sort((a, b) => a.dist - b.dist);
-            if (collected.length >= 3) { filled = true; break; }
+            if (collected.length >= 3) break;
           }
-          // Dacă am <3 la razele totuși (rar în orașe mici), păstrăm ce avem.
-          out[c.key] = filled ? collected.slice(0, 3) : collected.slice(0, 3);
+          out[c.key] = collected.slice(0, 3);
         }));
 
         if (alive) { setItems(out); setLoading(false); }
