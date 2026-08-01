@@ -509,13 +509,15 @@ export default function PropertyDetail() {
   );
 }
 
-function MapPreview({ lat, lng, title, query, t }) {
+function MapPreview({ lat, lng, title, landmark, zone, city, t }) {
   return (
     <PropertyGoogleMap
       lat={lat}
       lng={lng}
       title={title}
-      query={query}
+      landmark={landmark}
+      zone={zone}
+      city={city}
       t={t}
     />
   );
