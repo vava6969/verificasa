@@ -58,6 +58,20 @@ export default function Admin() {
 
   useEffect(() => { if (isAllowed) load(); }, [isAllowed]);
 
+  // Real-time: any create/update/delete on listings, comments, users,
+  // inspections, inquiries, reports or audit log reloads the whole panel
+  // automatically — no manual refresh needed after resolving a report,
+  // approving a listing, deleting a comment, etc.
+  useEffect(() => {
+    if (!isAllowed) return;
+    const unsubs = [];
+    const names = ["Property", "Comment", "AuditLog", "User", "InspectionRequest", "Inquiry", "Report"];
+    names.forEach((n) => {
+      try { unsubs.push(base44.entities[n].subscribe(() => load())); } catch { /* noop */ }
+    });
+    return () => { unsubs.forEach((u) => { try { u && u(); } catch { /* noop */ } }); };
+  }, [isAllowed]);
+
   const log = async (action, target_type, target_id, detail) => {
     try {
       await base44.entities.AuditLog.create({

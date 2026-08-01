@@ -89,9 +89,10 @@ export default function SearchPage() {
     return s;
   });
 
+  // Real-time: admin approvals/deletes or new listings appear live in results.
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+    const run = async () => {
       try {
         const all = await base44.entities.Property.list("-created_date", 200);
         if (cancelled) return;
@@ -99,8 +100,10 @@ export default function SearchPage() {
       } catch (e) {
         if (!cancelled) setProperties([]);
       }
-    })();
-    return () => { cancelled = true; };
+    };
+    run();
+    const unsub = base44.entities.Property.subscribe(() => run());
+    return () => { cancelled = true; try { unsub && unsub(); } catch { /* noop */ } };
   }, []);
 
   const toggle = (key) => {

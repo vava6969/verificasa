@@ -18,14 +18,22 @@ export default function MyReports() {
   const { user } = useAuth();
   const [reports, setReports] = useState(null);
 
+  const load = async () => {
+    if (!user?.id) { setReports([]); return; }
+    try {
+      const list = await base44.entities.Report.filter({ reporter_user_id: user.id }, "-created_date", 100);
+      setReports(list || []);
+    } catch { setReports([]); }
+  };
+
+  useEffect(() => { load(); }, [user?.id]);
+
+  // Real-time: when an admin resolves/rejects one of my reports, the status
+  // and resolution note update here automatically — no refresh needed.
   useEffect(() => {
-    (async () => {
-      if (!user?.id) { setReports([]); return; }
-      try {
-        const list = await base44.entities.Report.filter({ reporter_user_id: user.id }, "-created_date", 100);
-        setReports(list || []);
-      } catch { setReports([]); }
-    })();
+    if (!user?.id) return;
+    const unsub = base44.entities.Report.subscribe(() => load());
+    return () => { try { unsub && unsub(); } catch { /* noop */ } };
   }, [user?.id]);
 
   return (

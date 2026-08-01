@@ -31,6 +31,13 @@ export default function MyProperties() {
 
   useEffect(() => { load(); }, [user?.id]);
 
+  // Real-time: admin approval/rejection or own edits refresh this list live.
+  useEffect(() => {
+    if (!user?.id) return;
+    const unsub = base44.entities.Property.subscribe(() => load());
+    return () => { try { unsub && unsub(); } catch { /* noop */ } };
+  }, [user?.id]);
+
   const handleDelete = async (id) => {
     if (!confirm("Sigur ștergi acest anunț?")) return;
     try {

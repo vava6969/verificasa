@@ -18,6 +18,11 @@
     "content": {
       "type": "string",
       "title": "Mesaj"
+    },
+    "read_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Citit la (timestamp)"
     }
   },
   "required": [

@@ -48,7 +48,6 @@ export default function Footer() {
                 <Instagram className="h-4 w-4 text-emerald" />
                 <a href="https://instagram.com/verificasaro" target="_blank" rel="noopener noreferrer" className="hover:text-emerald">@verificasaro</a>
               </li>
-              <li className="flex items-center gap-2"><MapPin className="h-4 w-4 text-emerald" /> București, România 🇷🇴</li>
             </ul>
             <p className="mt-4 flex items-start gap-2 text-xs font-semibold text-white/70">
               <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald" /> {t("footer_coverage")}

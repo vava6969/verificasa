@@ -6,7 +6,12 @@ import { createNotification } from "@/lib/notifications";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MessageCircle, Send, ArrowLeft, Search, MoreVertical } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+  MessageCircle, Send, ArrowLeft, Search, MoreVertical, Check, CheckCheck, Trash2,
+} from "lucide-react";
 
 function initials(name) {
   if (!name) return "?";
@@ -27,7 +32,7 @@ function timeLabel(iso) {
 }
 
 const AVATAR_COLORS = [
-  "bg-blue-500","bg-violet-500","bg-rose-500","bg-amber-500","bg-teal-500","bg-indigo-500","bg-pink-500",
+  "bg-blue-500", "bg-violet-500", "bg-rose-500", "bg-amber-500", "bg-teal-500", "bg-indigo-500", "bg-pink-500",
 ];
 function avatarColor(id) {
   if (!id) return AVATAR_COLORS[0];
@@ -46,12 +51,33 @@ export default function Messages() {
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [convSearch, setConvSearch] = useState("");
+  const [busy, setBusy] = useState(false);
   const bottomRef = useRef(null);
 
   const loadConversations = async () => {
     try {
-      const all = await base44.entities.Conversation.list("-updated_date", 200);
-      setConversations(all.filter((c) => c.buyer_id === user.id || c.seller_id === user.id));
+      const [all, allMsgs] = await Promise.all([
+        base44.entities.Conversation.list("-updated_date", 200),
+        base44.entities.Message.list("-created_date", 500).catch(() => []),
+      ]);
+      const mine = all.filter((c) => c.buyer_id === user.id || c.seller_id === user.id);
+      // Compute unread badges + last activity from a single bulk fetch.
+      const unreadByConv = {};
+      const lastByConv = {};
+      allMsgs.forEach((m) => {
+        if (!m) return;
+        const cid = m.conversation_id;
+        if (m.sender_id !== user.id && !m.read_at) unreadByConv[cid] = (unreadByConv[cid] || 0) + 1;
+        if (!lastByConv[cid] || new Date(m.created_date) > new Date(lastByConv[cid])) lastByConv[cid] = m.created_date;
+      });
+      const enriched = mine.map((c) => ({
+        ...c,
+        _unread: unreadByConv[c.id] || 0,
+        _lastAt: lastByConv[c.id] || c.updated_date,
+      }));
+      // Newest activity first.
+      enriched.sort((a, b) => new Date(b._lastAt || 0) - new Date(a._lastAt || 0));
+      setConversations(enriched);
     } catch { setConversations([]); }
   };
 
@@ -60,32 +86,43 @@ export default function Messages() {
     loadConversations();
   }, [isAuthenticated, user?.id]);
 
+  // Real-time: any message or conversation change refreshes the list + active thread.
   useEffect(() => {
     if (!isAuthenticated) return;
     const unsubM = base44.entities.Message.subscribe(() => loadConversations());
     const unsubC = base44.entities.Conversation.subscribe(() => loadConversations());
-    return () => { unsubM?.(); unsubC?.(); };
+    return () => { try { unsubM?.(); } catch {} try { unsubC?.(); } catch {} };
   }, [isAuthenticated, user?.id]);
 
   const active = (conversations || []).find((c) => c.id === selectedId) || null;
 
+  const loadMessages = async (convId) => {
+    try {
+      const list = await base44.entities.Message.filter({ conversation_id: convId }, "created_date", 500);
+      setMessages(list);
+      // Mark any incoming messages as read (and stamp read_at).
+      const incoming = list.filter((m) => m.sender_id !== user.id && !m.read_at);
+      if (incoming.length) {
+        const now = new Date().toISOString();
+        await Promise.all(incoming.map((m) => base44.entities.Message.update(m.id, { read_at: now }).catch(() => {})));
+        const refreshed = await base44.entities.Message.filter({ conversation_id: convId }, "created_date", 500).catch(() => list);
+        setMessages(refreshed);
+        loadConversations();
+      }
+    } catch { setMessages([]); }
+  };
+
   useEffect(() => {
     let cancelled = false;
     if (!selectedId) { setMessages(null); return; }
-    (async () => {
-      try {
-        const list = await base44.entities.Message.filter({ conversation_id: selectedId }, "created_date", 200);
-        if (!cancelled) setMessages(list);
-      } catch { if (!cancelled) setMessages([]); }
-    })();
+    loadMessages(selectedId);
     const unsub = base44.entities.Message.subscribe((event) => {
-      if (event.data?.conversation_id === selectedId) {
-        base44.entities.Message.filter({ conversation_id: selectedId }, "created_date", 200)
-          .then(setMessages).catch(() => {});
-      }
+      if (cancelled) return;
+      if (event?.data?.conversation_id === selectedId) loadMessages(selectedId);
     });
-    return () => { cancelled = true; unsub?.(); };
-  }, [selectedId]);
+    return () => { cancelled = true; try { unsub?.(); } catch {} };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId, user?.id]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -115,19 +152,46 @@ export default function Messages() {
         });
       }
       setText("");
-      setMessages((m) => [
-        ...(m || []),
-        { id: "tmp" + Date.now(), sender_id: user.id, sender_name: user.full_name, content, created_date: new Date().toISOString() },
-      ]);
       loadConversations();
     } catch {
       toast({ title: "Eroare la trimitere", variant: "destructive" });
     } finally { setSending(false); }
   };
 
+  const markAllRead = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const allMsgs = await base44.entities.Message.list("-created_date", 500).catch(() => []);
+      const toUpdate = allMsgs.filter((m) => m.sender_id !== user.id && !m.read_at);
+      if (!toUpdate.length) { toast({ title: "Toate mesajele sunt deja citite" }); return; }
+      const now = new Date().toISOString();
+      await Promise.all(toUpdate.map((m) => base44.entities.Message.update(m.id, { read_at: now }).catch(() => {})));
+      toast({ title: `${toUpdate.length} mesaje marcate ca citite` });
+      loadConversations();
+      if (selectedId) loadMessages(selectedId);
+    } catch { toast({ title: "Eroare", variant: "destructive" }); }
+    finally { setBusy(false); }
+  };
+
+  const deleteConversation = async (conv) => {
+    const other = conv.buyer_id === user.id ? conv.seller_name : conv.buyer_name;
+    if (!confirm(`Ștergi conversația cu ${other}? Mesajele vor fi șterse definitiv.`)) return;
+    setBusy(true);
+    try {
+      await base44.entities.Message.deleteMany({ conversation_id: conv.id }).catch(() => {});
+      await base44.entities.Conversation.delete(conv.id);
+      toast({ title: "Conversație ștearsă" });
+      setParams({});
+      loadConversations();
+    } catch { toast({ title: "Eroare la ștergere", variant: "destructive" }); }
+    finally { setBusy(false); }
+  };
+
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   const openConv = (id) => setParams({ c: id });
+  const closeConv = () => setParams({});
 
   const filteredConvs = (conversations || []).filter((c) => {
     const q = convSearch.toLowerCase();
@@ -142,13 +206,14 @@ export default function Messages() {
   const otherName = active
     ? active.buyer_id === user?.id
       ? active.seller_name || "Proprietar"
-      : active.buyer_name || "Cumparator"
+      : active.buyer_name || "Cumpărător"
     : null;
 
-  return (
-    <div className="flex overflow-hidden bg-[#f4f6f9] dark:bg-background" style={{ height: "calc(100vh - 64px)" }}>
+  const totalUnread = (conversations || []).reduce((acc, c) => acc + (c._unread || 0), 0);
 
-      {/* ── SIDEBAR ─────────────────────────────────────────────── */}
+  return (
+    <div className="flex h-[calc(100vh-7rem)] flex-col overflow-hidden bg-[#f4f6f9] dark:bg-background lg:h-[calc(100vh-3.5rem)]">
+      {/* ── SIDEBAR ─────────────────────────── */}
       <aside
         className={[
           "flex flex-col border-r border-border bg-white dark:bg-card",
@@ -156,38 +221,50 @@ export default function Messages() {
           selectedId ? "hidden lg:flex" : "flex",
         ].join(" ")}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
-          <h1 className="font-heading text-xl font-bold text-navy dark:text-foreground">Mesaje</h1>
-          <button className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary/60">
-            <MoreVertical className="h-5 w-5" />
-          </button>
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+          <div className="flex items-center gap-2">
+            <h1 className="font-heading text-xl font-bold text-navy dark:text-foreground">Mesaje</h1>
+            {totalUnread > 0 && <span className="rounded-full bg-emerald px-2 py-0.5 text-[10px] font-bold text-white">{totalUnread}</span>}
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary/60" aria-label="Opțiuni">
+                <MoreVertical className="h-5 w-5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem onClick={markAllRead} disabled={busy} className="gap-2">
+                <CheckCheck className="h-4 w-4 text-emerald" /> Marchează toate ca citite
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => loadConversations()} className="gap-2">
+                <Search className="h-4 w-4" /> Reîmprospătează lista
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
-        {/* Search */}
-        <div className="px-4 py-3">
+        <div className="px-3 py-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               value={convSearch}
               onChange={(e) => setConvSearch(e.target.value)}
-              placeholder="Cauta conversatie..."
-              className="w-full rounded-full border border-border bg-secondary/40 py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald"
+              placeholder="Caută conversație..."
+              className="w-full rounded-full border border-border bg-background py-2.5 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card"
             />
           </div>
         </div>
 
-        {/* Conversations */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto pb-20 lg:pb-0">
           {conversations === null ? (
             <div className="space-y-1 px-2 py-2">
-              {[1,2,3,4].map((i) => <Skeleton key={i} className="h-16 rounded-2xl" />)}
+              {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-16 rounded-2xl" />)}
             </div>
           ) : filteredConvs.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-16 text-center px-6">
               <MessageCircle className="h-10 w-10 text-muted-foreground/30" />
               <p className="text-sm text-muted-foreground">
-                {convSearch ? "Nicio conversatie gasita." : "Nicio conversatie inca. Deschide un anunt si apasa Mesaj."}
+                {convSearch ? "Nicio conversație găsită." : "Nicio conversație încă. Deschide un anunț și apasă Mesaj."}
               </p>
             </div>
           ) : (
@@ -195,15 +272,14 @@ export default function Messages() {
               const isActive = selectedId === c.id;
               const otherN = c.buyer_id === user?.id ? c.seller_name : c.buyer_name;
               const color = avatarColor(c.id);
+              const unread = c._unread || 0;
               return (
                 <button
                   key={c.id}
                   onClick={() => openConv(c.id)}
                   className={[
                     "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors border-l-4",
-                    isActive
-                      ? "bg-emerald/10 border-emerald"
-                      : "border-transparent hover:bg-secondary/40",
+                    isActive ? "bg-emerald/10 border-emerald" : "border-transparent hover:bg-secondary/40",
                   ].join(" ")}
                 >
                   <span className={["flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white", color].join(" ")}>
@@ -211,12 +287,19 @@ export default function Messages() {
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-1">
-                      <span className="truncate text-sm font-semibold text-navy dark:text-foreground">
-                        {otherN || c.property_title || "Conversatie"}
+                      <span className={["truncate text-sm", unread ? "font-bold text-navy dark:text-foreground" : "font-semibold text-navy dark:text-foreground"].join(" ")}>
+                        {otherN || c.property_title || "Conversație"}
                       </span>
-                      <span className="shrink-0 text-[11px] text-muted-foreground">{timeLabel(c.updated_date)}</span>
+                      <span className="shrink-0 text-[11px] text-muted-foreground">{timeLabel(c._lastAt || c.updated_date)}</span>
                     </div>
-                    <p className="mt-0.5 truncate text-xs text-muted-foreground">{c.last_message || c.property_title || "Niciun mesaj"}</p>
+                    <div className="mt-0.5 flex items-center gap-2">
+                      <p className={["truncate text-xs", unread ? "font-medium text-foreground/80" : "text-muted-foreground"].join(" ")}>
+                        {c.last_message || c.property_title || "Niciun mesaj"}
+                      </p>
+                      {unread > 0 && (
+                        <span className="ml-auto shrink-0 rounded-full bg-emerald px-1.5 py-0.5 text-[10px] font-bold text-white">{unread}</span>
+                      )}
+                    </div>
                   </div>
                 </button>
               );
@@ -225,23 +308,23 @@ export default function Messages() {
         </div>
       </aside>
 
-      {/* ── CHAT THREAD ─────────────────────────────────────────── */}
+      {/* ── CHAT THREAD ─────────────────────── */}
       <main className={["flex flex-1 flex-col", selectedId ? "flex" : "hidden lg:flex"].join(" ")}>
         {!active ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center px-6">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald/10">
               <MessageCircle className="h-8 w-8 text-emerald" />
             </div>
-            <p className="font-heading text-lg font-bold text-navy dark:text-foreground">Selecteaza o conversatie</p>
-            <p className="max-w-xs text-sm text-muted-foreground">Alege din lista din stanga sau scrie unui proprietar din pagina unui anunt.</p>
+            <p className="font-heading text-lg font-bold text-navy dark:text-foreground">Selectează o conversație</p>
+            <p className="max-w-xs text-sm text-muted-foreground">Alege din lista din stânga sau scrie unui proprietar din pagina unui anunț.</p>
           </div>
         ) : (
           <>
-            {/* Thread header */}
-            <div className="flex items-center gap-3 border-b border-border bg-white dark:bg-card px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-3 border-b border-border bg-white dark:bg-card px-3 py-2.5 shadow-sm sm:px-4">
               <button
-                onClick={() => setParams({})}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary/60 lg:hidden"
+                onClick={closeConv}
+                className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary/60 lg:hidden"
+                aria-label="Înapoi"
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
@@ -255,15 +338,32 @@ export default function Messages() {
                 >
                   {active.property_title || "Proprietate"}
                 </Link>
-                <p className="text-xs text-muted-foreground">cu {otherName}</p>
+                <p className="truncate text-xs text-muted-foreground">cu {otherName}</p>
               </div>
-              <button className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary/60">
-                <MoreVertical className="h-5 w-5" />
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary/60" aria-label="Opțiuni conversație">
+                    <MoreVertical className="h-5 w-5" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem onClick={markAllRead} disabled={busy} className="gap-2">
+                    <CheckCheck className="h-4 w-4 text-emerald" /> Marchează toate ca citite
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => deleteConversation(active)}
+                    disabled={busy}
+                    className="gap-2 text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" /> Șterge conversația
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 space-y-3 overflow-y-auto px-4 py-5">
+            <div className="flex-1 space-y-2 overflow-y-auto px-3 py-4 sm:px-4">
               {messages === null ? (
                 <div className="flex justify-center py-8">
                   <div className="h-6 w-6 animate-spin rounded-full border-2 border-emerald border-t-transparent" />
@@ -275,6 +375,7 @@ export default function Messages() {
               ) : (
                 messages.map((m) => {
                   const mine = m.sender_id === user.id;
+                  const readTitle = m.read_at ? `Văzut la ${new Date(m.read_at).toLocaleString("ro-RO")}` : "Trimis · încă nu a fost văzut";
                   return (
                     <div key={m.id} className={"flex gap-2 " + (mine ? "justify-end" : "justify-start")}>
                       {!mine && (
@@ -282,18 +383,25 @@ export default function Messages() {
                           {initials(m.sender_name || "?")}
                         </span>
                       )}
-                      <div className={"flex max-w-[72%] flex-col gap-0.5 " + (mine ? "items-end" : "items-start")}>
+                      <div className={"flex max-w-[82%] flex-col gap-0.5 sm:max-w-[70%] " + (mine ? "items-end" : "items-start")}>
                         <div className={[
-                          "rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm",
-                          mine
-                            ? "rounded-br-sm bg-emerald text-white"
-                            : "rounded-bl-sm bg-white text-foreground dark:bg-card",
+                          "rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-sm sm:px-4",
+                          mine ? "rounded-br-sm bg-emerald text-white" : "rounded-bl-sm bg-white text-foreground dark:bg-card",
                         ].join(" ")}>
                           {m.content}
                         </div>
-                        <span className="px-1 text-[10px] text-muted-foreground">
-                          {new Date(m.created_date).toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" })}
-                        </span>
+                        <div className={"flex items-center gap-1 px-1 " + (mine ? "flex-row-reverse" : "flex-row")}>
+                          <span className="text-[10px] text-muted-foreground">
+                            {new Date(m.created_date).toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" })}
+                          </span>
+                          {mine && (
+                            m.read_at ? (
+                              <span title={readTitle} className="text-emerald"><CheckCheck className="h-3.5 w-3.5" /></span>
+                            ) : (
+                              <span title={readTitle} className="text-muted-foreground"><Check className="h-3.5 w-3.5" /></span>
+                            )
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -302,22 +410,25 @@ export default function Messages() {
               <div ref={bottomRef} />
             </div>
 
-            {/* Input */}
-            <form onSubmit={send} className="flex items-center gap-3 border-t border-border bg-white dark:bg-card px-4 py-3">
+            {/* Input — mobile-first: large touch target, no iOS zoom, safe-area-aware */}
+            <form
+              onSubmit={send}
+              className="flex items-center gap-2 border-t border-border bg-white dark:bg-card px-3 py-2.5 sm:px-4 sm:py-3"
+              style={{ paddingBottom: "calc(0.625rem + env(safe-area-inset-bottom))" }}
+            >
               <input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Scrie un mesaj..."
-                className="flex-1 rounded-full border border-border bg-secondary/30 px-4 py-2.5 text-sm outline-none focus:border-emerald"
+                className="flex-1 rounded-full border border-border bg-background px-4 py-3 text-base outline-none focus:border-emerald dark:bg-card"
               />
               <Button
                 type="submit"
                 disabled={sending || !text.trim()}
-                className="h-10 w-10 rounded-full bg-emerald p-0 text-white shadow-md hover:bg-emerald/90 disabled:opacity-50"
+                className="h-12 w-12 shrink-0 rounded-full bg-emerald p-0 text-white shadow-md hover:bg-emerald/90 disabled:opacity-50"
+                aria-label="Trimite"
               >
-                {sending
-                  ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  : <Send className="h-4 w-4" />}
+                {sending ? <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" /> : <Send className="h-5 w-5" />}
               </Button>
             </form>
           </>
