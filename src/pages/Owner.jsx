@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Camera, Eye, MessageSquare, FileText, TrendingUp, Upload, Plus, Download, Wifi, Volume2, Sun, Droplet,
+  Camera, Eye, MessageSquare, FileText, TrendingUp, Upload, Plus, Download, Wifi, Volume2, Sun, Droplet, MapPin,
 } from "lucide-react";
 import OwnerCharts from "@/components/OwnerCharts";
 import DateField from "@/components/DateField";
@@ -387,13 +387,27 @@ export function NewPropertyForm({ onDone, onCancel }) {
           <option value="">{t("f_zone")}</option>
           {zones.map((z) => <option key={z} value={z}>{z}</option>)}
         </select>
+      </div>
+
+      {/* Google Maps — casetă dedicată, lățime completă, accent vizibil */}
+      <div className="mt-3 space-y-1.5">
+        <label className="flex items-center gap-2 text-sm font-semibold text-navy">
+          <MapPin className="h-4 w-4 text-emerald" />
+          Locație exactă pe Google Maps 🗺️
+        </label>
         <GooglePlacesAutocomplete
           value={form.landmark}
           onChange={(v) => setForm((f) => ({ ...f, landmark: v }))}
           onPlace={(place) => setForm((f) => ({ ...f, landmark: place.name || f.landmark, latitude: place.lat != null ? place.lat : f.latitude, longitude: place.lng != null ? place.lng : f.longitude }))}
-          placeholder="Caută pe Google Maps (ex: Strada Nicolae Iorga)"
-          className={inputCls}
+          placeholder="Caută adresa pe Google Maps (ex: Strada Nicolae Iorga, Iași)…"
+          className="w-full rounded-lg border-2 border-emerald/60 bg-emerald-soft/30 px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card"
         />
+        <p className="text-[11px] text-muted-foreground">
+          Începe să tastezi adresa și selecteaz-o din sugestiile Google. Coordonatele GPS se salvează automat.
+        </p>
+      </div>
+
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <input required type="number" value={form.price_monthly} onChange={(e) => setForm((f) => ({ ...f, price_monthly: e.target.value }))} placeholder={t("f_price") + " *"} className={inputCls} />
         <input type="number" value={form.deposit} onChange={(e) => setForm((f) => ({ ...f, deposit: e.target.value }))} placeholder={t("f_deposit")} className={inputCls} />
         <input required type="number" value={form.rooms} onChange={(e) => setForm((f) => ({ ...f, rooms: e.target.value }))} placeholder={t("f_rooms") + " *"} className={inputCls} />
