@@ -2,6 +2,7 @@ import { useState } from "react";
 import { jsPDF } from "jspdf";
 import { FileDown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import { LOGO_URL } from "@/components/VerifiCasaLogo";
 import { useToast } from "@/components/ui/use-toast";
@@ -35,45 +36,17 @@ const stripGlyphs = (s) =>
         .trim();
 const SC = (s) => S(stripGlyphs(s));
 
-// Loads an image as a base64 data URL for embedding in the PDF.
-// Prefers fetch+blob (works on Wix CDN — CORS-allowed), falls back to canvas.
+// Loads an image as a base64 data URL via the server-side ProxyImage backend
+// function. This bypasses browser CORS restrictions for images hosted on
+// external CDNs (e.g. elit casaimobiliare.ro) that don't send the
+// `Access-Control-Allow-Origin` header, which is what was preventing listing
+// photos from appearing in the PDF.
 async function urlToDataURL(url) {
   if (!url) return null;
-
   try {
-    const res = await fetch(url, { mode: "cors", credentials: "omit" });
-    if (res.ok) {
-      const blob = await res.blob();
-      const dataUrl = await new Promise((resolve) => {
-        const r = new FileReader();
-        r.onload = () => resolve(r.result);
-        r.onerror = () => resolve(null);
-        r.readAsDataURL(blob);
-      });
-      if (dataUrl && dataUrl.length > 256) return dataUrl;
-    }
+    const r = await base44.functions.invoke("ProxyImage", { url });
+    if (r && r.dataUrl && r.dataUrl.length > 256) return r.dataUrl;
   } catch {}
-
-  try {
-    return await new Promise((resolve) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        try {
-          if (!img.naturalWidth || !img.naturalHeight) return resolve(null);
-          const canvas = document.createElement("canvas");
-          canvas.width = img.naturalWidth;
-          canvas.height = img.naturalHeight;
-          canvas.getContext("2d").drawImage(img, 0, 0);
-          const data = canvas.toDataURL("image/jpeg", 0.92);
-          resolve(data && data.length > 256 ? data : null);
-        } catch { resolve(null); }
-      };
-      img.onerror = () => resolve(null);
-      img.src = url;
-    });
-  } catch {}
-
   return null;
 }
 
@@ -186,8 +159,8 @@ export default function PropertyBrochure({ property, className = "" }) {
       }
       y += 16;
 
-      // ── COVER IMAGE + THUMBNAILS (photos from the listing) ────────────────
-      const imgs = (p.images || []).slice(0, 4);
+      // ── COVER IMAGE + THUMBNAILS (first 3 listing photos) ──────────────────
+      const imgs = (p.images || []).slice(0, 3);
       if (imgs.length > 0) {
         const coverH = 65;
         const coverData = await urlToDataURL(imgs[0]);
@@ -201,7 +174,8 @@ export default function PropertyBrochure({ property, className = "" }) {
         }
         y += coverH + 5;
 
-        const thumbs = imgs.slice(1, 4);
+        // First-3-photo rule already limits `imgs` to 3; show the remaining as thumbnails.
+        const thumbs = imgs.slice(1);
         if (thumbs.length > 0) {
           const th = 28, tw = (cw - (thumbs.length - 1) * 3) / thumbs.length;
           let tx = M;
