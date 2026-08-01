@@ -120,6 +120,7 @@ export default function Admin() {
   };
 
   const changeRole = async (u, role) => {
+    if (!isSuper) { toast({ title: "Doar SUPER_ADMIN poate schimba grade", variant: "destructive" }); return; }
     if (u.id === user.id && role !== user.role) { toast({ title: "Nu poti schimba propriul rol", variant: "destructive" }); return; }
     try {
       await base44.entities.User.update(u.id, { role });
@@ -390,7 +391,7 @@ export default function Admin() {
                     <select
                       value={u.role || "user"}
                       onChange={(e) => changeRole(u, e.target.value)}
-                      disabled={u.id === user.id}
+                      disabled={u.id === user.id || !isSuper}
                       className="rounded-full border border-border bg-white px-3 py-1.5 text-xs font-semibold outline-none focus:border-emerald disabled:opacity-60 dark:bg-card"
                     >
                       {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
