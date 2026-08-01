@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Play, MapPin, Maximize, BedDouble, ShieldCheck, PawPrint, BadgePercent,
@@ -23,6 +23,7 @@ export default function PropertyCard({ property }) {
   const p = property;
   const images = p.images?.length ? p.images : [];
   const [idx, setIdx] = useState(0);
+  const touchStartX = useRef(null);
 
   const isVerified = p.owner_verified || p.verification_level === "field_certified" || p.ai_tour_verified;
   const isVideo = !!p.ai_tour_verified;
@@ -71,36 +72,32 @@ export default function PropertyCard({ property }) {
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-glow dark:bg-card">
       {/* Cover with slider */}
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div
+        className="relative aspect-[4/3] overflow-hidden touch-pan-y"
+        onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+        onTouchEnd={(e) => {
+          const sx = touchStartX.current;
+          if (sx == null) return;
+          const dx = e.changedTouches[0].clientX - sx;
+          if (Math.abs(dx) > 40 && images.length > 1) {
+            setIdx((i) => (i + (dx < 0 ? 1 : -1) + images.length) % images.length);
+          }
+          touchStartX.current = null;
+        }}
+      >
         {images.length ? (
           <Image src={images[idx]} alt={p.title} fittingType="fill" className="h-full w-full transition-transform duration-500 group-hover:scale-[1.04]" />
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-navy/10 to-emerald/20" />
         )}
 
-        {isVideo && (
-          <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toDetail(); }} className="absolute inset-0 flex items-center justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 backdrop-blur">
-              <Play className="ml-0.5 h-5 w-5 fill-slate-800 text-slate-800" />
-            </div>
-          </button>
-        )}
-
-        {/* Slider controls */}
+        {/* Dots indicator only — swipe to navigate */}
         {images.length > 1 && (
-          <>
-            <button onClick={(e) => go(e, -1)} className="absolute left-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-slate-800 shadow-soft backdrop-blur transition hover:bg-white" aria-label={t("pc_prev")}>
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button onClick={(e) => go(e, 1)} className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-slate-800 shadow-soft backdrop-blur transition hover:bg-white" aria-label={t("pc_next")}>
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1">
-              {images.slice(0, 6).map((_, i) => (
-                <span key={i} className={`h-1.5 rounded-full transition ${i === idx ? "w-4 bg-white" : "w-1.5 bg-white/60"}`} />
-              ))}
-            </div>
-          </>
+          <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1">
+            {images.slice(0, 6).map((_, i) => (
+              <span key={i} className={`h-1.5 rounded-full transition ${i === idx ? "w-4 bg-white" : "w-1.5 bg-white/60"}`} />
+            ))}
+          </div>
         )}
 
         {/* Badges top-left */}
