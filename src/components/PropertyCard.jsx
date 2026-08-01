@@ -124,10 +124,10 @@ export default function PropertyCard({ property, hot = false }) {
           )}
         </div>
 
-        {/* HOT badge — trending (multe vizualizări), doar pe recomandate homepage */}
+        {/* Badge RECOMANDAT — trending (multe vizualizări), doar pe recomandate homepage */}
         {hot && (
-          <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-gradient-to-r from-orange-500 to-red-500 px-2.5 py-1 text-[11px] font-extrabold text-white shadow-gold animate-pulse">
-            🔥 {t("pc_hot")}
+          <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-gradient-to-r from-gold to-gold-deep px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white shadow-gold">
+            ⭐ {t("pc_hot")}
           </span>
         )}
 
@@ -146,7 +146,7 @@ export default function PropertyCard({ property, hot = false }) {
       </div>
 
       {/* Body */}
-      <div onClick={toDetail} className="flex flex-1 cursor-pointer flex-col p-4">
+      <div onClick={toDetail} className="flex min-w-0 flex-1 cursor-pointer flex-col p-3.5">
         <h3 className="font-heading text-base font-bold leading-snug text-navy line-clamp-1 dark:text-foreground">{p.title || <span className="italic text-muted-foreground/70">{t("info_missing")}</span>}</h3>
         <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
           <MapPin className="h-3 w-3 shrink-0" />
@@ -208,23 +208,23 @@ export default function PropertyCard({ property, hot = false }) {
       </div>
 
       {/* Contact buttons */}
-      <div className="grid grid-cols-3 gap-1.5 px-4 pb-4">
+      <div className="grid grid-cols-3 gap-1.5 px-3 pb-3">
         {waPhone && (
-          <a href={`https://wa.me/${waPhone}?text=${encodeURIComponent(t("pc_wa_msg", { title: p.title }))}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="flex items-center justify-center gap-1 rounded-xl bg-emerald px-2 py-2 text-xs font-bold text-white transition hover:opacity-90">
-            WhatsApp
+          <a href={`https://wa.me/${waPhone}?text=${encodeURIComponent(t("pc_wa_msg", { title: p.title }))}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="flex min-w-0 items-center justify-center gap-1 rounded-xl bg-emerald px-1.5 py-2 text-[11px] font-bold text-white transition hover:opacity-90">
+            <span className="truncate">WhatsApp</span>
           </a>
         )}
         {hasPhone ? (
-          <a href={`tel:${callPhone}`} onClick={(e) => e.stopPropagation()} className="flex items-center justify-center gap-1 rounded-xl border border-emerald/40 px-2 py-2 text-xs font-bold text-emerald transition hover:bg-emerald-soft">
-            <Phone className="h-3.5 w-3.5" /> {t("pc_call")}
+          <a href={`tel:${callPhone}`} onClick={(e) => e.stopPropagation()} className="flex min-w-0 items-center justify-center gap-1 rounded-xl border border-emerald/40 px-1.5 py-2 text-[11px] font-bold text-emerald transition hover:bg-emerald-soft">
+            <Phone className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">{t("pc_call")}</span>
           </a>
         ) : (
-          <span className="flex items-center justify-center gap-1 rounded-xl border border-border px-2 py-2 text-xs font-bold text-muted-foreground">
-            <PhoneOff className="h-3.5 w-3.5" /> {t("pc_call")}
+          <span className="flex min-w-0 items-center justify-center gap-1 rounded-xl border border-border px-1.5 py-2 text-[11px] font-bold text-muted-foreground">
+            <PhoneOff className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">{t("pc_call")}</span>
           </span>
         )}
-        <button onClick={handleMessage} className="flex items-center justify-center gap-1 rounded-xl bg-navy px-2 py-2 text-xs font-bold text-emerald transition hover:opacity-90">
-          <MessageCircle className="h-3.5 w-3.5" /> {t("pc_message")}
+        <button onClick={handleMessage} className="flex min-w-0 items-center justify-center gap-1 rounded-xl bg-navy px-1.5 py-2 text-[11px] font-bold text-emerald transition hover:opacity-90">
+          <MessageCircle className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">{t("pc_message")}</span>
         </button>
       </div>
     </div>
