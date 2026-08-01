@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { X, CheckCircle2, Camera, ClipboardCheck, Users, Sparkles } from "lucide-react";
+import { X, CheckCircle2, Camera, ClipboardCheck, Sparkles } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 
 export default function ListeazaPopup({ open, onClose }) {
@@ -22,7 +22,6 @@ export default function ListeazaPopup({ open, onClose }) {
   const steps = [
     { icon: ClipboardCheck, title: t("li_step1_t"), desc: t("li_step1_d") },
     { icon: Camera, title: t("li_step2_t"), desc: t("li_step2_d") },
-    { icon: Users, title: t("li_step3_t"), desc: t("li_step3_d") },
     { icon: Sparkles, title: t("li_step4_t"), desc: t("li_step4_d") },
   ];
 
