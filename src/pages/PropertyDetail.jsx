@@ -8,7 +8,6 @@ import { useCountry } from "@/components/CountryContext";
 import AITourPlayer from "@/components/AITourPlayer";
 import PropertyEditForm from "@/components/PropertyEditForm";
 import PhoneReveal from "@/components/PhoneReveal";
-import PropertyPOI from "@/components/PropertyPOI";
 import PropertyComments from "@/components/PropertyComments";
 import ReportModal from "@/components/ReportModal";
 import DateField from "@/components/DateField";
@@ -441,18 +440,6 @@ export default function PropertyDetail() {
                 city={p.city}
                 t={t}
               />
-            </div>
-
-            {/* POINTS OF INTEREST */}
-            <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-emerald" />
-                <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">{t("poi_section_title")}</h3>
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">{t("poi_section_sub", { zone: p.zone, city: p.city })}</p>
-              <div className="mt-4">
-                <PropertyPOI lat={p.latitude} lng={p.longitude} landmark={p.landmark} zone={p.zone} city={p.city} />
-              </div>
             </div>
 
             {/* COMMENTS */}
