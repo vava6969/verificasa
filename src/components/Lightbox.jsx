@@ -39,14 +39,28 @@ export default function Lightbox({ images, index, onClose, onIndex, saved = fals
 
   const handleShare = async () => {
     const url = window.location.href;
+    const data = { title: title || "VerifiCasa", text: title || "VerifiCasa", url };
     try {
       if (navigator.share) {
-        await navigator.share({ title: title || "VerifiCasa", url });
-      } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(url);
-        toast({ title: t("lb_link_copied") });
+        await navigator.share(data);
+        return;
       }
-    } catch (_) { /* user cancel — silent */ }
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      toast({ title: t("lb_link_copied") });
+    } catch (e) {
+      toast({ title: t("lb_link_copied") });
+    }
   };
 
   return (
