@@ -62,7 +62,10 @@ export default function GooglePlacesAutocomplete({
     (async () => {
       const key = await getKey();
       if (!alive) return;
-      if (!key) { setNoKey(true); setReady(true); return; }
+      // Cheile valide pentru Maps JS API încep mereu cu "AIza…".
+      // Orice alt format (ex. AQ.Ab…) e invalid → cădem pe text simplu,
+      // altfel Google atașează un Autocomplete care blochează tastarea.
+      if (!key || !key.startsWith("AIza")) { setNoKey(true); setReady(true); return; }
       try {
         await loadScript(key);
         if (!alive) return;
