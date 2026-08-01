@@ -40,6 +40,7 @@ import { createNotification } from "@/lib/notifications";
 export default function PropertyDetail() {
   const { id } = useParams();
   const { country, formatPrice, t, legalInfo, lang } = useCountry();
+  const locale = lang === "en" ? "en-GB" : "ro-RO";
   const { toast } = useToast();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -171,22 +172,22 @@ export default function PropertyDetail() {
       if (saved) {
         const list = await base44.entities.SavedProperty.filter({ user_id: user.id, property_id: p.id }, "-created_date", 10);
         for (const s of list) await base44.entities.SavedProperty.delete(s.id);
-        setSaved(false); toast({ title: "Eliminat din salvate" });
+        setSaved(false); toast({ title: t("pd_unsaved") });
       } else {
         await base44.entities.SavedProperty.create({ user_id: user.id, property_id: p.id });
-        setSaved(true); toast({ title: "Anunț salvat" });
-        // „Like la postare": notificăm proprietarul că cineva și-a apreciat/salvat anunțul
+        setSaved(true); toast({ title: t("pd_saved_toast") });
+        // „Like la postare": notify owner someone liked/saved their listing
         if (p.created_by_id && p.created_by_id !== user.id) {
           createNotification({
             userId: p.created_by_id,
             type: "like",
-            text: `${user.full_name || user.email} și-a apreciat (salvat) anunțul tău „${p.title}".`,
+            text: t("pd_like_msg", { name: user.full_name || user.email, title: p.title }),
             link: `/property/${p.id}`,
             actorName: user.full_name || user.email,
           });
         }
       }
-    } catch (e) { toast({ title: "Eroare", variant: "destructive" }); }
+    } catch (e) { toast({ title: t("pc_err_msg"), variant: "destructive" }); }
   };
 
   const handleMessage = async () => {
@@ -194,14 +195,14 @@ export default function PropertyDetail() {
     try {
       const conv = await startConversation(user, p);
       navigate(`/messages?c=${conv.id}`);
-    } catch (e) { toast({ title: "Eroare la mesaj", variant: "destructive" }); }
+    } catch (e) { toast({ title: t("pc_err_msg"), variant: "destructive" }); }
   };
 
   const stats = [
     { icon: BedDouble, label: t("stat_rooms"), value: p.rooms },
     { icon: Maximize, label: t("stat_area"), value: `${p.surface_sqm} mp` },
     { icon: Wallet, label: t("stat_deposit"), value: formatPrice(p.deposit || p.price_monthly, p.currency) },
-    { icon: Calendar, label: t("stat_avail"), value: p.available_from ? new Date(p.available_from).toLocaleDateString(country === "UK" ? "en-GB" : "ro-RO") : t("immediate") },
+    { icon: Calendar, label: t("stat_avail"), value: p.available_from ? new Date(p.available_from).toLocaleDateString(locale) : t("immediate") },
   ];
 
   return (
@@ -301,7 +302,7 @@ export default function PropertyDetail() {
                 <div>
                   <h1 className="font-heading text-2xl font-bold text-navy sm:text-3xl">{p.title}</h1>
                   <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4" /> {p.zone}, {p.city}{p.landmark ? ` · 📍 ${p.landmark}` : ""}, {p.country === "UK" ? "United Kingdom" : "România"}
+                    <MapPin className="h-4 w-4" /> {p.zone}, {p.city}{p.landmark ? ` · 📍 ${p.landmark}` : ""}, {p.country === "UK" ? t("pd_country_uk") : t("pd_country_ro")}
                   </p>
                   {p.created_date && (
                     <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
@@ -309,26 +310,26 @@ export default function PropertyDetail() {
                       <span className="font-medium text-foreground/70">{p.posted_by_name || p.owner_name || "VerifiCasa"}</span>
                       <span className="text-foreground/40">·</span>
                       <Clock className="h-3.5 w-3.5 text-emerald" />
-                      {new Date(p.created_date).toLocaleString("ro-RO", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                      {new Date(p.created_date).toLocaleString(locale, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
                       <span className="text-foreground/40">·</span>
                       {formatDistanceToNowStrict(new Date(p.created_date), { addSuffix: true, locale: lang === "en" ? enGB : ro })}
                     </p>
                   )}
                   <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground/70">
-                    Cod Proprietate: <span className="font-mono select-all font-semibold text-foreground/80">{p.property_code || p.id}</span>
+                    {t("pd_code_label")} <span className="font-mono select-all font-semibold text-foreground/80">{p.property_code || p.id}</span>
                   </p>
                   {p.approved_by_name && (
                     <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-emerald">
-                      <BadgeCheck className="h-3.5 w-3.5" /> Aprobat de {p.approved_by_name}{p.approved_date ? ` · ${new Date(p.approved_date).toLocaleString("ro-RO", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}` : ""}
+                      <BadgeCheck className="h-3.5 w-3.5" /> {t("pd_approved_by")} {p.approved_by_name}{p.approved_date ? ` · ${new Date(p.approved_date).toLocaleString(locale, { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}` : ""}
                     </p>
                   )}
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <Button size="sm" onClick={toggleSave} className="gap-1.5 bg-emerald text-white shadow-soft hover:bg-emerald/90">
-                      <Heart className={`h-4 w-4 ${saved ? "fill-white" : ""}`} /> {saved ? "Salvat" : "Salvează"}
+                      <Heart className={`h-4 w-4 ${saved ? "fill-white" : ""}`} /> {saved ? t("pd_saved") : t("pd_save")}
                     </Button>
                     {canEdit && (
                       <Button variant="outline" size="sm" onClick={() => setEditing(true)} className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft">
-                        <Pencil className="h-3.5 w-3.5" /> Editează
+                        <Pencil className="h-3.5 w-3.5" /> {t("pd_edit")}
                       </Button>
                     )}
                     <ReportModal targetType="property" targetId={p.id} targetTitle={p.title} variant="outline" size="sm" className="border-border" />
@@ -382,12 +383,12 @@ export default function PropertyDetail() {
 
                 {(p.internet_speed_mbps || p.noise_db != null || p.light_orientation || p.water_pressure_ok) && (
                   <div className="mt-4 rounded-xl border border-border bg-secondary/40 p-4">
-                    <p className="mb-2 text-xs font-bold uppercase tracking-wide text-foreground/60">Facilități verificate</p>
+                    <p className="mb-2 text-xs font-bold uppercase tracking-wide text-foreground/60">{t("pd_facilities_h")}</p>
                     <div className="flex flex-wrap gap-2">
-                      {p.internet_speed_mbps && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald">📶 Internet {p.internet_speed_mbps} Mbps</span>}
-                      {p.noise_db != null && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald">🔊 Zgomot {p.noise_db} dB</span>}
-                      {p.light_orientation && <span className="flex items-center gap-1.5 rounded-full bg-gold-soft px-3 py-1 text-xs font-semibold text-gold-deep dark:text-gold">☀️ Orientare {p.light_orientation}</span>}
-                      {p.water_pressure_ok && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald">💧 Presiune apă OK</span>}
+                      {p.internet_speed_mbps && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald">📶 {t("pd_fac_internet")} {p.internet_speed_mbps} Mbps</span>}
+                      {p.noise_db != null && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald">🔊 {t("pd_fac_noise")} {p.noise_db} dB</span>}
+                      {p.light_orientation && <span className="flex items-center gap-1.5 rounded-full bg-gold-soft px-3 py-1 text-xs font-semibold text-gold-deep dark:text-gold">☀️ {t("pd_fac_orientation")} {p.light_orientation}</span>}
+                      {p.water_pressure_ok && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald">💧 {t("pd_fac_water")}</span>}
                     </div>
                   </div>
                 )}
@@ -413,9 +414,9 @@ export default function PropertyDetail() {
             <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
               <div className="flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-emerald" />
-                <h3 className="font-heading text-lg font-bold text-navy">Puncte de interes în zonă</h3>
+                <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">{t("poi_section_title")}</h3>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">Generate automat pentru cartierul {p.zone}, {p.city}.</p>
+              <p className="mt-1 text-xs text-muted-foreground">{t("poi_section_sub", { zone: p.zone, city: p.city })}</p>
               <div className="mt-4">
                 <PropertyPOI zone={p.zone} city={p.city} />
               </div>
@@ -435,12 +436,12 @@ export default function PropertyDetail() {
               <p className="mt-1 text-xs text-muted-foreground">{t("contact_sub")}</p>
 
               <Button type="button" onClick={handleMessage} className="mt-3 w-full gap-1.5 bg-navy text-emerald hover:opacity-90">
-                <MessageCircle className="h-4 w-4" /> Mesaj
+                <MessageCircle className="h-4 w-4" /> {t("pd_msg_btn")}
               </Button>
 
               <form onSubmit={handleSubmit} className="mt-4 space-y-3">
                 <div className="rounded-xl bg-emerald-soft/40 p-3">
-                  <p className="mb-2 flex items-center gap-1 text-xs font-bold text-emerald"><Phone className="h-3.5 w-3.5" /> Contact vânzător</p>
+                  <p className="mb-2 flex items-center gap-1 text-xs font-bold text-emerald"><Phone className="h-3.5 w-3.5" /> {t("pd_seller_contact")}</p>
                   <PhoneReveal phone={p.phone} whatsappPhone={p.whatsapp_phone} />
                 </div>
                 <input required value={form.name} onChange={(e) => handleChange("name", e.target.value)} placeholder={t("ph_name")} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
@@ -452,8 +453,8 @@ export default function PropertyDetail() {
                   <div className="space-y-2.5">
                     <input value={form.occupation} onChange={(e) => handleChange("occupation", e.target.value)} placeholder={t("ph_occupation")} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
                     <input type="number" value={form.estimated_income} onChange={(e) => handleChange("estimated_income", e.target.value)} placeholder={t("ph_income")} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
-                    <DateField value={form.move_date} onChange={(e) => handleChange("move_date", e.target.value)} placeholder="Mutare la" className="w-full" />
-                    <DateField value={form.preferred_visit_date} onChange={(e) => handleChange("preferred_visit_date", e.target.value)} placeholder="Vizionare preferată" className="w-full" />
+                    <DateField value={form.move_date} onChange={(e) => handleChange("move_date", e.target.value)} placeholder={t("pd_move_label")} className="w-full" />
+                    <DateField value={form.preferred_visit_date} onChange={(e) => handleChange("preferred_visit_date", e.target.value)} placeholder={t("pd_visit_label")} className="w-full" />
                   </div>
                 </div>
 

@@ -11,7 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 export default function ShareableStoryCard({ property, className = "" }) {
   const cardRef = useRef(null);
   const [busy, setBusy] = useState(false);
-  const { formatPrice } = useCountry();
+  const { formatPrice, t, lang } = useCountry();
   const { toast } = useToast();
 
   const p = property || {};
@@ -23,11 +23,11 @@ export default function ShareableStoryCard({ property, className = "" }) {
   const isVideo = !!p.ai_tour_verified;
 
   const chips = [];
-  if (p.rooms != null) chips.push(`${p.rooms} camere`);
-  if (p.surface_sqm != null) chips.push(`${p.surface_sqm} mp`);
-  if (p.pet_friendly) chips.push("Pet friendly");
-  if (p.furnished) chips.push("Mobilat");
-  if (p.parking) chips.push("Parcare");
+  if (p.rooms != null) chips.push(`${p.rooms} ${t("card_chip_rooms")}`);
+  if (p.surface_sqm != null) chips.push(`${p.surface_sqm} ${t("card_chip_surface")}`);
+  if (p.pet_friendly) chips.push(t("card_chip_pet"));
+  if (p.furnished) chips.push(t("card_chip_furnished"));
+  if (p.parking) chips.push(t("card_chip_parking"));
 
   const handleGenerate = async () => {
     if (!cardRef.current) return;
@@ -37,16 +37,17 @@ export default function ShareableStoryCard({ property, className = "" }) {
         backgroundColor: "#ffffff",
         scale: 3,
         useCORS: true,
+        allowTaint: false,
         logging: false,
       });
       const dataUrl = canvas.toDataURL("image/png");
       const a = document.createElement("a");
       a.href = dataUrl;
-      a.download = `verificasa-${p.id || "proprietate"}.png`;
+      a.download = `${t("card_filename")}-${p.id || "property"}.png`;
       a.click();
-      toast({ title: "Card descărcat", description: "Imaginea a fost descărcată — o poți partaja pe Instagram/WhatsApp." });
+      toast({ title: t("toast_card_ok_title"), description: t("toast_card_ok_desc") });
     } catch (e) {
-      toast({ title: "Eroare la descărcare", description: "Încearcă din nou.", variant: "destructive" });
+      toast({ title: t("toast_card_err_title"), description: t("toast_card_err_desc"), variant: "destructive" });
     } finally {
       setBusy(false);
     }
@@ -61,7 +62,7 @@ export default function ShareableStoryCard({ property, className = "" }) {
         className="w-full gap-1.5 border-emerald/40 text-emerald hover:bg-emerald-soft"
       >
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Share2 className="h-4 w-4" />}
-        {busy ? "Se creează..." : "Descarcă Card Partajabil"}
+        {busy ? t("btn_creating_card") : t("btn_share_card")}
       </Button>
 
       {/* Offscreen card rendered for html2canvas capture */}
@@ -85,7 +86,7 @@ export default function ShareableStoryCard({ property, className = "" }) {
                 className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold"
                 style={{ background: "#C5A059", color: "#1B222C" }}
               >
-                {isField ? "🥇 VerifiCasa Certified" : "🟢 Verificat Video & AI"}
+                {isField ? t("card_certified") : t("card_video_v")}
               </span>
             </div>
           )}
@@ -93,14 +94,14 @@ export default function ShareableStoryCard({ property, className = "" }) {
           <div className="px-5 pt-3">
             <h3 className="text-[18px] font-extrabold leading-tight" style={{ color: "#1B222C" }}>{p.title}</h3>
             <p className="mt-1 text-[12px]" style={{ color: "#5a6270" }}>
-              {p.zone ? `${p.zone}, ` : ""}{p.city}, România
+              {p.zone ? `${p.zone}, ` : ""}{p.city}, {t("card_country")}
             </p>
 
             <div className="mt-3 flex items-baseline gap-1">
               <span className="text-[24px] font-extrabold" style={{ color: "#1B222C" }}>
                 {formatPrice(p.price_monthly, p.currency)}
               </span>
-              <span className="text-[12px]" style={{ color: "#5a6270" }}>/lună</span>
+              <span className="text-[12px]" style={{ color: "#5a6270" }}>{t("card_per_month")}</span>
             </div>
 
             {chips.length > 0 && (
@@ -119,12 +120,12 @@ export default function ShareableStoryCard({ property, className = "" }) {
               <img src={LOGO_URL} crossOrigin="anonymous" alt="VerifiCasa" className="h-9 w-9 rounded-full object-cover" />
               <div className="leading-none">
                 <span className="block text-[14px] font-extrabold tracking-tight" style={{ color: "#1B222C" }}>VerifiCasa</span>
-                <span className="mt-0.5 block text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#C5A059" }}>Inspecții & Verificări</span>
+                <span className="mt-0.5 block text-[8px] font-semibold uppercase tracking-[0.18em]" style={{ color: "#C5A059" }}>{t("card_brand_sub")}</span>
               </div>
             </div>
             <div className="flex flex-col items-center">
               <img src={qr} crossOrigin="anonymous" alt="QR" className="h-16 w-16" />
-              <span className="mt-1 text-[7px] font-semibold uppercase tracking-wide" style={{ color: "#5a6270" }}>Scanează</span>
+              <span className="mt-1 text-[7px] font-semibold uppercase tracking-wide" style={{ color: "#5a6270" }}>{t("card_scan")}</span>
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import React from "react";
 import { Bus, GraduationCap, TreePine } from "lucide-react";
+import { useCountry } from "@/components/CountryContext";
 
 // Auto-generated Points of Interest based on the property's zone/neighborhood.
 // In a production build this would come from a Maps API; here we use a curated
@@ -24,14 +25,14 @@ function getPOI(zone, city) {
   return CITY_FALLBACK[city] || CITY_FALLBACK["Iași"];
 }
 
-const CATS = [
-  { key: "transport", icon: Bus, label: "Transport", color: "text-blue-700 bg-blue-50" },
-  { key: "education", icon: GraduationCap, label: "Școli / Universități", color: "text-emerald bg-emerald-soft" },
-  { key: "recreation", icon: TreePine, label: "Recreere / Parcuri", color: "text-gold-deep bg-gold-soft" },
-];
-
 export default function PropertyPOI({ zone, city }) {
+  const { t, lang } = useCountry();
   const poi = getPOI(zone, city);
+  const CATS = [
+    { key: "transport",  icon: Bus,          label: t("poi_transport"),   color: "text-blue-700 bg-blue-50" },
+    { key: "education",  icon: GraduationCap,label: t("poi_education"),   color: "text-emerald bg-emerald-soft" },
+    { key: "recreation", icon: TreePine,     label: t("poi_recreation"),  color: "text-gold-deep bg-gold-soft" },
+  ];
   return (
     <div className="grid gap-4 sm:grid-cols-3">
       {CATS.map((c) => (
@@ -40,7 +41,7 @@ export default function PropertyPOI({ zone, city }) {
             <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${c.color}`}>
               <c.icon className="h-4 w-4" />
             </span>
-            <h4 className="font-heading text-sm font-bold text-navy">{c.label}</h4>
+            <h4 className="font-heading text-sm font-bold text-navy dark:text-foreground">{c.label}</h4>
           </div>
           <ul className="mt-3 space-y-1.5">
             {poi[c.key].map((item, i) => (
