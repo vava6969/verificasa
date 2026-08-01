@@ -504,6 +504,9 @@ export const STR = {
     pd_seller_contact: "Contact vânzător",
     pd_move_label: "Mutare la",
     pd_visit_label: "Vizionare preferată",
+    pc_hot: "HOT",
+    similar_h: "Proprietăți similare în zonă",
+    similar_sub: "Recomandări din {city} și apropiere",
   },
   en: {
     nav_rent: "Rent",
@@ -971,6 +974,9 @@ export const STR = {
     pd_seller_contact: "Seller contact",
     pd_move_label: "Move by",
     pd_visit_label: "Preferred viewing",
+    pc_hot: "HOT",
+    similar_h: "Similar properties nearby",
+    similar_sub: "Recommendations in {city} and nearby",
   },
 };
 

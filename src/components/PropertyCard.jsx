@@ -15,7 +15,7 @@ import { formatDistanceToNowStrict } from "date-fns";
 import { ro, enGB } from "date-fns/locale";
 
 // Premium listing card inspired by Storia/OLX.
-export default function PropertyCard({ property }) {
+export default function PropertyCard({ property, hot = false }) {
   const { currency, formatPrice, t, lang } = useCountry();
   const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
@@ -123,6 +123,13 @@ export default function PropertyCard({ property }) {
             </span>
           )}
         </div>
+
+        {/* HOT badge — trending (multe vizualizări), doar pe recomandate homepage */}
+        {hot && (
+          <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-gradient-to-r from-orange-500 to-red-500 px-2.5 py-1 text-[11px] font-extrabold text-white shadow-gold animate-pulse">
+            🔥 {t("pc_hot")}
+          </span>
+        )}
 
 
         {/* Seller role badge + date */}

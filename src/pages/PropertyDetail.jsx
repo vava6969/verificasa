@@ -9,6 +9,7 @@ import AITourPlayer from "@/components/AITourPlayer";
 import PropertyEditForm from "@/components/PropertyEditForm";
 import PhoneReveal from "@/components/PhoneReveal";
 import PropertyComments from "@/components/PropertyComments";
+import SimilarProperties from "@/components/SimilarProperties";
 import ReportModal from "@/components/ReportModal";
 import DateField from "@/components/DateField";
 import PropertyGoogleMap from "@/components/PropertyGoogleMap";
@@ -444,6 +445,9 @@ export default function PropertyDetail() {
 
             {/* COMMENTS */}
             <PropertyComments property={p} />
+
+            {/* SIMILAR RECOMMENDATIONS */}
+            <SimilarProperties property={p} />
           </div>
 
           {/* RIGHT */}

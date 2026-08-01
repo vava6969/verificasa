@@ -40,7 +40,7 @@ export default function Landing() {
     return () => { cancelled = true; };
   }, [country]);
 
-    const display = (properties || []).filter((p) => p.approval_status === "APPROVED").slice(0, 4);
+    const display = (properties || []).filter((p) => p.approval_status === "APPROVED").slice(0, 3);
 
   return (
     <div>
@@ -116,7 +116,7 @@ export default function Landing() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {display.map((p) => <PropertyCard key={p.id} property={p} />)}
+            {display.map((p) => <PropertyCard key={p.id} property={p} hot />)}
           </div>
         )}
 
