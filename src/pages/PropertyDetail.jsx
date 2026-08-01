@@ -16,8 +16,6 @@ L.Icon.Default.mergeOptions({
 });
 import { useCountry } from "@/components/CountryContext";
 import AITourPlayer from "@/components/AITourPlayer";
-import ShareableStoryCard from "@/components/ShareableStoryCard";
-import PropertyBrochure from "@/components/PropertyBrochure";
 import PropertyEditForm from "@/components/PropertyEditForm";
 import PhoneReveal from "@/components/PhoneReveal";
 import PropertyPOI from "@/components/PropertyPOI";
@@ -276,12 +274,6 @@ export default function PropertyDetail() {
               <p className="text-xs text-muted-foreground">{s.label}</p>
             </div>
           ))}
-        </div>
-
-        {/* Shareable story card + PDF brochure generator (under the announcement) */}
-        <div className="mt-4 mx-auto max-w-md space-y-2">
-          <ShareableStoryCard property={p} />
-          <PropertyBrochure property={p} />
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
