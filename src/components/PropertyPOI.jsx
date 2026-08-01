@@ -23,6 +23,11 @@ function staticPOI(zone, city) {
   if (POI_BY_ZONE[zone]) return POI_BY_ZONE[zone];
   return CITY_FALLBACK[city] || CITY_FALLBACK["Iași"];
 }
+function staticItems(zone, city) {
+  const st = staticPOI(zone, city);
+  const wrap = (arr) => arr.map((name) => ({ name, dist: null }));
+  return { transport: wrap(st.transport), education: wrap(st.education), recreation: wrap(st.recreation) };
+}
 
 let keyPromise = null;
 let scriptPromise = null;
@@ -80,7 +85,7 @@ export default function PropertyPOI({ lat, lng, landmark, zone, city }) {
     setLoading(true);
 
     const fallback = () => {
-      if (alive) { setItems(staticPOI(zone, city)); setLoading(false); }
+      if (alive) { setItems(staticItems(zone, city)); setLoading(false); }
     };
 
     (async () => {
@@ -127,9 +132,9 @@ export default function PropertyPOI({ lat, lng, landmark, zone, city }) {
         if (!out.transport && !out.education && !out.recreation) return fallback();
 
         // Completăm categoriile lipsă cu setul static.
-        const st = staticPOI(zone, city);
+        const st = staticItems(zone, city);
         ["transport", "education", "recreation"].forEach((k) => {
-          if (!out[k]) out[k] = st[k].map((name) => ({ name, dist: null }));
+          if (!out[k]) out[k] = st[k];
         });
 
         if (alive) { setItems(out); setLoading(false); }
