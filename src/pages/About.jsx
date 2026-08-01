@@ -6,27 +6,108 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useCountry } from "@/components/CountryContext";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
-const PILLARS = [
-  { icon: Video, title: "Tur Interactiv AI 360°", desc: "Generăm tururi virtuale din pozele proprietății, astfel încât chiriașii explorează locul online — economisind timp pentru toți." },
-  { icon: ShieldCheck, title: "Verificare fizică pe teren", desc: "Agenții noștri inspectează personal fiecare proprietate și emit un raport cu stare, zgomot, presiune apă și acte." },
-  { icon: Users, title: "Selectarea clienților potriviți", desc: "Filtrăm chiriașii și cumpărătorii calificați, ca să nu pierzi timp cu vizionări inutile." },
-  { icon: Lock, title: "Comisioane corecte & siguranță", desc: "Condiții transparente, fără taxe ascunse sau garanții exagerate. Pachete avantajoase pentru vânzare și închiriere." },
-];
-
-const STEPS = [
-  { icon: Search, title: "1. Cauți sau publici", desc: "Răsfoiești anunțuri verificate sau îți publici propria proprietate în câteva minute." },
-  { icon: ClipboardCheck, title: "2. Inspecție pe teren", desc: "Echipa VerifiCasa inspectează fizic locul și verifică actele pentru transparență 100%." },
-  { icon: Camera, title: "3. Tur 360° & promovare", desc: "Realizăm turul interactiv și poze, apoi îți propunem pachetul ideal de promovare." },
-  { icon: Handshake, title: "4. Contract & chei", desc: "Selectăm clientul potrivit și facilităm contractul și predarea — fără bătăi de cap." },
-];
+// All copy is bilingual — keyed by `lang` from CountryContext.
+// Romanian content is provided verbatim as requested; English is a faithful translation.
+const CONTENT = {
+  ro: {
+    hero_badge: "VerifiCasa · Agenție imobiliară",
+    hero_h: "Chirii & vânzări verificate, fără surprize.",
+    hero_p1: "VerifiCasa este o platformă imobiliară și agenție care combină tehnologia AI cu inspecții fizice reale.",
+    hero_p2: "Economisim timpul tău, oferim transparență totală și construim încredere între proprietari și chiriași/cumpărători.",
+    cta_search: "Caută proprietăți",
+    cta_list: "Publică un anunț",
+    pillars_k: "Ce facem",
+    pillars_h: "Tehnologie + oameni pe teren",
+    pillars: [
+      { icon: Video, title: "Tur Interactiv AI 360°", desc: "Generăm tururi virtuale din pozele proprietății, astfel încât chiriașii explorează locul online — economisind timp pentru toți." },
+      { icon: ShieldCheck, title: "Verificare fizică pe teren", desc: "Agenții noștri inspectează personal fiecare proprietate și emit un raport cu stare, zgomot, presiune apă și acte." },
+      { icon: Users, title: "Selectarea clienților potriviți", desc: "Filtrăm chiriașii și cumpărătorii calificați, ca să nu pierzi timp cu vizionări inutile." },
+      { icon: Lock, title: "Comisioane corecte & siguranță", desc: "Condiții transparente, fără taxe ascunse sau garanții exagerate. Pachete avantajoase pentru vânzare și închiriere." },
+    ],
+    steps_k: "Cum colaborăm",
+    steps_h: "Pași simpli, de la anunț la chei",
+    steps: [
+      { icon: Search, title: "1. Cauți sau publici", desc: "Răsfoiești anunțuri verificate sau îți publici propria proprietate în câteva minute." },
+      { icon: ClipboardCheck, title: "2. Inspecție pe teren", desc: "Echipa VerifiCasa inspectează fizic locul și verifică actele pentru transparență 100%." },
+      { icon: Camera, title: "3. Tur 360° & promovare", desc: "Realizăm turul interactiv și poze, apoi îți propunem pachetul ideal de promovare." },
+      { icon: Handshake, title: "4. Contract & chei", desc: "Selectăm clientul potrivit și facilităm contractul și predarea — fără bătăi de cap." },
+    ],
+    trust: [
+      { icon: BadgeCheck, title: "Inspecții fizice", desc: "Rapoarte reale cu zgomot (dB), presiune apă și acte." },
+      { icon: FileText, title: "Contracte transparente", desc: "Comisioane corecte, fără taxe ascunse." },
+      { icon: MapPin, title: "Acoperire Iași & Huși", desc: "Ne extindem în toată România." },
+    ],
+    story_k: "Cum s-a născut VerifiCasa",
+    story_h: "De la o problemă reală la o soluție inteligentă",
+    story_p1: "Totul a început de la o discuție simplă cu un grup de prieteni care își căutau o chirie. Privindu-i cum se luptau cu haosul din piață — zeci de apeluri telefonice, vizionări ratate, timp pierdut în trafic și, cel mai frustrant, anunțuri care ascundeau realitatea din teren —, mi-am dat seama că procesul acesta era complet depășit.",
+    story_p2: "Proprietarii, adesea grăbiți, omiteau detalii esențiale. Chiriașii și cumpărătorii, la rândul lor, pierdeau ore prețioase pentru spații care nu aveau nicio legătură cu fotografiile din anunțuri.",
+    story_p3: "Atunci a apărut întrebarea: Cum ar fi dacă am elimina complet această bătaie de cap? Cum ar fi dacă ai putea păși într-o locuință, să-i explorezi fiecare colțișor și să-i simți atmosfera, direct de pe telefonul sau calculatorul tău?",
+    story_birth: "Așa s-a născut VerifiCasa.",
+    story_p4: "Ne-am propus să redefinim transparența în imobiliare prin tururi virtuale 3D de înaltă precizie, inspecții obiective și informații complete, fără filtre și fără detalii ascunse. Am creat un standard premium pentru cei care nu vor să își irosească timpul și care caută exact locul potrivit, rapid și fără surprize neplăcute.",
+    service_h: "Cine beneficiază de serviciile noastre?",
+    service_buyers_t: "Cumpărătorii și Chiriașii",
+    service_buyers_d: "Câștigă timp, economisesc drumuri inutile și iau decizii în cunoștință de cauză.",
+    service_owners_t: "Proprietarii și Dezvoltatorii",
+    service_owners_d: "Își prezintă proprietățile la cel mai înalt nivel de profesionalism, atrăgând doar clienți cu adevărat interesați și serioși.",
+    story_p5: "VerifiCasa nu este doar despre imobile; este despre oameni, timp și încredere. Ceea ce a pornit de la o simplă idee s-a transformat într-un brand dedicat eficienței și transparenței totale.",
+    story_p6: "Suntem aici să creștem împreună cu voi, să vă ascultăm poveștile și să ne asigurăm că fie tranzacționați, fie închiriați, toată lumea câștigă.",
+  },
+  en: {
+    hero_badge: "VerifiCasa · Real Estate Agency",
+    hero_h: "Verified rentals & sales, no surprises.",
+    hero_p1: "VerifiCasa is a real-estate platform and agency that blends AI technology with real physical inspections.",
+    hero_p2: "We save your time, provide total transparency and build trust between landlords and tenants/buyers.",
+    cta_search: "Browse properties",
+    cta_list: "List a property",
+    pillars_k: "What we do",
+    pillars_h: "Technology + people on the ground",
+    pillars: [
+      { icon: Video, title: "Interactive AI 360° Tour", desc: "We generate virtual tours from the property's photos, so tenants can explore the place online — saving time for everyone." },
+      { icon: ShieldCheck, title: "Physical on-site inspection", desc: "Our agents personally inspect every property and issue a report on condition, noise, water pressure and paperwork." },
+      { icon: Users, title: "Screening the right clients", desc: "We filter qualified tenants and buyers, so you don't waste time on pointless viewings." },
+      { icon: Lock, title: "Fair fees & safety", desc: "Transparent terms, no hidden charges or inflated guarantees. Advantageous packages for sale and rent." },
+    ],
+    steps_k: "How we work together",
+    steps_h: "Simple steps, from listing to keys",
+    steps: [
+      { icon: Search, title: "1. Search or list", desc: "Browse verified listings or publish your own property in a few minutes." },
+      { icon: ClipboardCheck, title: "2. On-site inspection", desc: "The VerifiCasa team physically inspects the place and checks the paperwork for 100% transparency." },
+      { icon: Camera, title: "3. 360° Tour & promotion", desc: "We create the interactive tour and photos, then propose the ideal promotion package." },
+      { icon: Handshake, title: "4. Contract & keys", desc: "We select the right client and facilitate the contract and handover — hassle-free." },
+    ],
+    trust: [
+      { icon: BadgeCheck, title: "Physical inspections", desc: "Real reports with noise (dB), water pressure and paperwork." },
+      { icon: FileText, title: "Transparent contracts", desc: "Fair commissions, no hidden fees." },
+      { icon: MapPin, title: "Coverage Iași & Huși", desc: "Expanding across all of Romania." },
+    ],
+    story_k: "How VerifiCasa was born",
+    story_h: "From a real problem to a smart solution",
+    story_p1: "Everything began with a simple conversation with a group of friends who were searching for a rental. Watching them battle the chaos of the market — dozens of phone calls, failed viewings, hours lost in traffic and, most frustratingly, listings that hid the reality of the place — I realised the process was completely outdated.",
+    story_p2: "Landlords, often in a hurry, omitted essential details. Tenants and buyers, in turn, lost precious hours on spaces that had nothing to do with the photos in the listings.",
+    story_p3: "Then the question came up: what if we eliminated this hassle entirely? What if you could step into a home, explore every little corner and feel its atmosphere, straight from your phone or computer?",
+    story_birth: "That's how VerifiCasa was born.",
+    story_p4: "We set out to redefine transparency in real estate through high-precision 3D virtual tours, objective inspections and complete information — no filters, no hidden details. We created a premium standard for those who refuse to waste their time and who look for exactly the right place, fast and without nasty surprises.",
+    service_h: "Who benefits from our services?",
+    service_buyers_t: "Buyers and Tenants",
+    service_buyers_d: "Save time, skip pointless trips and make informed decisions.",
+    service_owners_t: "Landlords and Developers",
+    service_owners_d: "Present their properties at the highest level of professionalism, attracting only genuinely interested and serious clients.",
+    story_p5: "VerifiCasa isn't just about properties; it's about people, time and trust. What started as a simple idea has grown into a brand dedicated to total efficiency and transparency.",
+    story_p6: "We're here to grow together with you, to listen to your stories and to make sure that whether you're transacting or renting, everyone wins.",
+  },
+};
 
 export default function About() {
+  const { lang } = useCountry();
+  const c = CONTENT[lang] || CONTENT.ro;
+
   return (
     <div className="bg-secondary/30">
       {/* HERO */}
@@ -35,21 +116,20 @@ export default function About() {
         <div className="absolute -bottom-20 -right-10 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
         <div className="relative mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
           <motion.span initial="hidden" animate="show" variants={fadeUp} className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-white/10 px-4 py-1.5 text-xs font-semibold text-gold backdrop-blur-md">
-            <Sparkles className="h-3.5 w-3.5" /> VerifiCasa · Agenție imobiliară
+            <Sparkles className="h-3.5 w-3.5" /> {c.hero_badge}
           </motion.span>
           <motion.h1 initial="hidden" animate="show" variants={fadeUp} className="mt-6 font-heading text-4xl font-extrabold leading-tight sm:text-5xl">
-            Chirii & vânzări verificate, fără surprize.
+            {c.hero_h}
           </motion.h1>
           <motion.p initial="hidden" animate="show" variants={fadeUp} className="mx-auto mt-5 max-w-2xl rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-base text-white/85 backdrop-blur-md sm:text-lg">
-            VerifiCasa este o platformă imobiliară și agenție care combină tehnologia AI cu inspecții fizice reale.
-            Economisim timpul tău, oferim transparență totală și construim încredere între proprietari și chiriași/cumpărători.
+            {c.hero_p1} {c.hero_p2}
           </motion.p>
           <motion.div initial="hidden" animate="show" variants={fadeUp} className="mt-8 flex flex-wrap justify-center gap-3">
             <Button asChild className="rounded-full gradient-mint text-navy shadow-soft hover:opacity-90">
-              <Link to="/search">Caută proprietăți <ArrowRight className="h-4 w-4" /></Link>
+              <Link to="/search">{c.cta_search} <ArrowRight className="h-4 w-4" /></Link>
             </Button>
             <Button asChild variant="outline" className="rounded-full border-white/30 bg-white/5 text-white hover:bg-white/10">
-              <Link to="/owner">Publică un anunț</Link>
+              <Link to="/owner">{c.cta_list}</Link>
             </Button>
           </motion.div>
         </div>
@@ -58,11 +138,11 @@ export default function About() {
       {/* PILLARS */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-10 text-center">
-          <p className="text-xs font-bold uppercase tracking-wider text-emerald">Ce facem</p>
-          <h2 className="mt-1 font-heading text-3xl font-bold text-navy dark:text-foreground">Tehnologie + oameni pe teren</h2>
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald">{c.pillars_k}</p>
+          <h2 className="mt-1 font-heading text-3xl font-bold text-navy dark:text-foreground">{c.pillars_h}</h2>
         </div>
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={{ show: { transition: { staggerChildren: 0.1 } } }} className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-          {PILLARS.map((p, i) => (
+          {c.pillars.map((p, i) => (
             <motion.div key={i} variants={fadeUp} className="flex flex-col rounded-2xl border border-border bg-white p-6 shadow-soft dark:bg-card">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-soft text-emerald"><p.icon className="h-6 w-6" /></div>
               <h3 className="mt-4 font-heading text-lg font-bold text-navy dark:text-foreground">{p.title}</h3>
@@ -72,14 +152,46 @@ export default function About() {
         </motion.div>
       </section>
 
+      {/* OUR STORY */}
+      <section className="mx-auto max-w-3xl px-4 pb-16 sm:px-6 lg:px-8">
+        <div className="rounded-3xl border border-border bg-white p-7 shadow-soft dark:bg-card sm:p-9">
+          <div className="text-center">
+            <p className="text-xs font-bold uppercase tracking-wider text-emerald">{c.story_k}</p>
+            <h2 className="mt-1 font-heading text-2xl font-bold text-navy dark:text-foreground sm:text-3xl">{c.story_h}</h2>
+          </div>
+          <div className="mt-6 space-y-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
+            <p>{c.story_p1}</p>
+            <p>{c.story_p2}</p>
+            <p>{c.story_p3}</p>
+            <p className="font-heading text-lg font-bold text-navy dark:text-foreground">{c.story_birth}</p>
+            <p>{c.story_p4}</p>
+
+            <h3 className="font-heading text-xl font-bold text-navy dark:text-foreground pt-2">{c.service_h}</h3>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-border bg-secondary/30 p-4 dark:bg-navy-deep/40">
+                <p className="font-heading text-sm font-bold text-emerald">{c.service_buyers_t}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{c.service_buyers_d}</p>
+              </div>
+              <div className="rounded-2xl border border-border bg-secondary/30 p-4 dark:bg-navy-deep/40">
+                <p className="font-heading text-sm font-bold text-emerald">{c.service_owners_t}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{c.service_owners_d}</p>
+              </div>
+            </div>
+
+            <p>{c.story_p5}</p>
+            <p>{c.story_p6}</p>
+          </div>
+        </div>
+      </section>
+
       {/* STEPS */}
       <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
         <div className="mb-10 text-center">
-          <p className="text-xs font-bold uppercase tracking-wider text-emerald">Cum colaborăm</p>
-          <h2 className="mt-1 font-heading text-3xl font-bold text-navy dark:text-foreground">Pași simpli, de la anunț la chei</h2>
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald">{c.steps_k}</p>
+          <h2 className="mt-1 font-heading text-3xl font-bold text-navy dark:text-foreground">{c.steps_h}</h2>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map((s, i) => (
+          {c.steps.map((s, i) => (
             <motion.div key={i} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={fadeUp} className="relative rounded-2xl border border-border bg-white p-6 shadow-soft dark:bg-card">
               <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-navy text-emerald"><s.icon className="h-5 w-5" /></span>
               <h3 className="mt-4 font-heading text-base font-bold text-navy dark:text-foreground">{s.title}</h3>
@@ -92,16 +204,12 @@ export default function About() {
       {/* TRUST BAR */}
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
         <div className="grid gap-4 rounded-3xl border border-border bg-white p-8 shadow-soft sm:grid-cols-3 dark:bg-card">
-          {[
-            { icon: BadgeCheck, t: "Inspecții fizice", d: "Rapoarte reale cu zgomot (dB), presiune apă și acte." },
-            { icon: FileText, t: "Contracte transparente", d: "Comisioane corecte, fără taxe ascunse." },
-            { icon: MapPin, t: "Acoperire Iași & Huși", d: "Ne extindem în toată România." },
-          ].map((b, i) => (
+          {c.trust.map((b, i) => (
             <div key={i} className="flex items-start gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-soft text-emerald"><b.icon className="h-5 w-5" /></span>
               <div>
-                <p className="font-heading text-sm font-bold text-navy dark:text-foreground">{b.t}</p>
-                <p className="text-xs text-muted-foreground">{b.d}</p>
+                <p className="font-heading text-sm font-bold text-navy dark:text-foreground">{b.title}</p>
+                <p className="text-xs text-muted-foreground">{b.desc}</p>
               </div>
             </div>
           ))}

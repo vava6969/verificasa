@@ -352,7 +352,7 @@ export function NewPropertyForm({ onDone, onCancel }) {
 
   const TYPES = ["Garsonieră", "2 Camere", "3 Camere", "4+ Camere", "Casă", "Studio"];
 
-  const inputCls = "w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint text-foreground";
+  const inputCls = "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card";
   const reqMark = <span className="ml-0.5 text-rose-500">*</span>;
 
   return (

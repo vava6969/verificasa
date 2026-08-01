@@ -443,21 +443,21 @@ export default function PropertyDetail() {
                   <p className="mb-2 flex items-center gap-1 text-xs font-bold text-emerald"><Phone className="h-3.5 w-3.5" /> Contact vânzător</p>
                   <PhoneReveal phone={p.phone} whatsappPhone={p.whatsapp_phone} />
                 </div>
-                <input required value={form.name} onChange={(e) => handleChange("name", e.target.value)} placeholder={t("ph_name")} className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
-                <input required type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)} placeholder={t("ph_email")} className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
-                <input value={form.phone} onChange={(e) => handleChange("phone", e.target.value)} placeholder={t("ph_phone")} className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
+                <input required value={form.name} onChange={(e) => handleChange("name", e.target.value)} placeholder={t("ph_name")} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
+                <input required type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)} placeholder={t("ph_email")} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
+                <input value={form.phone} onChange={(e) => handleChange("phone", e.target.value)} placeholder={t("ph_phone")} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
 
                 <div className="rounded-xl bg-mint-soft/40 p-3">
                   <p className="mb-2 text-xs font-semibold text-navy">{t("prequal")}</p>
                   <div className="space-y-2.5">
-                    <input value={form.occupation} onChange={(e) => handleChange("occupation", e.target.value)} placeholder={t("ph_occupation")} className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-mint" />
-                    <input type="number" value={form.estimated_income} onChange={(e) => handleChange("estimated_income", e.target.value)} placeholder={t("ph_income")} className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-mint" />
+                    <input value={form.occupation} onChange={(e) => handleChange("occupation", e.target.value)} placeholder={t("ph_occupation")} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
+                    <input type="number" value={form.estimated_income} onChange={(e) => handleChange("estimated_income", e.target.value)} placeholder={t("ph_income")} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
                     <DateField value={form.move_date} onChange={(e) => handleChange("move_date", e.target.value)} placeholder="Mutare la" className="w-full" />
                     <DateField value={form.preferred_visit_date} onChange={(e) => handleChange("preferred_visit_date", e.target.value)} placeholder="Vizionare preferată" className="w-full" />
                   </div>
                 </div>
 
-                <textarea value={form.message} onChange={(e) => handleChange("message", e.target.value)} placeholder={t("ph_msg")} rows={3} className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint" />
+                <textarea value={form.message} onChange={(e) => handleChange("message", e.target.value)} placeholder={t("ph_msg")} rows={3} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
 
                 <Button type="submit" disabled={submitting} className="w-full gradient-mint text-navy shadow-soft hover:opacity-90">
                   <Send className="h-4 w-4" /> {submitting ? t("sending") : t("btn_send")}

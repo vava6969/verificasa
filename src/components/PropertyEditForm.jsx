@@ -62,7 +62,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
 
   const cities = useMemo(() => getCities("RO"), []);
   const zones = useMemo(() => getZones("RO", form.city), [form.city]);
-  const inputCls = "w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-emerald";
+  const inputCls = "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card";
   const lab = "text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70";
 
   const upd = (k, v) => setForm((f) => ({ ...f, [k]: v }));

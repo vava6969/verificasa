@@ -153,12 +153,9 @@ export default function Header() {
   return (
     <header className={`sticky top-0 z-50 w-full border-b border-border/60 bg-white/85 backdrop-blur-xl transition-all duration-300 ease-out dark:bg-navy-deep/85 ${hidden ? "-translate-y-[calc(100%+4px)] opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-3 shrink-0">
-            <VerifiCasaLogo size={44} tagline={false} />
-            <span className="hidden rounded-full border border-gold/40 bg-gold-soft px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-gold-deep lg:inline dark:bg-gold/10 dark:text-gold">
-              {t("hdr_tag")}
-            </span>
+        <div className="flex h-14 items-center justify-between gap-3">
+          <Link to="/" className="flex items-center gap-2 shrink-0">
+            <VerifiCasaLogo size={40} tagline={false} />
           </Link>
 
           <nav className="hidden items-center gap-6 md:flex">
@@ -167,56 +164,42 @@ export default function Header() {
             <Link to="/about" className={navItemCls("/about")}>{t("hdr_about")}</Link>
           </nav>
 
-          {/* Top-right actions — desktop keeps currency + theme; mobile reaches them via the account menu. */}
-          <div className="flex items-center gap-2.5">
+          {/* Top-right actions — shared by desktop and mobile. */}
+          <div className="flex items-center gap-2">
             <div className="hidden md:block"><CurrencySwitch /></div>
             <div className="hidden md:block"><ThemeToggle /></div>
 
             {isAuthenticated ? (
               <>
-                <Button asChild className="hidden rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 md:flex">
-                  <a href="/post-property" target="_blank" rel="noopener noreferrer"><Plus className="h-4 w-4" /> {t("hdr_add")}</a>
-                </Button>
-                <div className="hidden md:block"><ProfileMenu /></div>
+                <a
+                  href="/post-property"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={t("hdr_add")}
+                  className="flex h-9 items-center justify-center gap-1 rounded-full bg-emerald px-3 text-white shadow-soft transition hover:bg-emerald/90 md:px-4"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden md:inline">{t("hdr_add")}</span>
+                </a>
+                <ProfileMenu />
               </>
             ) : (
-              <div className="hidden items-center gap-2 md:flex">
-                <Link to="/login" className="flex h-9 items-center gap-1.5 rounded-full border border-border bg-white px-4 text-sm font-semibold text-foreground/80 transition hover:text-emerald dark:bg-navy dark:border-navy">
-                  <User className="h-4 w-4" /> {t("hdr_login")}
+              <div className="flex items-center gap-2">
+                <Link to="/login" className="flex h-9 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-sm font-semibold text-foreground transition hover:text-emerald dark:bg-card">
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline">{t("hdr_login")}</span>
                 </Link>
                 <Button asChild className="rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
-                  <Link to="/register"><Heart className="h-4 w-4" /> {t("hdr_register")}</Link>
+                  <Link to="/register">
+                    <Heart className="h-4 w-4 sm:hidden" />
+                    <span className="hidden sm:inline">{t("hdr_register")}</span>
+                  </Link>
                 </Button>
               </div>
             )}
           </div>
         </div>
 
-        {/* Mobile compact action row — nav links left, action group right. */}
-        <div className="flex items-center justify-between gap-2 border-t border-border/50 py-1.5 md:hidden">
-          <nav className="flex items-center gap-3.5 overflow-x-auto whitespace-nowrap">
-            <Link to="/" className={navItemClsMobile("/")}>{t("hdr_home")}</Link>
-            <Link to="/search" className={navItemClsMobile("/search")}>{t("sb_btn")}</Link>
-            <Link to="/about" className={navItemClsMobile("/about")}>{t("hdr_about")}</Link>
-            {isAuthenticated && <Link to="/my-properties" className={navItemClsMobile("/my-properties")}>{t("hdr_myprops")}</Link>}
-            {isAuthenticated && <Link to="/messages" className={navItemClsMobile("/messages")}>{t("hdr_messages")}</Link>}
-            {isAuthenticated && <Link to="/saved" className={navItemClsMobile("/saved")}>{t("hdr_saved")}</Link>}
-          </nav>
-          <div className="flex items-center gap-1.5 shrink-0">
-            {isAuthenticated ? (
-              <>
-                <a href="/post-property" target="_blank" rel="noopener noreferrer" className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald text-white shadow-soft" aria-label={t("hdr_add")}>
-                  <Plus className="h-4 w-4" />
-                </a>
-                <ProfileMenu mobile />
-              </>
-            ) : (
-              <Link to="/login" className="flex h-8 items-center gap-1 rounded-full border border-border bg-white px-2.5 text-[11px] font-bold text-foreground/80 dark:bg-navy dark:border-navy">
-                <User className="h-3.5 w-3.5" /> {t("hdr_login")}
-              </Link>
-            )}
-          </div>
-        </div>
       </div>
     </header>
   );
