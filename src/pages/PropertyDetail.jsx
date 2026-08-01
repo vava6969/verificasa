@@ -23,6 +23,7 @@ import PhoneReveal from "@/components/PhoneReveal";
 import PropertyPOI from "@/components/PropertyPOI";
 import PropertyComments from "@/components/PropertyComments";
 import ReportModal from "@/components/ReportModal";
+import DateField from "@/components/DateField";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -451,8 +452,8 @@ export default function PropertyDetail() {
                   <div className="space-y-2.5">
                     <input value={form.occupation} onChange={(e) => handleChange("occupation", e.target.value)} placeholder={t("ph_occupation")} className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-mint" />
                     <input type="number" value={form.estimated_income} onChange={(e) => handleChange("estimated_income", e.target.value)} placeholder={t("ph_income")} className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-mint" />
-                    <input type="date" value={form.move_date} onChange={(e) => handleChange("move_date", e.target.value)} className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-mint" />
-                    <input type="date" value={form.preferred_visit_date} onChange={(e) => handleChange("preferred_visit_date", e.target.value)} className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-mint" />
+                    <DateField value={form.move_date} onChange={(e) => handleChange("move_date", e.target.value)} placeholder="Mutare la" className="w-full" />
+                    <DateField value={form.preferred_visit_date} onChange={(e) => handleChange("preferred_visit_date", e.target.value)} placeholder="Vizionare preferată" className="w-full" />
                   </div>
                 </div>
 

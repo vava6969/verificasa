@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -24,9 +26,9 @@
     --input: 214 20% 90%;
     --ring: 152 100% 33%;
     --radius: 0.9rem;
-    --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-heading: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
     --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     --navy: 217 24% 14%;
     --navy-deep: 217 32% 9%;
@@ -82,7 +84,9 @@
     overflow-x: clip;
   }
   h1, h2, h3, h4, h5 {
-    @apply font-heading tracking-tight;
+    @apply font-heading;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
   }
 }
 

@@ -12,6 +12,7 @@ import {
   Camera, Eye, MessageSquare, FileText, TrendingUp, Upload, Plus, Download, Wifi, Volume2, Sun, Droplet,
 } from "lucide-react";
 import OwnerCharts from "@/components/OwnerCharts";
+import DateField from "@/components/DateField";
 import { generateUniquePropertyCode } from "@/lib/propertyCode";
 
 const MAX_PHOTOS = 20;
@@ -161,7 +162,7 @@ export default function Owner() {
   );
 }
 
-export function NewPropertyForm({ onDone }) {
+export function NewPropertyForm({ onDone, onCancel }) {
   const { country, t } = useCountry();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -329,6 +330,26 @@ export function NewPropertyForm({ onDone }) {
     }
   };
 
+  const resetAll = () => {
+    setForm({
+      title: "", description: "", price_monthly: "", city: "", zone: "", landmark: "", property_type: "Garsonieră",
+      rooms: "1", surface_sqm: "", floor: "", deposit: "", available_from: "", images: "",
+      latitude: "", longitude: "", owner_name: "",
+      transaction_type: "RENT", building_year: "", total_floors: "", phone: "", whatsapp_phone: "",
+      seller_role: "Proprietar",
+      parking: false, pet_friendly: false, commission_free: false, guarantee: false,
+    });
+    setChips({ wifi: false, noise: false, light: false, water: false });
+    setFacilities({});
+    setAgreed(false);
+  };
+
+  const handleCancel = () => {
+    resetAll();
+    if (onCancel) onCancel();
+    else onDone();
+  };
+
   const TYPES = ["Garsonieră", "2 Camere", "3 Camere", "4+ Camere", "Casă", "Studio"];
 
   const inputCls = "w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint text-foreground";
@@ -363,14 +384,11 @@ export function NewPropertyForm({ onDone }) {
         <input required type="number" value={form.rooms} onChange={(e) => setForm((f) => ({ ...f, rooms: e.target.value }))} placeholder={t("f_rooms") + " *"} className={inputCls} />
         <input required type="number" value={form.surface_sqm} onChange={(e) => setForm((f) => ({ ...f, surface_sqm: e.target.value }))} placeholder={t("f_surface") + " *"} className={inputCls} />
         <input required value={form.floor} onChange={(e) => setForm((f) => ({ ...f, floor: e.target.value }))} placeholder="Etaj (ex: 3, Parter, Demisol) *" className={inputCls} />
-        <input
-          type={form.available_from ? "date" : "text"}
+        <DateField
           value={form.available_from}
           onChange={(e) => setForm((f) => ({ ...f, available_from: e.target.value }))}
-          onFocus={(e) => { if (!form.available_from) { e.target.type = "date"; } }}
-          onBlur={(e) => { if (!form.available_from) e.target.type = "text"; }}
-          placeholder={t("f_avail") + " (apasă pentru calendar)"}
-          className={inputCls}
+          placeholder={t("f_avail")}
+          className="w-full"
         />
         <input value={form.owner_name} onChange={(e) => setForm((f) => ({ ...f, owner_name: e.target.value }))} placeholder={t("f_owner")} className={inputCls} />
         <input type="number" value={form.latitude} onChange={(e) => setForm((f) => ({ ...f, latitude: e.target.value }))} placeholder={t("f_lat")} className={inputCls} />
@@ -479,7 +497,7 @@ export function NewPropertyForm({ onDone }) {
         <Button type="submit" disabled={saving || uploading} className="flex-1 gradient-mint text-navy shadow-soft hover:opacity-90">
           {saving ? t("saving") : t("pub_btn")}
         </Button>
-        <Button type="button" variant="outline" onClick={onDone} className="min-w-[7rem]">{t("cancel")}</Button>
+        <Button type="button" variant="outline" onClick={handleCancel} className="min-w-[7rem]">{t("cancel")}</Button>
       </div>
     </form>
   );

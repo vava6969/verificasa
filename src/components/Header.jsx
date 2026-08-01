@@ -49,13 +49,8 @@ export default function Header() {
   const CurrencySwitch = ({ compact = false }) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex h-9 items-center gap-1.5 rounded-full border border-border bg-white px-3 text-xs font-bold text-navy shadow-soft transition hover:border-emerald/50 dark:bg-navy dark:text-foreground">
+        <button className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-soft transition hover:border-emerald/50 dark:bg-card" aria-label={`${t("hdr_currency")} / ${t("hdr_language")}`}>
           <Globe className="h-4 w-4 text-emerald" />
-          <span className="hidden md:inline">💰 {currency === "EUR" ? "🇪🇺" : "🇷🇴"} {currency}</span>
-          <span className="hidden md:inline text-muted-foreground">·</span>
-          <span className="hidden md:inline">🗣️ {lang === "ro" ? "🇷🇴" : "🇬🇧"} {lang.toUpperCase()}</span>
-          <span className="md:hidden">{currency === "EUR" ? "💶" : "💵"}</span>
-          <ChevronDown className="hidden h-3.5 w-3.5 shrink-0 text-muted-foreground md:inline" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-52">

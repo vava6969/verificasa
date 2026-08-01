@@ -52,7 +52,7 @@ export default function PostProperty() {
           </div>
         ) : (
           <div className="mt-2">
-            <NewPropertyForm onDone={() => setSubmitted(true)} />
+            <NewPropertyForm onDone={() => setSubmitted(true)} onCancel={() => {}} />
           </div>
         )}
       </div>

@@ -195,7 +195,7 @@ export default function SearchPage() {
         <select
           value={cityFilter}
           onChange={(e) => updateCity(e.target.value)}
-          className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium outline-none focus:border-emerald"
+          className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
         >
           <option value="">Oraș</option>
           {cities.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -204,7 +204,7 @@ export default function SearchPage() {
           value={zoneFilter}
           onChange={(e) => updateZone(e.target.value)}
           disabled={!cityFilter}
-          className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium outline-none focus:border-emerald disabled:opacity-50"
+          className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card disabled:opacity-50"
         >
           <option value="">Zona</option>
           {zones.map((z) => <option key={z} value={z}>{z}</option>)}
@@ -215,7 +215,7 @@ export default function SearchPage() {
             value={qParam}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Caută după titlu, cartier, reper (ex: Pacurari, liceu)..."
-            className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald"
+            className="w-full rounded-lg border border-border bg-background py-2 pl-9 pr-4 text-sm text-foreground outline-none focus:border-emerald dark:bg-card"
           />
         </div>
       </div>
@@ -241,7 +241,7 @@ export default function SearchPage() {
             value={budget}
             onChange={(e) => setBudget(e.target.value)}
             placeholder="Buget max /lună (€)"
-            className="w-48 rounded-full border border-border bg-white px-4 py-2 text-sm outline-none focus:border-emerald"
+            className="w-48 rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card"
           />
         </div>
       </div>
@@ -255,7 +255,7 @@ export default function SearchPage() {
           <select
             value={roomsMin}
             onChange={(e) => setRoomsMin(e.target.value)}
-            className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium outline-none focus:border-emerald"
+            className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
           >
             <option value="">Camere (min)</option>
             <option value="1">1+ camere</option>
@@ -269,13 +269,13 @@ export default function SearchPage() {
             value={surfaceMin}
             onChange={(e) => setSurfaceMin(e.target.value)}
             placeholder="Suprafață min (mp)"
-            className="w-44 rounded-full border border-border bg-white px-4 py-2 text-sm outline-none focus:border-emerald"
+            className="w-44 rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card"
           />
 
           <select
             value={fairness}
             onChange={(e) => setFairness(e.target.value)}
-            className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium outline-none focus:border-emerald"
+            className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
           >
             {FAIRNESS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
@@ -305,7 +305,7 @@ export default function SearchPage() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
-              className="rounded-full border border-border bg-white px-4 py-2 text-sm font-medium outline-none focus:border-emerald"
+              className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
             >
               {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>

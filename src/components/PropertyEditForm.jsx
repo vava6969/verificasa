@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { getCities, getZones } from "@/components/locations";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import DateField from "@/components/DateField";
 
 // Complete edit form for an existing property — admin or the owner who posted.
 // Verification/badge flags (owner_verified, ai_tour_verified, verification_level)
@@ -194,7 +195,9 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         <Field label="Total etaje"><input type="number" value={form.total_floors} onChange={(e) => upd("total_floors", e.target.value)} className={inputCls} /></Field>
         <Field label="An construcție"><input type="number" value={form.building_year} onChange={(e) => upd("building_year", e.target.value)} className={inputCls} /></Field>
         <Field label="Depozit"><input type="number" value={form.deposit} onChange={(e) => upd("deposit", e.target.value)} className={inputCls} /></Field>
-        <Field label="Disponibil din"><input type="date" value={form.available_from} onChange={(e) => upd("available_from", e.target.value)} className={inputCls} /></Field>
+        <Field label="Disponibil din">
+          <DateField value={form.available_from} onChange={(e) => upd("available_from", e.target.value)} placeholder="Selectează o dată" className="w-full" />
+        </Field>
         <Field label="Status">
           <select value={form.status} onChange={(e) => upd("status", e.target.value)} className={inputCls}>
             {STATUS.map((s) => <option key={s} value={s}>{s}</option>)}

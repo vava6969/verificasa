@@ -45,7 +45,7 @@ export default function SearchBar({ compact = false }) {
     navigate(`/search?${params.toString()}`);
   };
 
-  const inputCls = "flex flex-1 items-center gap-2 rounded-xl bg-secondary/60 px-3 py-2.5";
+  const inputCls = "flex flex-1 items-center gap-2 rounded-lg border border-border bg-background px-3 py-2.5 dark:bg-card";
 
   return (
     <form onSubmit={handleSearch} className="w-full rounded-2xl border border-white/20 bg-white/95 p-2 shadow-2xl backdrop-blur md:p-3">
