@@ -52,6 +52,7 @@ export default function PropertyGoogleMap({ lat, lng, title, landmark, zone, cit
   // deci le folosim doar când nu există un landmark.
   const useGeocode = !!landmark || !hasCoords;
   const containerRef = useRef(null);
+  const mapRef = useRef(null);
   const [status, setStatus] = useState("loading"); // loading | ok | error
   const [exact, setExact] = useState(!!landmark || hasCoords);
 
@@ -68,6 +69,11 @@ export default function PropertyGoogleMap({ lat, lng, title, landmark, zone, cit
         await loadScript(key);
         if (!alive || !containerRef.current) return;
         const g = window.google.maps;
+        // Curăță orice instanță veche de hartă din container — altfel
+        // google.maps.Map se stivuiește și harta anterioară (ex: Iași)
+        // rămâne vizibilă peste cea nouă.
+        if (containerRef.current) containerRef.current.innerHTML = "";
+        mapRef.current = null;
 
         const renderAt = (position, isExact) => {
           const map = new g.Map(containerRef.current, {
@@ -79,6 +85,7 @@ export default function PropertyGoogleMap({ lat, lng, title, landmark, zone, cit
             zoomControl: true,
             gestureHandling: "cooperative",
           });
+          mapRef.current = map;
           new g.Marker({ position, map, title });
           setExact(isExact);
           setStatus("ok");
@@ -101,7 +108,14 @@ export default function PropertyGoogleMap({ lat, lng, title, landmark, zone, cit
         if (alive) setStatus("error");
       }
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+      if (mapRef.current) {
+        try { window.google?.maps?.event?.clearInstanceListeners?.(mapRef.current); } catch {}
+        mapRef.current = null;
+      }
+      if (containerRef.current) containerRef.current.innerHTML = "";
+    };
   }, [lat, lng, query, title, landmark, useGeocode]);
 
   return (
