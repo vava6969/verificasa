@@ -130,6 +130,7 @@ export default function Admin() {
   };
 
   const delUser = async (u) => {
+    if (!isSuper) { toast({ title: "Doar SUPER_ADMIN poate sterge conturi", variant: "destructive" }); return; }
     if (u.id === user.id) { toast({ title: "Nu poti sterge propriul cont", variant: "destructive" }); return; }
     if (!confirm("Stergi utilizatorul " + u.email + "?")) return;
     try {
@@ -154,6 +155,7 @@ export default function Admin() {
   };
 
   const verifyUser = async (u, val) => {
+    if (!val && !isSuper) { toast({ title: "Doar SUPER_ADMIN poate retrage conturi", variant: "destructive" }); return; }
     try {
       await base44.entities.User.update(u.id, { is_verified: val });
       toast({ title: val ? "Utilizator verificat" : "Verificare retrasa" });
@@ -393,10 +395,10 @@ export default function Admin() {
                     >
                       {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
                     </select>
-                    <Button size="sm" variant="outline" onClick={() => verifyUser(u, !u.is_verified)} className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft">
+                    <Button size="sm" variant="outline" onClick={() => verifyUser(u, !u.is_verified)} className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft" disabled={u.is_verified && !isSuper}>
                       <ShieldCheck className="h-3.5 w-3.5" /> {u.is_verified ? "Retrage" : "Verifica"}
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => delUser(u)} className="gap-1 border-destructive/30 text-destructive hover:bg-destructive/10">
+                    <Button size="sm" variant="outline" onClick={() => delUser(u)} className="gap-1 border-destructive/30 text-destructive hover:bg-destructive/10" disabled={!isSuper}>
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
