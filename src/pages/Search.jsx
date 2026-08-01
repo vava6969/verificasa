@@ -12,28 +12,28 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 // VerifiCasa verification filters — each applies a real-property predicate.
 const VERIF_FILTERS = [
-  { key: "ai", label: "Tur 3D Inclus", icon: Sparkles, test: (p) => !!p.tour_3d_url || !!p.ai_video_url || !!p.ai_tour_verified },
-  { key: "field", label: "Verificat pe Teren", icon: ShieldCheck, test: (p) => p.owner_verified || p.verification_level === "field_certified" || p.ai_tour_verified },
-  { key: "pet", label: "Pet Friendly", icon: PawPrint, test: (p) => !!p.pet_friendly },
-  { key: "nofee", label: "Fără Comision", icon: BadgePercent, test: (p) => !!p.commission_free },
-  { key: "garant0", label: "Garanție 0", icon: Lock, test: (p) => p.deposit_option === "verificasa_guarantee" },
-  { key: "studio", label: "Garsonieră", icon: Home, test: (p) => ["Garsonieră", "Studio"].includes(p.property_type) },
-  { key: "2camere", label: "2 Camere", icon: Home, test: (p) => p.property_type === "2 Camere" },
-  { key: "parking", label: "Parcare", icon: Home, test: (p) => !!p.parking },
+  { key: "ai", labelKey: "tg_ai", icon: Sparkles, test: (p) => !!p.tour_3d_url || !!p.ai_video_url || !!p.ai_tour_verified },
+  { key: "field", labelKey: "tg_field", icon: ShieldCheck, test: (p) => p.owner_verified || p.verification_level === "field_certified" || p.ai_tour_verified },
+  { key: "pet", labelKey: "tg_pet", icon: PawPrint, test: (p) => !!p.pet_friendly },
+  { key: "nofee", labelKey: "tg_nofee", icon: BadgePercent, test: (p) => !!p.commission_free },
+  { key: "garant0", labelKey: "tg_garant0", icon: Lock, test: (p) => p.deposit_option === "verificasa_guarantee" },
+  { key: "studio", labelKey: "type_studio_vc", icon: Home, test: (p) => ["Garsonieră", "Studio"].includes(p.property_type) },
+  { key: "2camere", labelKey: "type_2_vc", icon: Home, test: (p) => p.property_type === "2 Camere" },
+  { key: "parking", labelKey: "sr_parking", icon: Home, test: (p) => !!p.parking },
 ];
 
-const FAIRNESS_OPTIONS = [
-  { value: "", label: "Preț corectitate (toate)" },
-  { value: "sub_piata", label: "Sub prețul pieței" },
-  { value: "corect", label: "Preț corect" },
-  { value: "peste_medie", label: "Peste media pieței" },
+const makeFairness = (t) => [
+  { value: "", label: t("sr_fairness_all") },
+  { value: "sub_piata", label: t("sr_fairness_below") },
+  { value: "corect", label: t("sr_fairness_fair") },
+  { value: "peste_medie", label: t("sr_fairness_above") },
 ];
 
-const SORT_OPTIONS = [
-  { value: "", label: "Sortează după" },
-  { value: "newest", label: "Cele mai noi" },
-  { value: "price_asc", label: "Preț crescător" },
-  { value: "price_desc", label: "Preț descrescător" },
+const makeSort = (t) => [
+  { value: "", label: t("sr_sort") },
+  { value: "newest", label: t("sr_sort_newest") },
+  { value: "price_asc", label: t("sr_sort_asc") },
+  { value: "price_desc", label: t("sr_sort_desc") },
 ];
 
 // Normalize text for diacritics-insensitive fuzzy matching so "Pacurari" matches
@@ -41,7 +41,7 @@ const SORT_OPTIONS = [
 const norm = (s) => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
 export default function SearchPage() {
-  const { country } = useCountry();
+  const { country, t } = useCountry();
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [params, setParams] = useSearchParams();
@@ -147,18 +147,18 @@ export default function SearchPage() {
   const found = filtered.length;
 
   const saveSearch = async () => {
-    if (!isAuthenticated) { toast({ title: "Conectează-te pentru a salva căutarea", variant: "destructive" }); return; }
+    if (!isAuthenticated) { toast({ title: t("sr_save_login"), variant: "destructive" }); return; }
     const qs = params.toString();
-    if (!qs) { toast({ title: "Aplică niște filtre mai întâi", variant: "destructive" }); return; }
+    if (!qs) { toast({ title: t("sr_save_empty"), variant: "destructive" }); return; }
     const parts = [];
     if (cityParam) parts.push(cityParam);
     if (zoneParam) parts.push(zoneParam);
     if (typeParam) parts.push(typeParam);
-    const label = parts.length ? parts.join(" · ") : "Toate proprietățile";
+    const label = parts.length ? parts.join(" · ") : t("sr_all");
     try {
       await base44.entities.SavedSearch.create({ user_id: user.id, label, query_string: qs });
-      toast({ title: "Căutare salvată", description: "O găsești în meniul tău → Căutări salvate" });
-    } catch (e) { toast({ title: "Eroare la salvare", variant: "destructive" }); }
+      toast({ title: t("sr_save_ok"), description: t("sr_save_ok_desc") });
+    } catch (e) { toast({ title: t("sr_save_err"), variant: "destructive" }); }
   };
 
   const resetFilters = () => {
@@ -173,22 +173,22 @@ export default function SearchPage() {
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-heading text-2xl font-bold text-navy">
-            {cityParam || zoneParam || typeParam || qParam ? "Rezultate căutare" : "Toate proprietățile"}
+            {cityParam || zoneParam || typeParam || qParam ? t("sr_results") : t("sr_all")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {cityParam && `Oraș: ${cityParam} · `}
-            {zoneParam && `Zona: ${zoneParam} · `}
-            {typeParam && `Tip: ${typeParam} · `}
-            {qParam && `Căutare: "${qParam}" · `}
-            {found} {found === 1 ? "proprietate găsită" : "proprietăți găsite"}
+            {cityParam && `${t("sr_city_select")}: ${cityParam} · `}
+            {zoneParam && `${t("sr_zone_select")}: ${zoneParam} · `}
+            {typeParam && `${t("sr_type")}: ${typeParam} · `}
+            {qParam && `${t("sr_search_label")}: "${qParam}" · `}
+            {found === 1 ? t("sr_found_one", { n: found }) : t("sr_found_many", { n: found })}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button onClick={resetFilters} variant="outline" className="gap-1.5 border-emerald/40 text-emerald hover:bg-emerald-soft">
-            <RotateCcw className="h-4 w-4" /> Șterge filtrele
+            <RotateCcw className="h-4 w-4" /> {t("sr_reset_filters")}
           </Button>
           <Button onClick={saveSearch} variant="outline" className="gap-1.5 border-gold/40 text-gold-deep hover:bg-gold-soft">
-            <BookmarkPlus className="h-4 w-4" /> Salvează căutarea
+            <BookmarkPlus className="h-4 w-4" /> {t("sr_save_search")}
           </Button>
         </div>
       </div>
@@ -200,7 +200,7 @@ export default function SearchPage() {
           onChange={(e) => updateCity(e.target.value)}
           className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
         >
-          <option value="">Oraș</option>
+          <option value="">{t("sr_city_select")}</option>
           {cities.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
         <select
@@ -209,7 +209,7 @@ export default function SearchPage() {
           disabled={!cityFilter}
           className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card disabled:opacity-50"
         >
-          <option value="">Zona</option>
+          <option value="">{t("sr_zone_select")}</option>
           {zones.map((z) => <option key={z} value={z}>{z}</option>)}
         </select>
         <div className="relative min-w-[220px] flex-1">
@@ -217,7 +217,7 @@ export default function SearchPage() {
           <input
             value={qParam}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Caută după titlu, cartier, reper (ex: Pacurari, liceu)..."
+            placeholder={t("sr_search_placeholder")}
             className="w-full rounded-lg border border-border bg-background py-2 pl-9 pr-4 text-sm text-foreground outline-none focus:border-emerald dark:bg-card"
           />
         </div>
@@ -235,7 +235,7 @@ export default function SearchPage() {
                 : "border-border bg-white text-foreground/70 hover:border-emerald/50"
             }`}
           >
-            <f.icon className="h-3.5 w-3.5" /> {f.label}
+            <f.icon className="h-3.5 w-3.5" /> {t(f.labelKey)}
           </button>
         ))}
         <div className="ml-auto">
@@ -243,7 +243,7 @@ export default function SearchPage() {
             type="number"
             value={budget}
             onChange={(e) => setBudget(e.target.value)}
-            placeholder="Buget max /lună (€)"
+            placeholder={t("ph_budget")}
             className="w-48 rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card"
           />
         </div>
@@ -252,7 +252,7 @@ export default function SearchPage() {
       {/* Advanced filters */}
       <div className="mb-6 rounded-2xl border border-border bg-secondary/30 p-4">
         <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-foreground/60">
-          <SlidersHorizontal className="h-4 w-4 text-emerald" /> Filtre avansate
+          <SlidersHorizontal className="h-4 w-4 text-emerald" /> {t("sr_advanced")}
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <select
@@ -260,18 +260,18 @@ export default function SearchPage() {
             onChange={(e) => setRoomsMin(e.target.value)}
             className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
           >
-            <option value="">Camere (min)</option>
-            <option value="1">1+ camere</option>
-            <option value="2">2+ camere</option>
-            <option value="3">3+ camere</option>
-            <option value="4">4+ camere</option>
+            <option value="">{t("sr_rooms_min")}</option>
+            <option value="1">{t("sr_rooms_option", { n: 1 })}</option>
+            <option value="2">{t("sr_rooms_option", { n: 2 })}</option>
+            <option value="3">{t("sr_rooms_option", { n: 3 })}</option>
+            <option value="4">{t("sr_rooms_option", { n: 4 })}</option>
           </select>
 
           <input
             type="number"
             value={surfaceMin}
             onChange={(e) => setSurfaceMin(e.target.value)}
-            placeholder="Suprafață min (mp)"
+            placeholder={t("sr_surface_min")}
             className="w-44 rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card"
           />
 
@@ -280,7 +280,7 @@ export default function SearchPage() {
             onChange={(e) => setFairness(e.target.value)}
             className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
           >
-            {FAIRNESS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            {makeFairness(t).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
 
           <button
@@ -290,7 +290,7 @@ export default function SearchPage() {
               furnished ? "border-emerald bg-emerald text-white shadow-soft" : "border-border bg-white text-foreground/70 hover:border-emerald/50"
             }`}
           >
-            Mobilat
+            {t("furnished")}
           </button>
 
           <button
@@ -300,7 +300,7 @@ export default function SearchPage() {
               swap ? "border-emerald bg-emerald text-white shadow-soft" : "border-border bg-white text-foreground/70 hover:border-emerald/50"
             }`}
           >
-            Schimb de chirie
+            {t("sr_swap")}
           </button>
 
           <div className="ml-auto flex items-center gap-2">
@@ -310,7 +310,7 @@ export default function SearchPage() {
               onChange={(e) => setSort(e.target.value)}
               className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
             >
-              {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              {makeSort(t).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
         </div>
@@ -323,8 +323,8 @@ export default function SearchPage() {
       ) : found === 0 ? (
         <div className="rounded-2xl border border-dashed border-border py-20 text-center">
           <Home className="mx-auto h-10 w-10 text-muted-foreground/40" />
-          <p className="mt-3 font-heading text-lg font-semibold text-navy">Nicio proprietate găsită</p>
-          <p className="text-sm text-muted-foreground">Încearcă alte filtre sau schimbă orașul.</p>
+          <p className="mt-3 font-heading text-lg font-semibold text-navy">{t("sr_empty_title")}</p>
+          <p className="text-sm text-muted-foreground">{t("sr_empty_sub")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">

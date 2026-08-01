@@ -4,6 +4,17 @@ import { getCities, getZones } from "@/components/locations";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import DateField from "@/components/DateField";
+import { Image as UIImage } from "@/components/ui/image";
+import GooglePlacesAutocomplete from "@/components/GooglePlacesAutocomplete";
+import { Upload, Trash2, Camera } from "lucide-react";
+
+const MAX_PHOTOS = 20;
+const onlyPhoneDigits = (v) => {
+  const clean = String(v || "").replace(/[^0-9+]/g, "");
+  if (clean.startsWith("+")) return "+" + clean.slice(1).replace(/\+/g, "");
+  return clean.replace(/\+/g, "");
+};
+const onlyDigits = (v, max) => String(v || "").replace(/[^0-9]/g, "").slice(0, max ?? 4);
 
 // Complete edit form for an existing property — admin or the owner who posted.
 // Verification/badge flags (owner_verified, ai_tour_verified, verification_level)
@@ -57,8 +68,12 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
     owner_verified: !!property.owner_verified,
     ai_tour_verified: !!property.ai_tour_verified,
     verification_level: property.verification_level || "unverified",
+    latitude: property.latitude ?? null,
+    longitude: property.longitude ?? null,
+    images: Array.isArray(property.images) ? [...property.images] : [],
   });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const cities = useMemo(() => getCities("RO"), []);
   const zones = useMemo(() => getZones("RO", form.city), [form.city]);
@@ -67,6 +82,35 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
 
   const upd = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const numOrNull = (v) => (v === "" || v == null ? null : Number(v));
+
+  const handleAddPhotos = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    if (form.images.length >= MAX_PHOTOS) {
+      toast({ title: `Ai atins maximul de ${MAX_PHOTOS} poze`, variant: "destructive" });
+      return;
+    }
+    setUploading(true);
+    try {
+      const remaining = Math.max(0, MAX_PHOTOS - form.images.length);
+      const urls = [];
+      for (const f of files.slice(0, remaining)) {
+        const { file_url } = await base44.integrations.Core.UploadFile({ file: f });
+        urls.push(file_url);
+      }
+      setForm((f) => ({ ...f, images: [...f.images, ...urls] }));
+      if (urls.length) toast({ title: `${urls.length} poze adăugate` });
+    } catch (err) {
+      toast({ title: "Eroare la încărcare", variant: "destructive" });
+    } finally {
+      setUploading(false);
+      if (e.target) e.target.value = "";
+    }
+  };
+
+  const removeImage = (idx) => {
+    setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -110,6 +154,10 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         commission_free: form.commission_free,
         reserve_instant: form.reserve_instant,
         is_swap_available: form.is_swap_available,
+        landmark: form.landmark,
+        latitude: form.latitude,
+        longitude: form.longitude,
+        images: form.images,
       };
       if (isAdmin) {
         payload.owner_verified = form.owner_verified;
@@ -166,6 +214,25 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       </div>
       <textarea value={form.description} onChange={(e) => upd("description", e.target.value)} placeholder="Descriere" rows={3} className={`mt-3 ${inputCls}`} />
 
+      {/* Poze */}
+      <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Poze ({form.images.length}/{MAX_PHOTOS})</p>
+      <div className="flex flex-wrap gap-2">
+        {form.images.map((img, i) => (
+          <div key={i} className="group relative h-20 w-28 overflow-hidden rounded-lg border border-border bg-secondary">
+            <UIImage src={img} fittingType="fill" className="h-full w-full" />
+            <button type="button" onClick={() => removeImage(i)} aria-label="Șterge poza" className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-navy-deep/70 text-white opacity-0 transition group-hover:opacity-100 hover:bg-rose-600">
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ))}
+        {form.images.length < MAX_PHOTOS && (
+          <label className="flex h-20 w-28 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-border bg-secondary/30 text-xs text-muted-foreground transition hover:border-emerald hover:text-emerald">
+            {uploading ? <span className="animate-pulse">Se încarcă…</span> : (<><Camera className="h-4 w-4" /> Adaugă</>)}
+            <input type="file" accept="image/*" multiple className="hidden" onChange={handleAddPhotos} />
+          </label>
+        )}
+      </div>
+
       {/* Locație */}
       <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Locație</p>
       <div className="grid gap-3 sm:grid-cols-2">
@@ -181,8 +248,14 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
             {zones.map((z) => <option key={z} value={z}>{z}</option>)}
           </select>
         </Field>
-        <Field label="Punct de reper / Stradă">
-          <input value={form.landmark} onChange={(e) => upd("landmark", e.target.value)} placeholder="ex: lângă Liceul Agricol" className={inputCls} />
+        <Field label="Caută pe Google Maps">
+          <GooglePlacesAutocomplete
+            value={form.landmark}
+            onChange={(v) => upd("landmark", v)}
+            onPlace={(place) => setForm((f) => ({ ...f, landmark: place.name || f.landmark, latitude: place.lat ?? f.latitude, longitude: place.lng ?? f.longitude }))}
+            placeholder="ex: Strada Nicolae Iorga"
+            className={inputCls}
+          />
         </Field>
       </div>
 
@@ -192,8 +265,8 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         <Field label="Camere"><input type="number" value={form.rooms} onChange={(e) => upd("rooms", e.target.value)} className={inputCls} /></Field>
         <Field label="Suprafață (mp)"><input type="number" value={form.surface_sqm} onChange={(e) => upd("surface_sqm", e.target.value)} className={inputCls} /></Field>
         <Field label="Etaj"><input value={form.floor} onChange={(e) => upd("floor", e.target.value)} placeholder="ex: 2/4" className={inputCls} /></Field>
-        <Field label="Total etaje"><input type="number" value={form.total_floors} onChange={(e) => upd("total_floors", e.target.value)} className={inputCls} /></Field>
-        <Field label="An construcție"><input type="number" value={form.building_year} onChange={(e) => upd("building_year", e.target.value)} className={inputCls} /></Field>
+        <Field label="Total etaje"><input inputMode="numeric" value={form.total_floors ?? ""} onChange={(e) => upd("total_floors", onlyDigits(e.target.value, 3))} className={inputCls} /></Field>
+        <Field label="An construcție"><input inputMode="numeric" value={form.building_year ?? ""} onChange={(e) => upd("building_year", onlyDigits(e.target.value, 4))} className={inputCls} /></Field>
         <Field label="Depozit"><input type="number" value={form.deposit} onChange={(e) => upd("deposit", e.target.value)} className={inputCls} /></Field>
         <Field label="Disponibil din">
           <DateField value={form.available_from} onChange={(e) => upd("available_from", e.target.value)} placeholder="Selectează o dată" className="w-full" />
@@ -218,8 +291,8 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       {/* Contact */}
       <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Contact & proprietar</p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <Field label="Telefon"><input value={form.phone} onChange={(e) => upd("phone", e.target.value)} placeholder="07xx..." className={inputCls} /></Field>
-        <Field label="WhatsApp (internațional)"><input value={form.whatsapp_phone} onChange={(e) => upd("whatsapp_phone", e.target.value)} placeholder="407xx..." className={inputCls} /></Field>
+        <Field label="Telefon"><input inputMode="numeric" value={form.phone} onChange={(e) => upd("phone", onlyPhoneDigits(e.target.value))} placeholder="07xx..." className={inputCls} /></Field>
+        <Field label="WhatsApp (internațional)"><input inputMode="tel" value={form.whatsapp_phone} onChange={(e) => upd("whatsapp_phone", onlyPhoneDigits(e.target.value))} placeholder="407xx..." className={inputCls} /></Field>
         <Field label="Nume proprietar"><input value={form.owner_name} onChange={(e) => upd("owner_name", e.target.value)} className={inputCls} /></Field>
         <Field label="Rol vânzător">
           <select value={form.seller_role} onChange={(e) => upd("seller_role", e.target.value)} className={inputCls}>

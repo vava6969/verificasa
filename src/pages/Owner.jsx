@@ -13,7 +13,16 @@ import {
 } from "lucide-react";
 import OwnerCharts from "@/components/OwnerCharts";
 import DateField from "@/components/DateField";
+import GooglePlacesAutocomplete from "@/components/GooglePlacesAutocomplete";
 import { generateUniquePropertyCode } from "@/lib/propertyCode";
+
+// Sanitizează intrările telefon la doar cifre (opțional "+" la început pentru internațional).
+const onlyPhoneDigits = (v) => {
+  const clean = String(v || "").replace(/[^0-9+]/g, "");
+  if (clean.startsWith("+")) return "+" + clean.slice(1).replace(/\+/g, "");
+  return clean.replace(/\+/g, "");
+};
+const only_digits = (v, max) => String(v || "").replace(/[^0-9]/g, "").slice(0, max ?? 4);
 
 const MAX_PHOTOS = 20;
 const MIN_PHOTOS = 3;
@@ -378,7 +387,13 @@ export function NewPropertyForm({ onDone, onCancel }) {
           <option value="">{t("f_zone")}</option>
           {zones.map((z) => <option key={z} value={z}>{z}</option>)}
         </select>
-        <input value={form.landmark} onChange={(e) => setForm((f) => ({ ...f, landmark: e.target.value }))} placeholder="Punct de reper / Stradă (ex: lângă Liceul Agricol)" className={inputCls} />
+        <GooglePlacesAutocomplete
+          value={form.landmark}
+          onChange={(v) => setForm((f) => ({ ...f, landmark: v }))}
+          onPlace={(place) => setForm((f) => ({ ...f, landmark: place.name || f.landmark, latitude: place.lat != null ? place.lat : f.latitude, longitude: place.lng != null ? place.lng : f.longitude }))}
+          placeholder="Caută pe Google Maps (ex: Strada Nicolae Iorga)"
+          className={inputCls}
+        />
         <input required type="number" value={form.price_monthly} onChange={(e) => setForm((f) => ({ ...f, price_monthly: e.target.value }))} placeholder={t("f_price") + " *"} className={inputCls} />
         <input type="number" value={form.deposit} onChange={(e) => setForm((f) => ({ ...f, deposit: e.target.value }))} placeholder={t("f_deposit")} className={inputCls} />
         <input required type="number" value={form.rooms} onChange={(e) => setForm((f) => ({ ...f, rooms: e.target.value }))} placeholder={t("f_rooms") + " *"} className={inputCls} />
@@ -391,8 +406,6 @@ export function NewPropertyForm({ onDone, onCancel }) {
           className="w-full"
         />
         <input value={form.owner_name} onChange={(e) => setForm((f) => ({ ...f, owner_name: e.target.value }))} placeholder={t("f_owner")} className={inputCls} />
-        <input type="number" value={form.latitude} onChange={(e) => setForm((f) => ({ ...f, latitude: e.target.value }))} placeholder={t("f_lat")} className={inputCls} />
-        <input type="number" value={form.longitude} onChange={(e) => setForm((f) => ({ ...f, longitude: e.target.value }))} placeholder={t("f_lng")} className={inputCls} />
         <select value={form.transaction_type} onChange={(e) => setForm((f) => ({ ...f, transaction_type: e.target.value }))} className={inputCls}>
           <option value="RENT">Închiriere</option>
           <option value="SALE">Vânzare</option>
@@ -401,10 +414,10 @@ export function NewPropertyForm({ onDone, onCancel }) {
           <option value="Proprietar">Proprietar</option>
           <option value="Agent">Agent</option>
         </select>
-        <input required value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} placeholder="Telefon (ex: 0759...) *" className={inputCls} />
-        <input value={form.whatsapp_phone} onChange={(e) => setForm((f) => ({ ...f, whatsapp_phone: e.target.value }))} placeholder="WhatsApp (ex: 40759...)" className={inputCls} />
-        <input type="number" value={form.building_year} onChange={(e) => setForm((f) => ({ ...f, building_year: e.target.value }))} placeholder="An construcție" className={inputCls} />
-        <input type="number" value={form.total_floors} onChange={(e) => setForm((f) => ({ ...f, total_floors: e.target.value }))} placeholder="Total etaje clădire" className={inputCls} />
+        <input required inputMode="numeric" value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: onlyPhoneDigits(e.target.value) }))} placeholder="Telefon (ex: 0759...) *" className={inputCls} />
+        <input inputMode="tel" value={form.whatsapp_phone} onChange={(e) => setForm((f) => ({ ...f, whatsapp_phone: onlyPhoneDigits(e.target.value) }))} placeholder="WhatsApp (ex: 40759...)" className={inputCls} />
+        <input inputMode="numeric" value={form.building_year} onChange={(e) => setForm((f) => ({ ...f, building_year: only_digits(e.target.value, 4) }))} placeholder="An construcție (ex: 2005)" className={inputCls} />
+        <input inputMode="numeric" value={form.total_floors} onChange={(e) => setForm((f) => ({ ...f, total_floors: only_digits(e.target.value, 3) }))} placeholder="Total etaje clădire (ex: 10)" className={inputCls} />
       </div>
 
       <textarea value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder={t("f_desc")} rows={3} className={`mt-3 ${inputCls}`} />

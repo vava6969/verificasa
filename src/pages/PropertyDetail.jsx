@@ -28,7 +28,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
-  Calendar, ShieldCheck, FileText, CheckCircle2, ChevronLeft, Send, Phone,
+  Calendar, ShieldCheck, FileText, CheckCircle2, ChevronLeft, ChevronRight, Send, Phone,
   Heart, MessageCircle, UserCircle2, Clock, Pencil, Box,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
@@ -90,6 +90,12 @@ export default function PropertyDetail() {
   }, [id]);
 
   const handleChange = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  // Telefonul de contact al cumpărătorului — doar cifre (opțional "+ la început").
+  const handlePhoneChange = (raw) => {
+    const clean = String(raw || "").replace(/[^0-9+]/g, "");
+    const v = clean.startsWith("+") ? "+" + clean.slice(1).replace(/\+/g, "") : clean.replace(/\+/g, "");
+    handleChange("phone", v);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -235,27 +241,61 @@ export default function PropertyDetail() {
               />
             </div>
           ) : (
-            <div
-              className="overflow-hidden rounded-2xl border border-border bg-white select-none"
-              onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
-              onTouchEnd={(e) => {
-                if (touchStartX.current == null) return;
-                const dx = e.changedTouches[0].clientX - touchStartX.current;
-                if (Math.abs(dx) > 50 && images.length > 1) {
-                  setActiveImage((i) => (i + (dx < 0 ? 1 : -1) + images.length) % images.length);
-                }
-                touchStartX.current = null;
-              }}
-            >
-              {images[activeImage] ? (
-                <Image src={images[activeImage]} alt={p.title} fittingType="fill" className="aspect-video w-full" />
-              ) : (
-                <div className="aspect-video w-full bg-gradient-to-br from-navy/10 to-mint/20" />
-              )}
+            <div className="select-none">
+              <div
+                className="relative flex items-center justify-center overflow-hidden rounded-2xl border border-border bg-navy-deep select-none"
+                style={{ aspectRatio: "16 / 10" }}
+                onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+                onTouchEnd={(e) => {
+                  if (touchStartX.current == null) return;
+                  const dx = e.changedTouches[0].clientX - touchStartX.current;
+                  if (Math.abs(dx) > 50 && images.length > 1) {
+                    setActiveImage((i) => (i + (dx < 0 ? 1 : -1) + images.length) % images.length);
+                  }
+                  touchStartX.current = null;
+                }}
+              >
+                {images[activeImage] ? (
+                  <Image src={images[activeImage]} alt={p.title} fittingType="fit" className="max-h-full w-full" />
+                ) : (
+                  <div className="flex aspect-video w-full max-w-3xl items-center justify-center bg-gradient-to-br from-navy/10 to-mint/20 text-muted-foreground">
+                    <span className="text-sm">Fără poze</span>
+                  </div>
+                )}
+
+                {images.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setActiveImage((i) => (i - 1 + images.length) % images.length)}
+                      aria-label="Imaginea anterioară"
+                      className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition hover:bg-white/30"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveImage((i) => (i + 1) % images.length)}
+                      aria-label="Imaginea următoare"
+                      className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition hover:bg-white/30"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
+                    <span className="absolute bottom-3 right-3 rounded-full bg-navy-deep/70 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-md">
+                      {activeImage + 1} / {images.length}
+                    </span>
+                  </>
+                )}
+              </div>
+
               {images.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto p-3">
+                <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
                   {images.map((img, i) => (
-                    <button key={i} onClick={() => setActiveImage(i)} className={`h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition ${activeImage === i ? "border-mint" : "border-transparent"}`}>
+                    <button
+                      key={i}
+                      onClick={() => setActiveImage(i)}
+                      className={`h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 bg-navy-deep transition ${activeImage === i ? "border-mint" : "border-transparent opacity-80 hover:opacity-100"}`}
+                    >
                       <Image src={img} alt={`thumb ${i}`} fittingType="fill" className="h-full w-full" />
                     </button>
                   ))}
@@ -438,7 +478,7 @@ export default function PropertyDetail() {
                 </div>
                 <input required value={form.name} onChange={(e) => handleChange("name", e.target.value)} placeholder={t("ph_name")} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
                 <input required type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)} placeholder={t("ph_email")} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
-                <input value={form.phone} onChange={(e) => handleChange("phone", e.target.value)} placeholder={t("ph_phone")} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
+                <input inputMode="numeric" value={form.phone} onChange={(e) => handlePhoneChange(e.target.value)} placeholder={t("ph_phone")} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
 
                 <div className="rounded-xl bg-mint-soft/40 p-3">
                   <p className="mb-2 text-xs font-semibold text-navy">{t("prequal")}</p>
