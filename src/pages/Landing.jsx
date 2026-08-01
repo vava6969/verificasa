@@ -60,11 +60,7 @@ export default function Landing() {
             <span className="text-gold">{t("hero_h1_b")}</span>
           </h1>
 
-          <p className="mt-5 max-w-2xl rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-base text-white/85 backdrop-blur-md sm:text-lg">
-            {t("hero_sub")}
-          </p>
-
-          <p className="mt-4 max-w-2xl rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm text-white/75 backdrop-blur-md sm:text-base">
+          <p className="mt-5 max-w-2xl rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-base text-white/85 backdrop-blur-md sm:text-lg">
             {t("hero_purpose")}
           </p>
 
