@@ -1,19 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 import { base44 } from "@/api/base44Client";
 import { formatDistanceToNowStrict } from "date-fns";
 import { ro, enGB } from "date-fns/locale";
 
-// Fix default marker icon for bundled leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
 import { useCountry } from "@/components/CountryContext";
 import AITourPlayer from "@/components/AITourPlayer";
 import PropertyEditForm from "@/components/PropertyEditForm";
@@ -22,6 +12,7 @@ import PropertyPOI from "@/components/PropertyPOI";
 import PropertyComments from "@/components/PropertyComments";
 import ReportModal from "@/components/ReportModal";
 import DateField from "@/components/DateField";
+import PropertyGoogleMap from "@/components/PropertyGoogleMap";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -445,7 +436,7 @@ export default function PropertyDetail() {
                 lat={p.latitude}
                 lng={p.longitude}
                 title={p.title}
-                query={[p.zone, p.city, "România"].filter(Boolean).join(", ")}
+                query={[p.landmark, p.zone, p.city, "România"].filter(Boolean).join(", ")}
                 t={t}
               />
             </div>
@@ -517,61 +508,13 @@ export default function PropertyDetail() {
 }
 
 function MapPreview({ lat, lng, title, query, t }) {
-  const hasCoords = lat != null && lng != null && !Number.isNaN(+lat) && !Number.isNaN(+lng);
-  const [coords, setCoords] = useState(hasCoords ? [+lat, +lng] : null);
-  const [loading, setLoading] = useState(!hasCoords);
-  const [error, setError] = useState(false);
-
-  // Dacă proprietarul a folosit adresa din Google Maps → marker exact.
-  // Altfel geocodăm zona/cartierul prin OpenStreetMap (Nominatim) și
-  // arătăm centrul zonei ca locație aproximativă.
-  useEffect(() => {
-    if (hasCoords) return;
-    let alive = true;
-    setLoading(true);
-    setError(false);
-    (async () => {
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query || "")}`,
-          { headers: { "Accept-Language": "ro,en" } }
-        );
-        const data = await res.json();
-        if (!alive) return;
-        if (data && data[0]) {
-          setCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
-        } else {
-          setError(true);
-        }
-      } catch {
-        if (alive) setError(true);
-      } finally {
-        if (alive) setLoading(false);
-      }
-    })();
-    return () => { alive = false; };
-  }, [hasCoords, query]);
-
   return (
-    <div className="h-72 w-full">
-      {loading && (
-        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t("map_load")}
-        </div>
-      )}
-      {!loading && error && (
-        <div className="flex h-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
-          {t("map_unavail")}
-        </div>
-      )}
-      {!loading && !error && coords && (
-        <MapContainer center={coords} zoom={hasCoords ? 15 : 13} style={{ height: "100%", width: "100%" }}>
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap' />
-          <Marker position={coords}>
-            <Popup>{hasCoords ? title : `${title} — ${t("map_approx")}`}</Popup>
-          </Marker>
-        </MapContainer>
-      )}
-    </div>
+    <PropertyGoogleMap
+      lat={lat}
+      lng={lng}
+      title={title}
+      query={query}
+      t={t}
+    />
   );
 }
