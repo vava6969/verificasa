@@ -123,6 +123,14 @@
   }
   .animate-blob { animation: vc-blob 9s ease-in-out infinite; }
 
+  @keyframes vc-badge-fade {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+  .animate-badge-fade {
+    animation: vc-badge-fade 1.8s ease-in-out infinite;
+  }
+
   /* Dark-mode: flip solid white surfaces and navy text to theme tokens,
      so text stays readable on the dark page background. Translucent
      white badges over images keep fixed dark text via slate utilities. */
