@@ -10,6 +10,7 @@ import PropertyEditForm from "@/components/PropertyEditForm";
 import PhoneReveal from "@/components/PhoneReveal";
 import PropertyComments from "@/components/PropertyComments";
 import SimilarProperties from "@/components/SimilarProperties";
+import Lightbox from "@/components/Lightbox";
 import ReportModal from "@/components/ReportModal";
 import DateField from "@/components/DateField";
 import PropertyGoogleMap from "@/components/PropertyGoogleMap";
@@ -43,6 +44,8 @@ export default function PropertyDetail() {
   const navigate = useNavigate();
   const [saved, setSaved] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [showLb, setShowLb] = useState(false);
+  const [lbIndex, setLbIndex] = useState(0);
   const viewedRef = useRef(new Set());
   const touchStartX = useRef(null);
 
@@ -247,7 +250,9 @@ export default function PropertyDetail() {
                 }}
               >
                 {images[activeImage] ? (
-                  <Image src={images[activeImage]} alt={p.title} fittingType="fit" className="max-h-full w-full" />
+                  <button type="button" onClick={() => { setLbIndex(activeImage); setShowLb(true); }} className="h-full w-full cursor-zoom-in">
+                    <Image src={images[activeImage]} alt={p.title} fittingType="fit" className="max-h-full w-full" />
+                  </button>
                 ) : (
                   <div className="flex aspect-video w-full max-w-3xl items-center justify-center bg-gradient-to-br from-navy/10 to-mint/20 text-muted-foreground">
                     <span className="text-sm">Fără poze</span>
@@ -449,6 +454,17 @@ export default function PropertyDetail() {
             {/* SIMILAR RECOMMENDATIONS */}
             <SimilarProperties property={p} />
           </div>
+          {showLb && images.length > 0 && (
+            <Lightbox
+              images={images}
+              index={lbIndex}
+              onIndex={setLbIndex}
+              onClose={() => setShowLb(false)}
+              saved={saved}
+              onToggleSave={toggleSave}
+              title={p.title}
+            />
+          )}
 
           {/* RIGHT */}
           <div className="lg:col-span-1">
