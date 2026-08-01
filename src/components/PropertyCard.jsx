@@ -126,7 +126,7 @@ export default function PropertyCard({ property, hot = false }) {
 
         {/* Badge RECOMANDAT — trending (multe vizualizări), doar pe recomandate homepage */}
         {hot && (
-          <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-gradient-to-r from-gold to-gold-deep px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white shadow-gold">
+          <span className="animate-blob absolute right-3 top-3 flex items-center gap-1 rounded-full bg-gradient-to-r from-gold to-gold-deep px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white shadow-gold">
             ⭐ {t("pc_hot")}
           </span>
         )}
