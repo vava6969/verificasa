@@ -203,20 +203,23 @@ export default function Admin() {
     <div className="min-h-screen bg-[#f4f6f9] dark:bg-background">
       {/* Top bar */}
       <div className="border-b border-border bg-white dark:bg-card shadow-sm">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-navy">
-              <ShieldAlert className="h-5 w-5 text-emerald" />
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 sm:px-6 sm:py-4">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-navy sm:h-9 sm:w-9 sm:rounded-xl">
+              <ShieldAlert className="h-4 w-4 text-emerald sm:h-5 sm:w-5" />
             </div>
-            <div>
-              <h1 className="font-heading text-xl font-bold text-navy dark:text-foreground">Admin Panel</h1>
-              <p className="text-xs text-muted-foreground">
+            <div className="min-w-0">
+              <h1 className="truncate font-heading text-base font-bold text-navy dark:text-foreground sm:text-xl">
+                Admin Panel
+                {isSuper && <span className="ml-1.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-emerald">Super</span>}
+              </h1>
+              <p className="hidden text-xs text-muted-foreground sm:block">
                 Moderare anunturi{isSuper ? " · Super Admin" : ""}
               </p>
             </div>
           </div>
-          <Button variant="outline" onClick={load} className="gap-1.5 rounded-full text-sm">
-            <RefreshCw className="h-4 w-4" /> Reincarca
+          <Button variant="outline" size="icon" onClick={load} aria-label="Reincarca" className="h-8 w-8 shrink-0 rounded-full sm:h-9 sm:w-auto sm:gap-1.5 sm:px-4 sm:text-sm">
+            <RefreshCw className="h-4 w-4" /> <span className="hidden sm:inline">Reincarca</span>
           </Button>
         </div>
       </div>
