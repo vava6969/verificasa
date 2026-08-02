@@ -10,6 +10,7 @@ import InspectieModal from "@/components/InspectieModal";
 import ListeazaPopup from "@/components/ListeazaPopup";
 import BetaBanner from "@/components/BetaBanner";
 import AboutVerifiCasa from "@/components/AboutVerifiCasa";
+import ValueStrips from "@/components/ValueStrips";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -44,11 +45,11 @@ export default function Landing() {
     const display = (properties || []).filter((p) => p.approval_status === "APPROVED").slice(0, 3);
 
   return (
-    <div>
+    <div className="landing-dark">
       <BetaBanner />
       {/* HERO */}
       <section className="relative min-h-[520px] overflow-hidden sm:min-h-[660px]">
-        <HeroPhoto />
+        <HeroPhoto fadeToClass="to-[#12161e]" />
 
         <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-4 pb-24 pt-12 text-center sm:px-6 sm:pb-48 sm:pt-28 lg:px-8">
           <p className="font-heading text-sm font-bold uppercase tracking-[0.3em] text-white/90">
@@ -61,10 +62,10 @@ export default function Landing() {
           <h1 className="mt-3 font-heading text-3xl font-extrabold leading-tight text-white sm:mt-4 sm:text-5xl lg:text-6xl">
             {t("hero_h1_a")}
             <br />
-            <span className="text-gold">{t("hero_h1_b")}</span>
+            <span className="text-gold-gradient">{t("hero_h1_b")}</span>
           </h1>
 
-          <div className="mt-5 w-full max-w-4xl sm:mt-8">
+          <div className="mt-5 w-full max-w-4xl rounded-[26px] glass-panel p-2 sm:mt-8 sm:p-3">
             <SearchBar />
           </div>
 
@@ -79,19 +80,7 @@ export default function Landing() {
 
       {/* VALUE PROPOSITION BAR */}
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-16 lg:px-8">
-        <div className="grid gap-3 sm:gap-5 md:grid-cols-3">
-          {valueProps.map((v, i) => (
-            <div key={i} className="flex items-start gap-3.5 rounded-2xl border border-border bg-white p-4 shadow-soft md:flex-col md:p-6">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-soft text-emerald md:h-12 md:w-12">
-                <v.icon className="h-5 w-5 md:h-6 md:w-6" />
-              </div>
-              <div>
-                <h3 className="font-heading text-base font-bold text-navy md:mt-4 md:text-lg">{v.title}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground md:mt-2">{v.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <ValueStrips items={valueProps} />
       </section>
 
       {/* DESPRE VERIFICASA */}

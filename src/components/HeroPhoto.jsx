@@ -11,7 +11,7 @@ const HEROES = [
   "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=2000&q=80",
 ];
 
-export default function HeroPhoto() {
+export default function HeroPhoto({ fadeToClass = "to-white" }) {
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function HeroPhoto() {
       </AnimatePresence>
       <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/55 via-navy/35 to-navy-deep/70" />
       <div className="absolute inset-0 bg-gradient-to-r from-navy-deep/55 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-b from-transparent to-white sm:h-72" />
+      <div className={`absolute inset-x-0 bottom-0 h-56 bg-gradient-to-b from-transparent sm:h-72 ${fadeToClass}`} />
     </div>
   );
 }
