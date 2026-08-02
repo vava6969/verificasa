@@ -47,44 +47,46 @@ export default function Account() {
   ];
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-4xl px-3 py-5 sm:px-6 sm:py-8 lg:px-8">
       {/* Profile header */}
-      <div className="mb-6 flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-6 text-center shadow-soft">
-        <VerifiCasaLogo size={56} tagline={false} />
-        <div>
-          <h1 className="text-xl font-bold">{greeting}</h1>
-          <p className="text-sm text-muted-foreground">{t("hdr_myaccount")}</p>
+      <div className="mb-4 flex items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-soft sm:p-4">
+        <VerifiCasaLogo size={40} tagline={false} wordmark={false} />
+        <div className="min-w-0">
+          <h1 className="truncate text-base font-bold sm:text-lg">{greeting}</h1>
+          <p className="text-xs text-muted-foreground">{t("hdr_myaccount")}</p>
         </div>
       </div>
 
       {/* Account options grid */}
-      <section id="account-menu" className="mb-8 scroll-mt-20">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">{t("hdr_myaccount")}</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <section id="account-menu" className="mb-6 scroll-mt-20 rounded-2xl border border-border bg-card p-4 shadow-soft">
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">{t("hdr_myaccount")}</h2>
+        <div className="grid grid-cols-4 gap-x-2 gap-y-4 sm:grid-cols-6">
           {options.map((opt) => {
             const Icon = opt.icon;
             return (
               <Link
                 key={opt.label}
                 to={opt.path}
-                className="group relative flex flex-col items-center justify-center gap-2 rounded-xl border border-border bg-card p-4 text-center shadow-soft transition hover:border-emerald/50 hover:bg-emerald-soft/40"
+                className="group flex flex-col items-center gap-1.5 text-center"
               >
-                <span className={`flex h-10 w-10 items-center justify-center rounded-full ${opt.admin ? "bg-gold-soft text-gold-deep" : "bg-emerald-soft text-emerald"}`}>
-                  <Icon className="h-5 w-5" />
-                </span>
-                {opt.badge && (
-                  <span className="absolute right-2 top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
-                    {opt.badge}
+                <span className="relative">
+                  <span className={`flex h-12 w-12 items-center justify-center rounded-full border transition group-hover:scale-105 ${opt.admin ? "border-gold/50 bg-gold-soft text-gold-deep" : "border-emerald/40 bg-emerald-soft text-emerald"}`}>
+                    <Icon className="h-5 w-5" />
                   </span>
-                )}
-                <span className="text-sm font-semibold">{opt.label}</span>
+                  {opt.badge && (
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white">
+                      {opt.badge}
+                    </span>
+                  )}
+                </span>
+                <span className="w-full text-[10px] font-semibold uppercase leading-tight tracking-wide text-muted-foreground">{opt.label}</span>
               </Link>
             );
           })}
         </div>
         <Button
           variant="outline"
-          className="mt-3 w-full"
+          className="mt-4 w-full"
           onClick={() => { logout("/"); }}
         >
           <LogOut className="mr-2 h-4 w-4" /> {t("hdr_logout")}
