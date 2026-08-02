@@ -222,8 +222,8 @@ export default function PropertyComments({ property }) {
               )}
               <ReportModal targetType="comment" targetId={c.id} targetTitle={(c.content || "").slice(0, 80)} variant="ghost" />
               {isAdmin && (
-                <button onClick={() => deleteComment(c)} className="flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-semibold text-muted-foreground transition hover:text-destructive">
-                  <Trash2 className="h-3.5 w-3.5" /> Șterge
+                <button onClick={() => deleteComment(c)} aria-label="Șterge" title="Șterge" className="flex shrink-0 items-center text-muted-foreground transition hover:text-destructive">
+                  <Trash2 className="h-4 w-4" />
                 </button>
               )}
             </div>
