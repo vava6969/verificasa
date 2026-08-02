@@ -21,7 +21,7 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
   Calendar, ShieldCheck, FileText, CheckCircle2, ChevronLeft, ChevronRight, Send, Phone,
-  Heart, MessageCircle, UserCircle2, Clock, Pencil, Box, Loader2,
+  Heart, MessageCircle, UserCircle2, Clock, Pencil, Box, Loader2, Maximize2, X,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
@@ -44,6 +44,7 @@ export default function PropertyDetail() {
   const navigate = useNavigate();
   const [saved, setSaved] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [tour3dFull, setTour3dFull] = useState(false);
   const [showLb, setShowLb] = useState(false);
   const [lbIndex, setLbIndex] = useState(0);
   const viewedRef = useRef(new Set());
@@ -205,6 +206,26 @@ export default function PropertyDetail() {
 
   return (
     <div className="bg-secondary/30">
+      {tour3dFull && p.tour_3d_url && (
+        <div className="fixed inset-0 z-[100] bg-navy-deep">
+          <iframe
+            src={p.tour_3d_url}
+            title="Tur 3D"
+            className="h-full w-full"
+            allowFullScreen
+            allow="xr-spatial-tracking; fullscreen; autoplay"
+            frameBorder="0"
+          />
+          <button
+            type="button"
+            onClick={() => setTour3dFull(false)}
+            aria-label={lang === "en" ? "Close" : "Închide"}
+            className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md active:bg-white/30"
+          >
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+      )}
       <div className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
         <Link to="/search" className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-navy">
           <ChevronLeft className="h-4 w-4" /> {t("back_results")}
@@ -224,7 +245,7 @@ export default function PropertyDetail() {
           </div>
 
           {tab === "3d" ? (
-            <div className="overflow-hidden rounded-2xl border border-border bg-navy-deep shadow-soft">
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-navy-deep shadow-soft">
               <iframe
                 src={p.tour_3d_url}
                 title="Tur 3D"
@@ -233,6 +254,13 @@ export default function PropertyDetail() {
                 allow="xr-spatial-tracking; fullscreen; autoplay"
                 frameBorder="0"
               />
+              <button
+                type="button"
+                onClick={() => setTour3dFull(true)}
+                className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-navy-deep/80 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md lg:hidden"
+              >
+                <Maximize2 className="h-3.5 w-3.5" /> {lang === "en" ? "Fullscreen" : "Ecran complet"}
+              </button>
             </div>
           ) : (
             <div className="select-none">
