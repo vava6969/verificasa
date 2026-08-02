@@ -78,16 +78,26 @@ export default function PropertyWizard({ onDone, onCancel }) {
     return null;
   };
 
+  // Jump to the top after the new step renders (instant, so it can't be
+  // interrupted mid-animation by the layout change).
+  const scrollTop = () => {
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    });
+  };
+
   const next = () => {
     const err = validateStep(step);
     if (err) { toast({ title: err, variant: "destructive" }); return; }
     setStep((s) => Math.min(STEPS.length - 1, s + 1));
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollTop();
   };
   const back = () => {
     if (step === 0) { onCancel ? onCancel() : onDone?.(); return; }
     setStep((s) => s - 1);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollTop();
   };
 
   const submit = async () => {
