@@ -1,0 +1,230 @@
+import React, { useEffect, useState, useRef } from "react";
+import { useParams, useNavigate, Link, Navigate } from "react-router-dom";
+import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
+import { createNotification } from "@/lib/notifications";
+import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Send, ArrowLeft, MoreVertical, Check, CheckCheck, Trash2 } from "lucide-react";
+import { initials, avatarColor } from "@/lib/chatUtils";
+
+// Full-screen iMessage-style conversation — its own page, no app chrome.
+export default function Conversation() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const [conv, setConv] = useState(null);
+  const [messages, setMessages] = useState(null);
+  const [text, setText] = useState("");
+  const [sending, setSending] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const bottomRef = useRef(null);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    base44.entities.Conversation.get(id).then(setConv).catch(() => setConv(false));
+  }, [id, isAuthenticated]);
+
+  const loadMessages = async () => {
+    try {
+      const list = await base44.entities.Message.filter({ conversation_id: id }, "created_date", 500);
+      setMessages(list);
+      const incoming = list.filter((m) => m.sender_id !== user.id && !m.read_at);
+      if (incoming.length) {
+        const now = new Date().toISOString();
+        await Promise.all(incoming.map((m) => base44.entities.Message.update(m.id, { read_at: now }).catch(() => {})));
+        const refreshed = await base44.entities.Message.filter({ conversation_id: id }, "created_date", 500).catch(() => list);
+        setMessages(refreshed);
+      }
+    } catch { setMessages([]); }
+  };
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let cancelled = false;
+    loadMessages();
+    const unsub = base44.entities.Message.subscribe((event) => {
+      if (cancelled) return;
+      if (event?.data?.conversation_id === id) loadMessages();
+    });
+    return () => { cancelled = true; try { unsub?.(); } catch {} };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, isAuthenticated, user?.id]);
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+
+  const otherName = conv
+    ? conv.buyer_id === user?.id ? conv.seller_name || "Proprietar" : conv.buyer_name || "Cumpărător"
+    : "";
+
+  const send = async (e) => {
+    e?.preventDefault();
+    if (!text.trim() || !conv) return;
+    setSending(true);
+    const content = text.trim();
+    try {
+      await base44.entities.Message.create({
+        conversation_id: conv.id,
+        sender_id: user.id,
+        sender_name: user.full_name || user.email,
+        content,
+      });
+      await base44.entities.Conversation.update(conv.id, { last_message: content });
+      const recipient = conv.buyer_id === user.id ? conv.seller_id : conv.buyer_id;
+      if (recipient && recipient !== user.id) {
+        createNotification({
+          userId: recipient,
+          type: "message",
+          text: "Ai un mesaj nou de la " + (user.full_name || user.email) + ".",
+          link: "/messages/" + conv.id,
+          actorName: user.full_name || user.email,
+        });
+      }
+      setText("");
+    } catch {
+      toast({ title: "Eroare la trimitere", variant: "destructive" });
+    } finally { setSending(false); }
+  };
+
+  const markAllRead = async () => {
+    if (busy || !messages) return;
+    setBusy(true);
+    try {
+      const toUpdate = messages.filter((m) => m.sender_id !== user.id && !m.read_at);
+      const now = new Date().toISOString();
+      await Promise.all(toUpdate.map((m) => base44.entities.Message.update(m.id, { read_at: now }).catch(() => {})));
+      loadMessages();
+    } finally { setBusy(false); }
+  };
+
+  const deleteConversation = async () => {
+    if (!conv) return;
+    if (!confirm(`Ștergi conversația cu ${otherName}? Mesajele vor fi șterse definitiv.`)) return;
+    setBusy(true);
+    try {
+      await base44.entities.Message.deleteMany({ conversation_id: conv.id }).catch(() => {});
+      await base44.entities.Conversation.delete(conv.id);
+      toast({ title: "Conversație ștearsă" });
+      navigate("/messages", { replace: true });
+    } catch { toast({ title: "Eroare la ștergere", variant: "destructive" }); }
+    finally { setBusy(false); }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#f4f6f9] dark:bg-background">
+      {/* Header */}
+      <div
+        className="flex items-center gap-2 border-b border-border bg-white px-3 py-2.5 shadow-sm dark:bg-card sm:px-4"
+        style={{ paddingTop: "calc(0.625rem + env(safe-area-inset-top))" }}
+      >
+        <button
+          onClick={() => navigate("/messages")}
+          className="flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary/60"
+          aria-label="Înapoi la inbox"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        <span className={["flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white", avatarColor(id)].join(" ")}>
+          {initials(otherName || "?")}
+        </span>
+        <div className="min-w-0 flex-1">
+          <Link
+            to={conv ? "/property/" + conv.property_id : "#"}
+            className="block truncate font-heading text-base font-bold text-navy hover:text-emerald dark:text-foreground"
+          >
+            {conv?.property_title || "Proprietate"}
+          </Link>
+          <p className="truncate text-xs text-muted-foreground">cu {otherName}</p>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary/60" aria-label="Opțiuni conversație">
+              <MoreVertical className="h-5 w-5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem onClick={markAllRead} disabled={busy} className="gap-2">
+              <CheckCheck className="h-4 w-4 text-emerald" /> Marchează toate ca citite
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={deleteConversation} disabled={busy} className="gap-2 text-destructive focus:text-destructive">
+              <Trash2 className="h-4 w-4" /> Șterge conversația
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 space-y-2 overflow-y-auto px-3 py-4 sm:px-4">
+        {messages === null ? (
+          <div className="flex justify-center py-8">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-emerald border-t-transparent" />
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="py-12 text-center text-sm text-muted-foreground">Niciun mesaj. Fii primul care scrie!</div>
+        ) : (
+          messages.map((m) => {
+            const mine = m.sender_id === user.id;
+            const readTitle = m.read_at
+              ? `Văzut la ${new Date(m.read_at).toLocaleString("ro-RO")}`
+              : "Trimis · încă nu a fost văzut";
+            return (
+              <div key={m.id} className={"flex gap-2 " + (mine ? "justify-end" : "justify-start")}>
+                {!mine && (
+                  <span className={["flex h-7 w-7 shrink-0 self-end items-center justify-center rounded-full text-[11px] font-bold text-white", avatarColor(id)].join(" ")}>
+                    {initials(m.sender_name || "?")}
+                  </span>
+                )}
+                <div className={"flex max-w-[82%] flex-col gap-0.5 sm:max-w-[70%] " + (mine ? "items-end" : "items-start")}>
+                  <div className={[
+                    "rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-sm sm:px-4",
+                    mine ? "rounded-br-sm bg-emerald text-white" : "rounded-bl-sm bg-white text-foreground dark:bg-card",
+                  ].join(" ")}>
+                    {m.content}
+                  </div>
+                  <div className={"flex items-center gap-1 px-1 " + (mine ? "flex-row-reverse" : "flex-row")}>
+                    <span className="text-[10px] text-muted-foreground">
+                      {new Date(m.created_date).toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                    {mine && (m.read_at
+                      ? <span title={readTitle} className="text-emerald"><CheckCheck className="h-3.5 w-3.5" /></span>
+                      : <span title={readTitle} className="text-muted-foreground"><Check className="h-3.5 w-3.5" /></span>)}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Composer */}
+      <form
+        onSubmit={send}
+        className="flex items-center gap-2 border-t border-border bg-white px-3 py-2.5 dark:bg-card sm:px-4 sm:py-3"
+        style={{ paddingBottom: "calc(0.625rem + env(safe-area-inset-bottom))" }}
+      >
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Scrie un mesaj..."
+          className="flex-1 rounded-full border border-border bg-background px-4 py-3 text-base outline-none focus:border-emerald dark:bg-card"
+        />
+        <Button
+          type="submit"
+          disabled={sending || !text.trim()}
+          className="h-12 w-12 shrink-0 rounded-full bg-emerald p-0 text-white shadow-md hover:bg-emerald/90 disabled:opacity-50"
+          aria-label="Trimite"
+        >
+          {sending ? <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" /> : <Send className="h-5 w-5" />}
+        </Button>
+      </form>
+    </div>
+  );
+}

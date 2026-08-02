@@ -20,6 +20,7 @@ import MyProperties from '@/pages/MyProperties';
 import Admin from '@/pages/Admin';
 import Settings from '@/pages/Settings';
 import Messages from '@/pages/Messages';
+import Conversation from '@/pages/Conversation';
 import Saved from '@/pages/Saved';
 import SavedSearches from '@/pages/SavedSearches';
 import About from '@/pages/About';
@@ -86,6 +87,7 @@ const AuthenticatedApp = () => {
       </Route>
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route path="/post-property" element={<CountryProvider><PostProperty /></CountryProvider>} />
+        <Route path="/messages/:id" element={<Conversation />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
