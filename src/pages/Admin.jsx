@@ -15,6 +15,7 @@ import PropertyEditForm from "@/components/PropertyEditForm";
 import PropertyLogs from "@/components/PropertyLogs";
 import AdminReports from "@/components/AdminReports";
 import AdminResolvedReports from "@/components/AdminResolvedReports";
+import AdminStatCard from "@/components/AdminStatCard";
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 const ROLE_OPTIONS = ["PROPRIETAR", "AGENT", "ADMIN", "SUPER_ADMIN", "SUPPORT", "user"];
@@ -224,15 +225,12 @@ export default function Admin() {
         {/* Stat cards */}
         <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            { label: "In asteptare",  value: pending.length,                                                 cls: "text-amber-600", bg: "bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-700/40" },
-            { label: "Utilizatori",   value: (users || []).length,                                           cls: "text-emerald",   bg: "bg-emerald-soft border-emerald/20 dark:bg-emerald-950/30" },
-            { label: "Sesizari",      value: (reports || []).filter((r) => r.status === "PENDING").length,  cls: "text-rose-600",  bg: "bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-700/40" },
-            { label: "Total anunturi", value: all.length,                                                    cls: "text-navy dark:text-foreground", bg: "bg-white border-border dark:bg-card" },
+            { label: "In asteptare",   value: pending.length,                                                icon: Clock,      tone: "amber" },
+            { label: "Utilizatori",    value: (users || []).length,                                          icon: Users,      tone: "emerald" },
+            { label: "Sesizari",       value: (reports || []).filter((r) => r.status === "PENDING").length,  icon: Flag,       tone: "rose" },
+            { label: "Total anunturi", value: all.length,                                                    icon: Building2,  tone: "slate" },
           ].map((s) => (
-            <div key={s.label} className={"rounded-2xl border px-4 py-3 shadow-sm " + s.bg}>
-              <p className={"text-2xl font-bold font-heading " + s.cls}>{s.value}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">{s.label}</p>
-            </div>
+            <AdminStatCard key={s.label} {...s} />
           ))}
         </div>
 
