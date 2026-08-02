@@ -25,6 +25,8 @@ import SavedSearches from '@/pages/SavedSearches';
 import About from '@/pages/About';
 import Terms from '@/pages/Terms';
 import Privacy from '@/pages/Privacy';
+import DataDeletion from '@/pages/DataDeletion';
+import Contact from '@/pages/Contact';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { CountryProvider } from '@/components/CountryContext';
 import Account from '@/pages/Account';
@@ -67,6 +69,8 @@ const AuthenticatedApp = () => {
         <Route path="/about" element={<About />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/data-deletion" element={<DataDeletion />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/property/:id" element={<PropertyDetail />} />
         <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
           <Route path="/owner" element={<Owner />} />

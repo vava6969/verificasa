@@ -36,6 +36,8 @@ export default function Footer() {
               <li className="flex items-start gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald" />{t("footer_anpc")}</li>
               <li><Link to="/terms" className="hover:text-emerald">{t("footer_terms")}</Link></li>
               <li><Link to="/privacy" className="hover:text-emerald">{t("footer_privacy")}</Link></li>
+              <li><Link to="/data-deletion" className="hover:text-emerald">Ștergerea Datelor</Link></li>
+              <li><Link to="/contact" className="hover:text-emerald">Contact</Link></li>
             </ul>
             <LegalBadges />
           </div>

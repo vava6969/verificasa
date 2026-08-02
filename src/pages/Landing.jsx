@@ -9,6 +9,7 @@ import LaunchCountdown from "@/components/LaunchCountdown";
 import InspectieModal from "@/components/InspectieModal";
 import ListeazaPopup from "@/components/ListeazaPopup";
 import BetaBanner from "@/components/BetaBanner";
+import AboutVerifiCasa from "@/components/AboutVerifiCasa";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -87,6 +88,9 @@ export default function Landing() {
           ))}
         </div>
       </section>
+
+      {/* DESPRE VERIFICASA */}
+      <AboutVerifiCasa />
 
       {/* FEATURED PROPERTIES */}
       <section id="featured" className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
