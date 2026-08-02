@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, SlidersHorizontal, ArrowDownUp, BookmarkPlus, RotateCcw, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
 
 // VerifiCasa verification filters — each applies a real-property predicate.
 const VERIF_FILTERS = [
@@ -223,97 +224,24 @@ export default function SearchPage() {
         </div>
       </div>
 
-      {/* Verification quick filters + budget */}
+      {/* Single filters entry point → slide-up sheet */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
-        {VERIF_FILTERS.map((f) => (
-          <button
-            key={f.key}
-            onClick={() => toggle(f.key)}
-            className={`flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-semibold transition ${
-              activeFilters.has(f.key)
-                ? "border-emerald bg-emerald text-white shadow-soft"
-                : "border-border bg-white text-foreground/70 hover:border-emerald/50"
-            }`}
-          >
-            <f.icon className="h-3.5 w-3.5" /> {t(f.labelKey)}
-          </button>
-        ))}
-        <div className="ml-auto">
-          <input
-            type="number"
-            value={budget}
-            onChange={(e) => setBudget(e.target.value)}
-            placeholder={t("ph_budget")}
-            className="w-48 rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card"
-          />
-        </div>
-      </div>
-
-      {/* Advanced filters */}
-      <div className="mb-6 rounded-2xl border border-border bg-secondary/30 p-4">
-        <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-foreground/60">
-          <SlidersHorizontal className="h-4 w-4 text-emerald" /> {t("sr_advanced")}
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <select
-            value={roomsMin}
-            onChange={(e) => setRoomsMin(e.target.value)}
-            className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
-          >
-            <option value="">{t("sr_rooms_min")}</option>
-            <option value="1">{t("sr_rooms_option", { n: 1 })}</option>
-            <option value="2">{t("sr_rooms_option", { n: 2 })}</option>
-            <option value="3">{t("sr_rooms_option", { n: 3 })}</option>
-            <option value="4">{t("sr_rooms_option", { n: 4 })}</option>
-          </select>
-
-          <input
-            type="number"
-            value={surfaceMin}
-            onChange={(e) => setSurfaceMin(e.target.value)}
-            placeholder={t("sr_surface_min")}
-            className="w-44 rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card"
-          />
-
-          <select
-            value={fairness}
-            onChange={(e) => setFairness(e.target.value)}
-            className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
-          >
-            {makeFairness(t).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-
-          <button
-            type="button"
-            onClick={() => setFurnished((v) => !v)}
-            className={`flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition ${
-              furnished ? "border-emerald bg-emerald text-white shadow-soft" : "border-border bg-white text-foreground/70 hover:border-emerald/50"
-            }`}
-          >
-            {t("furnished")}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setSwap((v) => !v)}
-            className={`flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition ${
-              swap ? "border-emerald bg-emerald text-white shadow-soft" : "border-border bg-white text-foreground/70 hover:border-emerald/50"
-            }`}
-          >
-            {t("sr_swap")}
-          </button>
-
-          <div className="ml-auto flex items-center gap-2">
-            <ArrowDownUp className="h-4 w-4 text-foreground/50" />
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
-            >
-              {makeSort(t).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-          </div>
-        </div>
+        <SearchFiltersDrawer
+          t={t}
+          filters={VERIF_FILTERS}
+          activeFilters={activeFilters}
+          onToggle={toggle}
+          budget={budget} setBudget={setBudget}
+          roomsMin={roomsMin} setRoomsMin={setRoomsMin}
+          surfaceMin={surfaceMin} setSurfaceMin={setSurfaceMin}
+          fairness={fairness} setFairness={setFairness}
+          fairnessOptions={makeFairness(t)}
+          furnished={furnished} setFurnished={setFurnished}
+          swap={swap} setSwap={setSwap}
+          sort={sort} setSort={setSort}
+          sortOptions={makeSort(t)}
+          onReset={resetFilters}
+        />
       </div>
 
       {properties === null ? (
