@@ -45,7 +45,7 @@ export function ChoiceCard({ active, onClick, emoji, title, sub }) {
       }
     >
       <span className="text-xl leading-none">{emoji}</span>
-      <span className="font-heading text-sm font-bold text-navy dark:text-foreground">{title}</span>
+      <span className="font-heading text-[13px] font-bold leading-tight tracking-tight text-navy dark:text-foreground whitespace-nowrap sm:text-sm">{title}</span>
       {sub && <span className="text-[11px] text-muted-foreground">{sub}</span>}
     </button>
   );

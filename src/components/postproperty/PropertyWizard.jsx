@@ -147,22 +147,13 @@ export default function PropertyWizard({ onDone, onCancel }) {
           <div className="h-full rounded-full gradient-emerald transition-all duration-500" style={{ width: `${progress}%` }} />
         </div>
 
-        <div className="mt-3 flex gap-1.5">
-          {STEPS.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => s.id < step && setStep(s.id)}
-              className={
-                "flex-1 truncate rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wider transition " +
-                (s.id === step ? "bg-navy text-white"
-                  : s.id < step ? "bg-emerald-soft text-emerald"
-                  : "text-muted-foreground/50")
-              }
-            >
-              {s.id < step ? "✓ " : ""}{s.title}
-            </button>
-          ))}
+        <div className="mt-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
+          <span className="rounded-full bg-navy px-2.5 py-1 text-white">{Current.title}</span>
+          {STEPS[step + 1] && (
+            <span className="flex items-center gap-1 text-muted-foreground/70">
+              <ArrowRight className="h-3 w-3" /> Urmează: {STEPS[step + 1].title}
+            </span>
+          )}
         </div>
       </div>
 
