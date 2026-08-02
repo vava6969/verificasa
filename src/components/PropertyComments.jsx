@@ -201,7 +201,7 @@ export default function PropertyComments({ property }) {
     const likeCount = (c.likes || []).length;
     const liked = isAuthenticated && (c.likes || []).includes(user.id);
     return (
-      <div key={c.id} className={cn("py-3", isReply && "pl-10")}>
+      <div key={c.id} className={cn("py-3", isReply && "pl-5 sm:pl-10")}>
         <div className="flex items-start gap-3">
           <Avatar url={c.avatar_url} name={name} className="h-9 w-9 shrink-0" />
           <div className="min-w-0 flex-1">
@@ -211,7 +211,7 @@ export default function PropertyComments({ property }) {
               <span className="ml-auto text-[10px] text-muted-foreground">{new Date(c.created_date).toLocaleDateString("ro-RO")}</span>
             </div>
             <p className="mt-1 text-sm text-foreground/80">{c.content}</p>
-            <div className="mt-2 flex items-center gap-3">
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
               <button onClick={() => toggleLike(c)} className={cn("flex items-center gap-1 text-xs font-semibold transition", liked ? "text-rose-500" : "text-muted-foreground hover:text-rose-500")}>
                 <Heart className={cn("h-3.5 w-3.5", liked && "fill-rose-500")} /> {likeCount > 0 ? likeCount : ""} Apreciază
               </button>
@@ -220,9 +220,9 @@ export default function PropertyComments({ property }) {
                   <Reply className="h-3.5 w-3.5" /> Răspunde
                 </button>
               )}
-              <ReportModal targetType="comment" targetId={c.id} targetTitle={(c.content || "").slice(0, 80)} variant="ghost" className="ml-auto" />
+              <ReportModal targetType="comment" targetId={c.id} targetTitle={(c.content || "").slice(0, 80)} variant="ghost" />
               {isAdmin && (
-                <button onClick={() => deleteComment(c)} className="flex items-center gap-1 text-xs font-semibold text-muted-foreground transition hover:text-destructive">
+                <button onClick={() => deleteComment(c)} className="flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-semibold text-muted-foreground transition hover:text-destructive">
                   <Trash2 className="h-3.5 w-3.5" /> Șterge
                 </button>
               )}
@@ -245,7 +245,7 @@ export default function PropertyComments({ property }) {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-6 shadow-soft dark:bg-card">
+    <div className="rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card sm:p-6">
       <div className="flex items-center gap-2">
         <MessageSquare className="h-5 w-5 text-emerald" />
         <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">Comentarii</h3>

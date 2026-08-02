@@ -205,7 +205,7 @@ export default function PropertyDetail() {
 
   return (
     <div className="bg-secondary/30">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
         <Link to="/search" className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-navy">
           <ChevronLeft className="h-4 w-4" /> {t("back_results")}
         </Link>
@@ -302,19 +302,23 @@ export default function PropertyDetail() {
         </div>
 
         {/* KEY STATS BAR */}
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
           {stats.map((s, i) => (
-            <div key={i} className="rounded-xl border border-border bg-white p-4 shadow-soft">
-              <s.icon className="h-5 w-5 text-mint" />
-              <p className="mt-2 font-heading text-lg font-bold text-navy">{s.value}</p>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
+            <div key={i} className="flex items-center gap-2 rounded-xl border border-border bg-white px-2.5 py-2 shadow-soft dark:bg-card">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-soft">
+                <s.icon className="h-3.5 w-3.5 text-emerald" />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate font-heading text-sm font-bold leading-tight text-navy dark:text-foreground">{s.value}</p>
+                <p className="truncate text-[10px] uppercase tracking-wide text-muted-foreground">{s.label}</p>
+              </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <div className="mt-4 grid gap-4 sm:mt-6 sm:gap-6 lg:grid-cols-3">
           {/* LEFT */}
-          <div className="space-y-6 lg:col-span-2">
+          <div className="space-y-4 sm:space-y-6 lg:col-span-2">
             {editing && (
               <PropertyEditForm
                 property={p}
@@ -325,10 +329,10 @@ export default function PropertyDetail() {
                 }}
               />
             )}
-            <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <h1 className="font-heading text-2xl font-bold text-navy sm:text-3xl">{p.title}</h1>
+            <div className="rounded-2xl border border-border bg-white p-4 shadow-soft sm:p-6">
+              <div className="flex flex-wrap items-start justify-between gap-2 sm:gap-3">
+                <div className="min-w-0 flex-1">
+                  <h1 className="font-heading text-xl font-bold text-navy sm:text-3xl">{p.title}</h1>
                   <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                     <MapPin className="h-4 w-4" /> {p.zone}, {p.city}{p.landmark ? ` · 📍 ${p.landmark}` : ""}, {p.country === "UK" ? t("pd_country_uk") : t("pd_country_ro")}
                   </p>
@@ -363,8 +367,8 @@ export default function PropertyDetail() {
                     <ReportModal targetType="property" targetId={p.id} targetTitle={p.title} variant="outline" size="sm" className="border-border" />
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-heading text-2xl font-bold text-navy">{formatPrice(p.price_monthly, p.currency)}</p>
+                <div className="shrink-0 text-right">
+                  <p className="font-heading text-xl font-bold text-navy sm:text-2xl">{formatPrice(p.price_monthly, p.currency)}</p>
                   <p className="text-xs text-muted-foreground">{t("pc_permonth")}</p>
                 </div>
               </div>
@@ -387,17 +391,17 @@ export default function PropertyDetail() {
                   </span>
                 )}
                 {p.pet_friendly && (
-                  <span className="flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+                  <span className="flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-400/15 dark:text-amber-300">
                     <PawPrint className="h-3.5 w-3.5" /> {t("badge_pet_v")}
                   </span>
                 )}
                 {p.parking && (
-                  <span className="flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800">
+                  <span className="flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800 dark:bg-blue-400/15 dark:text-blue-300">
                     <Car className="h-3.5 w-3.5" /> {t("badge_parking")}
                   </span>
                 )}
                 {p.furnished && (
-                  <span className="flex items-center gap-1 rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-800">
+                  <span className="flex items-center gap-1 rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-800 dark:bg-purple-400/15 dark:text-purple-300">
                     <CheckCircle2 className="h-3.5 w-3.5" /> {t("badge_furnished")}
                   </span>
                 )}
@@ -468,7 +472,7 @@ export default function PropertyDetail() {
 
           {/* RIGHT */}
           <div className="lg:col-span-1">
-            <div className="sticky top-20 rounded-2xl border border-border bg-white p-6 shadow-soft">
+            <div className="sticky top-20 rounded-2xl border border-border bg-white p-4 shadow-soft sm:p-6">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-mint" />
                 <h3 className="font-heading text-lg font-bold text-navy">{t("contact_h")}</h3>
