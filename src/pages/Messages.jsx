@@ -113,7 +113,7 @@ export default function Messages() {
             value={convSearch}
             onChange={(e) => setConvSearch(e.target.value)}
             placeholder="Caută conversație..."
-            className="w-full rounded-full border border-border bg-background py-2.5 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card"
+            className="w-full rounded-full border border-border bg-background py-2.5 pl-9 pr-4 text-base outline-none focus:border-emerald dark:bg-card"
           />
         </div>
       </div>
