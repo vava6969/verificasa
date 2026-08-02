@@ -1,5 +1,5 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
@@ -9,6 +9,10 @@ import InstagramPopup from "@/components/InstagramPopup";
 import CookieBanner from "@/components/CookieBanner";
 
 export default function Layout() {
+  const { pathname } = useLocation();
+  // Admin panel is a dense work surface — no marketing footer there.
+  const hideFooter = pathname.startsWith("/admin");
+
   return (
     <CountryProvider>
       <ScrollToTop />
@@ -17,7 +21,7 @@ export default function Layout() {
         <main className="flex-1 overflow-x-hidden pb-16 md:pb-0">
           <Outlet />
         </main>
-        <Footer />
+        {!hideFooter && <Footer />}
         <BottomNav />
         <InstagramPopup />
         <CookieBanner />

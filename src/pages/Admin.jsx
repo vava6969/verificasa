@@ -240,7 +240,7 @@ export default function Admin() {
         <div className="mb-5 rounded-2xl border border-border bg-white dark:bg-card shadow-sm overflow-hidden">
           <div className="px-4 pt-4 pb-2">
             <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Prioritare</p>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 no-scrollbar">
               {PTABS.map((t) => {
                 const Ico = t.icon;
                 const isActive = tab === t.k;
@@ -248,7 +248,7 @@ export default function Admin() {
                   <button
                     key={t.k}
                     onClick={() => setTab(t.k)}
-                    className={"flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-semibold transition " +
+                    className={"flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3.5 py-2 text-sm font-semibold transition " +
                       (isActive ? "bg-navy text-white shadow-sm" : "text-foreground/70 hover:bg-secondary/60")}
                   >
                     <Ico className={"h-4 w-4 " + (isActive ? "text-emerald" : t.tone === "rose" ? "text-rose-500" : t.tone === "amber" ? "text-amber-500" : "text-emerald")} />
