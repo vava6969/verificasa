@@ -3,105 +3,112 @@ import LegalPage from "@/components/LegalPage";
 
 export default function Terms() {
   return (
-    <LegalPage title="Termeni și Condiții – VerifiCasa" updated="Ultima actualizare: 26 Iulie 2026">
+    <LegalPage title="Termeni și Condiții – VerifiCasa" updated="Ultima actualizare: 2 August 2026">
       <p>
-        Prezentul document stabilește condițiile de utilizare a site-ului de prezentare
-        VerifiCasa (denumit în continuare „Site-ul”). Prin accesarea și navigarea pe acest
-        Site, sunteți de acord cu termenii descriși mai jos. Dacă nu sunteți de acord cu
-        aceștia, vă rugăm să părăsiți Site-ul.
+        Prin utilizarea acestui site și a aplicației, sunteți de acord cu prezentii termeni.
       </p>
 
       <section>
         <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
-          1. Caracterul informativ al Site-ului
+          Conturi
         </h2>
         <p>
-          1.1. Acest Site are un caracter strict informativ și de prezentare a serviciilor
-          imobiliare oferite de VerifiCasa.
-        </p>
-        <p>
-          1.2. Site-ul NU reprezintă o platformă automatizată, nu procesează plăți online, nu
-          creează conturi de utilizator și nu generează automat materiale digitale (cum ar fi
-          tururi virtuale sau randări AI) prin intermediul paginii web.
-        </p>
-        <p>
-          1.3. Orice imagini, exemple de tururi virtuale sau simulări prezentate pe site au rol
-          demonstrativ și de portofoliu.
+          Utilizatorii sunt responsabili pentru păstrarea confidențialității datelor de
+          autentificare.
         </p>
       </section>
 
       <section>
         <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
-          2. Prestarea serviciilor și contractul direct
+          Autentificarea Google
+        </h2>
+        <p>Atunci când utilizați autentificarea Google:</p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>acordați acces doar la informațiile pe care le aprobați;</li>
+          <li>puteți revoca accesul oricând din contul Google;</li>
+          <li>aplicația utilizează aceste informații exclusiv pentru funcționarea serviciului.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+          Utilizarea serviciului
+        </h2>
+        <p>Este interzisă:</p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>utilizarea ilegală;</li>
+          <li>încercarea de acces neautorizat;</li>
+          <li>copierea sau modificarea aplicației fără permisiune;</li>
+          <li>utilizarea serviciului în scopuri frauduloase.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+          Proprietatea intelectuală
         </h2>
         <p>
-          2.1. Toate serviciile oferite de VerifiCasa (promovare imobiliară, realizare tururi
-          virtuale AI, selecție chiriași, intermediere) sunt servicii prestate contra cost pe
-          baza unei solicitări directe.
-        </p>
-        <p>
-          2.2. Cadrul legal: Oferirea oricărui serviciu și plata aferentă se realizează EXCLUSIV
-          pe baza unui contract scris și semnat direct între VerifiCasa și Client
-          (Proprietar/Chiriaș).
-        </p>
-        <p>
-          2.3. Trimiterea unui formular de contact, a unui e-mail sau efectuarea unui apel
-          telefonic prin intermediul Site-ului nu obligă niciuna dintre părți la prestarea sau
-          plata vreunui serviciu până la semnarea formală a contractului de
-          intermediere/prestări servicii.
+          Tot conținutul aplicației aparține proprietarului acesteia și este protejat de
+          legislația privind drepturile de autor.
         </p>
       </section>
 
       <section>
         <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
-          3. Prețuri și comisioane
+          Limitarea răspunderii
         </h2>
         <p>
-          3.1. Prețurile, comisioanele și tarifele afișate pe Site (dacă există) au caracter
-          estimativ.
-        </p>
-        <p>
-          3.2. Valoarea finală a comisionului sau a tarifului pentru serviciile prestate va fi
-          stabilită de comun acord și menționată explicit în contractul direct semnat între
-          părți.
+          Serviciul este furnizat „ca atare”. Nu garantăm funcționarea neîntreruptă sau lipsa
+          erorilor.
         </p>
       </section>
 
       <section>
         <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
-          4. Limitarea răspunderii privind Site-ul
+          Încetarea accesului
         </h2>
         <p>
-          4.1. VerifiCasa depune toate eforturile pentru ca informațiile de pe Site să fie corecte
-          și actualizate. Cu toate acestea, nu garantăm că Site-ul nu va conține erori sau
-          omisiuni.
-        </p>
-        <p>
-          4.2. VerifiCasa nu poate fi trasă la răspundere pentru nicio daună directă sau indirectă
-          ce rezultă din accesarea sau utilizarea acestui Site de prezentare.
+          Ne rezervăm dreptul de a suspenda sau închide conturile care încalcă acești termeni.
         </p>
       </section>
 
       <section>
         <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
-          5. Drepturi de proprietate intelectuală
+          Modificarea termenilor
         </h2>
-        <p>
-          Întregul conținut al Site-ului (text, design, elemente grafice, logo-uri, materiale video
-          demonstrative) este proprietatea VerifiCasa și este protejat de legislația privind
-          drepturile de autor. Este interzisă copierea sau reproducerea conținutului fără acordul
-          scris al proprietarului.
-        </p>
+        <p>Ne rezervăm dreptul de a modifica acești termeni în orice moment.</p>
       </section>
 
       <section>
         <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
-          6. Legea aplicabilă
+          Politica privind Datele Google (Google User Data Policy)
         </h2>
         <p>
-          Prezentul document este guvernat de legile din România. Orice neînțelegere legată de
-          utilizarea Site-ului va fi rezolvată pe cale amiabilă sau de către instanțele
-          judecătorești competente.
+          Aplicația utilizează serviciile Google exclusiv pentru funcționalitățile solicitate
+          de utilizator.
+        </p>
+        <p>Datele accesate prin intermediul API-urilor Google:</p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>sunt utilizate numai pentru furnizarea serviciului solicitat;</li>
+          <li>nu sunt vândute;</li>
+          <li>nu sunt partajate în scopuri publicitare;</li>
+          <li>nu sunt folosite pentru crearea profilurilor de marketing;</li>
+          <li>
+            nu sunt transferate către terți fără consimțământul utilizatorului, cu excepția
+            cazurilor prevăzute de lege.
+          </li>
+        </ul>
+        <h3 className="font-heading text-sm font-bold text-navy dark:text-foreground mt-4">
+          Ștergerea accesului
+        </h3>
+        <p>Utilizatorul poate:</p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>revoca accesul aplicației din contul Google;</li>
+          <li>solicita ștergerea tuturor datelor stocate.</li>
+        </ul>
+        <p>
+          După ștergere, toate informațiile asociate sunt eliminate în conformitate cu
+          obligațiile legale.
         </p>
       </section>
     </LegalPage>
