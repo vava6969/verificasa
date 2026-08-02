@@ -70,7 +70,7 @@ export default function Landing() {
           </div>
 
           <Button asChild className="mt-4 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 sm:mt-6">
-            <a href="/post-property" target="_blank" rel="noopener noreferrer"><Plus className="h-4 w-4" /> {t("hdr_add")}</a>
+            <Link to="/post-property"><Plus className="h-4 w-4" /> {t("hdr_add")}</Link>
           </Button>
 
           <HeroCountdown />

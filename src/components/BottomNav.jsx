@@ -29,7 +29,7 @@ export default function BottomNav() {
     { icon: Heart, label: en ? "Saved" : "Salvate", path: "/saved", onClick: guard("/saved") },
     { icon: Plus, label: en ? "Add" : "Adaugă", path: "/post-property", onClick: () => {
       if (!isAuthenticated) { navigate("/login"); return; }
-      window.open("/post-property", "_blank", "noopener,noreferrer");
+      navigate("/post-property");
     }, primary: true },
     { icon: MessageCircle, label: en ? "Messages" : "Mesaje", path: "/messages", onClick: guard("/messages"), badge: unreadMessageCount > 0 ? (unreadMessageCount > 9 ? "9+" : unreadMessageCount) : null },
     { icon: User, label: isAuthenticated ? (en ? "Account" : "Cont") : t("hdr_login"), path: isAuthenticated ? "/account" : "/login", onClick: () => { if (isAuthenticated) { document.getElementById("account-menu")?.scrollIntoView({ behavior: "smooth", block: "start" }); navigate("/account#account-menu"); } else navigate("/login"); } },

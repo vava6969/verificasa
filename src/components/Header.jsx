@@ -133,7 +133,7 @@ export default function Header() {
         <DropdownMenuItem onClick={() => navigate("/searches")}><Search className="mr-2 h-4 w-4" /> {t("hdr_searches")}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/my-reports")}><Flag className="mr-2 h-4 w-4" /> Rapoartele mele</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => window.open("/post-property", "_blank", "noopener,noreferrer")}><Plus className="mr-2 h-4 w-4" /> {t("hdr_add_listing")}</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate("/post-property")}><Plus className="mr-2 h-4 w-4" /> {t("hdr_add_listing")}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/my-properties")}><Home className="mr-2 h-4 w-4" /> {t("hdr_myprops")}</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/settings")}><Settings className="mr-2 h-4 w-4" /> {t("hdr_settings")}</DropdownMenuItem>
         {canAdmin && (
@@ -171,16 +171,14 @@ export default function Header() {
 
             {isAuthenticated ? (
               <>
-                <a
-                  href="/post-property"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to="/post-property"
                   aria-label={t("hdr_add")}
                   className="flex h-9 items-center justify-center gap-1 rounded-full bg-emerald px-3 text-white shadow-soft transition hover:bg-emerald/90 md:px-4"
                 >
                   <Plus className="h-4 w-4" />
                   <span className="hidden md:inline">{t("hdr_add")}</span>
-                </a>
+                </Link>
                 <ProfileMenu />
               </>
             ) : (
