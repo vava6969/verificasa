@@ -8,7 +8,8 @@ import { useNotifications } from "@/hooks/useNotifications";
 // Mobile bottom navigation bar (OLX-style). Stays fixed and always visible
 // regardless of scroll position — items & structure unchanged.
 export default function BottomNav() {
-  const { t } = useCountry();
+  const { t, lang } = useCountry();
+  const en = lang === "en";
   const { isAuthenticated } = useAuth();
   const { unreadMessageCount } = useNotifications();
   const location = useLocation();
@@ -22,15 +23,16 @@ export default function BottomNav() {
     navigate(path);
   };
 
+  // Short single-row labels so nothing wraps onto two lines.
   const items = [
-    { icon: Home, label: t("hdr_home"), path: "/", onClick: guard("/") },
-    { icon: Heart, label: t("hdr_saved"), path: "/saved", onClick: guard("/saved") },
-    { icon: Plus, label: t("hdr_add"), path: "/post-property", onClick: () => {
+    { icon: Home, label: en ? "Home" : "Acasă", path: "/", onClick: guard("/") },
+    { icon: Heart, label: en ? "Saved" : "Salvate", path: "/saved", onClick: guard("/saved") },
+    { icon: Plus, label: en ? "Add" : "Adaugă", path: "/post-property", onClick: () => {
       if (!isAuthenticated) { navigate("/login"); return; }
       window.open("/post-property", "_blank", "noopener,noreferrer");
     }, primary: true },
-    { icon: MessageCircle, label: t("hdr_messages"), path: "/messages", onClick: guard("/messages"), badge: unreadMessageCount > 0 ? (unreadMessageCount > 9 ? "9+" : unreadMessageCount) : null },
-    { icon: User, label: isAuthenticated ? t("hdr_myaccount") : t("hdr_login"), path: isAuthenticated ? "/account" : "/login", onClick: () => { if (isAuthenticated) { document.getElementById("account-menu")?.scrollIntoView({ behavior: "smooth", block: "start" }); navigate("/account#account-menu"); } else navigate("/login"); } },
+    { icon: MessageCircle, label: en ? "Messages" : "Mesaje", path: "/messages", onClick: guard("/messages"), badge: unreadMessageCount > 0 ? (unreadMessageCount > 9 ? "9+" : unreadMessageCount) : null },
+    { icon: User, label: isAuthenticated ? (en ? "Account" : "Cont") : t("hdr_login"), path: isAuthenticated ? "/account" : "/login", onClick: () => { if (isAuthenticated) { document.getElementById("account-menu")?.scrollIntoView({ behavior: "smooth", block: "start" }); navigate("/account#account-menu"); } else navigate("/login"); } },
   ];
 
   const isActive = (path) => {
