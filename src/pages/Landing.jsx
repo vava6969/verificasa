@@ -51,11 +51,7 @@ export default function Landing() {
         <HeroPhoto />
 
         <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-4 pb-40 pt-24 text-center sm:px-6 sm:pb-48 sm:pt-28 lg:px-8">
-          <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-white/10 px-4 py-1.5 text-xs font-semibold text-gold backdrop-blur-md">
-            <ShieldCheck className="h-3.5 w-3.5" /> {t("hero_badge_verified")}
-          </span>
-
-          <p className="mt-5 font-heading text-sm font-bold uppercase tracking-[0.3em] text-white/90">
+          <p className="font-heading text-sm font-bold uppercase tracking-[0.3em] text-white/90">
             VerifiCasa
           </p>
           <p className="mt-1 text-xs font-medium text-white/70">
