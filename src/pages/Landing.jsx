@@ -55,7 +55,14 @@ export default function Landing() {
             <ShieldCheck className="h-3.5 w-3.5" /> {t("hero_badge_verified")}
           </span>
 
-          <h1 className="mt-6 font-heading text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
+          <p className="mt-5 font-heading text-sm font-bold uppercase tracking-[0.3em] text-white/90">
+            VerifiCasa
+          </p>
+          <p className="mt-1 text-xs font-medium text-white/70">
+            Inspecții & Verificări Imobiliare
+          </p>
+
+          <h1 className="mt-4 font-heading text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
             {t("hero_h1_a")}
             <br />
             <span className="text-gold">{t("hero_h1_b")}</span>
