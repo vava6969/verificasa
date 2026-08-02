@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useCountry } from "@/components/CountryContext";
 import { getCities, getZones } from "@/components/locations";
 
-export default function SearchBar({ compact = false }) {
+export default function SearchBar({ compact = false, onSubmitted }) {
   const { country, t } = useCountry();
   const navigate = useNavigate();
   const [city, setCity] = useState("");
@@ -43,16 +43,17 @@ export default function SearchBar({ compact = false }) {
     if (type && type !== "all") params.set("type", type);
     TOGGLES.forEach((tg) => { if (toggles[tg.key]) params.set(tg.key, "1"); });
     navigate(`/search?${params.toString()}`);
+    onSubmitted?.();
   };
 
-  const inputCls = "flex flex-1 items-center gap-2 rounded-lg border border-border bg-background px-3 py-2.5 dark:bg-card";
+  const inputCls = "flex flex-1 items-center gap-2 rounded-lg border border-border bg-white/80 px-3 py-2.5 dark:border-white/10 dark:bg-white/5";
 
   return (
-    <form onSubmit={handleSearch} className="w-full rounded-2xl border border-white/20 bg-white/95 p-2 shadow-2xl backdrop-blur md:p-3">
+    <form onSubmit={handleSearch} className="w-full">
       <div className="flex flex-col gap-2 md:flex-row md:items-center">
         <div className={inputCls}>
           <MapPin className="h-4 w-4 shrink-0 text-emerald" />
-          <select value={city} onChange={(e) => handleCity(e.target.value)} className="w-full cursor-pointer bg-transparent text-sm text-navy outline-none">
+          <select value={city} onChange={(e) => handleCity(e.target.value)} className="w-full cursor-pointer bg-transparent text-sm text-foreground outline-none">
             <option value="">{t("sb_city")}</option>
             {cities.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
@@ -62,7 +63,7 @@ export default function SearchBar({ compact = false }) {
 
         <div className={inputCls}>
           <Search className="h-4 w-4 shrink-0 text-emerald" />
-          <select value={zone} onChange={(e) => setZone(e.target.value)} disabled={!city} className="w-full cursor-pointer bg-transparent text-sm text-navy outline-none disabled:opacity-50">
+          <select value={zone} onChange={(e) => setZone(e.target.value)} disabled={!city} className="w-full cursor-pointer bg-transparent text-sm text-foreground outline-none disabled:opacity-50">
             <option value="">{t("sb_zone")}</option>
             {zones.map((z) => <option key={z} value={z}>{z}</option>)}
           </select>
@@ -72,7 +73,7 @@ export default function SearchBar({ compact = false }) {
 
         <div className={inputCls}>
           <Home className="h-4 w-4 shrink-0 text-emerald" />
-          <select value={type} onChange={(e) => setType(e.target.value)} className="w-full cursor-pointer bg-transparent text-sm text-navy outline-none">
+          <select value={type} onChange={(e) => setType(e.target.value)} className="w-full cursor-pointer bg-transparent text-sm text-foreground outline-none">
             {types.map((tp) => <option key={tp.value} value={tp.value}>{tp.label}</option>)}
           </select>
         </div>
@@ -94,7 +95,7 @@ export default function SearchBar({ compact = false }) {
               className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                 active
                   ? "border-emerald bg-emerald text-white shadow-soft"
-                  : "border-border bg-white text-foreground/70 hover:border-emerald/50"
+                  : "border-border bg-white/70 text-foreground/70 hover:border-emerald/50 dark:border-white/10 dark:bg-white/5"
               }`}
             >
               <tg.icon className="h-3.5 w-3.5" /> {tg.label}

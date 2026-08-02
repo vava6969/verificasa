@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Rocket } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 
 const TARGET = new Date("2026-08-28T10:00:00");
@@ -9,11 +9,12 @@ function diff() {
   const now = new Date();
   let d = TARGET - now;
   if (d < 0) d = 0;
-  const days = Math.floor(d / 86400000);
-  const hours = Math.floor((d % 86400000) / 3600000);
-  const mins = Math.floor((d % 3600000) / 60000);
-  const secs = Math.floor((d % 60000) / 1000);
-  return { days, hours, mins, secs };
+  return {
+    days: Math.floor(d / 86400000),
+    hours: Math.floor((d % 86400000) / 3600000),
+    mins: Math.floor((d % 3600000) / 60000),
+    secs: Math.floor((d % 60000) / 1000),
+  };
 }
 
 export default function LaunchCountdown() {
@@ -25,40 +26,50 @@ export default function LaunchCountdown() {
   }, []);
 
   const unit = (v, label) => (
-    <div className="flex flex-col items-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-navy-deep/80 font-heading text-xl font-extrabold text-white shadow-soft sm:h-20 sm:w-20 sm:rounded-2xl sm:text-3xl dark:bg-white/10">
+    <div className="flex min-w-[58px] flex-col items-center rounded-xl border border-border/70 bg-white/60 px-2 py-2.5 dark:border-white/10 dark:bg-white/5 sm:min-w-[76px] sm:py-3">
+      <span className="font-heading text-2xl font-bold tabular-nums tracking-tight text-navy dark:text-foreground sm:text-3xl">
         {String(v).padStart(2, "0")}
-      </div>
-      <span className="mt-1.5 text-[10px] font-semibold uppercase tracking-wide text-foreground/60 sm:mt-2 sm:text-[11px]">{label}</span>
+      </span>
+      <span className="mt-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-muted-foreground sm:text-[10px]">
+        {label}
+      </span>
     </div>
   );
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
-      <div className="relative overflow-hidden rounded-3xl border border-emerald/30 bg-emerald-soft/50 p-5 shadow-soft sm:p-10 dark:bg-emerald-soft/10">
-        <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-emerald/20 blur-2xl" />
-        <div className="relative flex flex-col items-center gap-4 text-center sm:gap-6 lg:flex-row lg:justify-between lg:text-left">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-emerald px-3 py-1 text-xs font-bold text-white shadow-soft">
-              <Rocket className="h-3.5 w-3.5" /> {t("countdown_badge")}
+    <section className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-10 lg:px-8">
+      <div className="overflow-hidden rounded-2xl border border-border bg-white/70 p-5 shadow-soft dark:border-white/10 dark:bg-white/[0.04] sm:rounded-3xl sm:p-8">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+          <div className="min-w-0">
+            <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-emerald">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald opacity-70" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald" />
+              </span>
+              {t("countdown_badge")}
             </span>
-            <h2 className="mt-2 font-heading text-xl font-extrabold text-navy dark:text-foreground sm:mt-3 sm:text-3xl">{t("countdown_h")}</h2>
+            <h2 className="mt-2 font-heading text-lg font-bold leading-snug text-navy dark:text-foreground sm:text-2xl">
+              {t("countdown_h")}
+            </h2>
             <p className="mt-1 text-xs text-muted-foreground sm:text-sm">{t("countdown_d")}</p>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-4">
-            {unit(time.days, t("countdown_days"))}
-            <span className="font-heading text-xl font-bold text-emerald sm:text-3xl">:</span>
-            {unit(time.hours, t("countdown_hours"))}
-            <span className="font-heading text-xl font-bold text-emerald sm:text-3xl">:</span>
-            {unit(time.mins, t("countdown_mins"))}
+          <div className="h-px w-full bg-border lg:hidden" />
+
+          <div className="flex items-center justify-between gap-4 lg:justify-end">
+            <div className="flex gap-2 sm:gap-3">
+              {unit(time.days, t("countdown_days"))}
+              {unit(time.hours, t("countdown_hours"))}
+              {unit(time.mins, t("countdown_mins"))}
+              {unit(time.secs, "SEC")}
+            </div>
           </div>
 
           <Link
             to="/about"
-            className="inline-flex items-center gap-2 rounded-full bg-emerald px-5 py-2.5 text-sm font-bold text-white shadow-soft transition hover:bg-emerald/90 hover:shadow-glow active:scale-[1.02] sm:px-6 sm:py-3 sm:text-base"
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald/40 px-5 py-2.5 text-sm font-semibold text-emerald transition hover:bg-emerald hover:text-white"
           >
-            <Rocket className="h-4 w-4" /> {t("countdown_btn")}
+            {t("countdown_btn")} <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </div>

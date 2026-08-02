@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
-import SearchBar from "@/components/SearchBar";
+import HeroSearch from "@/components/HeroSearch";
 import PropertyCard from "@/components/PropertyCard";
 import HeroPhoto from "@/components/HeroPhoto";
 import LaunchCountdown from "@/components/LaunchCountdown";
@@ -65,8 +65,8 @@ export default function Landing() {
             <span className="text-gold-gradient">{t("hero_h1_b")}</span>
           </h1>
 
-          <div className="mt-5 w-full max-w-4xl rounded-[26px] glass-panel p-2 sm:mt-8 sm:p-3">
-            <SearchBar />
+          <div className="mt-5 w-full max-w-4xl md:rounded-[26px] md:glass-panel md:p-3 sm:mt-8">
+            <HeroSearch />
           </div>
 
           <Button asChild className="mt-4 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 sm:mt-6">
