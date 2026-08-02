@@ -34,16 +34,17 @@ export default function Account() {
     else document.documentElement.classList.remove("dark");
   };
 
+  const en = lang === "en";
   const options = [
-    { icon: LayoutDashboard, label: t("hdr_dashboard"), path: "/" },
-    { icon: MessageCircle, label: t("hdr_messages"), path: "/messages" },
-    { icon: Bell, label: "Notificări", path: "/settings", badge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null },
-    { icon: Bookmark, label: t("hdr_saved"), path: "/saved" },
-    { icon: Search, label: t("hdr_searches"), path: "/searches" },
-    { icon: Plus, label: t("hdr_add_listing"), path: "/owner" },
-    { icon: Home, label: t("hdr_myprops"), path: "/my-properties" },
-    { icon: SettingsIcon, label: t("hdr_settings"), path: "/settings" },
-    ...(canAdmin ? [{ icon: ShieldCheck, label: t("hdr_admin"), path: "/admin", admin: true }] : []),
+    { icon: LayoutDashboard, label: en ? "Home" : "Acasă", path: "/" },
+    { icon: MessageCircle, label: en ? "Chat" : "Mesaje", path: "/messages" },
+    { icon: Bell, label: en ? "Alerts" : "Alerte", path: "/settings", badge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null },
+    { icon: Bookmark, label: en ? "Saved" : "Salvate", path: "/saved" },
+    { icon: Search, label: en ? "Searches" : "Căutări", path: "/searches" },
+    { icon: Plus, label: en ? "Add" : "Adaugă", path: "/owner" },
+    { icon: Home, label: en ? "Listings" : "Anunțuri", path: "/my-properties" },
+    { icon: SettingsIcon, label: en ? "Settings" : "Setări", path: "/settings" },
+    ...(canAdmin ? [{ icon: ShieldCheck, label: "Admin", path: "/admin", admin: true }] : []),
   ];
 
   return (
@@ -79,7 +80,7 @@ export default function Account() {
                     </span>
                   )}
                 </span>
-                <span className="w-full text-[10px] font-semibold uppercase leading-tight tracking-wide text-muted-foreground">{opt.label}</span>
+                <span className="w-full truncate text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{opt.label}</span>
               </Link>
             );
           })}
