@@ -1,7 +1,7 @@
 import React from "react";
 import {
   ShieldCheck, Video, FileText, Home, Users, Building2,
-  UserCheck, Search, Briefcase, Lock, Mail,
+  UserCheck, Search, Briefcase, Mail,
 } from "lucide-react";
 
 export default function AboutVerifiCasa() {
@@ -61,46 +61,6 @@ export default function AboutVerifiCasa() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Autentificare cu Google */}
-      <div className="mt-12 rounded-2xl border border-gold/30 bg-gold-soft/40 p-6 sm:p-8 dark:bg-card">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-navy shadow-soft dark:bg-secondary">
-            <Lock className="h-5 w-5 text-emerald" />
-          </div>
-          <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">
-            Autentificare cu Google
-          </h3>
-        </div>
-        <ul className="mt-4 space-y-2.5 text-sm leading-relaxed text-foreground/80">
-          <li className="flex items-start gap-2">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald" />
-            Autentificarea prin Google este <strong>opțională</strong> — puteți folosi și autentificarea clasică cu e-mail și parolă.
-          </li>
-          <li className="flex items-start gap-2">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald" />
-            Este folosită <strong>doar pentru identificarea și autentificarea utilizatorului</strong> (nume, e-mail, fotografie de profil).
-          </li>
-          <li className="flex items-start gap-2">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald" />
-            Datele Google <strong>nu sunt utilizate pentru publicitate</strong> și nu sunt folosite pentru profilare comercială.
-          </li>
-          <li className="flex items-start gap-2">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald" />
-            Datele <strong>nu sunt vândute și nu sunt partajate către terți</strong> în scopuri comerciale.
-          </li>
-          <li className="flex items-start gap-2">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald" />
-            Puteți <strong>revoca accesul oricând</strong> din contul Google sau puteți solicita ștergerea datelor.
-          </li>
-        </ul>
-        <p className="mt-4 text-xs text-muted-foreground">
-          Pentru detalii complete, consultați{" "}
-          <a href="/privacy" className="font-semibold text-emerald hover:underline">Politica de Confidențialitate</a>
-          {" "}și{" "}
-          <a href="/data-deletion" className="font-semibold text-emerald hover:underline">pagina de Ștergere a Datelor</a>.
-        </p>
       </div>
 
       {/* Contact rapid */}
