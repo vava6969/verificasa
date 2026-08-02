@@ -15,9 +15,9 @@ export default function VerifiCasaLogo({ size = 44, withWordmark = true, tagline
         className="rounded-full object-cover ring-1 ring-gold/50"
       />
       {withWordmark && (
-        <div className="leading-none">
-          <span className="block font-heading text-lg font-extrabold tracking-tight text-navy">VerifiCasa</span>
-          <span className="mt-0.5 block text-[8.5px] font-semibold uppercase tracking-[0.2em] text-gold">
+        <div className="min-w-0 leading-none">
+          <span className="block truncate font-heading text-base font-extrabold tracking-tight text-navy sm:text-lg">VerifiCasa</span>
+          <span className="mt-0.5 hidden text-[8.5px] font-semibold uppercase tracking-[0.2em] text-gold sm:block">
             Inspecții & Verificări Imobiliare
           </span>
           {tagline && (

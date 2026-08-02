@@ -153,9 +153,9 @@ export default function Header() {
   return (
     <header className={`sticky top-0 z-50 w-full border-b border-border/60 bg-white/85 backdrop-blur-xl transition-all duration-300 ease-out dark:bg-navy-deep/85 ${hidden ? "-translate-y-[calc(100%+4px)] opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-14 items-center justify-between gap-3">
-          <Link to="/" className="flex items-center gap-2 shrink-0">
-            <VerifiCasaLogo size={40} tagline={false} />
+        <div className="flex h-14 items-center justify-between gap-2">
+          <Link to="/" className="flex min-w-0 items-center gap-2">
+            <VerifiCasaLogo size={36} tagline={false} />
           </Link>
 
           <nav className="hidden items-center gap-6 md:flex">
@@ -165,7 +165,7 @@ export default function Header() {
           </nav>
 
           {/* Top-right actions — shared by desktop and mobile. */}
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <div className="hidden md:block"><CurrencySwitch /></div>
             <div className="hidden md:block"><ThemeToggle /></div>
 

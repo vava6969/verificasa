@@ -47,10 +47,10 @@ export default function Landing() {
     <div>
       <BetaBanner />
       {/* HERO */}
-      <section className="relative min-h-[660px] overflow-hidden">
+      <section className="relative min-h-[520px] overflow-hidden sm:min-h-[660px]">
         <HeroPhoto />
 
-        <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-4 pb-40 pt-24 text-center sm:px-6 sm:pb-48 sm:pt-28 lg:px-8">
+        <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-4 pb-24 pt-12 text-center sm:px-6 sm:pb-48 sm:pt-28 lg:px-8">
           <p className="font-heading text-sm font-bold uppercase tracking-[0.3em] text-white/90">
             VerifiCasa
           </p>
@@ -58,17 +58,17 @@ export default function Landing() {
             Inspecții & Verificări Imobiliare
           </p>
 
-          <h1 className="mt-4 font-heading text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
+          <h1 className="mt-3 font-heading text-3xl font-extrabold leading-tight text-white sm:mt-4 sm:text-5xl lg:text-6xl">
             {t("hero_h1_a")}
             <br />
             <span className="text-gold">{t("hero_h1_b")}</span>
           </h1>
 
-          <div className="mt-8 w-full max-w-4xl">
+          <div className="mt-5 w-full max-w-4xl sm:mt-8">
             <SearchBar />
           </div>
 
-          <Button asChild className="mt-6 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
+          <Button asChild className="mt-4 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 sm:mt-6">
             <a href="/post-property" target="_blank" rel="noopener noreferrer"><Plus className="h-4 w-4" /> {t("hdr_add")}</a>
           </Button>
         </div>
@@ -78,15 +78,17 @@ export default function Landing() {
       <LaunchCountdown />
 
       {/* VALUE PROPOSITION BAR */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid gap-5 md:grid-cols-3">
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-16 lg:px-8">
+        <div className="grid gap-3 sm:gap-5 md:grid-cols-3">
           {valueProps.map((v, i) => (
-            <div key={i} className="flex flex-col rounded-2xl border border-border bg-white p-6 shadow-soft">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-soft text-emerald">
-                <v.icon className="h-6 w-6" />
+            <div key={i} className="flex items-start gap-3.5 rounded-2xl border border-border bg-white p-4 shadow-soft md:flex-col md:p-6">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-soft text-emerald md:h-12 md:w-12">
+                <v.icon className="h-5 w-5 md:h-6 md:w-6" />
               </div>
-              <h3 className="mt-4 font-heading text-lg font-bold text-navy">{v.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{v.desc}</p>
+              <div>
+                <h3 className="font-heading text-base font-bold text-navy md:mt-4 md:text-lg">{v.title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground md:mt-2">{v.desc}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -96,8 +98,8 @@ export default function Landing() {
       <AboutVerifiCasa />
 
       {/* FEATURED PROPERTIES */}
-      <section id="featured" className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-end justify-between">
+      <section id="featured" className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 sm:pb-16 lg:px-8">
+        <div className="mb-5 flex items-end justify-between sm:mb-8">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-emerald">{t("featured_kicker")}</p>
             <h2 className="mt-1 font-heading text-2xl font-bold text-navy sm:text-3xl">{t("featured_h")}</h2>
@@ -118,13 +120,13 @@ export default function Landing() {
             <p className="text-sm text-muted-foreground">{t("featured_none_d")}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
             {display.map((p) => <PropertyCard key={p.id} property={p} hot />)}
           </div>
         )}
 
         {display.length > 0 && (
-          <div className="mt-8 flex justify-center">
+          <div className="mt-5 flex justify-center sm:mt-8">
             <Button asChild className="gap-2 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
               <Link to="/search">{t("view_all")} <ArrowRight className="h-4 w-4" /></Link>
             </Button>
@@ -133,8 +135,8 @@ export default function Landing() {
       </section>
 
       {/* SOLICITĂ O INSPECȚIE CTA */}
-      <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl gradient-navy p-8 text-white shadow-soft sm:p-12">
+      <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 sm:pb-20 lg:px-8">
+        <div className="relative overflow-hidden rounded-3xl gradient-navy p-6 text-white shadow-soft sm:p-12">
           <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-emerald/20 blur-2xl animate-blob" />
           <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-gold/20 blur-2xl animate-blob" style={{ animationDelay: "2.5s" }} />
           <div className="absolute right-1/3 -bottom-8 h-32 w-32 rounded-full bg-emerald/15 blur-2xl animate-blob" style={{ animationDelay: "4s" }} />
@@ -142,9 +144,9 @@ export default function Landing() {
             <span className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-white/10 px-3 py-1 text-xs font-semibold text-gold">
               <ShieldCheck className="h-3.5 w-3.5" /> {t("owner_badge")}
             </span>
-            <h2 className="mt-4 font-heading text-3xl font-bold leading-tight">{t("owner_h")}</h2>
-            <p className="mt-3 text-white/75">{t("owner_d")}</p>
-            <div className="mt-6 flex flex-wrap gap-3">
+            <h2 className="mt-3 font-heading text-2xl font-bold leading-tight sm:mt-4 sm:text-3xl">{t("owner_h")}</h2>
+            <p className="mt-2 text-sm text-white/75 sm:mt-3 sm:text-base">{t("owner_d")}</p>
+            <div className="mt-4 flex flex-wrap gap-2.5 sm:mt-6 sm:gap-3">
               <Button onClick={() => setShowInspectie(true)} className="gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
                 <ShieldCheck className="h-4 w-4" /> {t("owner_btn_inspectie")}
               </Button>
@@ -153,9 +155,9 @@ export default function Landing() {
               </Button>
             </div>
 
-            <p className="mt-5 text-xs text-white/55">{t("owner_note")}</p>
+            <p className="mt-4 text-xs text-white/55 sm:mt-5">{t("owner_note")}</p>
 
-            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="mt-5 grid grid-cols-2 gap-2 sm:mt-8 sm:grid-cols-4 sm:gap-3">
               {[
                 { emoji: "🛡️", label: t("b_verified") },
                 { emoji: "📐", label: t("b_measure") },
