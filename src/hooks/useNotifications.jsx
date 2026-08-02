@@ -39,6 +39,14 @@ export function useNotifications() {
   }, [isAuthenticated, user?.id]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadMessageCount = notifications.filter((n) => !n.read && n.type === "message").length;
+
+  const markAsRead = useCallback(async (id) => {
+    setNotifications((ns) => ns.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    try {
+      await base44.entities.Notification.update(id, { read: true });
+    } catch (e) { /* ignore */ }
+  }, []);
 
   const markAllRead = useCallback(async () => {
     const unread = notifications.filter((n) => !n.read);
@@ -54,5 +62,5 @@ export function useNotifications() {
     }
   }, [notifications]);
 
-  return { notifications, unreadCount, markAllRead, loading, reload: load };
+  return { notifications, unreadCount, unreadMessageCount, markAsRead, markAllRead, loading, reload: load };
 }

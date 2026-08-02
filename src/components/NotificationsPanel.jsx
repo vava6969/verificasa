@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Bell, MessageCircle, Heart, MessageSquare, Home, Star, CheckCheck, Phone, Tag, Building2 } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -30,19 +30,12 @@ function timeAgo(dateStr) {
 const TABS = ["Recente", "Citite", "Marcate"];
 
 export default function NotificationsPanel() {
-  const { notifications, unreadCount, markAllRead, loading } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllRead, loading } = useNotifications();
   const [activeTab, setActiveTab] = useState("Recente");
   const [starred, setStarred] = useState(() => {
     try { return new Set(JSON.parse(localStorage.getItem("vc_starred_notifs") || "[]")); }
     catch { return new Set(); }
   });
-
-  useEffect(() => {
-    if (unreadCount > 0) {
-      const t = setTimeout(() => markAllRead(), 1500);
-      return () => clearTimeout(t);
-    }
-  }, [unreadCount]);
 
   const toggleStar = (id, e) => {
     e.preventDefault(); e.stopPropagation();
@@ -156,11 +149,11 @@ export default function NotificationsPanel() {
             );
 
             return n.link ? (
-              <Link key={n.id} to={n.link} className="block">
+              <Link key={n.id} to={n.link} className="block" onClick={() => markAsRead(n.id)}>
                 {body}
               </Link>
             ) : (
-              <div key={n.id}>{body}</div>
+              <div key={n.id} onClick={() => markAsRead(n.id)}>{body}</div>
             );
           })
         )}

@@ -176,6 +176,8 @@ export function NewPropertyForm({ onDone, onCancel }) {
   const { user } = useAuth();
   const { toast } = useToast();
   const cities = useMemo(() => getCities(country), [country]);
+  const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
+  const isAdmin = ADMIN_ROLES.includes((user?.role || "").toUpperCase());
   const [form, setForm] = useState({
     title: "", description: "", price_monthly: "", city: "", zone: "", landmark: "", property_type: "Garsonieră",
     rooms: "1", surface_sqm: "", floor: "", deposit: "", available_from: "", images: "",
@@ -282,7 +284,12 @@ export function NewPropertyForm({ onDone, onCancel }) {
         phone: form.phone || "",
         whatsapp_phone: form.whatsapp_phone || "",
         seller_role: form.seller_role || "Proprietar",
-        approval_status: "PENDING",
+        approval_status: isAdmin ? "APPROVED" : "PENDING",
+        ...(isAdmin ? {
+          approved_by_id: user.id,
+          approved_by_name: user.full_name || user.email,
+          approved_date: new Date().toISOString(),
+        } : {}),
         furnished: true,
         pet_friendly: form.pet_friendly,
         parking: form.parking,
@@ -321,14 +328,18 @@ export function NewPropertyForm({ onDone, onCancel }) {
           ...(facilities.terasa ? ["🌿 Terasă / Grădină"] : []),
         ],
       });
-      try {
-        base44.functions.invoke("NotifyAdminsOnNewProperty", {
-          property_id: created.id,
-          title: form.title,
-          owner_name: form.owner_name || "",
-        }).catch(() => {});
-      } catch (_) {}
-      toast({ title: "Anunț trimis spre aprobare", description: "Un administrator îl va verifica în curând. Va apărea în lista publică după aprobare." });
+      if (!isAdmin) {
+        try {
+          base44.functions.invoke("NotifyAdminsOnNewProperty", {
+            property_id: created.id,
+            title: form.title,
+            owner_name: form.owner_name || "",
+          }).catch(() => {});
+        } catch (_) {}
+      }
+      toast(isAdmin
+        ? { title: "Anunț publicat", description: "Anunțul tău este vizibil acum în lista publică." }
+        : { title: "Anunț trimis spre aprobare", description: "Un administrator îl va verifica în curând. Va apărea în lista publică după aprobare." });
       onDone();
     } catch (err) {
       console.error("[Owner] create failed:", err);

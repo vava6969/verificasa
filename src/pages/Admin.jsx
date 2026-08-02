@@ -38,22 +38,19 @@ export default function Admin() {
   const isAllowed = isAuthenticated && user && ADMIN_ROLES.includes((user.role || "").toUpperCase());
   const isSuper = (user?.role || "").toUpperCase() === "SUPER_ADMIN";
 
+  const safe = async (fn, fallback) => { try { return await fn(); } catch { return fallback; } };
   const load = async () => {
-    try {
-      const [props, cmts, logs, usrs, insp, inq, reps] = await Promise.all([
-        base44.entities.Property.list("-created_date", 100),
-        base44.entities.Comment.list("-created_date", 50),
-        base44.entities.AuditLog.list("-created_date", 50),
-        base44.entities.User.list("-created_date", 100),
-        base44.entities.InspectionRequest.list("-created_date", 50),
-        base44.entities.Inquiry.list("-created_date", 50),
-        base44.entities.Report.list("-created_date", 100),
-      ]);
-      setProperties(props); setComments(cmts); setAudit(logs); setUsers(usrs);
-      setInspections(insp); setInquiries(inq); setReports(reps);
-    } catch {
-      setProperties([]); setComments([]); setAudit([]); setUsers([]); setInquiries([]); setReports([]);
-    }
+    const [props, cmts, logs, usrs, insp, inq, reps] = await Promise.all([
+      safe(() => base44.entities.Property.list("-created_date", 100), []),
+      safe(() => base44.entities.Comment.list("-created_date", 50), []),
+      safe(() => base44.entities.AuditLog.list("-created_date", 50), []),
+      safe(() => base44.entities.User.list("-created_date", 100), []),
+      safe(() => base44.entities.InspectionRequest.list("-created_date", 50), []),
+      safe(() => base44.entities.Inquiry.list("-created_date", 50), []),
+      safe(() => base44.entities.Report.list("-created_date", 100), []),
+    ]);
+    setProperties(props); setComments(cmts); setAudit(logs); setUsers(usrs);
+    setInspections(insp); setInquiries(inq); setReports(reps);
   };
 
   useEffect(() => { if (isAllowed) load(); }, [isAllowed]);
