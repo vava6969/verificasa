@@ -39,7 +39,7 @@ export default function AboutVerifiCasa() {
       {/* Servicii — compact rows on mobile, cards from sm up */}
       <div className="mt-5 grid gap-2.5 sm:mt-10 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
         {services.map((s, i) => (
-          <div key={i} className="flex items-start gap-3 rounded-2xl glass-panel p-3.5 sm:flex-col sm:p-6">
+          <div key={i} className="flex items-start gap-3 rounded-2xl surface-card p-3.5 sm:flex-col sm:p-6">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-soft text-emerald sm:h-11 sm:w-11">
               <s.icon className="h-4 w-4 sm:h-5 sm:w-5" />
             </div>
@@ -52,7 +52,7 @@ export default function AboutVerifiCasa() {
       </div>
 
       {/* Cui se adresează */}
-      <div className="mt-5 rounded-2xl glass-panel p-4 sm:mt-12 sm:p-8">
+      <div className="mt-5 rounded-2xl surface-card p-4 sm:mt-12 sm:p-8">
         <h3 className="text-center font-heading text-sm font-bold text-navy dark:text-foreground sm:text-lg">
           Cui se adresează
         </h3>

@@ -5,7 +5,7 @@ import { useCountry } from "@/components/CountryContext";
 import HeroSearch from "@/components/HeroSearch";
 import PropertyCard from "@/components/PropertyCard";
 import HeroPhoto from "@/components/HeroPhoto";
-import LaunchCountdown from "@/components/LaunchCountdown";
+import HeroCountdown from "@/components/HeroCountdown";
 import InspectieModal from "@/components/InspectieModal";
 import ListeazaPopup from "@/components/ListeazaPopup";
 import BetaBanner from "@/components/BetaBanner";
@@ -72,11 +72,10 @@ export default function Landing() {
           <Button asChild className="mt-4 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 sm:mt-6">
             <a href="/post-property" target="_blank" rel="noopener noreferrer"><Plus className="h-4 w-4" /> {t("hdr_add")}</a>
           </Button>
+
+          <HeroCountdown />
         </div>
       </section>
-
-      {/* COUNTDOWN BANNER */}
-      <LaunchCountdown />
 
       {/* VALUE PROPOSITION BAR */}
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-16 lg:px-8">
