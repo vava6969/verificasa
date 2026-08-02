@@ -49,7 +49,7 @@ export default function Landing() {
       <BetaBanner />
       {/* HERO */}
       <section className="relative min-h-[520px] overflow-hidden sm:min-h-[660px]">
-        <HeroPhoto fadeToClass="to-[#12161e]" />
+        <HeroPhoto />
 
         <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-4 pb-24 pt-12 text-center sm:px-6 sm:pb-48 sm:pt-28 lg:px-8">
           <p className="font-heading text-sm font-bold uppercase tracking-[0.3em] text-white/90">

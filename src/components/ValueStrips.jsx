@@ -14,8 +14,8 @@ export default function ValueStrips({ items }) {
             <v.icon className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
           <div className="min-w-0">
-            <h3 className="font-heading text-base font-bold text-white sm:text-lg">{v.title}</h3>
-            <p className="mt-1 text-sm leading-relaxed text-white/60">{v.desc}</p>
+            <h3 className="font-heading text-base font-bold text-navy dark:text-white sm:text-lg">{v.title}</h3>
+            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{v.desc}</p>
           </div>
         </div>
       ))}

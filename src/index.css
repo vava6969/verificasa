@@ -163,29 +163,38 @@
   /* ---- Dark Immersive landing scope ----
      Scoped overrides so shared components (countdown, about, property cards)
      render as frosted-glass panels on the deep navy landing background. */
-  .landing-dark { background-color: #12161e; color: #E8ECF2; }
-  .landing-dark .bg-white,
-  .landing-dark .bg-card,
-  .landing-dark .bg-secondary\/40 {
+  .dark .landing-dark { background-color: #12161e; color: #E8ECF2; }
+  .dark .landing-dark .bg-white,
+  .dark .landing-dark .bg-card,
+  .dark .landing-dark .bg-secondary\/40 {
     background-color: rgb(255 255 255 / 0.05);
     backdrop-filter: blur(14px);
   }
-  .landing-dark .text-navy,
-  .landing-dark .dark\:text-foreground { color: #F2F5F9; }
-  .landing-dark .text-muted-foreground { color: rgb(226 232 240 / 0.62); }
-  .landing-dark .border-border { border-color: rgb(255 255 255 / 0.10); }
-  .landing-dark .bg-emerald-soft { background-color: rgb(0 168 89 / 0.16); }
-  .landing-dark .shadow-soft { box-shadow: 0 10px 34px -18px rgb(0 0 0 / 0.9); }
-  .landing-dark .bg-navy-deep\/80 { background-color: rgb(255 255 255 / 0.07); }
-  .landing-dark .bg-gold.text-navy { color: #12161e; }
-  .landing-dark .gradient-navy { background-image: linear-gradient(135deg, #10141c 0%, #161d28 60%, #1b2532 100%); }
+  .dark .landing-dark .text-navy,
+  .dark .landing-dark .dark\:text-foreground { color: #F2F5F9; }
+  .dark .landing-dark .text-muted-foreground { color: rgb(226 232 240 / 0.62); }
+  .dark .landing-dark .border-border { border-color: rgb(255 255 255 / 0.10); }
+  .dark .landing-dark .bg-emerald-soft { background-color: rgb(0 168 89 / 0.16); }
+  .dark .landing-dark .shadow-soft { box-shadow: 0 10px 34px -18px rgb(0 0 0 / 0.9); }
+  .dark .landing-dark .bg-navy-deep\/80 { background-color: rgb(255 255 255 / 0.07); }
+  .dark .landing-dark .gradient-navy { background-image: linear-gradient(135deg, #10141c 0%, #161d28 60%, #1b2532 100%); }
+
+  /* Frosted panels: light-mode = white glass on light bg, dark = white/5 glass */
   .glass-panel {
+    background: rgb(255 255 255 / 0.72);
+    border: 1px solid rgb(27 34 44 / 0.08);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 12px 34px -20px rgb(27 34 44 / 0.45);
+  }
+  .dark .glass-panel {
     background: rgb(255 255 255 / 0.05);
     border: 1px solid rgb(255 255 255 / 0.10);
-    backdrop-filter: blur(16px);
     box-shadow: 0 12px 40px -22px rgb(0 0 0 / 0.9);
   }
-  .glass-panel-hi { background: rgb(255 255 255 / 0.08); }
+
+  /* Hero bottom fade blends into the page background in both themes */
+  .hero-fade { background-image: linear-gradient(to bottom, transparent, #ffffff); }
+  .dark .hero-fade { background-image: linear-gradient(to bottom, transparent, #12161e); }
   .glow-emerald { box-shadow: 0 0 0 1px rgb(0 168 89 / 0.30), 0 10px 30px -12px rgb(0 168 89 / 0.55); }
   .text-gold-gradient {
     background-image: linear-gradient(100deg, #E7CB92 0%, #C5A059 55%, #9C7B38 100%);
