@@ -4,7 +4,7 @@ import {
   Play, MapPin, Maximize, BedDouble, ShieldCheck, PawPrint, BadgePercent,
   TrendingDown, TrendingUp, Eye, Building2, Phone, MessageCircle,
   ChevronLeft, ChevronRight, Calendar, PhoneOff, Clock,
-  UserCircle2, Box,
+  UserCircle2, Box, Crown, Sparkles,
 } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
@@ -124,10 +124,10 @@ export default function PropertyCard({ property, hot = false }) {
           )}
         </div>
 
-        {/* Badge RECOMANDAT — trending (multe vizualizări), doar pe recomandate homepage */}
+        {/* Badge RECOMANDAT — premium, oferit doar de admin */}
         {hot && (
-          <span className="animate-badge-fade absolute right-3 top-3 flex items-center gap-1 rounded-full bg-gradient-to-r from-gold to-gold-deep px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white shadow-gold">
-            ⭐ {t("pc_hot")}
+          <span className="premium-badge absolute right-3 top-3 flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white">
+            <Crown className="h-3 w-3" /> {t("pc_hot")}
           </span>
         )}
 

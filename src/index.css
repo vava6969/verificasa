@@ -219,4 +219,18 @@
 
   /* Gradient buttons keep dark text on the bright green in both themes. */
   .dark .gradient-mint.text-navy, .dark .gradient-emerald.text-navy { color: hsl(217 24% 14%); }
+
+  /* Premium RECOMANDAT badge — metallic gold with shine sweep */
+  .premium-badge {
+    background: linear-gradient(135deg, #9C7B38 0%, #C5A059 25%, #F0D98A 50%, #C5A059 75%, #9C7B38 100%);
+    background-size: 200% 100%;
+    border: 1px solid rgb(240 217 138 / 0.6);
+    box-shadow: 0 2px 8px -2px rgb(197 160 89 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.5), 0 0 0 1px rgb(156 123 56 / 0.3);
+    text-shadow: 0 1px 1px rgb(92 72 30 / 0.5);
+    animation: vc-shine 4s ease-in-out infinite;
+  }
+  @keyframes vc-shine {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
 }
