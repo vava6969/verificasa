@@ -11,7 +11,7 @@ import CookieBanner from "@/components/CookieBanner";
 export default function Layout() {
   const { pathname } = useLocation();
   // Admin panel is a dense work surface — no marketing footer there.
-  const hideFooter = pathname.startsWith("/admin");
+  const hideFooter = pathname.startsWith("/admin") || pathname.startsWith("/messages");
 
   return (
     <CountryProvider>

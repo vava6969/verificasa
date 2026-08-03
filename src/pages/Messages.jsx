@@ -7,8 +7,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { MessageCircle, Search, MoreVertical, CheckCheck, RefreshCw } from "lucide-react";
+import { MessageCircle, Search, MoreVertical, CheckCheck, RefreshCw, Trash2, ChevronDown } from "lucide-react";
 import { initials, timeLabel, avatarColor } from "@/lib/chatUtils";
+import { Image } from "@/components/ui/image";
+
+const PAGE_SIZE = 5;
 
 export default function Messages() {
   const { user, isAuthenticated } = useAuth();
@@ -19,14 +22,26 @@ export default function Messages() {
   const [conversations, setConversations] = useState(null);
   const [convSearch, setConvSearch] = useState("");
   const [busy, setBusy] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [avatarMap, setAvatarMap] = useState({});
+  const [deletingId, setDeletingId] = useState(null);
 
   const loadConversations = async () => {
     try {
-      const [all, allMsgs] = await Promise.all([
+      const [all, allMsgs, allUsers] = await Promise.all([
         base44.entities.Conversation.list("-updated_date", 200),
         base44.entities.Message.list("-created_date", 500).catch(() => []),
+        base44.entities.User.list("-created_date", 200).catch(() => []),
       ]);
       const mine = all.filter((c) => c.buyer_id === user.id || c.seller_id === user.id);
+
+      // Build avatar map (user id -> avatar_url)
+      const avatars = {};
+      (allUsers || []).forEach((u) => {
+        if (u.id && u.avatar_url) avatars[u.id] = u.avatar_url;
+      });
+      setAvatarMap(avatars);
+
       const unreadByConv = {};
       const lastByConv = {};
       allMsgs.forEach((m) => {
@@ -52,7 +67,6 @@ export default function Messages() {
   }, [isAuthenticated, user?.id]);
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  // Older notification links used /messages?c=<id>
   if (legacyId) return <Navigate to={"/messages/" + legacyId} replace />;
 
   const markAllRead = async () => {
@@ -70,6 +84,21 @@ export default function Messages() {
     finally { setBusy(false); }
   };
 
+  const deleteConversation = async (e, conv) => {
+    e.stopPropagation();
+    setDeletingId(conv.id);
+    try {
+      await base44.entities.Message.deleteMany({ conversation_id: conv.id }).catch(() => {});
+      await base44.entities.Conversation.delete(conv.id);
+      toast({ title: "Conversație ștearsă" });
+      loadConversations();
+    } catch {
+      toast({ title: "Ștergerea a eșuat", variant: "destructive" });
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const filteredConvs = (conversations || []).filter((c) => {
     const q = convSearch.toLowerCase();
     if (!q) return true;
@@ -81,13 +110,20 @@ export default function Messages() {
   });
 
   const totalUnread = (conversations || []).reduce((acc, c) => acc + (c._unread || 0), 0);
+  const visibleConvs = filteredConvs.slice(0, visibleCount);
+  const hasMore = filteredConvs.length > visibleCount;
 
   return (
     <div className="mx-auto flex h-[calc(100vh-7rem)] w-full max-w-2xl flex-col overflow-hidden bg-[#f4f6f9] dark:bg-background lg:h-[calc(100vh-3.5rem)]">
+      {/* Header */}
       <div className="flex items-center justify-between border-b border-border bg-white px-4 py-3 dark:bg-card">
         <div className="flex items-center gap-2">
           <h1 className="font-heading text-xl font-bold text-navy dark:text-foreground">Mesaje</h1>
-          {totalUnread > 0 && <span className="rounded-full bg-emerald px-2 py-0.5 text-[10px] font-bold text-white">{totalUnread}</span>}
+          {totalUnread > 0 && (
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+              {totalUnread > 9 ? "+9" : totalUnread}
+            </span>
+          )}
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -106,18 +142,20 @@ export default function Messages() {
         </DropdownMenu>
       </div>
 
+      {/* Search */}
       <div className="bg-white px-3 py-2 dark:bg-card">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={convSearch}
-            onChange={(e) => setConvSearch(e.target.value)}
+            onChange={(e) => { setConvSearch(e.target.value); setVisibleCount(PAGE_SIZE); }}
             placeholder="Caută conversație..."
             className="w-full rounded-full border border-border bg-background py-2.5 pl-9 pr-4 text-base outline-none focus:border-emerald dark:bg-card"
           />
         </div>
       </div>
 
+      {/* List */}
       <div className="flex-1 overflow-y-auto pb-20 lg:pb-0">
         {conversations === null ? (
           <div className="space-y-1 px-2 py-2">
@@ -131,37 +169,73 @@ export default function Messages() {
             </p>
           </div>
         ) : (
-          filteredConvs.map((c) => {
-            const otherN = c.buyer_id === user?.id ? c.seller_name : c.buyer_name;
-            const unread = c._unread || 0;
-            return (
-              <button
-                key={c.id}
-                onClick={() => navigate("/messages/" + c.id)}
-                className="flex w-full items-center gap-3 border-b border-border/50 bg-white px-4 py-3 text-left transition-colors hover:bg-secondary/40 dark:bg-card"
-              >
-                <span className={["flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white", avatarColor(c.id)].join(" ")}>
-                  {initials(otherN || c.property_title || "?")}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-1">
-                    <span className={["truncate text-sm text-navy dark:text-foreground", unread ? "font-bold" : "font-semibold"].join(" ")}>
-                      {otherN || c.property_title || "Conversație"}
+          <>
+            {visibleConvs.map((c) => {
+              const otherId = c.buyer_id === user?.id ? c.seller_id : c.buyer_id;
+              const otherN = c.buyer_id === user?.id ? c.seller_name : c.buyer_name;
+              const unread = c._unread || 0;
+              const avatarUrl = avatarMap[otherId];
+              return (
+                <div
+                  key={c.id}
+                  onClick={() => navigate("/messages/" + c.id)}
+                  className="group flex w-full cursor-pointer items-center gap-3 border-b border-border/50 bg-white px-4 py-3 text-left transition-colors hover:bg-secondary/40 dark:bg-card"
+                >
+                  {avatarUrl ? (
+                    <Image
+                      src={avatarUrl}
+                      alt={otherN || "Avatar"}
+                      fittingType="fill"
+                      className="h-11 w-11 shrink-0 rounded-full"
+                    />
+                  ) : (
+                    <span className={["flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white", avatarColor(c.id)].join(" ")}>
+                      {initials(otherN || c.property_title || "?")}
                     </span>
-                    <span className="shrink-0 text-[11px] text-muted-foreground">{timeLabel(c._lastAt || c.updated_date)}</span>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className={["truncate text-sm text-navy dark:text-foreground", unread ? "font-bold" : "font-semibold"].join(" ")}>
+                        {otherN || c.property_title || "Conversație"}
+                      </span>
+                      <span className="shrink-0 text-[11px] text-muted-foreground">{timeLabel(c._lastAt || c.updated_date)}</span>
+                    </div>
+                    <div className="mt-0.5 flex items-center gap-2">
+                      <p className={["truncate text-xs", unread ? "font-medium text-foreground/80" : "text-muted-foreground"].join(" ")}>
+                        {c.last_message || c.property_title || "Niciun mesaj"}
+                      </p>
+                      {unread > 0 && (
+                        <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+                          {unread > 9 ? "+9" : unread}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="mt-0.5 flex items-center gap-2">
-                    <p className={["truncate text-xs", unread ? "font-medium text-foreground/80" : "text-muted-foreground"].join(" ")}>
-                      {c.last_message || c.property_title || "Niciun mesaj"}
-                    </p>
-                    {unread > 0 && (
-                      <span className="ml-auto shrink-0 rounded-full bg-emerald px-1.5 py-0.5 text-[10px] font-bold text-white">{unread}</span>
+                  <button
+                    onClick={(e) => deleteConversation(e, c)}
+                    disabled={deletingId === c.id}
+                    className="shrink-0 rounded-full p-1.5 text-muted-foreground/40 transition hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/40"
+                    aria-label="Șterge conversația"
+                  >
+                    {deletingId === c.id ? (
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
                     )}
-                  </div>
+                  </button>
                 </div>
+              );
+            })}
+            {hasMore && (
+              <button
+                onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                className="flex w-full items-center justify-center gap-2 border-b border-border/50 bg-white py-4 text-sm font-semibold text-emerald transition hover:bg-emerald-soft dark:bg-card"
+              >
+                <ChevronDown className="h-4 w-4" />
+                Arată mai multe ({filteredConvs.length - visibleCount} restante)
               </button>
-            );
-          })
+            )}
+          </>
         )}
       </div>
     </div>
