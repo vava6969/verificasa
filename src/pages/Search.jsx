@@ -269,35 +269,41 @@ export default function SearchPage() {
             {paged.map((p) => <PropertyCard key={p.id} property={p} />)}
           </div>
 
-          {totalPages > 1 && (
-            <div className="mt-7 flex flex-col items-center gap-3">
-              <p className="text-xs font-medium text-muted-foreground">{lang === "en" ? `Page ${safePage} of ${totalPages}` : `Pagina ${safePage} din ${totalPages}`}</p>
-              <div className="flex items-center gap-1.5">
-                <button onClick={() => goPage(Math.max(1, safePage - 1))} disabled={safePage === 1}
-                  className="flex h-9 items-center justify-center rounded-lg border border-border bg-white px-3 text-sm font-medium text-foreground transition hover:bg-secondary disabled:opacity-40 dark:bg-card">
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                {Array.from({ length: totalPages }).map((_, i) => {
-                  const pn = i + 1;
-                  if (totalPages > 7 && Math.abs(pn - safePage) > 1 && pn !== 1 && pn !== totalPages) {
-                    if (pn === 2 || pn === totalPages - 1) return <span key={pn} className="px-1 text-muted-foreground">…</span>;
-                    return null;
-                  }
-                  return (
+          {totalPages > 1 && (() => {
+            const MAX_VISIBLE = 5;
+            let start = Math.max(1, safePage - Math.floor(MAX_VISIBLE / 2));
+            let end = Math.min(totalPages, start + MAX_VISIBLE - 1);
+            start = Math.max(1, end - MAX_VISIBLE + 1);
+            const pages = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+            return (
+              <div className="mt-7 flex flex-col items-center gap-3">
+                <p className="text-xs font-medium text-muted-foreground">
+                  {lang === "en"
+                    ? `${found} listings · Page ${safePage} of ${totalPages}`
+                    : `${found} anunțuri · Pagina ${safePage} din ${totalPages}`}
+                </p>
+                <div className="flex items-center gap-1.5">
+                  <button onClick={() => goPage(Math.max(1, safePage - 1))} disabled={safePage === 1}
+                    className="flex h-9 items-center justify-center rounded-lg border border-border bg-white px-3 text-sm font-medium text-foreground transition hover:bg-secondary disabled:opacity-40 dark:bg-card">
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  {start > 1 && <span className="px-1 text-muted-foreground">…</span>}
+                  {pages.map((pn) => (
                     <button key={pn} onClick={() => goPage(pn)}
                       className={"h-9 min-w-9 rounded-lg px-3 text-sm font-semibold transition " +
                         (pn === safePage ? "bg-navy text-white shadow-soft" : "border border-border bg-white text-foreground hover:bg-secondary dark:bg-card")}>
                       {pn}
                     </button>
-                  );
-                })}
-                <button onClick={() => goPage(Math.min(totalPages, safePage + 1))} disabled={safePage === totalPages}
-                  className="flex h-9 items-center justify-center rounded-lg border border-border bg-white px-3 text-sm font-medium text-foreground transition hover:bg-secondary disabled:opacity-40 dark:bg-card">
-                  <ChevronRight className="h-4 w-4" />
-                </button>
+                  ))}
+                  {end < totalPages && <span className="px-1 text-muted-foreground">…</span>}
+                  <button onClick={() => goPage(Math.min(totalPages, safePage + 1))} disabled={safePage === totalPages}
+                    className="flex h-9 items-center justify-center rounded-lg border border-border bg-white px-3 text-sm font-medium text-foreground transition hover:bg-secondary disabled:opacity-40 dark:bg-card">
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </>
       )}
     </div>
