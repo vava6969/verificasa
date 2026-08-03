@@ -46,7 +46,7 @@ export default function SimilarProperties({ property }) {
   if (!items) {
     return (
       <div className="flex gap-3 overflow-hidden sm:gap-4">
-        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-80 w-[260px] shrink-0 rounded-2xl sm:w-72" />)}
+        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-80 w-[240px] shrink-0 rounded-2xl sm:w-72" />)}
       </div>
     );
   }
@@ -77,11 +77,11 @@ export default function SimilarProperties({ property }) {
 
       <div
         ref={scrollerRef}
-        className="no-scrollbar mt-3 flex gap-3 overflow-x-auto scroll-smooth pb-1 sm:mt-4 sm:gap-4"
-        style={{ scrollSnapType: "x mandatory" }}
+        className="no-scrollbar mt-3 flex gap-3 overflow-x-auto pb-2 sm:mt-4 sm:gap-4"
+        style={{ scrollSnapType: "x proximity", WebkitOverflowScrolling: "touch" }}
       >
         {items.map((p) => (
-          <div key={p.id} className="w-[260px] shrink-0 sm:w-72 lg:w-80" style={{ scrollSnapAlign: "start" }}>
+          <div key={p.id} className="w-[240px] shrink-0 sm:w-72 lg:w-80" style={{ scrollSnapAlign: "start" }}>
             <PropertyCard property={p} />
           </div>
         ))}

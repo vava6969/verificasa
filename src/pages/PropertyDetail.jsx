@@ -346,7 +346,7 @@ export default function PropertyDetail() {
 
         <div className="mt-4 grid gap-4 sm:mt-6 sm:gap-6 lg:grid-cols-3">
           {/* LEFT */}
-          <div className="space-y-4 sm:space-y-6 lg:col-span-2">
+          <div className="min-w-0 space-y-4 sm:space-y-6 lg:col-span-2">
             {editing && (
               <PropertyEditForm
                 property={p}
@@ -499,7 +499,7 @@ export default function PropertyDetail() {
           )}
 
           {/* RIGHT */}
-          <div className="lg:col-span-1">
+          <div className="min-w-0 lg:col-span-1">
             <div className="sticky top-20 rounded-2xl border border-border bg-white p-4 shadow-soft sm:p-6">
               <div className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-mint" />
