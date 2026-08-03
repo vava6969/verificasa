@@ -7,7 +7,7 @@ import PropertyCard from "@/components/PropertyCard";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, SlidersHorizontal, ArrowDownUp, BookmarkPlus, RotateCcw, Search } from "lucide-react";
+import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, SlidersHorizontal, ArrowDownUp, BookmarkPlus, RotateCcw, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
 
@@ -42,7 +42,7 @@ const makeSort = (t) => [
 const norm = (s) => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
 export default function SearchPage() {
-  const { country, t } = useCountry();
+  const { country, t, lang } = useCountry();
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [params, setParams] = useSearchParams();
@@ -54,6 +54,7 @@ export default function SearchPage() {
   const [swap, setSwap] = useState(false);
   const [fairness, setFairness] = useState("");
   const [sort, setSort] = useState("");
+  const [page, setPage] = useState(1);
 
   const cityParam = params.get("city");
   const zoneParam = params.get("zone");
@@ -107,6 +108,9 @@ export default function SearchPage() {
     return () => { cancelled = true; try { unsub && unsub(); } catch { /* noop */ } };
   }, []);
 
+  // Reset to first page whenever filters change
+  useEffect(() => { setPage(1); }, [cityParam, zoneParam, typeParam, qParam, budget, roomsMin, surfaceMin, furnished, swap, fairness, sort, activeFilters.size]);
+
   const toggle = (key) => {
     setActiveFilters((prev) => {
       const n = new Set(prev);
@@ -146,6 +150,11 @@ export default function SearchPage() {
   else if (sort === "newest") filtered = [...filtered].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
 
   const found = filtered.length;
+  const PER_PAGE = 10;
+  const totalPages = Math.max(1, Math.ceil(found / PER_PAGE));
+  const safePage = Math.min(page, totalPages);
+  const paged = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
+  const goPage = (pn) => { setPage(pn); window.scrollTo({ top: 0, behavior: "smooth" }); };
 
   const saveSearch = async () => {
     if (!isAuthenticated) { toast({ title: t("sr_save_login"), variant: "destructive" }); return; }
@@ -255,9 +264,41 @@ export default function SearchPage() {
           <p className="text-sm text-muted-foreground">{t("sr_empty_sub")}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((p) => <PropertyCard key={p.id} property={p} />)}
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {paged.map((p) => <PropertyCard key={p.id} property={p} />)}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="mt-7 flex flex-col items-center gap-3">
+              <p className="text-xs font-medium text-muted-foreground">{lang === "en" ? `Page ${safePage} of ${totalPages}` : `Pagina ${safePage} din ${totalPages}`}</p>
+              <div className="flex items-center gap-1.5">
+                <button onClick={() => goPage(Math.max(1, safePage - 1))} disabled={safePage === 1}
+                  className="flex h-9 items-center justify-center rounded-lg border border-border bg-white px-3 text-sm font-medium text-foreground transition hover:bg-secondary disabled:opacity-40 dark:bg-card">
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                {Array.from({ length: totalPages }).map((_, i) => {
+                  const pn = i + 1;
+                  if (totalPages > 7 && Math.abs(pn - safePage) > 1 && pn !== 1 && pn !== totalPages) {
+                    if (pn === 2 || pn === totalPages - 1) return <span key={pn} className="px-1 text-muted-foreground">…</span>;
+                    return null;
+                  }
+                  return (
+                    <button key={pn} onClick={() => goPage(pn)}
+                      className={"h-9 min-w-9 rounded-lg px-3 text-sm font-semibold transition " +
+                        (pn === safePage ? "bg-navy text-white shadow-soft" : "border border-border bg-white text-foreground hover:bg-secondary dark:bg-card")}>
+                      {pn}
+                    </button>
+                  );
+                })}
+                <button onClick={() => goPage(Math.min(totalPages, safePage + 1))} disabled={safePage === totalPages}
+                  className="flex h-9 items-center justify-center rounded-lg border border-border bg-white px-3 text-sm font-medium text-foreground transition hover:bg-secondary disabled:opacity-40 dark:bg-card">
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

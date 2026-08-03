@@ -70,7 +70,7 @@ export default function PropertyCard({ property, hot = false }) {
     : "";
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-glow dark:bg-card">
+    <div className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-glow dark:bg-card ${hot ? "premium-glow border-gold/50" : "border-border"}`}>
       {/* Cover with slider */}
       <div
         className="relative aspect-[4/3] overflow-hidden touch-pan-y"
@@ -100,29 +100,42 @@ export default function PropertyCard({ property, hot = false }) {
           </div>
         )}
 
-        {/* Badges top-left */}
-        <div className="absolute left-3 top-3 flex flex-col gap-1.5">
-          {isVerified && (
-            <span className="flex items-center gap-1 rounded-full bg-emerald px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
+        {/* Badges top-left — max 3 visible, rest collapsed as +X */}
+        {(() => {
+          const badges = [];
+          if (isVerified) badges.push(
+            <span key="v" className="flex items-center gap-1 rounded-full bg-emerald px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
               <ShieldCheck className="h-3.5 w-3.5" /> {t("pc_verified")}
             </span>
-          )}
-          {p.tour_3d_url && (
-            <span className="flex items-center gap-1 rounded-full bg-navy px-2.5 py-1 text-[11px] font-bold text-mint shadow-soft ring-1 ring-mint/40">
+          );
+          if (p.tour_3d_url) badges.push(
+            <span key="3d" className="flex items-center gap-1 rounded-full bg-navy px-2.5 py-1 text-[11px] font-bold text-mint shadow-soft ring-1 ring-mint/40">
               <Box className="h-3.5 w-3.5" /> {t("tab_3d")}
             </span>
-          )}
-          {p.commission_free && (
-            <span className="flex items-center gap-1 rounded-full bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
+          );
+          if (p.commission_free) badges.push(
+            <span key="cf" className="flex items-center gap-1 rounded-full bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
               <BadgePercent className="h-3 w-3" /> {t("pc_com0")}
             </span>
-          )}
-          {p.pet_friendly && (
-            <span className="flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold text-slate-800 backdrop-blur">
+          );
+          if (p.pet_friendly) badges.push(
+            <span key="pet" className="flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold text-slate-800 backdrop-blur">
               <PawPrint className="h-3 w-3" /> {t("pc_pet_btn")}
             </span>
-          )}
-        </div>
+          );
+          const visible = badges.slice(0, 3);
+          const extra = badges.length - visible.length;
+          return (
+            <div className="absolute left-3 top-3 flex flex-col gap-1.5">
+              {visible}
+              {extra > 0 && (
+                <span className="flex items-center justify-center rounded-full bg-navy/80 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  +{extra}
+                </span>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Badge RECOMANDAT — premium, oferit doar de admin */}
         {hot && (

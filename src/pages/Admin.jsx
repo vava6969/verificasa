@@ -9,7 +9,7 @@ import { Image as UIImage } from "@/components/ui/image";
 import {
   ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck,
   Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil,
-  Sparkles, History, Flag, ClipboardCheck,
+  Sparkles, History, Flag, ClipboardCheck, Crown,
 } from "lucide-react";
 import PropertyEditForm from "@/components/PropertyEditForm";
 import PropertyLogs from "@/components/PropertyLogs";
@@ -35,6 +35,7 @@ export default function Admin() {
   const [editingId, setEditingId] = useState(null);
   const [propSearch, setPropSearch] = useState("");
   const [auditSearch, setAuditSearch] = useState("");
+  const [featuredInput, setFeaturedInput] = useState("");
 
   const isAllowed = isAuthenticated && user && ADMIN_ROLES.includes((user.role || "").toUpperCase());
   const isSuper = (user?.role || "").toUpperCase() === "SUPER_ADMIN";
@@ -153,6 +154,25 @@ export default function Admin() {
     } catch { toast({ title: "Eroare", variant: "destructive" }); }
   };
 
+  const toggleFeatured = async (p) => {
+    try {
+      await base44.entities.Property.update(p.id, { featured: !p.featured });
+      toast({ title: !p.featured ? "Badge Recomandat acordat" : "Badge Recomandat retras" });
+      log(!p.featured ? "grant_featured" : "revoke_featured", "property", p.id, p.title);
+      load();
+    } catch { toast({ title: "Eroare", variant: "destructive" }); }
+  };
+
+  const grantFeaturedById = async () => {
+    const input = featuredInput.trim();
+    if (!input) return;
+    const p = (properties || []).find((x) => x.id === input || String(x.property_code) === input || x.id.startsWith(input));
+    if (!p) { toast({ title: "Proprietate negasita", variant: "destructive" }); return; }
+    if (p.featured) { toast({ title: "Aceasta proprietate are deja badge-ul", variant: "destructive" }); return; }
+    await toggleFeatured(p);
+    setFeaturedInput("");
+  };
+
   const verifyUser = async (u, val) => {
     if (!val && !isSuper) { toast({ title: "Doar SUPER_ADMIN poate retrage conturi", variant: "destructive" }); return; }
     try {
@@ -191,6 +211,7 @@ export default function Admin() {
     { k: "inspectii",          label: "Inspectii",    icon: ClipboardList,   count: (inspections || []).length,                                     tone: "emerald" },
     { k: "rapoarte",           label: "Sesizari",     icon: Flag,            count: (reports || []).filter((r) => r.status === "PENDING").length,   tone: "rose" },
     { k: "rapoarte_rezolvate", label: "Rezolvate",    icon: ClipboardCheck,  count: (reports || []).filter((r) => r.status !== "PENDING").length,   tone: "emerald" },
+    { k: "recomandate",        label: "Recomandate",   icon: Crown,            count: all.filter((p) => p.featured).length,                           tone: "gold" },
   ];
   const GTABS = [
     { k: "all",      label: "Toate anunturile",   icon: Building2 },
@@ -252,13 +273,14 @@ export default function Admin() {
                     className={"flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3.5 py-2 text-sm font-semibold transition " +
                       (isActive ? "bg-navy text-white shadow-sm" : "text-foreground/70 hover:bg-secondary/60")}
                   >
-                    <Ico className={"h-4 w-4 " + (isActive ? "text-emerald" : t.tone === "rose" ? "text-rose-500" : t.tone === "amber" ? "text-amber-500" : "text-emerald")} />
+                    <Ico className={"h-4 w-4 " + (isActive ? "text-emerald" : t.tone === "rose" ? "text-rose-500" : t.tone === "amber" ? "text-amber-500" : t.tone === "gold" ? "text-gold-deep" : "text-emerald")} />
                     {t.label}
                     {t.count > 0 && (
                       <span className={"rounded-full px-1.5 py-0.5 text-[10px] font-bold " +
                         (isActive ? "bg-white/20 text-white" :
                          t.tone === "rose" ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400" :
                          t.tone === "amber" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" :
+                         t.tone === "gold" ? "bg-gold-soft text-gold-deep" :
                          "bg-emerald-soft text-emerald")}>
                         {t.count}
                       </span>
@@ -422,6 +444,54 @@ export default function Admin() {
                     <p className="mt-1 text-sm text-foreground/80">{c.content}</p>
                   </div>
                 ))}
+            </div>
+
+          ) : tab === "recomandate" ? (
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-gold/30 bg-gold-soft/30 p-4 dark:bg-card">
+                <div className="mb-1 flex items-center gap-2">
+                  <Crown className="h-5 w-5 text-gold-deep" />
+                  <h3 className="font-heading font-bold text-navy dark:text-foreground">Acordare badge Recomandat</h3>
+                </div>
+                <p className="mb-3 text-xs text-muted-foreground">Introdu ID-ul sau codul proprietatii pentru a acorda badge-ul premium Recomandat.</p>
+                <div className="flex gap-2">
+                  <input
+                    value={featuredInput}
+                    onChange={(e) => setFeaturedInput(e.target.value)}
+                    placeholder="ID proprietate sau cod..."
+                    className="flex-1 rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-gold dark:bg-card"
+                    onKeyDown={(e) => { if (e.key === "Enter") grantFeaturedById(); }}
+                  />
+                  <Button onClick={grantFeaturedById} className="gap-1.5 gradient-gold text-white hover:opacity-90">
+                    <Crown className="h-4 w-4" /> Acorda
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <p className="mb-2 text-sm font-semibold text-navy dark:text-foreground">
+                  Proprietati recomandate ({all.filter((p) => p.featured).length})
+                </p>
+                {all.filter((p) => p.featured).length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Nicio proprietate recomandata.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {all.filter((p) => p.featured).map((p) => (
+                      <div key={p.id} className="flex items-center gap-3 rounded-xl border border-gold/30 bg-white p-3 dark:bg-card">
+                        <div className="h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-secondary">
+                          {p.images?.[0] && <UIImage src={p.images[0]} fittingType="fill" className="h-full w-full" />}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-heading font-bold text-navy line-clamp-1 dark:text-foreground">{p.title}</p>
+                          <p className="text-xs text-muted-foreground">{p.zone}, {p.city} · Cod: {p.property_code || p.id.slice(0, 8)}</p>
+                        </div>
+                        <Button size="sm" variant="outline" onClick={() => toggleFeatured(p)} className="gap-1 border-destructive/30 text-destructive hover:bg-destructive/10">
+                          <X className="h-3.5 w-3.5" /> Retrage
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
           ) : (

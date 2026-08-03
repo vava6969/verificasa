@@ -233,4 +233,14 @@
     0%, 100% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
   }
+
+  /* Premium glow ring around RECOMANDAT property cards */
+  .premium-glow {
+    box-shadow: 0 0 0 1px rgb(197 160 89 / 0.35), 0 8px 30px -8px rgb(197 160 89 / 0.4), 0 0 24px -6px rgb(197 160 89 / 0.25);
+    animation: vc-glow-pulse 3s ease-in-out infinite;
+  }
+  @keyframes vc-glow-pulse {
+    0%, 100% { box-shadow: 0 0 0 1px rgb(197 160 89 / 0.35), 0 8px 30px -8px rgb(197 160 89 / 0.4), 0 0 24px -6px rgb(197 160 89 / 0.25); }
+    50% { box-shadow: 0 0 0 1px rgb(197 160 89 / 0.55), 0 14px 44px -8px rgb(197 160 89 / 0.55), 0 0 36px -6px rgb(197 160 89 / 0.4); }
+  }
 }

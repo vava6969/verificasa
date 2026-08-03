@@ -87,14 +87,18 @@ export default function Owner() {
           </Button>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-3">
+        <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-4">
           {STAT_CARDS.map((s, i) => (
-            <div key={i} className="rounded-2xl border border-border bg-white p-5 shadow-soft">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-mint-soft">
-                <s.icon className="h-5 w-5 text-navy" />
+            <div key={i} className="surface-card rounded-xl p-2.5 sm:p-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-soft sm:h-10 sm:w-10">
+                  <s.icon className="h-4 w-4 text-emerald sm:h-5 sm:w-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-heading text-lg font-bold leading-none text-navy sm:text-2xl">{s.value}</p>
+                  <p className="mt-0.5 truncate text-[10px] text-muted-foreground sm:text-xs">{s.label}</p>
+                </div>
               </div>
-              <p className="mt-3 font-heading text-2xl font-bold text-navy">{s.value}</p>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
             </div>
           ))}
         </div>
