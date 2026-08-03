@@ -236,7 +236,7 @@ export default function PropertyCard({ property, hot = false }) {
             <PhoneOff className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">{t("pc_call")}</span>
           </span>
         )}
-        <button onClick={handleMessage} className="flex min-w-0 items-center justify-center gap-1 rounded-xl bg-navy px-1.5 py-2 text-[11px] font-bold text-emerald transition hover:opacity-90">
+        <button onClick={handleMessage} className="flex min-w-0 items-center justify-center gap-1 rounded-xl bg-primary px-1.5 py-2 text-[11px] font-bold text-primary-foreground transition hover:opacity-90">
           <MessageCircle className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">{t("pc_message")}</span>
         </button>
       </div>

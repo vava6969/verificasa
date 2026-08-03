@@ -4,8 +4,8 @@
   "title": "Property",
   "properties": {
     "property_code": {
-      "type": "number",
-      "title": "Cod proprietate unic"
+      "type": "string",
+      "title": "Cod proprietate unic (6 cifre + 6 litere)"
     },
     "title": {
       "type": "string",

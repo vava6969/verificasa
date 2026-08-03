@@ -507,7 +507,7 @@ export default function PropertyDetail() {
               </div>
               <p className="mt-1 text-xs text-muted-foreground">{t("contact_sub")}</p>
 
-              <Button type="button" onClick={handleMessage} className="mt-3 w-full gap-1.5 bg-navy text-emerald hover:opacity-90">
+              <Button type="button" onClick={handleMessage} className="mt-3 w-full gap-1.5 bg-primary text-primary-foreground hover:opacity-90">
                 <MessageCircle className="h-4 w-4" /> {t("pd_msg_btn")}
               </Button>
 

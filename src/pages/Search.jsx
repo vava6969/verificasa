@@ -130,7 +130,7 @@ export default function SearchPage() {
     if (zoneParam && !norm(`${p.zone || ""} ${p.landmark || ""}`).includes(norm(zoneParam))) return false;
     if (typeParam && p.property_type !== typeParam) return false;
     if (qParam) {
-      const hay = norm([p.title, p.zone, p.city, p.landmark, p.description, p.property_type].join(" "));
+      const hay = norm([p.title, p.zone, p.city, p.landmark, p.description, p.property_type, p.property_code].join(" "));
       if (!hay.includes(norm(qParam))) return false;
     }
     for (const f of VERIF_FILTERS) {
