@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import { Sparkles, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import PropertyCard from "@/components/PropertyCard";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// 3 proprietăți similare, din același oraș, recomandate după vizualizări.
+// Până la 6 proprietăți similare, din același oraș, recomandate după vizualizări.
+// Afișate într-un carusel orizontal (scroll stânga→dreapta) cu buton "Vezi toate".
 export default function SimilarProperties({ property }) {
   const { t } = useCountry();
   const [items, setItems] = useState(null);
+  const scrollerRef = useRef(null);
 
   useEffect(() => {
     let alive = true;
@@ -20,14 +22,13 @@ export default function SimilarProperties({ property }) {
         const same = all.filter(
           (p) => p.city === property.city && p.id !== property.id && (p.approval_status || "APPROVED") === "APPROVED"
         );
-        // Dacă orașul are mai puțin de 3, completăm cu apropiate (alte orașe, top vizualizări).
-        if (same.length < 3) {
+        if (same.length < 6) {
           const extra = all.filter(
             (p) => p.id !== property.id && (p.approval_status || "APPROVED") === "APPROVED" && p.city !== property.city
           );
-          setItems([...same, ...extra].slice(0, 3));
+          setItems([...same, ...extra].slice(0, 6));
         } else {
-          setItems(same.slice(0, 3));
+          setItems(same.slice(0, 6));
         }
       } catch {
         if (alive) setItems([]);
@@ -36,10 +37,16 @@ export default function SimilarProperties({ property }) {
     return () => { alive = false; };
   }, [property]);
 
+  const scrollBy = (dir) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * (el.clientWidth * 0.8), behavior: "smooth" });
+  };
+
   if (!items) {
     return (
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)}
+      <div className="flex gap-4 overflow-hidden">
+        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-80 w-72 shrink-0 rounded-2xl" />)}
       </div>
     );
   }
@@ -47,24 +54,51 @@ export default function SimilarProperties({ property }) {
   if (items.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
-      <div className="flex items-center gap-2">
-        <Sparkles className="h-5 w-5 text-gold" />
-        <div>
-          <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">{t("similar_h")}</h3>
-          <p className="text-xs text-muted-foreground">{t("similar_sub", { city: property.city })}</p>
+    <div className="rounded-2xl border border-border bg-white p-4 shadow-soft sm:p-6">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-gold" />
+          <div>
+            <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">{t("similar_h")}</h3>
+            <p className="text-xs text-muted-foreground">{t("similar_sub", { city: property.city })}</p>
+          </div>
+        </div>
+        <div className="hidden gap-1.5 sm:flex">
+          <button onClick={() => scrollBy(-1)} aria-label="Anterior"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-foreground transition hover:bg-secondary dark:bg-card">
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button onClick={() => scrollBy(1)} aria-label="Următor"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-foreground transition hover:bg-secondary dark:bg-card">
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
       </div>
-      <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((p) => <PropertyCard key={p.id} property={p} />)}
+
+      <div
+        ref={scrollerRef}
+        className="no-scrollbar mt-4 flex gap-4 overflow-x-auto scroll-smooth pb-1"
+        style={{ scrollSnapType: "x mandatory" }}
+      >
+        {items.map((p) => (
+          <div key={p.id} className="w-72 shrink-0 sm:w-80" style={{ scrollSnapAlign: "start" }}>
+            <PropertyCard property={p} />
+          </div>
+        ))}
+
+        {/* Card final — Vezi toate */}
+        <Link
+          to={`/search?city=${encodeURIComponent(property.city || "")}`}
+          className="group flex w-40 shrink-0 flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-emerald/40 bg-emerald-soft/40 p-6 text-center transition hover:border-emerald hover:bg-emerald-soft sm:w-48"
+          style={{ scrollSnapAlign: "start" }}
+        >
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald text-white shadow-soft transition group-hover:scale-110">
+            <ArrowRight className="h-6 w-6" />
+          </div>
+          <p className="text-sm font-bold text-navy dark:text-foreground">{t("view_all")}</p>
+          <p className="text-[11px] text-muted-foreground">{property.city}</p>
+        </Link>
       </div>
-      {items.length > 0 && (
-        <div className="mt-6 text-center">
-          <Link to={`/search?city=${encodeURIComponent(property.city || "")}`} className="text-sm font-semibold text-emerald hover:underline">
-            {t("view_all")} →
-          </Link>
-        </div>
-      )}
     </div>
   );
 }
