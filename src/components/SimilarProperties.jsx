@@ -45,8 +45,8 @@ export default function SimilarProperties({ property }) {
 
   if (!items) {
     return (
-      <div className="flex gap-4 overflow-hidden">
-        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-80 w-72 shrink-0 rounded-2xl" />)}
+      <div className="flex gap-3 overflow-hidden sm:gap-4">
+        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-80 w-[260px] shrink-0 rounded-2xl sm:w-72" />)}
       </div>
     );
   }
@@ -54,13 +54,13 @@ export default function SimilarProperties({ property }) {
   if (items.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-4 shadow-soft sm:p-6">
+    <div className="overflow-hidden rounded-2xl border border-border bg-white p-3 shadow-soft sm:p-6">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-gold" />
-          <div>
-            <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">{t("similar_h")}</h3>
-            <p className="text-xs text-muted-foreground">{t("similar_sub", { city: property.city })}</p>
+        <div className="flex min-w-0 items-center gap-2">
+          <Sparkles className="h-5 w-5 shrink-0 text-gold" />
+          <div className="min-w-0">
+            <h3 className="font-heading text-base font-bold text-navy dark:text-foreground sm:text-lg">{t("similar_h")}</h3>
+            <p className="truncate text-xs text-muted-foreground">{t("similar_sub", { city: property.city })}</p>
           </div>
         </div>
         <div className="hidden gap-1.5 sm:flex">
@@ -77,11 +77,11 @@ export default function SimilarProperties({ property }) {
 
       <div
         ref={scrollerRef}
-        className="no-scrollbar mt-4 flex gap-4 overflow-x-auto scroll-smooth pb-1"
+        className="no-scrollbar mt-3 flex gap-3 overflow-x-auto scroll-smooth pb-1 sm:mt-4 sm:gap-4"
         style={{ scrollSnapType: "x mandatory" }}
       >
         {items.map((p) => (
-          <div key={p.id} className="w-72 shrink-0 sm:w-80" style={{ scrollSnapAlign: "start" }}>
+          <div key={p.id} className="w-[260px] shrink-0 sm:w-72 lg:w-80" style={{ scrollSnapAlign: "start" }}>
             <PropertyCard property={p} />
           </div>
         ))}
@@ -89,7 +89,7 @@ export default function SimilarProperties({ property }) {
         {/* Card final — Vezi toate */}
         <Link
           to={`/search?city=${encodeURIComponent(property.city || "")}`}
-          className="group flex w-40 shrink-0 flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-emerald/40 bg-emerald-soft/40 p-6 text-center transition hover:border-emerald hover:bg-emerald-soft sm:w-48"
+          className="group flex w-36 shrink-0 flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-emerald/40 bg-emerald-soft/40 p-6 text-center transition hover:border-emerald hover:bg-emerald-soft sm:w-48"
           style={{ scrollSnapAlign: "start" }}
         >
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald text-white shadow-soft transition group-hover:scale-110">
