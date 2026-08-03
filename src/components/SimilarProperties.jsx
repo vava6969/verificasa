@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Sparkles, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
-import PropertyCard from "@/components/PropertyCard";
+import SimilarPropertyCard from "@/components/SimilarPropertyCard";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Până la 6 proprietăți similare, din același oraș, recomandate după vizualizări.
@@ -46,7 +46,7 @@ export default function SimilarProperties({ property }) {
   if (!items) {
     return (
       <div className="flex gap-3 overflow-hidden sm:gap-4">
-        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-80 w-[240px] shrink-0 rounded-2xl sm:w-72" />)}
+        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-64 w-[220px] shrink-0 rounded-2xl sm:w-64" />)}
       </div>
     );
   }
@@ -81,8 +81,8 @@ export default function SimilarProperties({ property }) {
         style={{ scrollSnapType: "x proximity", WebkitOverflowScrolling: "touch" }}
       >
         {items.map((p) => (
-          <div key={p.id} className="w-[240px] shrink-0 sm:w-72 lg:w-80" style={{ scrollSnapAlign: "start" }}>
-            <PropertyCard property={p} />
+          <div key={p.id} className="w-[220px] shrink-0 sm:w-64 lg:w-72" style={{ scrollSnapAlign: "start" }}>
+            <SimilarPropertyCard property={p} hot={p.featured} />
           </div>
         ))}
 
