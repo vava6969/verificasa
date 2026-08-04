@@ -24,10 +24,11 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const isActive = (to) => location.pathname === to || (to !== "/" && location.pathname.startsWith(to));
+  const isLanding = location.pathname === "/";
   const navItemCls = (to) =>
-    `text-sm font-semibold transition hover:text-emerald ${isActive(to) ? "text-emerald" : "text-foreground/80"}`;
+    `text-sm font-semibold transition hover:text-emerald ${isActive(to) ? "text-emerald" : isLanding ? "text-white/90" : "text-foreground/80"}`;
   const navItemClsMobile = (to) =>
-    `text-xs font-bold transition ${isActive(to) ? "text-emerald" : "text-foreground/70"}`;
+    `text-xs font-bold transition ${isActive(to) ? "text-emerald" : isLanding ? "text-white/80" : "text-foreground/70"}`;
   const greeting = user?.full_name || user?.email || (lang === "en" ? "user" : "utilizator");
   const role = (user?.role || "").toUpperCase();
   const canAdmin = ADMIN_ROLES.includes(role);
@@ -151,11 +152,11 @@ export default function Header() {
   );
 
   return (
-    <header className={`sticky top-0 z-50 w-full border-b border-border/30 bg-white/45 backdrop-blur-2xl transition-all duration-300 ease-out dark:bg-navy-deep/40 ${hidden ? "-translate-y-[calc(100%+4px)] opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
+    <header className={`sticky top-0 z-50 w-full transition-all duration-300 ease-out ${isLanding ? "bg-gradient-to-b from-black/30 to-transparent" : "border-b border-border/30 bg-white/55 backdrop-blur-2xl dark:bg-navy-deep/40"} ${hidden ? "-translate-y-[calc(100%+4px)] opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between gap-2">
           <Link to="/" className="flex min-w-0 items-center gap-2">
-            <VerifiCasaLogo size={36} tagline={false} />
+            <VerifiCasaLogo size={36} tagline={false} tone={isLanding ? "light" : "dark"} />
           </Link>
 
           <nav className="hidden items-center gap-6 md:flex">

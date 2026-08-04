@@ -5,7 +5,7 @@ import React from "react";
 export const LOGO_URL =
   "https://media.base44.com/images/public/6a5ef7d63008cd71560dfe14/4317025d6_Gemini_Generated_Image_al0itkal0itkal0i.png";
 
-export default function VerifiCasaLogo({ size = 44, withWordmark = true, tagline = false, className = "" }) {
+export default function VerifiCasaLogo({ size = 44, withWordmark = true, tagline = false, className = "", tone = "dark" }) {
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
       <img
@@ -16,7 +16,7 @@ export default function VerifiCasaLogo({ size = 44, withWordmark = true, tagline
       />
       {withWordmark && (
         <div className="min-w-0 leading-none">
-          <span className="block truncate font-heading text-base font-extrabold tracking-tight text-navy sm:text-lg">VerifiCasa</span>
+          <span className={`block truncate font-heading text-base font-extrabold tracking-tight ${tone === "light" ? "text-white" : "text-navy"} sm:text-lg`}>VerifiCasa</span>
           <span className="mt-0.5 hidden text-[8.5px] font-semibold uppercase tracking-[0.2em] text-gold sm:block">
             Inspecții & Verificări Imobiliare
           </span>

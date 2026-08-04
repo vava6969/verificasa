@@ -8,12 +8,12 @@ import LegalBadges from "@/components/LegalBadges";
 export default function Footer() {
   const { t } = useCountry();
   return (
-    <footer className="relative bg-navy-deep text-white/80">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-background to-transparent" />
-      <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+    <footer className="bg-navy-deep text-white/80">
+      <div className="h-20 bg-gradient-to-b from-background to-transparent" />
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-4">
           <div>
-            <VerifiCasaLogo size={44} tagline={false} />
+            <VerifiCasaLogo size={44} tagline={false} tone="light" />
             <p className="mt-4 text-sm leading-relaxed text-white/55">{t("footer_desc_vc")}</p>
             <div className="mt-4 flex items-center gap-2 rounded-lg border border-gold/30 bg-white/5 px-3 py-2 text-xs font-semibold text-gold">
               <ShieldCheck className="h-4 w-4" /> {t("footer_inspectii")}
