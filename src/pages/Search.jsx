@@ -7,7 +7,7 @@ import PropertyCard from "@/components/PropertyCard";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, SlidersHorizontal, ArrowDownUp, BookmarkPlus, RotateCcw, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, SlidersHorizontal, ArrowDownUp, BookmarkPlus, RotateCcw, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
 
@@ -17,7 +17,6 @@ const VERIF_FILTERS = [
   { key: "field", labelKey: "tg_field", icon: ShieldCheck, test: (p) => p.owner_verified || p.verification_level === "field_certified" || p.ai_tour_verified },
   { key: "pet", labelKey: "tg_pet", icon: PawPrint, test: (p) => !!p.pet_friendly },
   { key: "nofee", labelKey: "tg_nofee", icon: BadgePercent, test: (p) => !!p.commission_free },
-  { key: "garant0", labelKey: "tg_garant0", icon: Lock, test: (p) => p.deposit_option === "verificasa_guarantee" },
   { key: "studio", labelKey: "type_studio_vc", icon: Home, test: (p) => ["Garsonieră", "Studio"].includes(p.property_type) },
   { key: "2camere", labelKey: "type_2_vc", icon: Home, test: (p) => p.property_type === "2 Camere" },
   { key: "parking", labelKey: "sr_parking", icon: Home, test: (p) => !!p.parking },

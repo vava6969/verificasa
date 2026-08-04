@@ -1,11 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Check, Home, MapPin, Ruler, Sparkles, Camera } from "lucide-react";
+import { LoadingButton } from "@/components/ui/loading-button";
+import { ArrowLeft, ArrowRight, Home, MapPin, Ruler, Sparkles, Camera } from "lucide-react";
+import confetti from "canvas-confetti";
 import { generateUniquePropertyCode } from "@/lib/propertyCode";
+import { uploadPhotos } from "@/lib/imageUpload";
 import {
   EMPTY_FORM, MIN_PHOTOS, MAX_PHOTOS, buildPropertyPayload,
 } from "@/lib/propertyPayload";
@@ -37,7 +40,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
   const [facilities, setFacilities] = useState({});
   const [agreed, setAgreed] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const publishRef = useRef(null);
 
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
   const imagesCount = useMemo(() => (form.images ? form.images.split(",").filter(Boolean).length : 0), [form.images]);
@@ -53,11 +56,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
         toast({ title: `Ai atins maximul de ${MAX_PHOTOS} poze`, variant: "destructive" });
         return;
       }
-      const urls = [];
-      for (const f of files.slice(0, remaining)) {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file: f });
-        urls.push(file_url);
-      }
+      const urls = await uploadPhotos(files, remaining);
       set({ images: [...existing, ...urls].join(",") });
     } catch {
       toast({ title: "Încărcarea pozelor a eșuat", variant: "destructive" });
@@ -100,35 +99,41 @@ export default function PropertyWizard({ onDone, onCancel }) {
     scrollTop();
   };
 
-  const submit = async () => {
+  const handlePublish = async () => {
     for (let s = 0; s <= 2; s++) {
       const err = validateStep(s);
-      if (err) { setStep(s); toast({ title: err, variant: "destructive" }); return; }
+      if (err) { setStep(s); toast({ title: err, variant: "destructive" }); throw new Error(err); }
     }
-    if (imagesCount < MIN_PHOTOS) { toast({ title: `Încarcă cel puțin ${MIN_PHOTOS} poze`, variant: "destructive" }); return; }
-    if (!form.phone) { toast({ title: "Completează numărul de telefon", variant: "destructive" }); return; }
-    if (!agreed) { toast({ title: "Acceptă termenii pentru a publica", variant: "destructive" }); return; }
+    if (imagesCount < MIN_PHOTOS) { toast({ title: `Încarcă cel puțin ${MIN_PHOTOS} poze`, variant: "destructive" }); throw new Error("photos"); }
+    if (!form.phone) { toast({ title: "Completează numărul de telefon", variant: "destructive" }); throw new Error("phone"); }
+    if (!agreed) { toast({ title: "Acceptă termenii pentru a publica", variant: "destructive" }); throw new Error("terms"); }
 
-    setSaving(true);
-    try {
-      const property_code = await generateUniquePropertyCode();
-      const created = await base44.entities.Property.create(
-        buildPropertyPayload({ form, chips, facilities, country, user, isAdmin, property_code })
-      );
-      if (!isAdmin) {
-        base44.functions.invoke("NotifyAdminsOnNewProperty", {
-          property_id: created.id, title: form.title, owner_name: form.owner_name || "",
-        }).catch(() => {});
-      }
-      toast(isAdmin
-        ? { title: "Anunț publicat", description: "Este vizibil acum în lista publică." }
-        : { title: "Anunț trimis spre aprobare", description: "Un administrator îl va verifica în curând." });
-      onDone?.();
-    } catch (err) {
-      toast({ title: "Salvarea a eșuat", description: err?.message || "Eroare necunoscută", variant: "destructive" });
-    } finally {
-      setSaving(false);
+    const property_code = await generateUniquePropertyCode();
+    const created = await base44.entities.Property.create(
+      buildPropertyPayload({ form, chips, facilities, country, user, isAdmin, property_code })
+    );
+    if (!isAdmin) {
+      base44.functions.invoke("NotifyAdminsOnNewProperty", {
+        property_id: created.id, title: form.title, owner_name: form.owner_name || "",
+      }).catch(() => {});
     }
+    toast(isAdmin
+      ? { title: "Anunț publicat", description: "Este vizibil acum în lista publică." }
+      : { title: "Anunț trimis spre aprobare", description: "Un administrator îl va verifica în curând." });
+
+    // Confetti bursting from the publish button.
+    const el = publishRef.current;
+    const origin = el
+      ? { x: (el.getBoundingClientRect().left + el.getBoundingClientRect().width / 2) / window.innerWidth, y: (el.getBoundingClientRect().top + el.getBoundingClientRect().height / 2) / window.innerHeight }
+      : { y: 0.85 };
+    const colors = ["#00A859", "#C5A059", "#1B222C", "#E8ECF2"];
+    confetti({ particleCount: 110, spread: 78, startVelocity: 42, origin, colors });
+    setTimeout(() => confetti({ particleCount: 70, angle: 60, spread: 60, origin: { x: 0, y: origin.y }, colors }), 120);
+    setTimeout(() => confetti({ particleCount: 70, angle: 120, spread: 60, origin: { x: 1, y: origin.y }, colors }), 120);
+
+    // Let the success state show, then leave.
+    await new Promise((r) => setTimeout(r, 1500));
+    onDone?.();
   };
 
   const Current = STEPS[step];
@@ -186,9 +191,18 @@ export default function PropertyWizard({ onDone, onCancel }) {
             Continuă <ArrowRight className="h-4 w-4" />
           </Button>
         ) : (
-          <Button type="button" onClick={submit} disabled={saving || uploading} className="flex-1 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
-            <Check className="h-4 w-4" /> {saving ? "Se publică…" : "Publică anunțul"}
-          </Button>
+          <span ref={publishRef} className="flex-1">
+            <LoadingButton
+              onAction={handlePublish}
+              disabled={uploading}
+              pendingLabel="Se publică…"
+              successLabel="Publicat!"
+              errorLabel="Încearcă din nou"
+              className="w-full"
+            >
+              Publică anunțul
+            </LoadingButton>
+          </span>
         )}
       </div>
     </div>

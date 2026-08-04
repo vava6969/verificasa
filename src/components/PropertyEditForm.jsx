@@ -7,6 +7,7 @@ import DateField from "@/components/DateField";
 import { Image as UIImage } from "@/components/ui/image";
 import GooglePlacesAutocomplete from "@/components/GooglePlacesAutocomplete";
 import { Upload, Trash2, Camera } from "lucide-react";
+import { uploadPhotos } from "@/lib/imageUpload";
 
 const MAX_PHOTOS = 20;
 const onlyPhoneDigits = (v) => {
@@ -24,7 +25,6 @@ const TYPES = ["Garsonieră", "2 Camere", "3 Camere", "4+ Camere", "Casă", "Stu
 const STATUS = ["Activ", "Rezervat", "Închis"];
 const TRANSACTIONS = ["RENT", "SALE"];
 const CURRENCIES = ["EUR", "RON", "GBP"];
-const DEPOSIT_OPTIONS = [{ v: "standard", label: "Standard" }, { v: "verificasa_guarantee", label: "Garanție VerifiCasa" }];
 const FAIRNESS = [{ v: "", label: "—" }, { v: "sub_piata", label: "Sub piață" }, { v: "corect", label: "Corect" }, { v: "peste_medie", label: "Peste medie" }];
 const VERIF = [{ v: "unverified", label: "Neverificat" }, { v: "video_ai", label: "Video / AI" }, { v: "field_certified", label: "Certificat pe teren" }];
 
@@ -93,11 +93,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
     setUploading(true);
     try {
       const remaining = Math.max(0, MAX_PHOTOS - form.images.length);
-      const urls = [];
-      for (const f of files.slice(0, remaining)) {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file: f });
-        urls.push(file_url);
-      }
+      const urls = await uploadPhotos(files, remaining);
       setForm((f) => ({ ...f, images: [...f.images, ...urls] }));
       if (urls.length) toast({ title: `${urls.length} poze adăugate` });
     } catch (err) {
@@ -147,7 +143,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         ai_video_url: form.ai_video_url,
         monthly_utilities_estimate: numOrNull(form.monthly_utilities_estimate),
         maintenance_fee: numOrNull(form.maintenance_fee),
-        deposit_option: form.deposit_option,
+        deposit_option: "standard",
         price_fairness: form.price_fairness || null,
         status: form.status,
         featured: form.featured,
@@ -307,11 +303,6 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Field label="Estimare utilități/lună"><input type="number" value={form.monthly_utilities_estimate} onChange={(e) => upd("monthly_utilities_estimate", e.target.value)} className={inputCls} /></Field>
         <Field label="Întreținere/lună"><input type="number" value={form.maintenance_fee} onChange={(e) => upd("maintenance_fee", e.target.value)} className={inputCls} /></Field>
-        <Field label="Opțiune garanție">
-          <select value={form.deposit_option} onChange={(e) => upd("deposit_option", e.target.value)} className={inputCls}>
-            {DEPOSIT_OPTIONS.map((o) => <option key={o.v} value={o.v}>{o.label}</option>)}
-          </select>
-        </Field>
         <Field label="Corectitudine preț">
           <select value={form.price_fairness} onChange={(e) => upd("price_fairness", e.target.value)} className={inputCls}>
             {FAIRNESS.map((f) => <option key={f.v} value={f.v}>{f.label}</option>)}

@@ -16,7 +16,7 @@ export const EMPTY_FORM = {
   latitude: "", longitude: "", owner_name: "",
   transaction_type: "RENT", building_year: "", total_floors: "", phone: "", whatsapp_phone: "",
   seller_role: "Proprietar",
-  parking: false, pet_friendly: false, commission_free: false, guarantee: false,
+  parking: false, pet_friendly: false, commission_free: false,
 };
 
 export const CHIP_OPTS = [
@@ -43,7 +43,6 @@ export const OPTION_OPTS = [
   { key: "parking", emoji: "🅿️", label: "Parcare" },
   { key: "pet_friendly", emoji: "🐾", label: "Pet Friendly" },
   { key: "commission_free", emoji: "🆓", label: "Fără Comision" },
-  { key: "guarantee", emoji: "🛡️", label: "Garanție 0 (VerifiCasa)" },
 ];
 
 // Builds the Property entity payload from wizard/form state.
@@ -80,7 +79,7 @@ export function buildPropertyPayload({ form, chips, facilities, country, user, i
     pet_friendly: form.pet_friendly,
     parking: form.parking,
     commission_free: form.commission_free,
-    deposit_option: form.guarantee ? "verificasa_guarantee" : "standard",
+    deposit_option: "standard",
     available_from: form.available_from || null,
     images: form.images ? form.images.split(",").filter(Boolean) : [],
     ai_video_url: "",
