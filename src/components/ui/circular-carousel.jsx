@@ -137,37 +137,37 @@ export function CircularCarousel({
                 aria-selected={isActive}
                 role="option"
                 className={cn(
-                  "absolute inset-0 m-auto flex h-40 w-52 cursor-pointer flex-col items-start justify-between overflow-hidden rounded-2xl border border-border bg-card p-5 backdrop-blur-sm transition-shadow duration-300 sm:h-44 sm:w-64",
+                  "absolute inset-0 m-auto flex h-40 w-52 cursor-pointer flex-col items-start gap-2 overflow-hidden rounded-2xl border border-border bg-card p-4 backdrop-blur-sm transition-shadow duration-300 sm:h-44 sm:w-64",
                   isActive
                     ? "shadow-soft ring-1 ring-emerald/50"
                     : "shadow-soft blur-[2px]",
                 )}
               >
-                {Icon && (
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-soft text-emerald">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                )}
-                <div className="w-full overflow-hidden">
+                <div className="flex w-full items-center gap-2.5 overflow-hidden">
+                  {Icon && (
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-soft text-emerald">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                  )}
                   <h3
                     className={cn(
                       "break-words font-semibold leading-tight transition-colors duration-300",
                       isActive
-                        ? "text-foreground text-sm sm:text-base"
-                        : "text-muted-foreground text-xs sm:text-sm",
+                        ? "text-foreground text-xs sm:text-sm"
+                        : "text-muted-foreground text-xs",
                     )}
                   >
                     {item.title}
                   </h3>
-                  <p
-                    className={cn(
-                      "mt-1.5 break-words text-xs leading-relaxed transition-colors duration-300 line-clamp-4",
-                      isActive ? "text-muted-foreground" : "text-muted-foreground/60",
-                    )}
-                  >
-                    {item.description}
-                  </p>
                 </div>
+                <p
+                  className={cn(
+                    "break-words text-[11px] leading-relaxed transition-colors duration-300 line-clamp-5",
+                    isActive ? "text-muted-foreground" : "text-muted-foreground/60",
+                  )}
+                >
+                  {item.description}
+                </p>
               </motion.button>
             );
           })}
