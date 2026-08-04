@@ -5,6 +5,16 @@ export default async function(req) {
   try {
     const base44 = await client(req);
 
+    // Admin-only action: verify the caller is authenticated and has an admin role.
+    const me = await base44.auth.me();
+    if (!me) {
+      return Response.json({ error: "Authentication required" }, { status: 401 });
+    }
+    const role = (me.role || "").toUpperCase();
+    if (role !== "ADMIN" && role !== "SUPER_ADMIN") {
+      return Response.json({ error: "Admin access required" }, { status: 403 });
+    }
+
     let body = {};
     try { body = await req.json(); } catch (_) { body = {}; }
     const propertyId = body.property_id;
