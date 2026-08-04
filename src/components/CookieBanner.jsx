@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Cookie, Settings, X, Check, ShieldCheck } from "lucide-react";
+import { Cookie, X, Check, ShieldCheck } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { Button } from "@/components/ui/button";
 import { getConsent, setConsent } from "@/lib/cookieConsent";
@@ -12,37 +12,39 @@ export default function CookieBanner() {
   const { t } = useCountry();
   const [show, setShow] = useState(false);
   const [showPrefs, setShowPrefs] = useState(false);
-  const [showFAB, setShowFAB] = useState(false);
   const [prefs, setPrefs] = useState({ functional: false, analytics: false });
 
   useEffect(() => {
     const c = getConsent();
-    if (!c) {
-      setShow(true);
-    } else {
-      setShowFAB(true);
-    }
+    if (!c) setShow(true);
+  }, []);
+
+  // Allow other parts of the app (e.g. Account page) to open the preferences modal
+  useEffect(() => {
+    const handler = () => {
+      setPrefs({ functional: getConsent()?.functional || false, analytics: getConsent()?.analytics || false });
+      setShowPrefs(true);
+    };
+    window.addEventListener("vc-open-cookie-prefs", handler);
+    return () => window.removeEventListener("vc-open-cookie-prefs", handler);
   }, []);
 
   const acceptAll = () => {
     setConsent({ necessary: true, functional: true, analytics: true });
     setShow(false);
     setShowPrefs(false);
-    setShowFAB(true);
   };
 
   const rejectAll = () => {
     setConsent({ necessary: true, functional: false, analytics: false });
     setShow(false);
     setShowPrefs(false);
-    setShowFAB(true);
   };
 
   const savePrefs = () => {
     setConsent({ necessary: true, functional: prefs.functional, analytics: prefs.analytics });
     setShow(false);
     setShowPrefs(false);
-    setShowFAB(true);
   };
 
   return (
@@ -159,21 +161,6 @@ export default function CookieBanner() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {showFAB && (
-          <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            onClick={() => { setShowPrefs(true); setPrefs({ functional: getConsent()?.functional || false, analytics: getConsent()?.analytics || false }); }}
-            className="fixed bottom-4 left-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-emerald/30 bg-navy-deep/90 text-emerald shadow-glow backdrop-blur-md transition hover:scale-105"
-            aria-label={t("cookie_settings")}
-            title={t("cookie_settings")}
-          >
-            <Settings className="h-5 w-5" />
-          </motion.button>
-        )}
-      </AnimatePresence>
     </>
   );
 }

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, MessageCircle, Bell, Bookmark, Search, Plus, Home,
-  Settings as SettingsIcon, ShieldCheck, LogOut, Moon, Sun, Check,
+  Settings as SettingsIcon, ShieldCheck, LogOut, Moon, Sun, Check, Cookie,
 } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
@@ -147,6 +147,17 @@ export default function Account() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Cookie settings */}
+          <div>
+            <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold"><span>🍪</span> {en ? "Cookie settings" : "Setări cookies"}</p>
+            <button
+              onClick={() => window.dispatchEvent(new Event("vc-open-cookie-prefs"))}
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-semibold text-muted-foreground transition hover:border-emerald/50 hover:text-emerald"
+            >
+              <Cookie className="h-4 w-4" /> {en ? "Manage cookie preferences" : "Gestionează preferințele cookies"}
+            </button>
           </div>
         </div>
       </section>
