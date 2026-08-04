@@ -49,7 +49,7 @@ export default function Header() {
   const CurrencySwitch = ({ compact = false }) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-soft transition hover:border-emerald/50 dark:bg-card" aria-label={`${t("hdr_currency")} / ${t("hdr_language")}`}>
+        <button className="flex h-9 w-9 items-center justify-center rounded-full border border-border/50 bg-white/60 text-foreground shadow-soft backdrop-blur-md transition hover:border-emerald/50 dark:bg-card/60" aria-label={`${t("hdr_currency")} / ${t("hdr_language")}`}>
           <Globe className="h-4 w-4 text-emerald" />
         </button>
       </DropdownMenuTrigger>
@@ -102,7 +102,7 @@ export default function Header() {
   const ProfileMenu = ({ mobile = false }) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="relative flex h-9 items-center gap-2 rounded-full border border-border bg-white px-2.5 text-sm font-semibold text-navy shadow-soft transition hover:border-emerald/50 dark:bg-navy dark:text-foreground">
+        <button className="relative flex h-9 items-center gap-2 rounded-full border border-border/50 bg-white/60 px-2.5 text-sm font-semibold text-navy shadow-soft backdrop-blur-md transition hover:border-emerald/50 dark:bg-navy-deep/60 dark:text-foreground">
           {user?.avatar_url ? (
             <img src={user.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover" />
           ) : (
@@ -151,7 +151,7 @@ export default function Header() {
   );
 
   return (
-    <header className={`sticky top-0 z-50 w-full border-b border-border/60 bg-white/85 backdrop-blur-xl transition-all duration-300 ease-out dark:bg-navy-deep/85 ${hidden ? "-translate-y-[calc(100%+4px)] opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
+    <header className={`sticky top-0 z-50 w-full border-b border-border/30 bg-white/45 backdrop-blur-2xl transition-all duration-300 ease-out dark:bg-navy-deep/40 ${hidden ? "-translate-y-[calc(100%+4px)] opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between gap-2">
           <Link to="/" className="flex min-w-0 items-center gap-2">

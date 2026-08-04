@@ -8,8 +8,9 @@ import LegalBadges from "@/components/LegalBadges";
 export default function Footer() {
   const { t } = useCountry();
   return (
-    <footer className="border-t border-gold/20 bg-navy-deep text-white/80">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+    <footer className="relative bg-navy-deep text-white/80">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-background to-transparent" />
+      <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-4">
           <div>
             <VerifiCasaLogo size={44} tagline={false} />

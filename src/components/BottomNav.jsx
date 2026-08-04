@@ -42,7 +42,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-7xl items-stretch justify-around border-t border-border/60 bg-white/90 px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-4px_18px_-8px_rgb(27_34_44/0.18)] backdrop-blur-xl md:hidden dark:bg-navy-deep/90"
+      className="fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-7xl items-stretch justify-around border-t border-border/30 bg-white/55 px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-6px_24px_-10px_rgb(27_34_44/0.22)] backdrop-blur-2xl md:hidden dark:bg-navy-deep/50"
       aria-label="Navigare rapidă"
     >
       {items.map((it) => {
