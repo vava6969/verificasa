@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   ShieldCheck, ArrowRight, Video, FileText, Lock, Home, Plus,
-  UserCheck, FileCheck, Clock, BadgePercent, Shield,
+  UserCheck, Flag, Clock, BadgePercent, MessageSquare,
 } from "lucide-react";
 
 export default function Landing() {
@@ -30,10 +30,10 @@ export default function Landing() {
     { id: "3", icon: Lock, title: t("vp3_t"), description: t("vp3_d") },
     { id: "4", icon: FileText, title: t("vp4_t"), description: t("vp4_d") },
     { id: "5", icon: UserCheck, title: t("vp5_t"), description: t("vp5_d") },
-    { id: "6", icon: FileCheck, title: t("vp6_t"), description: t("vp6_d") },
+    { id: "6", icon: Flag, title: t("vp6_t"), description: t("vp6_d") },
     { id: "7", icon: Clock, title: t("vp7_t"), description: t("vp7_d") },
     { id: "8", icon: BadgePercent, title: t("vp8_t"), description: t("vp8_d") },
-    { id: "9", icon: Shield, title: t("vp9_t"), description: t("vp9_d") },
+    { id: "9", icon: MessageSquare, title: t("vp9_t"), description: t("vp9_d") },
   ];
   useEffect(() => {
     let cancelled = false;
