@@ -41,5 +41,95 @@
     "property_id",
     "buyer_id",
     "seller_id"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "data.buyer_id": "{{user.id}}"
+        },
+        {
+          "data.seller_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "data.buyer_id": "{{user.id}}"
+        },
+        {
+          "data.seller_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "ADMIN"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "SUPER_ADMIN"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.buyer_id": "{{user.id}}"
+        },
+        {
+          "data.seller_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "ADMIN"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "SUPER_ADMIN"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.buyer_id": "{{user.id}}"
+        },
+        {
+          "data.seller_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "ADMIN"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "SUPER_ADMIN"
+          }
+        }
+      ]
+    }
+  }
 }
