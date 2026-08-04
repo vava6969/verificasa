@@ -3,7 +3,7 @@ import LegalPage from "@/components/LegalPage";
 
 export default function Terms() {
   return (
-    <LegalPage title="Termeni și Condiții – VerifiCasa" updated="Ultima actualizare: 2 August 2026">
+    <LegalPage title="Termeni și Condiții – VerifiCasa" updated="Ultima actualizare: 5 August 2026">
       <p>
         Prezentul document stabilește condițiile de utilizare a site-ului și aplicației
         VerifiCasa (denumite în continuare „Platforma”). Prin accesarea, navigarea și utilizarea
@@ -208,6 +208,121 @@ export default function Terms() {
           utilizarea Platformei va fi rezolvată pe cale amiabilă sau de către instanțele
           judecătorești competente.
         </p>
+      </section>
+
+      <section>
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+          13. Protecția Consumatorului (Legea nr. 363/2007 și OUG nr. 13/2022)
+        </h2>
+        <p>
+          13.1. VerifiCasa respectă legislația privind protecția consumatorilor din România,
+          inclusiv Legea nr. 363/2007 privind combaterea practicilor comerciale incorecte și
+          Ordonanța de Urgență nr. 13/2022 (Codul Consumatorului).
+        </p>
+        <p>
+          13.2. Consumatorii beneficiază de drepturile legale prevăzute de legislația în
+          vigoare, inclusiv dreptul de a depune o plângere la Autoritatea Națională pentru
+          Protecția Consumatorilor (ANPC) —{" "}
+          <a href="https://www.anpc.ro" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+            www.anpc.ro
+          </a>{" "}sau la TelVerde 0800.080.999.
+        </p>
+        <p>
+          13.3. Platforma afișează prețuri clare, în moneda de tranzacționare, incluzând
+          toate taxele obligatorii. Nu aplicăm practici comerciale înșelătoare sau
+          publicitate falsă.
+        </p>
+      </section>
+
+      <section>
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+          14. Soluționarea Alternativă a Litigiilor (SAL)
+        </h2>
+        <p>
+          14.1. Conform OUG nr. 13/2022 și Legii nr. 192/2006 privind medierea, consumatorii
+          pot apela la proceduri alternative de soluționare a litigiilor (SAL) pentru
+          disputele cu VerifiCasa.
+        </p>
+        <p>
+          14.2. Platforma de soluționare alternativă a litigiilor este disponibilă la{" "}
+          <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+            ec.europa.eu/consumers/odr
+          </a>. Pentru România, autoritatea competentă este ANPC.
+        </p>
+        <p>
+          14.3. Înainte de a apela la SAL, recomandăm soluționarea amiabilă prin contactarea
+          noastră la{" "}
+          <a href="mailto:birou@verificasa.site" className="text-primary hover:underline">birou@verificasa.site</a>.
+        </p>
+      </section>
+
+      <section>
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+          15. Comerț electronic și comunicări (Legea nr. 365/2002)
+        </h2>
+        <p>
+          15.1. Platforma VerifiCasa funcționează ca intermediar de servicii imobiliare în
+          conformitate cu Legea nr. 365/2002 privind comerțul electronic.
+        </p>
+        <p>
+          15.2. Nu trimitem comunicări comerciale nesolicitate (spam). Orice buletin
+          informativ (newsletter) necesită înscriere voluntară și poate fi dezabonat
+          oricând.
+        </p>
+        <p>
+          15.3. Identitatea și datele de contact ale operatorului sunt afișate în secțiunea
+          „Despre Noi” și în Politica de Confidențialitate.
+        </p>
+      </section>
+
+      <section>
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+          16. Forța majoră
+        </h2>
+        <p>
+          VerifiCasa nu răspunde pentru nicio neexecutare sau executare defectuoasă a
+          obligațiilor sale cauzată de evenimente de forță majoră (ex: catastrofe naturale,
+          epidemii, acte ale autorităților publice, pene de curent, defecțiuni ale
+          rețelelor de comunicații, atacuri cibernetice). În astfel de cazuri, obligațiile
+          sunt suspendate pe durata evenimentului.
+        </p>
+      </section>
+
+      <section>
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+          17. Răspunderea pentru conținutul utilizatorilor
+        </h2>
+        <p>
+          17.1. Conform Legii nr. 365/2002 și Directivei 2000/31/CE, VerifiCasa acționează ca
+          intermediar (host) pentru conținutul generat de utilizatori (anunțuri, comentarii,
+          mesaje). Nu avem obligația generală de a supraveghea informațiile transmise sau
+          stocate.
+        </p>
+        <p>
+          17.2. La notificarea unei încălcări (ex: conținut ilegal, defăimător, care încalcă
+          drepturile de autor), acționăm rapid pentru a elimina sau bloca accesul la
+          conținutul respectiv, conform art. 16 din Directiva 2000/31/CE.
+        </p>
+        <p>
+          17.3. Puteți semnala conținut inadecvat folosind sistemul de raportare din platformă
+          sau la{" "}
+          <a href="mailto:birou@verificasa.site" className="text-primary hover:underline">birou@verificasa.site</a>.
+        </p>
+      </section>
+
+      <section>
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+          18. Date de contact ale operatorului
+        </h2>
+        <p>
+          Operatorul Platformei VerifiCasa poate fi contactat pentru orice aspect legat de
+          acești Termeni la:
+        </p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>E-mail: <a href="mailto:birou@verificasa.site" className="text-primary hover:underline">birou@verificasa.site</a></li>
+          <li>WhatsApp / Telefon: disponibile în pagina de Contact</li>
+          <li>Instagram: <a href="https://instagram.com/verificasaro" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">@verificasaro</a></li>
+        </ul>
       </section>
     </LegalPage>
   );

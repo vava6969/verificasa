@@ -27,6 +27,7 @@ import About from '@/pages/About';
 import Terms from '@/pages/Terms';
 import Privacy from '@/pages/Privacy';
 import DataDeletion from '@/pages/DataDeletion';
+import CookiePolicy from '@/pages/CookiePolicy';
 import Contact from '@/pages/Contact';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { CountryProvider } from '@/components/CountryContext';
@@ -71,6 +72,7 @@ const AuthenticatedApp = () => {
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/data-deletion" element={<DataDeletion />} />
+        <Route path="/cookies" element={<CookiePolicy />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/property/:id" element={<PropertyDetail />} />
         <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>

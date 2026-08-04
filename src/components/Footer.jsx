@@ -38,6 +38,7 @@ export default function Footer() {
               <li><Link to="/terms" className="hover:text-emerald">{t("footer_terms")}</Link></li>
               <li><Link to="/privacy" className="hover:text-emerald">{t("footer_privacy")}</Link></li>
               <li><Link to="/data-deletion" className="hover:text-emerald">Ștergerea Datelor</Link></li>
+              <li><Link to="/cookies" className="hover:text-emerald">Politica de Cookies</Link></li>
               <li><Link to="/contact" className="hover:text-emerald">Contact</Link></li>
             </ul>
             <LegalBadges />

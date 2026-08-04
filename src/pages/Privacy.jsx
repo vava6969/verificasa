@@ -1,9 +1,10 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import LegalPage from "@/components/LegalPage";
 
 export default function Privacy() {
   return (
-    <LegalPage title="Politică de Confidențialitate (GDPR) – VerifiCasa" updated="Ultima actualizare: 2 August 2026">
+    <LegalPage title="Politică de Confidențialitate (GDPR) – VerifiCasa" updated="Ultima actualizare: 5 August 2026">
       <p>
         VerifiCasa (denumită în continuare „noi”, „Platforma” sau „Site-ul”) respectă
         confidențialitatea datelor dumneavoastră cu caracter personal și se angajează să le
@@ -200,7 +201,9 @@ export default function Privacy() {
           Folosim cookie-uri necesare pentru funcționarea corectă a site-ului (autentificare,
           preferințe de limbă și monedă, securitate). Nu folosim cookie-uri de marketing sau
           urmărire publicitară fără consimțământul dumneavoastră. Puteți gestiona preferințele
-          privind cookie-uri din setările browserului.
+          privind cookie-uri din setările browserului sau din panoul de preferințe al
+          Platformei. Detalii complete în{" "}
+          <Link to="/cookies" className="text-primary hover:underline">Politica de Cookies</Link>.
         </p>
       </section>
 
@@ -236,6 +239,97 @@ export default function Privacy() {
           moment. Data „Ultima actualizare” de la începutul documentului reflectă ultima
           revizuire. Vă recomandăm să verificați periodic această pagină.
         </p>
+      </section>
+
+      <section>
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+          12. Datele de contact ale Operatorului și ale DPO
+        </h2>
+        <p>
+          <strong>Operatorul datelor:</strong> VerifiCasa (persoană juridică), operator al
+          prelucrării datelor cu caracter personal conform art. 4 alin. 7 GDPR.
+        </p>
+        <p>
+          <strong>Date de contact:</strong> birou@verificasa.site · Instagram @verificasaro ·
+          detaliile complete în pagina de Contact.
+        </p>
+        <p>
+          <strong>Responsabil cu protecția datelor (DPO):</strong> În conformitate cu art. 37
+          GDPR, puteți contacta responsabilul nostru cu protecția datelor la adresa de e-mail
+          de mai sus, menționând „DPO / Protecția Datelor” în subiect.
+        </p>
+      </section>
+
+      <section>
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+          13. Autoritatea de supraveghere (ANSPDCP)
+        </h2>
+        <p>
+          Aveți dreptul de a depune o plângere la Autoritatea Națională de Supraveghere a
+          Prelucrării Datelor cu Caracter Personal (ANSPDCP), instituția națională de
+          supraveghere din România:
+        </p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>Website: <a href="https://www.dataprotection.ro" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">www.dataprotection.ro</a></li>
+          <li>E-mail: <a href="mailto:anspdcp@dataprotection.ro" className="text-primary hover:underline">anspdcp@dataprotection.ro</a></li>
+          <li>Telefon: +40 318.059.211</li>
+          <li>Adresa: B-dul Geniului nr. 28, Sector 6, București, cod poștal 060024</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+          14. Perioade de păstrare a datelor pe categorii
+        </h2>
+        <ul className="list-disc space-y-1 pl-5">
+          <li><strong>Date de contact (formulare, fără contract):</strong> maximum 12 luni;</li>
+          <li><strong>Date de cont și autentificare:</strong> pe durata activă a contului;</li>
+          <li><strong>Date de proprietate (anunțuri):</strong> pe durata publicării + 12 luni;</li>
+          <li><strong>Mesaje și conversații:</strong> maximum 24 luni de la ultimul mesaj;</li>
+          <li><strong>Comentarii și rapoarte:</strong> maximum 12 luni după rezolvare;</li>
+          <li><strong>Date financiar-contabile (clienți cu contract):</strong> conform Legii
+          nr. 82/1991 (10 ani pentru documente contabile, 5 ani pentru facturi);</li>
+          <li><strong>Date tehnice de navigare (loguri):</strong> maximum 90 de zile;</li>
+          <li><strong>Consimțământul pentru cookies:</strong> 12 luni.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+          15. Decizii automate și profilare
+        </h2>
+        <p>
+          Nu luăm decizii bazate exclusiv pe prelucrarea automată care produc efecte juridice
+          sau vă afectează în mod similar într-o măsură semnificativă (art. 22 GDPR). Nu
+          efectuăm profilare în scopuri de marketing sau publicitate. Utilizarea AI pentru
+          generarea tururilor 3D este un proces tehnic care nu produce decizii despre
+          persoane.
+        </p>
+      </section>
+
+      <section>
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+          16. Transferuri internaționale de date
+        </h2>
+        <p>
+          Anumite date pot fi procesate de furnizori de servicii IT aflați în afara
+          Spațiului Economic European (ex: hosting cloud, servicii de e-mail). În aceste
+          cazuri, asigurăm garanții adecvate conform art. 44-49 GDPR: clauze contractuale
+          tip adoptate de Comisia Europeană, decizii de adecvare sau reguli corporative
+          obligatorii. Puteți solicita o copie a acestor garanții contactându-ne.
+        </p>
+      </section>
+
+      <section>
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+          17. Temeiurile legale detaliate (art. 6 GDPR)
+        </h2>
+        <ul className="list-disc space-y-1 pl-5">
+          <li><strong>art. 6 alin. 1 lit. a (consimțământ):</strong> cookie-uri funcționale și de analiză, autentificare Google;</li>
+          <li><strong>art. 6 alin. 1 lit. b (contract):</strong> prestarea serviciilor contractate;</li>
+          <li><strong>art. 6 alin. 1 lit. c (obligație legală):</strong> păstrarea documentelor financiar-contabile;</li>
+          <li><strong>art. 6 alin. 1 lit. f (interes legitim):</strong> securitate, prevenirea fraudelor, îmbunătățirea serviciilor.</li>
+        </ul>
       </section>
     </LegalPage>
   );
