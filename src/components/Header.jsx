@@ -182,18 +182,13 @@ export default function Header() {
                 <ProfileMenu />
               </>
             ) : (
-              <div className="flex items-center gap-2">
-                <Link to="/login" className="flex h-9 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-sm font-semibold text-foreground transition hover:text-emerald dark:bg-card">
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">{t("hdr_login")}</span>
-                </Link>
-                <Button asChild className="rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
-                  <Link to="/register">
-                    <Heart className="h-4 w-4 sm:hidden" />
-                    <span className="hidden sm:inline">{t("hdr_register")}</span>
-                  </Link>
-                </Button>
-              </div>
+              <Link
+                to="/login"
+                className="flex h-9 items-center gap-1.5 rounded-full bg-emerald px-4 text-sm font-semibold text-white shadow-soft transition hover:bg-emerald/90"
+              >
+                <User className="h-4 w-4" />
+                <span>{t("hdr_login")}</span>
+              </Link>
             )}
           </div>
         </div>
