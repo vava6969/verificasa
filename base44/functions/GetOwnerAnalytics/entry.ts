@@ -14,6 +14,17 @@ Deno.serve(async (req) => {
       return Response.json({ error: "owner_id required" }, { status: 400 });
     }
 
+    // Authenticate the caller and authorize: only the owner themselves or an
+    // admin may read this owner's analytics (prevents IDOR via arbitrary owner_id).
+    const me = await base44.auth.me();
+    if (!me) {
+      return Response.json({ error: "Authentication required" }, { status: 401 });
+    }
+    const isAdmin = (me.role || "").toUpperCase() === "ADMIN" || (me.role || "").toUpperCase() === "SUPER_ADMIN";
+    if (me.id !== ownerId && !isAdmin) {
+      return Response.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     // Owner's properties (guarded by created_by_id equality).
     const props = await svc.entities.Property.filter(
       { created_by_id: ownerId },
