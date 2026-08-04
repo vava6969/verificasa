@@ -78,14 +78,12 @@ export default function Landing() {
       </section>
 
       {/* VALUE PROPOSITION CAROUSEL */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-16 lg:px-8">
-        <div className="mb-8 text-center">
+      <section className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 lg:px-8">
+        <div className="mb-3 text-center sm:mb-5">
           <p className="text-xs font-bold uppercase tracking-wider text-emerald">De ce VerifiCasa?</p>
-          <h2 className="mt-1 font-heading text-2xl font-bold text-navy sm:text-3xl">Transparență și încredere, pas cu pas</h2>
+          <h2 className="mt-1 font-heading text-xl font-bold text-navy sm:text-2xl">Transparență și încredere, pas cu pas</h2>
         </div>
-        <div className="overflow-hidden rounded-3xl bg-navy-deep px-2 py-8 shadow-soft sm:px-8 sm:py-10">
-          <CircularCarousel items={carouselItems} />
-        </div>
+        <CircularCarousel items={carouselItems} />
       </section>
 
       {/* DESPRE VERIFICASA */}
