@@ -16,11 +16,8 @@ function getItemPosition(index, activeIndex, total, radiusX, radiusY) {
   if (Math.abs(adjustedOffset) > half * 2) return null;
 
   const angle = (adjustedOffset / VISIBLE_COUNT) * Math.PI;
-  // Active card centered at (0,0); side cards spread horizontally and
-  // dropped slightly below to create a stacked / coverflow depth effect.
   const x = Math.sin(angle) * radiusX;
   const y = (1 - Math.cos(angle)) * radiusY;
-  const rotY = adjustedOffset * -12; // subtle 3D yaw
 
   const distance = Math.abs(adjustedOffset);
   const maxDistance = half + 1;
@@ -28,7 +25,7 @@ function getItemPosition(index, activeIndex, total, radiusX, radiusY) {
   const opacity = Math.max(0.18, 1 - (distance / maxDistance) * 0.72);
   const zIndex = VISIBLE_COUNT - distance;
 
-  return { x, y, scale, opacity, zIndex, adjustedOffset, rotY };
+  return { x, y, scale, opacity, zIndex, adjustedOffset };
 }
 
 export function CircularCarousel({
@@ -49,9 +46,9 @@ export function CircularCarousel({
   const activeIndex = controlledIndex ?? internalIndex;
   const total = items.length;
 
-  // Responsive radius — compact stack on mobile, wider arc on desktop
-  const radiusX = isMobile ? 48 : 190;
-  const radiusY = isMobile ? 18 : 55;
+  // Compact stack on mobile, wider arc on desktop
+  const radiusX = isMobile ? 42 : 190;
+  const radiusY = isMobile ? 14 : 55;
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 640);
@@ -106,15 +103,12 @@ export function CircularCarousel({
       onFocus={() => setIsFocused(true)}
       onBlur={() => setIsFocused(false)}
       className={cn(
-        "relative flex flex-col items-center justify-center gap-6 outline-none sm:gap-8",
+        "relative flex flex-col items-center justify-center gap-5 outline-none sm:gap-8",
         className,
       )}
     >
-      {/* Stacked track — overflow hidden so side cards fade behind active */}
-      <div
-        className="relative h-[260px] w-full max-w-lg overflow-hidden sm:h-[300px]"
-        style={{ perspective: "1000px" }}
-      >
+      {/* Track — overflow hidden so side cards clip behind active */}
+      <div className="relative h-[240px] w-full overflow-hidden sm:h-[300px]">
         <AnimatePresence mode="popLayout">
           {items.map((item, i) => {
             const pos = getItemPosition(i, activeIndex, total, radiusX, radiusY);
@@ -129,12 +123,11 @@ export function CircularCarousel({
                 layout
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{
-                  x: pos.x,
-                  y: pos.y,
+                  x: `calc(-50% + ${pos.x}px)`,
+                  y: `calc(-50% + ${pos.y}px)`,
                   scale: pos.scale,
                   opacity: pos.opacity,
                   zIndex: pos.zIndex,
-                  rotateY: pos.rotY,
                 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 transition={{
@@ -146,12 +139,11 @@ export function CircularCarousel({
                 aria-selected={isActive}
                 role="option"
                 className={cn(
-                  "absolute left-1/2 top-1/2 flex h-40 w-52 -translate-x-1/2 -translate-y-1/2 cursor-pointer flex-col items-start justify-between rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-800/95 to-zinc-900/95 p-5 backdrop-blur-sm transition-shadow duration-300 sm:h-44 sm:w-64",
+                  "absolute left-1/2 top-1/2 flex h-40 w-48 cursor-pointer flex-col items-start justify-between rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-800/95 to-zinc-900/95 p-5 backdrop-blur-sm transition-shadow duration-300 sm:h-44 sm:w-64",
                   isActive
                     ? "shadow-[0_20px_60px_-12px_rgba(0,0,0,0.6)] ring-1 ring-emerald/50"
-                    : "shadow-[0_8px_24px_-4px_rgba(0,0,0,0.4)] blur-[1.5px]",
+                    : "shadow-[0_8px_24px_-4px_rgba(0,0,0,0.4)] blur-[2px]",
                 )}
-                style={{ transformOrigin: "center center" }}
               >
                 {Icon && (
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-soft text-emerald">

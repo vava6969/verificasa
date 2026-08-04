@@ -83,7 +83,7 @@ export default function Landing() {
           <p className="text-xs font-bold uppercase tracking-wider text-emerald">De ce VerifiCasa?</p>
           <h2 className="mt-1 font-heading text-2xl font-bold text-navy sm:text-3xl">Transparență și încredere, pas cu pas</h2>
         </div>
-        <div className="overflow-hidden rounded-3xl bg-navy-deep p-6 shadow-soft sm:p-10">
+        <div className="overflow-hidden rounded-3xl bg-navy-deep px-2 py-8 shadow-soft sm:px-8 sm:py-10">
           <CircularCarousel items={carouselItems} />
         </div>
       </section>
