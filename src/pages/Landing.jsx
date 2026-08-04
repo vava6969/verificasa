@@ -10,7 +10,7 @@ import InspectieModal from "@/components/InspectieModal";
 import ListeazaPopup from "@/components/ListeazaPopup";
 import BetaBanner from "@/components/BetaBanner";
 import AboutVerifiCasa from "@/components/AboutVerifiCasa";
-import ValueStrips from "@/components/ValueStrips";
+import CircularCarousel from "@/components/ui/circular-carousel";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -23,10 +23,10 @@ export default function Landing() {
   const [showInspectie, setShowInspectie] = useState(false);
   const [showListeaza, setShowListeaza] = useState(false);
 
-  const valueProps = [
-    { icon: Video, title: t("vp1_t"), desc: t("vp1_d") },
-    { icon: ShieldCheck, title: t("vp2_t"), desc: t("vp2_d") },
-    { icon: Lock, title: t("vp3_t"), desc: t("vp3_d") },
+  const carouselItems = [
+    { id: "1", icon: Video, title: t("vp1_t"), description: t("vp1_d") },
+    { id: "2", icon: ShieldCheck, title: t("vp2_t"), description: t("vp2_d") },
+    { id: "3", icon: Lock, title: t("vp3_t"), description: t("vp3_d") },
   ];
   useEffect(() => {
     let cancelled = false;
@@ -77,9 +77,15 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* VALUE PROPOSITION BAR */}
+      {/* VALUE PROPOSITION CAROUSEL */}
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-16 lg:px-8">
-        <ValueStrips items={valueProps} />
+        <div className="mb-8 text-center">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald">De ce VerifiCasa?</p>
+          <h2 className="mt-1 font-heading text-2xl font-bold text-navy sm:text-3xl">Transparență și încredere, pas cu pas</h2>
+        </div>
+        <div className="overflow-hidden rounded-3xl bg-navy-deep p-6 shadow-soft sm:p-10">
+          <CircularCarousel items={carouselItems} />
+        </div>
       </section>
 
       {/* DESPRE VERIFICASA */}
