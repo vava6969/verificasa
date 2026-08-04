@@ -46,9 +46,8 @@ export function CircularCarousel({
   const activeIndex = controlledIndex ?? internalIndex;
   const total = items.length;
 
-  // Compact stack on mobile, wider arc on desktop
-  const radiusX = isMobile ? 42 : 190;
-  const radiusY = isMobile ? 14 : 55;
+  const radiusX = isMobile ? 38 : 190;
+  const radiusY = isMobile ? 12 : 55;
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 640);
@@ -107,8 +106,8 @@ export function CircularCarousel({
         className,
       )}
     >
-      {/* Track — overflow hidden so side cards clip behind active */}
-      <div className="relative h-[240px] w-full overflow-hidden sm:h-[300px]">
+      {/* Track */}
+      <div className="relative h-[260px] w-full overflow-hidden sm:h-[300px]">
         <AnimatePresence mode="popLayout">
           {items.map((item, i) => {
             const pos = getItemPosition(i, activeIndex, total, radiusX, radiusY);
@@ -120,11 +119,10 @@ export function CircularCarousel({
             return (
               <motion.button
                 key={item.id}
-                layout
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{
-                  x: `calc(-50% + ${pos.x}px)`,
-                  y: `calc(-50% + ${pos.y}px)`,
+                  x: pos.x,
+                  y: pos.y,
                   scale: pos.scale,
                   opacity: pos.opacity,
                   zIndex: pos.zIndex,
@@ -139,31 +137,31 @@ export function CircularCarousel({
                 aria-selected={isActive}
                 role="option"
                 className={cn(
-                  "absolute left-1/2 top-1/2 flex h-40 w-48 cursor-pointer flex-col items-start justify-between rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-800/95 to-zinc-900/95 p-5 backdrop-blur-sm transition-shadow duration-300 sm:h-44 sm:w-64",
+                  "absolute inset-0 m-auto flex h-40 w-52 cursor-pointer flex-col items-start justify-between overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-800/95 to-zinc-900/95 p-5 backdrop-blur-sm transition-shadow duration-300 sm:h-44 sm:w-64",
                   isActive
                     ? "shadow-[0_20px_60px_-12px_rgba(0,0,0,0.6)] ring-1 ring-emerald/50"
                     : "shadow-[0_8px_24px_-4px_rgba(0,0,0,0.4)] blur-[2px]",
                 )}
               >
                 {Icon && (
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-soft text-emerald">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-soft text-emerald">
                     <Icon className="h-5 w-5" />
                   </span>
                 )}
-                <div className="w-full">
+                <div className="w-full overflow-hidden">
                   <h3
                     className={cn(
-                      "font-semibold leading-tight transition-colors duration-300",
+                      "break-words font-semibold leading-tight transition-colors duration-300",
                       isActive
-                        ? "text-white text-base"
-                        : "text-white/80 text-sm",
+                        ? "text-white text-sm sm:text-base"
+                        : "text-white/80 text-xs sm:text-sm",
                     )}
                   >
                     {item.title}
                   </h3>
                   <p
                     className={cn(
-                      "mt-1.5 line-clamp-4 text-xs leading-relaxed transition-colors duration-300",
+                      "mt-1.5 break-words text-xs leading-relaxed transition-colors duration-300 line-clamp-4",
                       isActive ? "text-white/65" : "text-white/40",
                     )}
                   >
@@ -198,7 +196,6 @@ export function CircularCarousel({
           <ChevronLeft className="size-5" />
         </motion.button>
 
-        {/* Dot indicators */}
         <div className="flex items-center gap-1.5" role="tablist">
           {items.map((_, i) => (
             <button
