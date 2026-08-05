@@ -140,7 +140,7 @@ export function buildEmail(content) {
           <tr>
             <td align="center">
               <p style="margin:0;font-size:11px;line-height:1.65;color:#7a8289;">Acest mesaj este trimis automat. Te rugăm să nu răspunzi la acest e-mail. Pentru setări de comunicare, intră în <a href="${APP_URL}/account" style="color:#295fb3;text-decoration:none;">Contul tău</a> &gt; Setări &gt; Notificări.</p>
-              <p style="margin:10px 0 0;font-size:11px;color:#7a8289;">© ${new Date().getFullYear()} VerifiCasa · ${APP_URL.replace(/^https?:\/\//, "")}</p>
+              <p style="margin:10px 0 0;font-size:11px;color:#7a8289;">© ${new Date().getFullYear()} VerifiCasa · www.verificasa.ro</p>
             </td>
           </tr>
         </table>

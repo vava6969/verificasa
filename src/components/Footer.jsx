@@ -1,5 +1,5 @@
 import React from "react";
-import { Mail, MapPin, ShieldCheck, Instagram } from "lucide-react";
+import { Mail, MapPin, ShieldCheck, Instagram, Music2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCountry } from "@/components/CountryContext";
 import VerifiCasaLogo from "@/components/VerifiCasaLogo";
@@ -47,10 +47,17 @@ export default function Footer() {
           <div>
             <h4 className="font-heading text-sm font-semibold uppercase tracking-wider text-gold">{t("f_contact")}</h4>
             <ul className="mt-4 space-y-2.5 text-sm text-white/60">
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-emerald" /> birou@verificasa.site</li>
+              <li className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-emerald" />
+                <a href="mailto:contact@verificasa.site" className="hover:text-emerald">contact@verificasa.site</a>
+              </li>
               <li className="flex items-center gap-2">
                 <Instagram className="h-4 w-4 text-emerald" />
                 <a href="https://instagram.com/verificasaro" target="_blank" rel="noopener noreferrer" className="hover:text-emerald">@verificasaro</a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Music2 className="h-4 w-4 text-emerald" />
+                <a href="https://tiktok.com/@verificasaro" target="_blank" rel="noopener noreferrer" className="hover:text-emerald">verificasaro</a>
               </li>
             </ul>
             <p className="mt-4 flex items-start gap-2 text-xs font-semibold text-white/70">
