@@ -99,8 +99,8 @@ function EmailCard({ item, index }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.5, delay: (index % 2) * 0.08, ease: "easeOut" }}
-      whileHover={{ y: -4 }}
-      className={`group relative flex flex-col gap-3 rounded-2xl border border-white/60 bg-white/70 p-5 backdrop-blur-xl transition-shadow hover:border-gold/40 dark:border-white/10 dark:bg-white/[0.04] ${isHero ? "sm:col-span-2 " + a.glow : ""} ${a.ring} hover:ring-2`}
+      whileHover={{ y: -6, scale: 1.01 }}
+      className={`group relative flex flex-col gap-3 rounded-2xl border border-white/50 bg-white/40 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_30px_-14px_rgba(27,34,44,0.18)] backdrop-blur-2xl transition-all hover:border-gold/50 hover:bg-white/55 dark:border-white/10 dark:bg-white/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_10px_36px_-16px_rgba(0,0,0,0.7)] dark:hover:bg-white/[0.08] ${isHero ? "sm:col-span-2 " + a.glow : ""} ${a.ring} hover:ring-2`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${a.iconBg}`}>
@@ -164,7 +164,14 @@ export default function EmailDirectory() {
   const depts = EMAILS.filter((e) => ["Recrutare", "Legal", "Admin"].includes(e.badge));
 
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-6 overflow-hidden rounded-3xl p-4 sm:p-6">
+      {/* Decorative gradient blobs — give the glass cards something to blur on light theme */}
+      <div className="pointer-events-none absolute -left-20 -top-10 h-64 w-64 rounded-full bg-emerald/20 blur-3xl dark:bg-emerald/10" />
+      <div className="pointer-events-none absolute -right-16 top-40 h-56 w-56 rounded-full bg-gold/25 blur-3xl dark:bg-gold/15" />
+      <div className="pointer-events-none absolute bottom-20 left-1/3 h-60 w-60 rounded-full bg-blue-400/15 blur-3xl dark:bg-blue-500/10" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-soft/40 via-transparent to-gold-soft/40 dark:from-emerald/5 dark:to-gold/5" />
+
+      <div className="relative space-y-6">
       {/* Hero email */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {hero.map((e, i) => <EmailCard key={e.email} item={e} index={i} />)}
@@ -221,6 +228,7 @@ export default function EmailDirectory() {
           </div>
         </div>
       </motion.div>
+      </div>
     </div>
   );
 }
