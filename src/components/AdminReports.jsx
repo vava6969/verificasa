@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Flag, Eye, AlertTriangle, Pencil } from "lucide-react";
 import PropertyEditForm from "@/components/PropertyEditForm";
+import { useLoadMore } from "@/hooks/useLoadMore";
+import LoadMoreButton from "@/components/admin/LoadMoreButton";
 
 const STATUS_TONE = {
   PENDING: "bg-amber-50 text-amber-700",
@@ -24,6 +26,7 @@ export default function AdminReports({ reports = [], properties = [], onReload }
   const [form, setForm] = useState({
     status: "RESOLVED", note: "", auto_action: "none", send_email: false, resolved_date: "",
   });
+  const { count: repCount, loadMore: loadMoreReps } = useLoadMore(5, []);
 
   const open = (r) => {
     setResolvingId(r.id);
@@ -56,7 +59,9 @@ export default function AdminReports({ reports = [], properties = [], onReload }
     <div className="space-y-3">
       {reports.length === 0 ? (
         <p className="text-sm text-muted-foreground">Nicio sesizare. 🎉</p>
-      ) : reports.map((r) => (
+      ) : (
+        <>
+        {reports.slice(0, repCount).map((r) => (
         <div key={r.id} className="rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
@@ -195,7 +200,12 @@ export default function AdminReports({ reports = [], properties = [], onReload }
             </div>
           )}
         </div>
-      ))}
+        ))}
+        {reports.length > repCount && (
+          <LoadMoreButton onClick={loadMoreReps} remaining={reports.length - repCount} />
+        )}
+        </>
+      )}
     </div>
   );
 }

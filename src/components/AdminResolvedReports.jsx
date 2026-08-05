@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Flag, CheckCircle2, XCircle, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLoadMore } from "@/hooks/useLoadMore";
+import LoadMoreButton from "@/components/admin/LoadMoreButton";
 
 const STATUS_TONE = {
   RESOLVED: "bg-emerald-soft text-emerald",
@@ -18,6 +20,7 @@ const AUTO_ACTION_LABEL = {
 // rejected). Shows the full original report (reason, details, reporter) plus
 // who handled it, when, what auto-action was applied and the resolution note.
 export default function AdminResolvedReports({ reports = [] }) {
+  const { count: repCount, loadMore: loadMoreReps } = useLoadMore(5, []);
   if (reports.length === 0) {
     return <p className="text-sm text-muted-foreground">Nicio sesizare procesată încă.</p>;
   }
@@ -28,7 +31,7 @@ export default function AdminResolvedReports({ reports = [] }) {
   });
   return (
     <div className="space-y-3">
-      {sorted.map((r) => {
+      {sorted.slice(0, repCount).map((r) => {
         const Icon = r.status === "RESOLVED" ? CheckCircle2 : XCircle;
         const tone = r.status === "RESOLVED" ? "text-emerald" : "text-rose-500";
         return (
@@ -84,6 +87,9 @@ export default function AdminResolvedReports({ reports = [] }) {
           </div>
         );
       })}
+      {sorted.length > repCount && (
+        <LoadMoreButton onClick={loadMoreReps} remaining={sorted.length - repCount} />
+      )}
     </div>
   );
 }

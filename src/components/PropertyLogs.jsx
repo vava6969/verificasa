@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Search, Inbox, MessageSquare, ShieldCheck, History } from "lucide-react";
+import { useLoadMore } from "@/hooks/useLoadMore";
+import LoadMoreButton from "@/components/admin/LoadMoreButton";
 
 const ACTION_LABELS = {
   approve: "Aprobat anunț",
@@ -21,6 +23,8 @@ const relTime = (iso) => {
 export default function PropertyLogs({ properties = [], audit = [], comments = [], inquiries = [] }) {
   const [q, setQ] = useState("");
   const [pid, setPid] = useState("");
+  const { count: listCount, loadMore: loadMoreList } = useLoadMore(8, [q]);
+  const { count: tlCount, loadMore: loadMoreTl } = useLoadMore(6, [pid]);
 
   const list = useMemo(() => {
     const lq = q.toLowerCase();
@@ -71,7 +75,7 @@ export default function PropertyLogs({ properties = [], audit = [], comments = [
         <div className="max-h-[60vh] space-y-1 overflow-auto rounded-2xl border border-border bg-white p-1 dark:bg-card">
           {list.length === 0 ? (
             <p className="px-3 py-2 text-xs text-muted-foreground">Nicio proprietate.</p>
-          ) : list.map((p) => (
+          ) : list.slice(0, listCount).map((p) => (
             <button key={p.id} onClick={() => setPid(p.id)} className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition ${pid === p.id ? "bg-navy text-white" : "hover:bg-secondary"}`}>
               <History className="h-3.5 w-3.5 shrink-0" />
               <span className="min-w-0 flex-1 truncate">{p.title}</span>
@@ -79,6 +83,9 @@ export default function PropertyLogs({ properties = [], audit = [], comments = [
               {p.approval_status !== "APPROVED" && <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">nou</span>}
             </button>
           ))}
+          {list.length > listCount && (
+            <div className="px-2 pt-1"><LoadMoreButton onClick={loadMoreList} remaining={list.length - listCount} /></div>
+          )}
         </div>
       </div>
 
@@ -100,7 +107,7 @@ export default function PropertyLogs({ properties = [], audit = [], comments = [
               </button>
             </div>
             <ol className="space-y-3">
-              {timeline.map((it, idx) => {
+              {timeline.slice(0, tlCount).map((it, idx) => {
                 const Icon = it.Icon;
                 return (
                   <li key={idx} className="flex gap-3">
@@ -118,6 +125,9 @@ export default function PropertyLogs({ properties = [], audit = [], comments = [
                 );
               })}
             </ol>
+            {timeline.length > tlCount && (
+              <div className="mt-3"><LoadMoreButton onClick={loadMoreTl} remaining={timeline.length - tlCount} /></div>
+            )}
           </>
         )}
       </div>

@@ -17,6 +17,8 @@ import AdminReports from "@/components/AdminReports";
 import AdminResolvedReports from "@/components/AdminResolvedReports";
 import AdminStatCard from "@/components/AdminStatCard";
 import InspectionContactModal from "@/components/InspectionContactModal";
+import { useLoadMore } from "@/hooks/useLoadMore";
+import LoadMoreButton from "@/components/admin/LoadMoreButton";
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 const ROLE_OPTIONS = ["PROPRIETAR", "AGENT", "ADMIN", "SUPER_ADMIN", "SUPPORT", "user"];
@@ -36,9 +38,20 @@ export default function Admin() {
   const [editingId, setEditingId] = useState(null);
   const [propSearch, setPropSearch] = useState("");
   const [auditSearch, setAuditSearch] = useState("");
+  const [commentSearch, setCommentSearch] = useState("");
   const [featuredInput, setFeaturedInput] = useState("");
   const [contactTarget, setContactTarget] = useState(null);
   const [contactSending, setContactSending] = useState(false);
+
+  // Paginare incrementală — afișăm câte 5 itemi per secțiune; restul la „Încarcă mai mult".
+  // Reset automat la schimbarea filtrului/tab-ului, dar NU la realtime reload.
+  const { count: propCount, loadMore: loadMoreProps } = useLoadMore(5, [propSearch, tab]);
+  const { count: auditCount, loadMore: loadMoreAudit } = useLoadMore(5, [auditSearch, tab]);
+  const { count: userCount, loadMore: loadMoreUsers } = useLoadMore(5, [userSearch, tab]);
+  const { count: commentCount, loadMore: loadMoreComments } = useLoadMore(5, [commentSearch, tab]);
+  const { count: inspCount, loadMore: loadMoreInsp } = useLoadMore(5, [tab]);
+  const { count: featCount, loadMore: loadMoreFeat } = useLoadMore(5, [tab]);
+  const { count: inspDoneCount, loadMore: loadMoreInspDone } = useLoadMore(5, [tab]);
 
   const isAllowed = isAuthenticated && user && ADMIN_ROLES.includes((user.role || "").toUpperCase());
   const isSuper = (user?.role || "").toUpperCase() === "SUPER_ADMIN";
@@ -346,9 +359,13 @@ export default function Admin() {
         <div>
           {tab === "inspectii" ? (
             <div className="space-y-2">
-              {(inspections || []).filter((r) => r.status === "Nou").length === 0 ? (
-                <p className="text-sm text-muted-foreground">Nicio solicitare de inspectie nepreluata.</p>
-              ) : (inspections || []).filter((r) => r.status === "Nou").map((r) => (
+              {(() => {
+                const items = (inspections || []).filter((r) => r.status === "Nou");
+                if (items.length === 0) return <p className="text-sm text-muted-foreground">Nicio solicitare de inspectie nepreluata.</p>;
+                const visible = items.slice(0, inspCount);
+                return (
+                  <>
+                    {visible.map((r) => (
                 <div key={r.id} className="rounded-xl border border-border bg-white p-4 dark:bg-card">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
@@ -375,7 +392,13 @@ export default function Admin() {
                     )}
                   </div>
                 </div>
-              ))}
+                    ))}
+                    {items.length > visible.length && (
+                      <LoadMoreButton onClick={loadMoreInsp} remaining={items.length - visible.length} />
+                    )}
+                  </>
+                );
+              })()}
             </div>
 
           ) : tab === "audit" ? (
@@ -396,7 +419,10 @@ export default function Admin() {
                     .filter(Boolean).join(" ").toLowerCase().includes(as)
                 );
                 if (src.length === 0) return <p className="text-sm text-muted-foreground">Nicio actiune gasita.</p>;
-                return src.map((a) => (
+                const visible = src.slice(0, auditCount);
+                return (
+                  <>
+                    {visible.map((a) => (
                   <div key={a.id} className="flex items-center justify-between rounded-xl border border-border bg-white p-3 text-sm dark:bg-card">
                     <span>
                       <b className="text-navy dark:text-foreground">{a.actor_name}</b>
@@ -408,7 +434,12 @@ export default function Admin() {
                     </span>
                     <span className="text-xs text-muted-foreground">{new Date(a.created_date).toLocaleString("ro-RO")}</span>
                   </div>
-                ));
+                    ))}
+                    {src.length > visible.length && (
+                      <LoadMoreButton onClick={loadMoreAudit} remaining={src.length - visible.length} />
+                    )}
+                  </>
+                );
               })()}
             </div>
 
@@ -429,7 +460,7 @@ export default function Admin() {
                         Inspecții preluate ({insp.length})
                       </p>
                       <div className="space-y-2">
-                        {insp.map((r) => (
+                        {insp.slice(0, inspDoneCount).map((r) => (
                           <div key={r.id} className="rounded-xl border border-border bg-white p-4 dark:bg-card">
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               <div>
@@ -447,6 +478,9 @@ export default function Admin() {
                             {r.package_interest && <p className="text-xs text-muted-foreground">Pachet: {r.package_interest}</p>}
                           </div>
                         ))}
+                        {insp.length > inspDoneCount && (
+                          <LoadMoreButton onClick={loadMoreInspDone} remaining={insp.length - inspDoneCount} />
+                        )}
                       </div>
                     </div>
                   );
@@ -471,7 +505,7 @@ export default function Admin() {
                 ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-2xl" />)
                 : filteredUsers.length === 0
                 ? <p className="text-sm text-muted-foreground">Niciun utilizator gasit.</p>
-                : filteredUsers.map((u) => (
+                : filteredUsers.slice(0, userCount).map((u) => (
                   <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card">
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-soft text-emerald">
                       <Users className="h-5 w-5" />
@@ -496,13 +530,32 @@ export default function Admin() {
                     </Button>
                   </div>
                 ))}
+                {filteredUsers.length > userCount && (
+                  <LoadMoreButton onClick={loadMoreUsers} remaining={filteredUsers.length - userCount} />
+                )}
             </div>
 
           ) : tab === "comments" ? (
             <div className="space-y-2">
-              {(comments || []).length === 0
-                ? <p className="text-sm text-muted-foreground">Niciun comentariu.</p>
-                : comments.map((c) => (
+              <div className="relative max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  value={commentSearch}
+                  onChange={(e) => setCommentSearch(e.target.value)}
+                  placeholder="Cauta dupa autor, continut sau proprietate..."
+                  className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card"
+                />
+              </div>
+              {(() => {
+                const cs = (commentSearch || "").toLowerCase();
+                const items = (comments || []).filter((c) =>
+                  !cs || [c.user_name, c.content, c.property_title, c.user_role].filter(Boolean).join(" ").toLowerCase().includes(cs)
+                );
+                if (items.length === 0) return <p className="text-sm text-muted-foreground">Niciun comentariu gasit.</p>;
+                const visible = items.slice(0, commentCount);
+                return (
+                  <>
+                    {visible.map((c) => (
                   <div key={c.id} className="rounded-xl border border-border bg-white p-3 dark:bg-card">
                     <div className="flex items-center justify-between">
                       <span className="text-sm">
@@ -515,7 +568,13 @@ export default function Admin() {
                     </div>
                     <p className="mt-1 text-sm text-foreground/80">{c.content}</p>
                   </div>
-                ))}
+                    ))}
+                    {items.length > visible.length && (
+                      <LoadMoreButton onClick={loadMoreComments} remaining={items.length - visible.length} />
+                    )}
+                  </>
+                );
+              })()}
             </div>
 
           ) : tab === "recomandate" ? (
@@ -547,7 +606,7 @@ export default function Admin() {
                   <p className="text-sm text-muted-foreground">Nicio proprietate recomandata.</p>
                 ) : (
                   <div className="space-y-2">
-                    {all.filter((p) => p.featured).map((p) => (
+                    {all.filter((p) => p.featured).slice(0, featCount).map((p) => (
                       <div key={p.id} className="flex items-center gap-3 rounded-xl border border-gold/30 bg-white p-3 dark:bg-card">
                         <div className="h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-secondary">
                           {p.images?.[0] && <UIImage src={p.images[0]} fittingType="fill" className="h-full w-full" />}
@@ -561,6 +620,9 @@ export default function Admin() {
                         </Button>
                       </div>
                     ))}
+                    {all.filter((p) => p.featured).length > featCount && (
+                      <LoadMoreButton onClick={loadMoreFeat} remaining={all.filter((p) => p.featured).length - featCount} />
+                    )}
                   </div>
                 )}
               </div>
@@ -588,7 +650,10 @@ export default function Admin() {
                     ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-2xl" />)
                     : <p className="text-sm text-muted-foreground">{tab === "pending" ? "Niciun anunt in asteptare." : "Niciun anunt gasit."}</p>;
                 }
-                return src.map((p) => {
+                const visible = src.slice(0, propCount);
+                return (
+                  <>
+                  {visible.map((p) => {
                   if (editingId === p.id) {
                     return <PropertyEditForm key={p.id} property={p} isAdmin onDone={() => { setEditingId(null); load(); }} />;
                   }
@@ -634,7 +699,12 @@ export default function Admin() {
                       </div>
                     </div>
                   );
-                });
+                })}
+                  {src.length > visible.length && (
+                    <LoadMoreButton onClick={loadMoreProps} remaining={src.length - visible.length} />
+                  )}
+                  </>
+                );
               })()}
             </div>
           )}
