@@ -97,6 +97,11 @@ export default function Landing() {
       {/* DESPRE VERIFICASA */}
       <AboutVerifiCasa />
 
+      {/* MAP SEARCH CTA */}
+      <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
+        <MapSearchCTA />
+      </section>
+
       {/* FEATURED PROPERTIES */}
       <section id="featured" className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 sm:pb-16 lg:px-8">
         <div className="mb-5 flex items-end justify-between sm:mb-8">
@@ -132,11 +137,6 @@ export default function Landing() {
             </Button>
           </div>
         )}
-      </section>
-
-      {/* MAP SEARCH CTA */}
-      <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
-        <MapSearchCTA />
       </section>
 
       {/* SOLICITĂ O INSPECȚIE CTA */}
