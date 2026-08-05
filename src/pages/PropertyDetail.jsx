@@ -113,6 +113,30 @@ export default function PropertyDetail() {
         preferred_visit_date: form.preferred_visit_date || null,
         status: "Nou",
       });
+      // Trimite mesaj în aplicație (conversație) către proprietar cu toate datele clientului
+      if (user) {
+        try {
+          const conv = await startConversation(user, property);
+          const inquiryLines = [
+            "📋 Cerere nouă de închiriere",
+            `👤 ${form.name}`,
+            `📧 ${form.email}`,
+            form.phone ? `📞 ${form.phone}` : null,
+            form.occupation ? `💼 ${form.occupation}` : null,
+            form.estimated_income ? `💰 Venit estimat: ${form.estimated_income} RON` : null,
+            form.move_date ? `📅 Mutare: ${form.move_date}` : null,
+            form.preferred_visit_date ? `👁️ Vizionare: ${form.preferred_visit_date}` : null,
+            form.message ? `💬 ${form.message}` : null,
+          ].filter(Boolean);
+          await base44.entities.Message.create({
+            conversation_id: conv.id,
+            sender_id: user.id,
+            sender_name: user.full_name || user.email,
+            content: inquiryLines.join("\n"),
+          });
+          await base44.entities.Conversation.update(conv.id, { last_message: `📋 Cerere de la ${form.name}` });
+        } catch (_) { /* best-effort */ }
+      }
       try {
         await base44.functions.invoke("NotifyOnNewInquiry", {
           inquiry: {
@@ -231,8 +255,11 @@ export default function PropertyDetail() {
           <ChevronLeft className="h-4 w-4" /> {t("back_results")}
         </Link>
 
-        {/* HERO */}
-        <div className="mt-4">
+        <div className="mt-4 grid gap-4 sm:mt-6 sm:gap-6 lg:grid-cols-3">
+          {/* LEFT */}
+          <div className="min-w-0 space-y-4 sm:space-y-6 lg:col-span-2">
+            {/* GALLERY */}
+            <div>
           <div className="mb-3 flex items-center gap-2">
             <button onClick={() => setTab("gallery")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "gallery" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
               {t("tab_gallery")} ({images.length})
@@ -344,9 +371,6 @@ export default function PropertyDetail() {
           ))}
         </div>
 
-        <div className="mt-4 grid gap-4 sm:mt-6 sm:gap-6 lg:grid-cols-3">
-          {/* LEFT */}
-          <div className="min-w-0 space-y-4 sm:space-y-6 lg:col-span-2">
             {editing && (
               <PropertyEditForm
                 property={p}
