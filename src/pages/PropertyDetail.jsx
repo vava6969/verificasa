@@ -265,8 +265,8 @@ export default function PropertyDetail() {
           ) : (
             <div className="select-none">
               <div
-                className="relative flex items-center justify-center overflow-hidden rounded-2xl border border-border bg-navy-deep select-none"
-                style={{ aspectRatio: "16 / 10" }}
+                className="relative flex items-center justify-center overflow-hidden rounded-2xl border border-border bg-secondary select-none"
+                style={{ aspectRatio: "4 / 3" }}
                 onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
                 onTouchEnd={(e) => {
                   if (touchStartX.current == null) return;
@@ -279,7 +279,7 @@ export default function PropertyDetail() {
               >
                 {images[activeImage] ? (
                   <button type="button" onClick={() => { setLbIndex(activeImage); setShowLb(true); }} className="h-full w-full cursor-zoom-in">
-                    <Image src={images[activeImage]} alt={p.title} fittingType="fit" className="max-h-full w-full" />
+                    <Image src={images[activeImage]} alt={p.title} fittingType="fill" className="h-full w-full" />
                   </button>
                 ) : (
                   <div className="flex aspect-video w-full max-w-3xl items-center justify-center bg-gradient-to-br from-navy/10 to-mint/20 text-muted-foreground">
