@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { X, ShieldCheck, Send, ArrowLeft, ArrowRight, User, Home, MessageSquare, CheckCircle2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { X, ShieldCheck, Send, ArrowLeft, ArrowRight, User, Home, MessageSquare, CheckCircle2, LogIn, Lock } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useToast } from "@/components/ui/use-toast";
 import { useCountry } from "@/components/CountryContext";
+import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { inputCls, Field, ChoiceCard } from "@/components/postproperty/wizardUi";
 
@@ -28,6 +30,7 @@ const PACKAGES = [
 export default function InspectieModal({ open, onClose }) {
   const { t } = useCountry();
   const { toast } = useToast();
+  const { user, isAuthenticated, isLoadingAuth } = useAuth();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({ name: "", email: "", phone: "", role: "Proprietar", address_or_url: "", package_interest: "", message: "" });
   const [sending, setSending] = useState(false);
@@ -35,14 +38,19 @@ export default function InspectieModal({ open, onClose }) {
   useEffect(() => {
     if (!open) return;
     setStep(0);
+    // Preia automat numele și emailul din contul utilizatorului autentificat.
+    if (isAuthenticated && user) {
+      setForm((f) => ({ ...f, name: user.full_name || "", email: user.email || "" }));
+    }
     const onEsc = (e) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", onEsc);
     document.body.style.overflow = "hidden";
     return () => { document.removeEventListener("keydown", onEsc); document.body.style.overflow = ""; };
-  }, [open]);
+  }, [open, isAuthenticated, user]);
 
   if (!open) return null;
 
+  const needsAuth = !isLoadingAuth && !isAuthenticated;
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
 
   const validateStep = (s) => {
@@ -105,6 +113,27 @@ export default function InspectieModal({ open, onClose }) {
           </div>
         </div>
 
+        {needsAuth ? (
+          <div className="flex flex-col items-center justify-center gap-4 px-6 py-12 text-center">
+            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-soft text-emerald"><Lock className="h-7 w-7" /></span>
+            <div>
+              <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">Autentificare necesară</h3>
+              <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
+                Pentru a solicita o inspecție, trebuie să fii autentificat. Datele tale de contact se preiau automat din cont, iar cererea este mai ușor de procesat.
+              </p>
+            </div>
+            <div className="flex flex-wrap justify-center gap-2.5">
+              <Button asChild className="gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
+                <Link to="/login"><LogIn className="h-4 w-4" /> Intră în cont</Link>
+              </Button>
+              <Button asChild variant="outline" className="gap-1.5 rounded-full">
+                <Link to="/register">Creează cont</Link>
+              </Button>
+            </div>
+            <button onClick={onClose} className="mt-1 text-xs text-muted-foreground hover:underline">Anulează</button>
+          </div>
+        ) : (
+        <>
         {/* Stepper header */}
         <div className="shrink-0 border-b border-border/60 px-5 py-4">
           <div className="flex items-center justify-between">
@@ -157,12 +186,15 @@ export default function InspectieModal({ open, onClose }) {
                 </Field>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Field label="Nume" required>
-                    <input value={form.name} onChange={(e) => set({ name: e.target.value })} placeholder={t("ins_ph_name")} className={inputCls} required />
+                    <input value={form.name} readOnly={isAuthenticated} onChange={(e) => set({ name: e.target.value })} placeholder={t("ins_ph_name")} className={inputCls + (isAuthenticated ? " cursor-not-allowed bg-secondary/50" : "")} required />
                   </Field>
                   <Field label="Email" required>
-                    <input type="email" value={form.email} onChange={(e) => set({ email: e.target.value })} placeholder={t("ins_ph_email")} className={inputCls} required />
+                    <input type="email" value={form.email} readOnly={isAuthenticated} onChange={(e) => set({ email: e.target.value })} placeholder={t("ins_ph_email")} className={inputCls + (isAuthenticated ? " cursor-not-allowed bg-secondary/50" : "")} required />
                   </Field>
                 </div>
+                {isAuthenticated && (
+                  <p className="text-[11px] text-emerald">✓ Date de contact preluate automat din contul tău.</p>
+                )}
                 <Field label="Telefon">
                   <input value={form.phone} onChange={(e) => set({ phone: e.target.value })} placeholder={t("ins_ph_phone")} className={inputCls} />
                 </Field>
@@ -237,6 +269,8 @@ export default function InspectieModal({ open, onClose }) {
             )}
           </div>
         </form>
+        </>
+        )}
       </div>
     </div>
   );
