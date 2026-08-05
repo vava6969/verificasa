@@ -19,6 +19,8 @@ export default function MapSearchCTA() {
             src="https://media.base44.com/images/public/6a5ef7d63008cd71560dfe14/c39d91807_image.png"
             alt="Toate proprietățile pe hartă"
             fittingType="fill"
+            focalPointX={0.75}
+            focalPointY={0.2}
             className="h-36 w-full sm:h-44 sm:w-56"
           />
         </div>
