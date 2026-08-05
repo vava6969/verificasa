@@ -9,13 +9,14 @@ import { Image as UIImage } from "@/components/ui/image";
 import {
   ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck,
   Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil,
-  Sparkles, History, Flag, ClipboardCheck, Crown,
+  Sparkles, History, Flag, ClipboardCheck, Crown, Mail, Phone,
 } from "lucide-react";
 import PropertyEditForm from "@/components/PropertyEditForm";
 import PropertyLogs from "@/components/PropertyLogs";
 import AdminReports from "@/components/AdminReports";
 import AdminResolvedReports from "@/components/AdminResolvedReports";
 import AdminStatCard from "@/components/AdminStatCard";
+import InspectionContactModal from "@/components/InspectionContactModal";
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 const ROLE_OPTIONS = ["PROPRIETAR", "AGENT", "ADMIN", "SUPER_ADMIN", "SUPPORT", "user"];
@@ -36,6 +37,8 @@ export default function Admin() {
   const [propSearch, setPropSearch] = useState("");
   const [auditSearch, setAuditSearch] = useState("");
   const [featuredInput, setFeaturedInput] = useState("");
+  const [contactTarget, setContactTarget] = useState(null);
+  const [contactSending, setContactSending] = useState(false);
 
   const isAllowed = isAuthenticated && user && ADMIN_ROLES.includes((user.role || "").toUpperCase());
   const isSuper = (user?.role || "").toUpperCase() === "SUPER_ADMIN";
@@ -183,6 +186,33 @@ export default function Admin() {
     } catch { toast({ title: "Eroare", variant: "destructive" }); }
   };
 
+  // Admin a contactat proprietarul pentru o cerere de inspecție:
+  // trimite e-mail automat, schimbă statusul în "Contactat" și salvează AuditLog.
+  const contactInspection = async (note) => {
+    const r = contactTarget;
+    if (!r) return;
+    setContactSending(true);
+    try {
+      await base44.entities.InspectionRequest.update(r.id, { status: "Contactat" });
+      log("contact_inspection", "inspection", r.id,
+        `${r.name || "—"} · ${r.address_or_url || "—"} · ${r.package_interest || "—"}${note ? " · Notă: " + note : ""}`);
+      try {
+        base44.functions.invoke("NotifyOnInspectionContacted", {
+          inspection_id: r.id, name: r.name, email: r.email,
+          address_or_url: r.address_or_url, package_interest: r.package_interest,
+          admin_note: note || "",
+        }).catch(() => {});
+      } catch {}
+      toast({ title: "Proprietar contactat", description: "E-mail trimis și cerere mutată la Rezolvate." });
+      setContactTarget(null);
+      load();
+    } catch {
+      toast({ title: "Eroare la contactare", variant: "destructive" });
+    } finally {
+      setContactSending(false);
+    }
+  };
+
   if (isAuthenticated && !isAllowed) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
@@ -208,9 +238,9 @@ export default function Admin() {
   const PTABS = [
     { k: "pending",            label: "In asteptare", icon: Clock,          count: pending.length,                                                 tone: "amber" },
     { k: "users",              label: "Utilizatori",  icon: Users,           count: (users || []).length,                                           tone: "emerald" },
-    { k: "inspectii",          label: "Inspectii",    icon: ClipboardList,   count: (inspections || []).length,                                     tone: "emerald" },
+    { k: "inspectii",          label: "Inspectii",    icon: ClipboardList,   count: (inspections || []).filter((r) => r.status === "Nou").length,   tone: "emerald" },
     { k: "rapoarte",           label: "Sesizari",     icon: Flag,            count: (reports || []).filter((r) => r.status === "PENDING").length,   tone: "rose" },
-    { k: "rapoarte_rezolvate", label: "Rezolvate",    icon: ClipboardCheck,  count: (reports || []).filter((r) => r.status !== "PENDING").length,   tone: "emerald" },
+    { k: "rapoarte_rezolvate", label: "Rezolvate",    icon: ClipboardCheck,  count: (reports || []).filter((r) => r.status !== "PENDING").length + (inspections || []).filter((r) => r.status !== "Nou").length, tone: "emerald" },
     { k: "recomandate",        label: "Recomandate",   icon: Crown,            count: all.filter((p) => p.featured).length,                           tone: "gold" },
   ];
   const GTABS = [
@@ -316,9 +346,9 @@ export default function Admin() {
         <div>
           {tab === "inspectii" ? (
             <div className="space-y-2">
-              {(inspections || []).length === 0 ? (
-                <p className="text-sm text-muted-foreground">Nicio solicitare de inspectie.</p>
-              ) : inspections.map((r) => (
+              {(inspections || []).filter((r) => r.status === "Nou").length === 0 ? (
+                <p className="text-sm text-muted-foreground">Nicio solicitare de inspectie nepreluata.</p>
+              ) : (inspections || []).filter((r) => r.status === "Nou").map((r) => (
                 <div key={r.id} className="rounded-xl border border-border bg-white p-4 dark:bg-card">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
@@ -327,16 +357,23 @@ export default function Admin() {
                       </p>
                       <p className="text-xs text-muted-foreground">{r.email} · {r.phone || "fara tel"}</p>
                     </div>
-                    <span className={"rounded-full px-2.5 py-0.5 text-[11px] font-semibold " +
-                      (r.status === "Nou" ? "bg-blue-50 text-blue-700" :
-                       r.status === "Contactat" ? "bg-mint-soft text-navy" :
-                       "bg-secondary text-muted-foreground")}>
+                    <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
                       {r.status}
                     </span>
                   </div>
                   {r.address_or_url && <p className="mt-1 text-xs text-muted-foreground">Adresa: {r.address_or_url}</p>}
                   {r.package_interest && <p className="text-xs text-muted-foreground">Pachet: {r.package_interest}</p>}
                   {r.message && <p className="mt-1 text-sm text-foreground/80">{r.message}</p>}
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button size="sm" onClick={() => setContactTarget(r)} className="gap-1.5 bg-emerald text-white hover:bg-emerald/90">
+                      <Mail className="h-3.5 w-3.5" /> Contactează proprietarul
+                    </Button>
+                    {r.phone && (
+                      <Button size="sm" variant="outline" asChild className="gap-1 border-emerald/40 text-emerald hover:bg-emerald-soft">
+                        <a href={`tel:${r.phone}`}><Phone className="h-3.5 w-3.5" /> {r.phone}</a>
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -382,7 +419,42 @@ export default function Admin() {
             <AdminReports reports={(reports || []).filter((r) => r.status === "PENDING")} properties={properties || []} onReload={load} />
 
           ) : tab === "rapoarte_rezolvate" ? (
-            <AdminResolvedReports reports={(reports || []).filter((r) => r.status !== "PENDING")} />
+            <div className="space-y-5">
+              {(() => {
+                const insp = (inspections || []).filter((r) => r.status !== "Nou");
+                if (insp.length > 0) {
+                  return (
+                    <div>
+                      <p className="mb-2 text-sm font-semibold text-navy dark:text-foreground">
+                        Inspecții preluate ({insp.length})
+                      </p>
+                      <div className="space-y-2">
+                        {insp.map((r) => (
+                          <div key={r.id} className="rounded-xl border border-border bg-white p-4 dark:bg-card">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div>
+                                <p className="font-heading font-bold text-navy dark:text-foreground">
+                                  {r.name} <span className="text-xs font-normal text-muted-foreground">· {r.role}</span>
+                                </p>
+                                <p className="text-xs text-muted-foreground">{r.email} · {r.phone || "fara tel"}</p>
+                              </div>
+                              <span className={"rounded-full px-2.5 py-0.5 text-[11px] font-semibold " +
+                                (r.status === "Contactat" ? "bg-emerald-soft text-emerald" : "bg-secondary text-muted-foreground")}>
+                                {r.status}
+                              </span>
+                            </div>
+                            {r.address_or_url && <p className="mt-1 text-xs text-muted-foreground">Adresa: {r.address_or_url}</p>}
+                            {r.package_interest && <p className="text-xs text-muted-foreground">Pachet: {r.package_interest}</p>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+              <AdminResolvedReports reports={(reports || []).filter((r) => r.status !== "PENDING")} />
+            </div>
 
           ) : tab === "users" ? (
             <div className="space-y-3">
@@ -568,6 +640,14 @@ export default function Admin() {
           )}
         </div>
       </div>
+
+      <InspectionContactModal
+        inspection={contactTarget}
+        open={!!contactTarget}
+        onClose={() => setContactTarget(null)}
+        onConfirm={contactInspection}
+        sending={contactSending}
+      />
     </div>
   );
 }
