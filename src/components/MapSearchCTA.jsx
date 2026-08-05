@@ -18,8 +18,8 @@ export default function MapSearchCTA() {
           <Image
             src="https://media.base44.com/images/public/6a5ef7d63008cd71560dfe14/c39d91807_image.png"
             alt="Toate proprietățile pe hartă"
-            fittingType="fit"
-            className="h-36 w-full sm:h-40 sm:w-52"
+            fittingType="fill"
+            className="h-36 w-full sm:h-44 sm:w-56"
           />
         </div>
 
