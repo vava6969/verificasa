@@ -80,17 +80,18 @@ export default function InspectionContactModal({ inspection, open, onClose, onCo
         </div>
 
         {/* Footer */}
-        <div className="flex items-center gap-3 border-t border-border/60 px-5 py-3">
-          <Button type="button" variant="outline" onClick={onClose} className="rounded-full">
+        <div className="flex items-center gap-2 border-t border-border/60 px-4 py-3 sm:px-5 sm:gap-3">
+          <Button type="button" variant="outline" onClick={onClose} className="shrink-0 rounded-full px-4">
             Anulează
           </Button>
           <Button
             type="button"
             onClick={() => onConfirm(note.trim())}
             disabled={sending}
-            className="flex-1 gap-2 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 disabled:opacity-60"
+            className="min-w-0 flex-1 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 disabled:opacity-60"
           >
-            <Send className="h-4 w-4" /> {sending ? "Se trimite…" : "Contactează proprietarul"}
+            <Send className="h-4 w-4 shrink-0" />
+            <span className="truncate">{sending ? "Se trimite…" : "Contactează"}</span>
           </Button>
         </div>
       </div>
