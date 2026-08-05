@@ -57,12 +57,18 @@ function propertyIcon(property) {
   const isFeatured = property.featured || property.verification_level === "field_certified";
   const color = isFeatured ? PIN_GOLD : property.transaction_type === "SALE" ? PIN_SALE : PIN_RENT;
   const glow = isFeatured ? `filter:drop-shadow(0 0 6px ${color}cc);` : "";
+  const isNew =
+    property.created_date &&
+    (Date.now() - new Date(property.created_date).getTime()) / 86400000 <= 7;
+  const newBadge = isNew
+    ? `<div style="position:absolute;top:-9px;right:-12px;background:#00A859;color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:6px;border:1.5px solid #fff;white-space:nowrap;letter-spacing:.5px;font-family:Inter,system-ui,sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.4);z-index:2;">NOU!</div>`
+    : "";
   return L.divIcon({
     className: "vc-property-pin",
-    html: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="${glow}" xmlns="http://www.w3.org/2000/svg">
+    html: `<div style="position:relative;">${newBadge}<svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="${glow}" xmlns="http://www.w3.org/2000/svg">
       <path d="M12 2C7.6 2 4 5.6 4 10c0 5.5 7 12 8 12s8-6.5 8-12c0-4.4-3.6-8-8-8z" fill="${color}" stroke="#fff" stroke-width="2"/>
       <circle cx="12" cy="10" r="3" fill="#fff"/>
-    </svg>`,
+    </svg></div>`,
     iconSize: [28, 28],
     iconAnchor: [14, 28],
   });
@@ -164,7 +170,27 @@ export default function MapSearch() {
         if (!cancelled) setProperties([]);
       }
     })();
-    return () => { cancelled = true; };
+
+    // Realtime: new/updated/deleted properties appear on the map instantly
+    const unsubscribe = base44.entities.Property.subscribe((event) => {
+      const p = event.data;
+      setProperties((prev) => {
+        if (!prev) return prev;
+        if (event.type === "delete") return prev.filter((x) => x.id !== event.id);
+        if (!p) return prev;
+        const matches = p.approval_status === "APPROVED" && p.status === "Activ" && p.country === "RO";
+        if (!matches) return prev.filter((x) => x.id !== p.id);
+        const idx = prev.findIndex((x) => x.id === p.id);
+        if (idx >= 0) {
+          const next = [...prev];
+          next[idx] = p;
+          return next;
+        }
+        return [p, ...prev];
+      });
+    });
+
+    return () => { cancelled = true; unsubscribe(); };
   }, []);
 
   const geoProps = useMemo(
