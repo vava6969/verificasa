@@ -1,7 +1,8 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   ShieldCheck, Video, FileText, Home, Users, Building2,
-  UserCheck, Search, Briefcase, Mail,
+  UserCheck, Search, Briefcase, ArrowRight,
 } from "lucide-react";
 
 export default function AboutVerifiCasa() {
@@ -66,12 +67,13 @@ export default function AboutVerifiCasa() {
       </div>
 
       {/* Contact rapid */}
-      <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5 text-xs text-muted-foreground sm:mt-8 sm:text-sm">
-        <Mail className="h-4 w-4 text-emerald" />
-        Contact:{" "}
-        <a href="mailto:birou@verificasa.site" className="font-semibold text-emerald hover:underline">
-          birou@verificasa.site
-        </a>
+      <div className="mt-4 flex justify-center sm:mt-8">
+        <Link
+          to="/contact"
+          className="inline-flex items-center gap-1.5 rounded-full bg-emerald px-4 py-2 text-xs font-semibold text-white shadow-soft transition hover:bg-emerald/90 sm:text-sm"
+        >
+          Contactează-ne <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
     </section>
   );
