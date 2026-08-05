@@ -12,14 +12,14 @@ export default function Layout() {
   const { pathname } = useLocation();
   // Admin panel is a dense work surface — no marketing footer there.
   const hideFooter = pathname.startsWith("/admin") || pathname.startsWith("/messages") || pathname.startsWith("/map");
-  const hideBottomNav = pathname.startsWith("/map");
+  const hideBottomNav = false;
 
   return (
     <CountryProvider>
       <ScrollToTop />
       <div className="flex min-h-screen flex-col overflow-x-clip bg-background">
         <Header />
-        <main className={`flex-1 overflow-x-hidden ${pathname.startsWith("/map") ? "" : "pb-16 md:pb-0"}`}>
+        <main className="flex-1 overflow-x-hidden pb-16 md:pb-0">
           <Outlet />
         </main>
         {!hideFooter && <Footer />}

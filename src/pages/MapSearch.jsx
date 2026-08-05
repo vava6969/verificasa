@@ -12,15 +12,17 @@ import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import PropertyCard from "@/components/PropertyCard";
 import MapPropertySheet from "@/components/MapPropertySheet";
+import MapInfoCards from "@/components/MapInfoCards";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  MapPin, Heart, X, ArrowLeft, Plus, Minus, PenLine, Trash2, Check,
+  MapPin, Heart, X, ArrowLeft, Plus, Minus, PenLine, Trash2, Check, Loader2,
 } from "lucide-react";
 import { ROMANIA_COUNTIES, ROMANIA_CENTER, ROMANIA_MAX_BOUNDS } from "@/lib/romaniaCounties";
 
 const PIN_RENT = "#3b82f6";
 const PIN_SALE = "#00A859";
 const PIN_GOLD = "#C5A059";
+const PAGE_SIZE = 5;
 
 function formatCount(n) {
   if (n >= 1000) {
@@ -31,23 +33,26 @@ function formatCount(n) {
 }
 
 function clusterIcon(count, isActive) {
-  const size = count >= 1000 ? 52 : count >= 100 ? 46 : count >= 10 ? 40 : 36;
+  const baseSize = count >= 1000 ? 52 : count >= 100 ? 46 : count >= 10 ? 40 : 36;
+  const size = isActive ? baseSize + 6 : baseSize;
   const bg = isActive ? "#00A859" : "#3a6c76";
+  const shadow = isActive
+    ? `box-shadow:0 0 0 10px ${bg}22,0 4px 16px rgba(0,0,0,0.35);`
+    : `box-shadow:0 2px 8px rgba(0,0,0,0.3),0 0 0 4px ${bg}33;`;
   return L.divIcon({
     className: "vc-cluster",
     html: `<div style="
       width:${size}px;height:${size}px;border-radius:50%;
       background:${bg};color:#fff;display:flex;align-items:center;justify-content:center;
       font-weight:700;font-size:12px;font-family:Inter,system-ui,sans-serif;
-      box-shadow:0 2px 8px rgba(0,0,0,0.3),0 0 0 4px ${bg}33;
-      border:2.5px solid #fff;transition:transform .15s ease;
+      ${shadow}
+      border:2.5px solid #fff;transition:all .15s ease;
     ">${formatCount(count)}</div>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
   });
 }
 
-// Color-coded property pin: blue=rent, green=sale, gold(glow)=featured/VIP
 function propertyIcon(property) {
   const isFeatured = property.featured || property.verification_level === "field_certified";
   const color = isFeatured ? PIN_GOLD : property.transaction_type === "SALE" ? PIN_SALE : PIN_RENT;
@@ -63,7 +68,15 @@ function propertyIcon(property) {
   });
 }
 
-// Ray-casting point-in-polygon test (polygon = array of [lat, lng])
+function countyLabelIcon(name) {
+  return L.divIcon({
+    className: "vc-county-label",
+    html: `<span style="font-size:10px;font-weight:600;color:#4a5568;background:rgba(255,255,255,0.8);padding:1px 5px;border-radius:3px;white-space:nowrap;pointer-events:none;text-shadow:0 1px 2px rgba(255,255,255,0.9);box-shadow:0 1px 3px rgba(0,0,0,0.1);">${name}</span>`,
+    iconSize: [0, 0],
+    iconAnchor: [0, 0],
+  });
+}
+
 function pointInPolygon(lat, lng, polygon) {
   let inside = false;
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -75,7 +88,6 @@ function pointInPolygon(lat, lng, polygon) {
   return inside;
 }
 
-// Tracks map viewport changes, handles flyTo, exposes map instance.
 function MapController({ onBoundsChange, onZoomChange, flyTarget, onFlyDone, onReady }) {
   const map = useMap();
 
@@ -110,7 +122,6 @@ function MapController({ onBoundsChange, onZoomChange, flyTarget, onFlyDone, onR
   return null;
 }
 
-// Captures map clicks in draw mode to build a polygon.
 function DrawController({ drawMode, onAddPoint }) {
   useMapEvents({
     click: (e) => {
@@ -137,6 +148,7 @@ export default function MapSearch() {
   const [mapInstance, setMapInstance] = useState(null);
   const [drawMode, setDrawMode] = useState(false);
   const [polygonPoints, setPolygonPoints] = useState([]);
+  const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
 
   useEffect(() => {
     let cancelled = false;
@@ -210,7 +222,6 @@ export default function MapSearch() {
     }));
   }, [geoProps, zoom]);
 
-  // Properties visible in current bounds, optionally filtered by drawn polygon
   const visibleProperties = useMemo(() => {
     let result = geoProps;
     if (bounds) {
@@ -227,6 +238,17 @@ export default function MapSearch() {
     }
     return result;
   }, [geoProps, bounds, polygonPoints]);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setDisplayCount(PAGE_SIZE);
+  }, [bounds, polygonPoints]);
+
+  const displayedProperties = visibleProperties.slice(0, displayCount);
+  const hasMore = displayedProperties.length < visibleProperties.length;
+
+  // 99+ format for badge
+  const badgeCount = visibleProperties.length > 99 ? "99+" : String(visibleProperties.length);
 
   const handleClusterClick = useCallback(
     (cluster) => {
@@ -281,9 +303,9 @@ export default function MapSearch() {
   const clearPolygon = () => setPolygonPoints([]);
 
   return (
-    <div className="flex flex-col md:flex-row h-[calc(100dvh-3.5rem)]">
-      {/* MAP PANE */}
-      <div className="relative h-[50%] md:h-full md:flex-1">
+    <div className="flex flex-col md:flex-row md:h-[calc(100dvh-3.5rem)]">
+      {/* MAP PANE — z-0 contains all inner z-indexes below the header/dropdown */}
+      <div className="relative z-0 h-[50vh] md:h-full md:flex-1">
         <MapContainer
           center={ROMANIA_CENTER}
           zoom={6}
@@ -294,12 +316,24 @@ export default function MapSearch() {
           zoomControl={false}
           scrollWheelZoom
           className="h-full w-full"
-          style={{ background: "#d4e8f5" }}
+          style={{ background: "#e8eef4" }}
         >
           <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
           />
+
+          {/* County labels at low zoom */}
+          {zoom < 8 &&
+            ROMANIA_COUNTIES.map((c) => (
+              <Marker
+                key={`label-${c.name}`}
+                position={[c.lat, c.lng]}
+                icon={countyLabelIcon(c.name)}
+                interactive={false}
+                zIndexOffset={-500}
+              />
+            ))}
 
           {/* Drawn polygon */}
           {polygonPoints.length >= 2 && (
@@ -332,7 +366,7 @@ export default function MapSearch() {
                   mouseout: () => setHoveredKey(null),
                 }}
               >
-                <Tooltip>
+                <Tooltip direction="top" offset={[0, -10]}>
                   {c.type === "county"
                     ? `Județul ${c.county}`
                     : c.type === "city"
@@ -361,7 +395,7 @@ export default function MapSearch() {
           <ArrowLeft className="h-4 w-4" /> {en ? "Back" : "Înapoi"}
         </button>
 
-        {/* Custom zoom controls (below back button) */}
+        {/* Custom zoom controls */}
         <div className="absolute left-3 top-14 z-[1000] flex flex-col gap-1">
           <button
             onClick={() => mapInstance?.zoomIn()}
@@ -432,18 +466,29 @@ export default function MapSearch() {
           onClick={() => setShowListMobile(true)}
           className="absolute bottom-4 left-1/2 z-[1000] flex -translate-x-1/2 items-center gap-2 rounded-full bg-navy-deep px-4 py-2 text-sm font-semibold text-white shadow-glow md:hidden"
         >
-          <MapPin className="h-4 w-4" /> {visibleProperties.length} {en ? "properties" : "proprietăți"}
+          <MapPin className="h-4 w-4" /> {badgeCount} {en ? "properties" : "proprietăți"}
         </button>
 
         {/* Mobile bottom sheet */}
         <MapPropertySheet property={selectedProperty} onClose={() => setSelectedProperty(null)} lang={lang} />
       </div>
 
+      {/* INFO CARDS (mobile only — fill space below map) */}
+      <div className="space-y-3 p-4 md:hidden">
+        {properties === null ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-emerald" />
+          </div>
+        ) : (
+          <MapInfoCards properties={properties} lang={lang} />
+        )}
+      </div>
+
       {/* LIST PANE */}
       <div
         className={`${
-          showListMobile ? "absolute inset-0 z-[1100] block" : "hidden"
-        } h-full md:relative md:z-auto md:block md:w-[400px] md:shrink-0 overflow-y-auto border-t md:border-t-0 md:border-l border-border bg-background`}
+          showListMobile ? "fixed inset-0 z-[1100] block" : "hidden"
+        } md:relative md:z-auto md:block md:w-[400px] md:shrink-0 md:h-full overflow-y-auto border-t md:border-t-0 md:border-l border-border bg-background`}
       >
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background/95 p-3 backdrop-blur">
           <div>
@@ -478,7 +523,19 @@ export default function MapSearch() {
               </p>
             </div>
           ) : (
-            visibleProperties.map((p) => <PropertyCard key={p.id} property={p} />)
+            <>
+              {displayedProperties.map((p) => (
+                <PropertyCard key={p.id} property={p} />
+              ))}
+              {hasMore && (
+                <button
+                  onClick={() => setDisplayCount((c) => c + PAGE_SIZE)}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald/30 bg-emerald-soft py-3 text-sm font-semibold text-emerald transition hover:bg-emerald/10 dark:bg-emerald/10"
+                >
+                  <Plus className="h-4 w-4" /> {en ? "Load more" : "Încarcă mai multe"}
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
