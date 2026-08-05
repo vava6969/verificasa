@@ -1,27 +1,18 @@
 import React from "react";
 import LegalPage from "@/components/LegalPage";
-import { Mail, Instagram, MapPin, Clock } from "lucide-react";
+import EmailDirectory from "@/components/EmailDirectory";
+import { Instagram, MapPin, Clock, ShieldCheck } from "lucide-react";
 
 export default function Contact() {
   return (
-    <LegalPage title="Contact – VerifiCasa" updated="Ultima actualizare: 2 August 2026">
+    <LegalPage title="Contact – VerifiCasa" updated="Ultima actualizare: 5 August 2026">
       <p>
-        Pentru orice întrebare, solicitare sau problemă legată de serviciile VerifiCasa,
-        inclusiv pentru cereri privind protecția datelor și ștergerea contului, ne puteți
-        contacta folosind datele de mai jos.
+        Suntem aici să te ajutăm. Mai jos găsești directorul complet de adrese de email,
+        organizat pe departamente. Apasă pe orice card pentru a deschide clientul tău de email
+        sau folosește butonul de copiere pentru a salva adresa rapid.
       </p>
 
-      <section>
-        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
-          Suport și întrebări generale
-        </h2>
-        <div className="mt-3 flex items-center gap-2 rounded-lg border border-border bg-secondary/40 p-4">
-          <Mail className="h-5 w-5 text-emerald" />
-          <a href="mailto:birou@verificasa.site" className="font-semibold text-emerald hover:underline">
-            birou@verificasa.site
-          </a>
-        </div>
-      </section>
+      <EmailDirectory />
 
       <section>
         <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
@@ -30,8 +21,8 @@ export default function Contact() {
         <p>
           Pentru solicitări privind accesul, rectificarea, ștergerea sau restricționarea
           prelucrării datelor personale, inclusiv a datelor asociate contului Google,
-          contactați-ne la adresa de e-mail de mai sus. Cererile sunt procesate conform
-          Regulamentului (UE) 2016/679 (GDPR).
+          scrie-ne la <a href="mailto:legal@verificasa.ro" className="text-primary hover:underline">legal@verificasa.ro</a>.
+          Cererile sunt procesate conform Regulamentului (UE) 2016/679 (GDPR).
         </p>
         <p>
           Detalii complete găsiți pe pagina{" "}
@@ -41,14 +32,20 @@ export default function Contact() {
 
       <section>
         <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
-          Social Media
+          Social Media & Domenii verificate
         </h2>
-        <div className="mt-3 flex items-center gap-2">
-          <Instagram className="h-5 w-5 text-emerald" />
-          <a href="https://instagram.com/verificasaro" target="_blank" rel="noopener noreferrer" className="font-semibold text-emerald hover:underline">
-            @verificasaro
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <a href="https://instagram.com/verificasaro" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary/40 px-3 py-2 text-sm font-semibold text-emerald hover:underline">
+            <Instagram className="h-4 w-4" /> @verificasaro
           </a>
+          <span className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary/40 px-3 py-2 text-sm font-semibold text-emerald">
+            <ShieldCheck className="h-4 w-4" /> TikTok: verificasaro
+          </span>
         </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Domenii verificate: <span className="font-mono font-semibold">www.verificasa.ro</span> &{" "}
+          <span className="font-mono font-semibold">www.verificasa.site</span>
+        </p>
       </section>
 
       <section>
