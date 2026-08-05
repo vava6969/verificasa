@@ -17,24 +17,25 @@ export default async function(req) {
     const admins = await getAdmins(base44);
 
     const subject = `⚠️ Anunț nou în așteptarea moderării — VerifiCasa`;
-    const emailBody = [
-      `Salut, Admin!`,
-      ``,
-      `Un utilizator tocmai a publicat o proprietate nouă care necesită verificare manuală în Admin Panel:`,
-      ``,
-      `🏠 Titlu: ${title}`,
-      `👤 Autor: ${authorName}`,
-      `📅 Data trimiterii: ${submittedDate}`,
-      ``,
-      `🔍 Acțiune necesară: Verificare detalii și aprobare/respingere.`,
-      ``,
-      `👉 Deschide Panoul de Admin: ${APP_URL}/admin`,
-    ].join("\n");
+    const content = {
+      category: "property_pending",
+      title: "Anunț nou în așteptarea moderării",
+      greeting: "Salut, Admin!",
+      intro: "Un utilizator tocmai a publicat o proprietate nouă care necesită verificare manuală în Admin Panel.",
+      dataFields: [
+        { icon: "🏠", label: "Titlu", value: title },
+        { icon: "👤", label: "Autor", value: authorName },
+        { icon: "📅", label: "Data trimiterii", value: submittedDate },
+      ],
+      ctaLink: `${APP_URL}/admin`,
+      ctaLabel: "Deschide Panoul de Admin",
+      closingNote: "🔍 Acțiune necesară: Verificare detalii și aprobare/respingere.",
+    };
 
     let emailed = 0;
     let notified = 0;
     for (const a of admins) {
-      if (await sendVC(base44, { to: a.email, subject, body: emailBody })) emailed += 1;
+      if (await sendVC(base44, { to: a.email, subject, content })) emailed += 1;
     }
     if (admins.length) {
       notified = await notifyMany(base44, admins.map((a) => ({

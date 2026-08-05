@@ -84,10 +84,23 @@ export default async function(req) {
       } catch (_) { /* best-effort */ }
     }
     if (send_email && report.reporter_email) {
+      const isResolved = status === "RESOLVED";
       await sendVC(base44, {
         to: report.reporter_email,
         subject: `VerifiCasa — Raport ${verdict}`,
-        body: `Salut,\n\nRaportul tău (${report.reason}) a fost ${verdict} de echipa VerifiCasa.\n${resolution_note ? `\nMesaj: ${resolution_note}\n` : ""}\nMulțumim că ne-ai ajutat să menținem platforma sigură.\n\nVerifiCasa`,
+        content: {
+          category: isResolved ? "report_resolved" : "report_rejected",
+          title: isResolved ? "Raportul tău a fost rezolvat" : "Raportul tău a fost respins",
+          greeting: "Salut!",
+          intro: `Raportul tău (${report.reason}) a fost ${verdict} de echipa VerifiCasa.`,
+          dataFields: [
+            { icon: "📋", label: "Motiv raport", value: report.reason },
+            ...(resolution_note ? [{ icon: "💬", label: "Mesaj", value: resolution_note }] : []),
+          ],
+          ctaLink: report.target_type === "property" ? `${APP_URL}/property/${report.target_id}` : `${APP_URL}`,
+          ctaLabel: "Vezi pe platformă",
+          closingNote: "Mulțumim că ne-ai ajutat să menținem platforma sigură. 🛡️",
+        },
       });
     }
 

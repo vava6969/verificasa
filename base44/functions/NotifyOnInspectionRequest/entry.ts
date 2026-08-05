@@ -20,23 +20,25 @@ export default async function(req) {
     const admins = await getAdmins(base44);
 
     const subject = `🛠️ Solicitare nouă de inspecție / Tur 3D`;
-    const bodyText = [
-      `Salut, echipă!`,
-      ``,
-      `Un proprietar a solicitat o verificare fizică sau un Tur 3D pentru proprietatea sa:`,
-      ``,
-      `🏠 Proprietate: ${address}`,
-      `👤 Solicitant: ${name}`,
-      `📞 Contact: ${phone}`,
-      `📋 Tip cerere: ${pkg}`,
-      ...(message ? [``, `💬 Mesaj: ${message}`] : []),
-      ``,
-      `👉 Gestionează cererea în secțiunea Inspecții: ${APP_URL}/admin`,
-    ].join("\n");
+    const content = {
+      category: "inspection",
+      title: "Solicitare nouă de inspecție / Tur 3D",
+      greeting: "Salut, echipă!",
+      intro: "Un proprietar a solicitat o verificare fizică sau un Tur 3D pentru proprietatea sa.",
+      dataFields: [
+        { icon: "🏠", label: "Proprietate", value: address },
+        { icon: "👤", label: "Solicitant", value: name },
+        { icon: "📞", label: "Contact", value: phone },
+        { icon: "📋", label: "Tip cerere", value: pkg },
+        ...(message ? [{ icon: "💬", label: "Mesaj", value: message }] : []),
+      ],
+      ctaLink: `${APP_URL}/admin`,
+      ctaLabel: "Gestionează cererea",
+    };
 
     let emailed = 0;
     for (const a of admins) {
-      if (await sendVC(base44, { to: a.email, subject, body: bodyText })) emailed += 1;
+      if (await sendVC(base44, { to: a.email, subject, content })) emailed += 1;
     }
     const notified = await notifyMany(base44, admins.map((a) => ({
       user_id: a.id, type: "system", text: `Solicitare nouă de inspecție de la ${name} (${phone || "fără tel"}).`,

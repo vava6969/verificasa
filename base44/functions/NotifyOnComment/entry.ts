@@ -29,19 +29,21 @@ export default async function(req) {
     }
 
     const subject = `💬 Ai un comentariu nou la proprietatea ta`;
-    const bodyText = [
-      `Salut!`,
-      ``,
-      `Cineva a lăsat o întrebare sau un comentariu la una dintre proprietățile tale:`,
-      ``,
-      `🏠 Proprietate: ${propertyTitle}`,
-      `👤 Utilizator: ${authorName}`,
-      `💬 Comentariu: „${content}"`,
-      ``,
-      `👉 Răspunde la comentariu în platformă: ${APP_URL}/property/${propertyId}`,
-    ].join("\n");
+    const emailContent = {
+      category: "comment",
+      title: "Comentariu nou la proprietatea ta",
+      greeting: "Salut!",
+      intro: "Cineva a lăsat o întrebare sau un comentariu la una dintre proprietățile tale.",
+      dataFields: [
+        { icon: "🏠", label: "Proprietate", value: propertyTitle },
+        { icon: "👤", label: "Utilizator", value: authorName },
+        { icon: "💬", label: "Comentariu", value: `„${content}"` },
+      ],
+      ctaLink: `${APP_URL}/property/${propertyId}`,
+      ctaLabel: "Răspunde la comentariu",
+    };
 
-    const emailed = await sendVC(base44, { to: owner.email, subject, body: bodyText });
+    const emailed = await sendVC(base44, { to: owner.email, subject, content: emailContent });
     const notified = await notify(base44, {
       user_id: owner.id, type: "comment",
       text: `${authorName} a comentat la anunțul tău „${propertyTitle}".`,

@@ -32,36 +32,39 @@ export default async function(req) {
 
     const approvedDate = new Date().toISOString().slice(0, 10);
 
-    let subject, bodyText, link, linkLabel;
+    let subject, content, link, linkLabel;
     if (decision === "APPROVED") {
       subject = `✅ Anunțul tău a fost aprobat — VerifiCasa`;
-      bodyText = [
-        `Felicitări! 🥳`,
-        ``,
-        `Anunțul tău a trecut de procesul de moderare și este acum activ și vizibil public pe platformă.`,
-        ``,
-        `🏠 Proprietate: ${title}`,
-        `📅 Data aprobării: ${approvedDate}`,
-        `🛡️ Status: Aprobat`,
-        ``,
-        `👉 Vezi anunțul live pe site: ${APP_URL}/property/${propertyId}`,
-      ].join("\n");
+      content = {
+        category: "property_approved",
+        title: "Anunțul tău a fost aprobat",
+        greeting: "Felicitări! 🥳",
+        intro: "Anunțul tău a trecut de procesul de moderare și este acum activ și vizibil public pe platformă.",
+        dataFields: [
+          { icon: "🏠", label: "Proprietate", value: title },
+          { icon: "📅", label: "Data aprobării", value: approvedDate },
+          { icon: "🛡️", label: "Status", value: "Aprobat" },
+        ],
+        ctaLink: `${APP_URL}/property/${propertyId}`,
+        ctaLabel: "Vezi anunțul live",
+      };
       link = `/property/${propertyId}`;
       linkLabel = "Vezi anunțul";
     } else {
       subject = `⚠️ Actualizare status anunț — VerifiCasa`;
-      bodyText = [
-        `Salut!`,
-        ``,
-        `Din păcate, anunțul tău nu a putut fi aprobat în starea actuală deoarece nu respectă toate standardele noastre de publicare sau necesită informații suplimentare.`,
-        ``,
-        `🏠 Proprietate: ${title}`,
-        ...(reason ? [`💬 Motiv moderare: ${reason}`] : [`💬 Motiv moderare: Te rugăm să adaugi fotografii clare și reale ale interiorului.`]),
-        ``,
-        `Poți edita oricând detaliile din panou și poți trimite anunțul din nou spre aprobare. 🔄`,
-        ``,
-        `👉 Editează anunțul: ${APP_URL}/my-properties`,
-      ].join("\n");
+      content = {
+        category: "property_rejected",
+        title: "Anunțul necesită revizuire",
+        greeting: "Salut!",
+        intro: "Din păcate, anunțul tău nu a putut fi aprobat în starea actuală deoarece nu respectă toate standardele noastre de publicare sau necesită informații suplimentare.",
+        dataFields: [
+          { icon: "🏠", label: "Proprietate", value: title },
+          { icon: "💬", label: "Motiv moderare", value: reason || "Te rugăm să adaugi fotografii clare și reale ale interiorului." },
+        ],
+        ctaLink: `${APP_URL}/my-properties`,
+        ctaLabel: "Editează și retrimite",
+        closingNote: "Poți edita oricând detaliile din panou și poți trimite anunțul din nou spre aprobare. 🔄",
+      };
       link = "/my-properties";
       linkLabel = "Editează anunțul";
     }
@@ -69,7 +72,7 @@ export default async function(req) {
     let emailed = false;
     let notified = false;
     if (owner && owner.email) {
-      emailed = await sendVC(base44, { to: owner.email, subject, body: bodyText });
+      emailed = await sendVC(base44, { to: owner.email, subject, content });
       notified = await notify(base44, {
         user_id: owner.id,
         type: "property",
