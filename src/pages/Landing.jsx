@@ -8,6 +8,7 @@ import HeroPhoto from "@/components/HeroPhoto";
 import HeroCountdown from "@/components/HeroCountdown";
 import InspectieModal from "@/components/InspectieModal";
 import ListeazaPopup from "@/components/ListeazaPopup";
+import MapSearchCTA from "@/components/MapSearchCTA";
 import BetaBanner from "@/components/BetaBanner";
 import AboutVerifiCasa from "@/components/AboutVerifiCasa";
 import CircularCarousel from "@/components/ui/circular-carousel";
@@ -131,6 +132,11 @@ export default function Landing() {
             </Button>
           </div>
         )}
+      </section>
+
+      {/* MAP SEARCH CTA */}
+      <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
+        <MapSearchCTA />
       </section>
 
       {/* SOLICITĂ O INSPECȚIE CTA */}
