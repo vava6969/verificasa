@@ -19,11 +19,17 @@ export default function MapInfoCards({ properties, lang }) {
     });
     const topCounties = Object.entries(counties)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 3);
-    const recent = [...geo]
+      .slice(0, 4);
+    const featured = geo
+      .filter((p) => p.featured || p.verification_level === "field_certified")
       .sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0))
       .slice(0, 3);
-    return { total: geo.length, countyCount: Object.keys(counties).length, cityCount: cities.size, topCounties, recent };
+    const featuredIds = new Set(featured.map((p) => p.id));
+    const nonFeatured = geo
+      .filter((p) => !featuredIds.has(p.id))
+      .sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0));
+    const recent = [...featured, ...nonFeatured].slice(0, 5);
+    return { total: geo.length, countyCount: Object.keys(counties).length, cityCount: cities.size, topCounties, recent, featuredIds };
   }, [properties]);
 
   return (
@@ -86,24 +92,36 @@ export default function MapInfoCards({ properties, lang }) {
           </p>
         </div>
         <div className="mt-3 space-y-2">
-          {stats.recent.map((p) => (
-            <Link
-              key={p.id}
-              to={`/property/${p.id}`}
-              className="flex items-center justify-between rounded-lg p-1.5 transition hover:bg-secondary dark:hover:bg-white/5"
-            >
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-foreground">{p.title}</p>
-                <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <MapPin className="h-3 w-3" /> {p.city}
-                  {p.zone ? `, ${p.zone}` : ""}
+          {stats.recent.map((p) => {
+            const isPromoted = stats.featuredIds.has(p.id);
+            return (
+              <Link
+                key={p.id}
+                to={`/property/${p.id}`}
+                className={`flex items-center justify-between rounded-lg p-1.5 transition hover:bg-secondary dark:hover:bg-white/5 ${
+                  isPromoted ? "border border-gold/40 bg-gold-soft/50 dark:bg-gold/10" : ""
+                }`}
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="flex items-center gap-1.5 truncate text-sm font-medium text-foreground">
+                    {isPromoted && (
+                      <span className="inline-flex shrink-0 rounded-full bg-gold px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                        Promovat
+                      </span>
+                    )}
+                    <span className="truncate">{p.title}</span>
+                  </p>
+                  <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <MapPin className="h-3 w-3" /> {p.city}
+                    {p.zone ? `, ${p.zone}` : ""}
+                  </p>
+                </div>
+                <p className="ml-2 shrink-0 text-sm font-bold text-emerald">
+                  {formatPrice(p.price_monthly, p.currency)}
                 </p>
-              </div>
-              <p className="ml-2 shrink-0 text-sm font-bold text-emerald">
-                {formatPrice(p.price_monthly, p.currency)}
-              </p>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </>

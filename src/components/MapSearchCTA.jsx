@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { MapPin } from "lucide-react";
+import { Image } from "@/components/ui/image";
 import { useCountry } from "@/components/CountryContext";
 import { Button } from "@/components/ui/button";
 
@@ -13,17 +14,13 @@ export default function MapSearchCTA() {
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft dark:border-white/10">
       <div className="flex flex-col sm:flex-row sm:items-center">
         {/* Illustration */}
-        <div className="relative flex h-36 w-full items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-soft to-gold-soft sm:h-40 sm:w-52 sm:shrink-0 dark:from-emerald/10 dark:to-gold/10">
-          {/* Decorative map pins */}
-          <span className="absolute left-5 top-5 h-3 w-3 rounded-full bg-rose-500/70 shadow-sm" />
-          <span className="absolute right-6 top-8 h-2.5 w-2.5 rounded-full bg-rose-500/50" />
-          <span className="absolute bottom-6 left-10 h-2.5 w-2.5 rounded-full bg-rose-500/60" />
-          <span className="absolute bottom-8 right-10 h-3 w-3 rounded-full bg-rose-500/70 shadow-sm" />
-          <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-8 translate-y-4 rounded-full bg-rose-500/40" />
-          {/* Central map icon */}
-          <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-emerald/30 bg-white/70 backdrop-blur-sm dark:bg-white/10">
-            <MapPin className="h-10 w-10 text-emerald" />
-          </div>
+        <div className="overflow-hidden rounded-xl bg-slate-50 sm:shrink-0">
+          <Image
+            src="https://media.base44.com/images/public/6a5ef7d63008cd71560dfe14/c39d91807_image.png"
+            alt="Toate proprietățile pe hartă"
+            fittingType="fit"
+            className="h-36 w-full sm:h-40 sm:w-52"
+          />
         </div>
 
         {/* Content */}
