@@ -8,6 +8,7 @@ import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
+import { safeReturnTo } from "@/lib/authReturnTo";
 
 /**
  * AuthComponent — glassmorphism multi-step auth (sign-up / sign-in)
@@ -118,8 +119,8 @@ export function AuthComponent({ logo, brandName = "VerifiCasa" }) {
     setTimeout(() => confetti({ particleCount: 60, angle: 120, spread: 55, origin: { x: 1 }, colors }), 150);
   };
 
-  const handleGoogle = () => base44.auth.loginWithProvider("google", "/");
-  const handleApple = () => base44.auth.loginWithProvider("apple", "/");
+  const handleGoogle = () => base44.auth.loginWithProvider("google", safeReturnTo());
+  const handleApple = () => base44.auth.loginWithProvider("apple", safeReturnTo());
 
   const next = (e) => {
     e.preventDefault();
@@ -154,7 +155,7 @@ export function AuthComponent({ logo, brandName = "VerifiCasa" }) {
     setLoading(true);
     try {
       await base44.auth.loginViaEmailPassword(email, password);
-      window.location.href = "/";
+      window.location.href = safeReturnTo();
     } catch (err) {
       setError(err.message || L.invalid);
     } finally {
@@ -170,7 +171,7 @@ export function AuthComponent({ logo, brandName = "VerifiCasa" }) {
       if (result?.access_token) base44.auth.setToken(result.access_token);
       fireConfetti();
       setStep(3);
-      setTimeout(() => { window.location.href = "/"; }, 1800);
+      setTimeout(() => { window.location.href = safeReturnTo(); }, 1800);
     } catch (err) {
       setError(err.message || L.invalidCode);
     } finally {
