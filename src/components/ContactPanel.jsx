@@ -54,7 +54,7 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
       <p className="mt-0.5 text-xs text-muted-foreground">{t("contact_sub")}</p>
 
       {/* Agent identity */}
-      <div className="mt-4 flex items-center gap-3">
+      <Link to={targetUserId ? `/profile/${targetUserId}` : "#"} className="mt-4 flex items-center gap-3 rounded-xl p-1 -m-1 transition hover:bg-secondary/50">
         {avatarUrl ? (
           <img src={avatarUrl} alt={sellerName} className="h-14 w-14 shrink-0 rounded-full object-cover" />
         ) : (
@@ -63,13 +63,19 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
           </span>
         )}
         <div className="min-w-0">
-          <p className="truncate font-heading text-sm font-bold text-navy dark:text-foreground">{sellerName}</p>
+          <p className="truncate font-heading text-sm font-bold text-navy hover:text-emerald dark:text-foreground">{sellerName}</p>
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
             <span className={`inline-block h-2 w-2 rounded-full ${isProprietar ? "bg-emerald" : "bg-blue-500"}`} />
             {isProprietar ? t("pc_seller_landlord") : t("pc_seller_agent")}
           </p>
+          {count > 0 && (
+            <div className="mt-0.5 flex items-center gap-1">
+              <RatingStars rating={average} size="sm" showNumber />
+              <span className="text-xs text-muted-foreground">({count})</span>
+            </div>
+          )}
         </div>
-      </div>
+      </Link>
 
       {/* Primary CTA */}
       <Button onClick={onMessage} className="mt-4 w-full gap-2 bg-emerald text-white shadow-soft hover:bg-emerald/90" size="lg">

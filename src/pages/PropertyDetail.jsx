@@ -312,7 +312,13 @@ export default function PropertyDetail() {
                   {p.created_date && (
                     <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
                       <UserCircle2 className="h-3.5 w-3.5 text-emerald" />
-                      <span className="font-medium text-foreground/70">{p.posted_by_name || p.owner_name || "VerifiCasa"}</span>
+                      {p.created_by_id ? (
+                        <Link to={`/profile/${p.created_by_id}`} className="font-medium text-foreground/70 underline-offset-2 hover:text-emerald hover:underline">
+                          {p.posted_by_name || p.owner_name || "VerifiCasa"}
+                        </Link>
+                      ) : (
+                        <span className="font-medium text-foreground/70">{p.posted_by_name || p.owner_name || "VerifiCasa"}</span>
+                      )}
                       <span className="text-foreground/40">·</span>
                       <Clock className="h-3.5 w-3.5 text-emerald" />
                       {new Date(p.created_date).toLocaleString(locale, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
