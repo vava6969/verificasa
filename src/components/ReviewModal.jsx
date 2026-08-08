@@ -36,6 +36,21 @@ export default function ReviewModal({ targetUser, onClose }) {
         comment: comment.trim(),
         is_verified: hasConversation,
       });
+      // Notify the reviewed user (email + in-app). Best-effort, non-blocking.
+      try {
+        await fetch(`/api/functions/NotifyOnNewReview`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            target_user_id: targetUser.id,
+            reviewer_user_id: user.id,
+            reviewer_name: user.full_name || user.email,
+            rating,
+            comment: comment.trim(),
+            is_verified: hasConversation,
+          }),
+        });
+      } catch (_) {}
       toast({ title: t("rv_submitted") });
       onClose();
     } catch (err) {

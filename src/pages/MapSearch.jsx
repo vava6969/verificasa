@@ -331,7 +331,7 @@ export default function MapSearch() {
   return (
     <div className="flex flex-col md:flex-row md:h-[calc(100dvh-3.5rem)]">
       {/* MAP PANE — z-0 contains all inner z-indexes below the header/dropdown */}
-      <div className="relative z-0 h-[50vh] md:h-full md:flex-1">
+      <div className="relative z-0 h-[55vh] md:h-full md:flex-1">
         <MapContainer
           center={ROMANIA_CENTER}
           zoom={6}
@@ -440,9 +440,10 @@ export default function MapSearch() {
         {/* Save search */}
         <button
           onClick={saveSearch}
-          className="absolute right-3 top-3 z-[1000] flex items-center gap-1.5 rounded-full bg-rose-500 px-3 py-1.5 text-sm font-semibold text-white shadow-soft hover:bg-rose-600"
+          className="absolute right-3 top-3 z-[1000] flex items-center gap-1.5 rounded-full bg-rose-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-soft hover:bg-rose-600 sm:px-3"
+          aria-label={en ? "Save search" : "Salvează căutarea"}
         >
-          <Heart className="h-4 w-4" /> {en ? "Save search" : "Salvează căutarea"}
+          <Heart className="h-4 w-4" /> <span className="hidden sm:inline">{en ? "Save" : "Salvează"}</span>
         </button>
 
         {/* Draw / polygon controls */}
@@ -500,7 +501,7 @@ export default function MapSearch() {
       </div>
 
       {/* INFO CARDS (mobile only — fill space below map) */}
-      <div className="space-y-3 p-4 md:hidden">
+      <div className="space-y-3 p-4 pb-24 md:hidden">
         {properties === null ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-emerald" />

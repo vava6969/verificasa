@@ -15,6 +15,7 @@
         "like",
         "message",
         "property",
+        "review",
         "system"
       ],
       "default": "system",

@@ -15,6 +15,7 @@ const CATEGORIES = {
   property_pending:   { color: "#D9A441", icon: "🏠", box: "#FBF4E6" },
   inquiry:            { color: "#2A73CC", icon: "🔔", box: "#E9F1FB" },
   comment:            { color: "#5B5BD6", icon: "💬", box: "#EEEDFB" },
+  review:             { color: "#F59E0B", icon: "⭐", box: "#FEF6E7" },
   inspection:         { color: "#0D9488", icon: "🛠️", box: "#E6F5F3" },
   report_resolved:    { color: "#00A859", icon: "🛡️", box: "#E8F8F0" },
   report_rejected:    { color: "#64748B", icon: "📋", box: "#F1F5F9" },
