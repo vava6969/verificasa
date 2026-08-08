@@ -36,6 +36,7 @@ import Account from '@/pages/Account';
 import MyReports from '@/pages/MyReports';
 import PostProperty from '@/pages/PostProperty';
 import MapSearch from '@/pages/MapSearch';
+import UserProfile from '@/pages/UserProfile';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -78,6 +79,7 @@ const AuthenticatedApp = () => {
         <Route path="/cookies" element={<CookiePolicy />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/property/:id" element={<PropertyDetail />} />
+        <Route path="/profile/:id" element={<UserProfile />} />
         <Route path="/map" element={<MapSearch />} />
         <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
           <Route path="/owner" element={<Owner />} />

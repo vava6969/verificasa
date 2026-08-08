@@ -1,37 +1,371 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  User, Lock, Bell, Shield, Home, Loader2, Check, Camera, Building2, ChevronRight,
+} from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
+import { useCountry } from "@/components/CountryContext";
+import { useToast } from "@/components/ui/use-toast";
+import { base44 } from "@/api/base44Client";
+import { Button } from "@/components/ui/button";
+import { Image as UIImage } from "@/components/ui/image";
 import AvatarUpload from "@/components/AvatarUpload";
 import ThemeToggle from "@/components/ThemeToggle";
 import NotificationsPanel from "@/components/NotificationsPanel";
 
 export default function Settings() {
-  const { user } = useAuth();
+  const { user, checkUserAuth } = useAuth();
+  const { t } = useCountry();
+  const { toast } = useToast();
+  const [tab, setTab] = useState("profile");
+  const [saving, setSaving] = useState(false);
+
+  // Profile form state
+  const [form, setForm] = useState({
+    full_name: user?.full_name || "",
+    seller_type: user?.seller_type || "Proprietar",
+    agency_name: user?.agency_name || "",
+    agency_logo_url: user?.agency_logo_url || "",
+    license_number: user?.license_number || "",
+    bio: user?.bio || "",
+    phone_public: user?.phone_public !== false,
+    whatsapp_visible: user?.whatsapp_visible !== false,
+    profile_visibility: user?.profile_visibility || "public",
+    show_activity_status: user?.show_activity_status !== false,
+    email_notify_messages: user?.email_notify_messages !== false,
+    email_notify_reviews: user?.email_notify_reviews !== false,
+  });
+
+  // Password form
+  const [passForm, setPassForm] = useState({ current: "", next: "", confirm: "" });
+  const [passLoading, setPassLoading] = useState(false);
+
+  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  const saveProfile = async () => {
+    setSaving(true);
+    try {
+      await base44.auth.updateMe({
+        full_name: form.full_name,
+        seller_type: form.seller_type,
+        agency_name: form.seller_type === "Agent" ? form.agency_name : "",
+        agency_logo_url: form.seller_type === "Agent" ? form.agency_logo_url : "",
+        license_number: form.seller_type === "Agent" ? form.license_number : "",
+        bio: form.bio,
+        phone_public: form.phone_public,
+        whatsapp_visible: form.whatsapp_visible,
+        profile_visibility: form.profile_visibility,
+        show_activity_status: form.show_activity_status,
+        email_notify_messages: form.email_notify_messages,
+        email_notify_reviews: form.email_notify_reviews,
+      });
+      await checkUserAuth();
+      toast({ title: t("st_saved") });
+    } catch (e) {
+      toast({ title: t("st_save"), description: e.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAgencyLogo = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      set("agency_logo_url", file_url);
+    } catch (e) {}
+  };
+
+  const changePassword = async (e) => {
+    e.preventDefault();
+    // The platform doesn't expose a direct changePassword method for logged-in
+    // users — redirect to the forgot-password flow which sends a reset email.
+    try {
+      await base44.auth.resetPasswordRequest?.(user?.email || "");
+      toast({ title: t("st_pass_changed"), description: "Verifică-ți emailul pentru linkul de resetare." });
+    } catch (e) {
+      toast({ title: t("st_pass_error"), description: e.message, variant: "destructive" });
+    }
+  };
+
+  const tabs = [
+    { id: "profile", icon: User, label: t("st_tab_profile") },
+    { id: "privacy", icon: Shield, label: t("st_tab_privacy") },
+    { id: "notifications", icon: Bell, label: t("st_tab_notifications") },
+    { id: "security", icon: Lock, label: t("st_tab_security") },
+    { id: "listings", icon: Home, label: t("st_tab_listings") },
+  ];
+
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
-      <h1 className="font-heading text-3xl font-bold text-navy">Setări cont</h1>
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+      <h1 className="font-heading text-2xl font-bold text-navy dark:text-foreground sm:text-3xl">{t("st_title")}</h1>
 
-      <NotificationsPanel />
+      {/* Tab bar */}
+      <div className="mt-5 flex gap-1 overflow-x-auto border-b border-border no-scrollbar">
+        {tabs.map((tb) => {
+          const Ico = tb.icon;
+          return (
+            <button
+              key={tb.id}
+              onClick={() => setTab(tb.id)}
+              className={`relative flex shrink-0 items-center gap-1.5 px-3 py-2.5 text-sm font-semibold transition ${tab === tb.id ? "text-emerald" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              <Ico className="h-4 w-4" /> {tb.label}
+              {tab === tb.id && <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-emerald" />}
+            </button>
+          );
+        })}
+      </div>
 
-      <section className="mt-6 rounded-2xl border border-border bg-white p-6 shadow-soft">
-        <h2 className="font-heading text-lg font-bold text-navy">Poza de profil</h2>
-        <p className="text-sm text-muted-foreground">Va apărea în comentarii (cu like/reply) și în meniul tău.</p>
-        <div className="mt-4"><AvatarUpload /></div>
-      </section>
+      {/* Tab content */}
+      <div className="mt-6">
+        {/* PROFILE TAB */}
+        {tab === "profile" && (
+          <div className="space-y-6">
+            {/* Avatar */}
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
+              <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">{t("st_avatar")}</h2>
+              <p className="text-sm text-muted-foreground">Va apărea în comentarii, chat și pe profilul tău public.</p>
+              <div className="mt-4"><AvatarUpload /></div>
+            </section>
 
-      <section className="mt-6 rounded-2xl border border-border bg-white p-6 shadow-soft">
-        <h2 className="font-heading text-lg font-bold text-navy">Aspect</h2>
-        <p className="text-sm text-muted-foreground">Comută între temă deschisă și întunecată.</p>
-        <div className="mt-4"><ThemeToggle withLabel /></div>
-      </section>
+            {/* Name + role */}
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
+              <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">{t("st_full_name")}</h2>
+              <input
+                value={form.full_name}
+                onChange={(e) => set("full_name", e.target.value)}
+                className="mt-3 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+              />
+              <div className="mt-4">
+                <p className="mb-2 text-sm font-semibold text-navy dark:text-foreground">{t("st_seller_type")}</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {["Proprietar", "Agent"].map((r) => (
+                    <button
+                      key={r}
+                      onClick={() => set("seller_type", r)}
+                      className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-semibold transition ${form.seller_type === r ? "border-emerald bg-emerald-soft text-emerald" : "border-border bg-background text-muted-foreground hover:border-emerald/50"}`}
+                    >
+                      {r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </section>
 
-      <section className="mt-6 rounded-2xl border border-border bg-white p-6 shadow-soft">
-        <h2 className="font-heading text-lg font-bold text-navy">Date cont</h2>
+            {/* Agency fields (only if Agent) */}
+            {form.seller_type === "Agent" && (
+              <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
+                <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground">
+                  <Building2 className="h-4 w-4 text-emerald" /> {t("st_agency_name")}
+                </h2>
+                <input
+                  value={form.agency_name}
+                  onChange={(e) => set("agency_name", e.target.value)}
+                  placeholder="Ex: Coldwell Banker Iași"
+                  className="mt-3 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                />
+                <p className="mt-4 mb-2 text-sm font-semibold text-navy dark:text-foreground">{t("st_agency_logo")}</p>
+                <div className="flex items-center gap-3">
+                  {form.agency_logo_url ? (
+                    <UIImage src={form.agency_logo_url} fittingType="fit" className="h-14 w-14 rounded-lg border border-border object-contain" />
+                  ) : (
+                    <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-secondary text-muted-foreground">
+                      <Building2 className="h-6 w-6" />
+                    </div>
+                  )}
+                  <label className="cursor-pointer">
+                    <input type="file" accept="image/*" hidden onChange={handleAgencyLogo} />
+                    <span className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-semibold text-muted-foreground hover:border-emerald/50 hover:text-emerald">
+                      <Camera className="h-4 w-4" /> Upload
+                    </span>
+                  </label>
+                </div>
+                <p className="mt-4 mb-2 text-sm font-semibold text-navy dark:text-foreground">{t("st_license")}</p>
+                <input
+                  value={form.license_number}
+                  onChange={(e) => set("license_number", e.target.value)}
+                  className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                />
+              </section>
+            )}
+
+            {/* Bio */}
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
+              <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">{t("st_bio")}</h2>
+              <textarea
+                value={form.bio}
+                onChange={(e) => set("bio", e.target.value)}
+                rows={3}
+                maxLength={500}
+                placeholder={t("st_bio_ph")}
+                className="mt-3 w-full resize-none rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+              />
+              <p className="mt-1 text-right text-xs text-muted-foreground">{form.bio.length}/500</p>
+            </section>
+
+            <Button onClick={saveProfile} disabled={saving} className="w-full gap-2 bg-emerald text-white shadow-soft hover:bg-emerald/90">
+              {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> {t("st_saving")}</> : <><Check className="h-4 w-4" /> {t("st_save")}</>}
+            </Button>
+          </div>
+        )}
+
+        {/* PRIVACY TAB */}
+        {tab === "privacy" && (
+          <div className="space-y-4">
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
+              <ToggleRow
+                label={t("st_phone_public")}
+                value={form.phone_public}
+                onChange={(v) => set("phone_public", v)}
+              />
+              <ToggleRow
+                label={t("st_whatsapp_visible")}
+                value={form.whatsapp_visible}
+                onChange={(v) => set("whatsapp_visible", v)}
+              />
+              <ToggleRow
+                label={t("st_show_activity")}
+                value={form.show_activity_status}
+                onChange={(v) => set("show_activity_status", v)}
+              />
+            </section>
+
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
+              <p className="mb-3 text-sm font-semibold text-navy dark:text-foreground">{t("st_profile_vis")}</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { v: "public", label: t("st_vis_public") },
+                  { v: "authenticated_only", label: t("st_vis_auth") },
+                ].map((opt) => (
+                  <button
+                    key={opt.v}
+                    onClick={() => set("profile_visibility", opt.v)}
+                    className={`rounded-xl border px-3 py-2.5 text-sm font-semibold transition ${form.profile_visibility === opt.v ? "border-emerald bg-emerald-soft text-emerald" : "border-border bg-background text-muted-foreground hover:border-emerald/50"}`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <Button onClick={saveProfile} disabled={saving} className="w-full gap-2 bg-emerald text-white shadow-soft hover:bg-emerald/90">
+              {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> {t("st_saving")}</> : <><Check className="h-4 w-4" /> {t("st_save")}</>}
+            </Button>
+          </div>
+        )}
+
+        {/* NOTIFICATIONS TAB */}
+        {tab === "notifications" && (
+          <div className="space-y-4">
+            <NotificationsPanel />
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
+              <ToggleRow
+                label={t("st_email_messages")}
+                value={form.email_notify_messages}
+                onChange={(v) => set("email_notify_messages", v)}
+              />
+              <ToggleRow
+                label={t("st_email_reviews")}
+                value={form.email_notify_reviews}
+                onChange={(v) => set("email_notify_reviews", v)}
+              />
+            </section>
+            <Button onClick={saveProfile} disabled={saving} className="w-full gap-2 bg-emerald text-white shadow-soft hover:bg-emerald/90">
+              {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> {t("st_saving")}</> : <><Check className="h-4 w-4" /> {t("st_save")}</>}
+            </Button>
+          </div>
+        )}
+
+        {/* SECURITY TAB */}
+        {tab === "security" && (
+          <div className="space-y-4">
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
+              <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground">
+                <Lock className="h-4 w-4 text-emerald" /> {t("st_change_password")}
+              </h2>
+              <form onSubmit={changePassword} className="mt-4 space-y-3">
+                <input
+                  type="password"
+                  value={passForm.current}
+                  onChange={(e) => setPassForm((f) => ({ ...f, current: e.target.value }))}
+                  placeholder={t("st_current_pass")}
+                  className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                />
+                <input
+                  type="password"
+                  value={passForm.next}
+                  onChange={(e) => setPassForm((f) => ({ ...f, next: e.target.value }))}
+                  placeholder={t("st_new_pass")}
+                  className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                />
+                <input
+                  type="password"
+                  value={passForm.confirm}
+                  onChange={(e) => setPassForm((f) => ({ ...f, confirm: e.target.value }))}
+                  placeholder={t("st_confirm_pass")}
+                  className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                />
+                <Button type="submit" disabled={passLoading} className="w-full gap-2 bg-emerald text-white hover:bg-emerald/90">
+                  {passLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  {t("st_change_password")}
+                </Button>
+              </form>
+            </section>
+
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
+              <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">Aspect</h2>
+              <p className="text-sm text-muted-foreground">Comută între temă deschisă și întunecată.</p>
+              <div className="mt-3"><ThemeToggle withLabel /></div>
+            </section>
+          </div>
+        )}
+
+        {/* LISTINGS TAB */}
+        {tab === "listings" && (
+          <div>
+            <Link
+              to="/my-properties"
+              className="flex items-center justify-between rounded-2xl border border-border bg-white p-5 shadow-soft transition hover:border-emerald/40 dark:bg-card"
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-soft text-emerald">
+                  <Home className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="font-semibold text-navy dark:text-foreground">{t("st_my_listings")}</p>
+                  <p className="text-sm text-muted-foreground">{t("st_manage_listings")}</p>
+                </div>
+              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* Account data */}
+      <section className="mt-6 rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
+        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">Date cont</h2>
         <dl className="mt-3 text-sm">
-          <div className="flex justify-between border-b border-border/50 py-2"><dt className="text-muted-foreground">Nume</dt><dd className="font-semibold text-navy">{user?.full_name || "—"}</dd></div>
-          <div className="flex justify-between border-b border-border/50 py-2"><dt className="text-muted-foreground">Email</dt><dd className="font-semibold text-navy">{user?.email || "—"}</dd></div>
-          <div className="flex justify-between py-2"><dt className="text-muted-foreground">Rol</dt><dd className="font-semibold text-navy">{(user?.role || "—").toUpperCase()}</dd></div>
+          <div className="flex justify-between border-b border-border/50 py-2"><dt className="text-muted-foreground">Email</dt><dd className="font-semibold text-navy dark:text-foreground">{user?.email || "—"}</dd></div>
+          <div className="flex justify-between py-2"><dt className="text-muted-foreground">Rol</dt><dd className="font-semibold text-navy dark:text-foreground">{(user?.role || "—").toUpperCase()}</dd></div>
         </dl>
       </section>
+    </div>
+  );
+}
+
+function ToggleRow({ label, value, onChange }) {
+  return (
+    <div className="flex items-center justify-between py-2.5">
+      <span className="text-sm font-medium text-foreground/80">{label}</span>
+      <button
+        onClick={() => onChange(!value)}
+        className={`relative h-6 w-11 rounded-full transition ${value ? "bg-emerald" : "bg-muted-foreground/30"}`}
+      >
+        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition ${value ? "left-[22px]" : "left-0.5"}`} />
+      </button>
     </div>
   );
 }

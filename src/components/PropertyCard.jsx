@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   MapPin, Maximize, BedDouble, ShieldCheck, PawPrint, BadgePercent,
   Eye, Building2, Phone, MessageCircle,
@@ -189,13 +189,23 @@ export default function PropertyCard({ property, hot = false }) {
 
       {/* Footer — agent + icon buttons */}
       <div className="flex items-center gap-2 border-t border-border/60 px-3.5 py-2.5">
-        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ${isProprietar ? "bg-emerald" : "bg-blue-600"}`}>
-          {(p.posted_by_name || p.owner_name || "V").charAt(0).toUpperCase()}
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[11px] font-semibold text-navy dark:text-foreground">{p.posted_by_name || p.owner_name || "VerifiCasa"}</p>
+        <Link
+          to={p.created_by_id ? `/profile/${p.created_by_id}` : "#"}
+          onClick={(e) => e.stopPropagation()}
+          className="flex shrink-0 items-center"
+        >
+          <span className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold text-white ${isProprietar ? "bg-emerald" : "bg-blue-600"}`}>
+            {(p.posted_by_name || p.owner_name || "V").charAt(0).toUpperCase()}
+          </span>
+        </Link>
+        <Link
+          to={p.created_by_id ? `/profile/${p.created_by_id}` : "#"}
+          onClick={(e) => e.stopPropagation()}
+          className="min-w-0 flex-1"
+        >
+          <p className="truncate text-[11px] font-semibold text-navy hover:text-emerald hover:underline dark:text-foreground">{p.posted_by_name || p.owner_name || "VerifiCasa"}</p>
           <p className="truncate text-[10px] text-muted-foreground">{sellerLabel}{postedAgo ? ` · ${postedAgo}` : ""}</p>
-        </div>
+        </Link>
         <div className="flex shrink-0 items-center gap-1">
           {hasPhone ? (
             <a href={`tel:${callPhone}`} onClick={(e) => e.stopPropagation()} title={t("pc_call")} className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald/30 text-emerald transition hover:bg-emerald-soft">

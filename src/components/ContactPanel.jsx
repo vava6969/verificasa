@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { MessageCircle, Phone, ShieldCheck, BadgeCheck, Clock, Home } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { useCountry } from "@/components/CountryContext";
 import { initials, avatarColor } from "@/lib/chatUtils";
+import RatingStars from "@/components/RatingStars";
 
 // Panou de contact redesignat — fără formular, doar chat + telefon.
 // Înlocuiește vechiul formular de „pre-calificare" cu un card curat tip Zillow.
@@ -13,10 +16,31 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
   const sellerRole = p.seller_role || (p.owner_verified ? "Proprietar" : "Agent");
   const isProprietar = sellerRole === "Proprietar";
   const avatarUrl = ownerUser?.avatar_url;
+  const targetUserId = p.created_by_id || ownerUser?.id;
   const callPhone = (p.phone || "").replace(/\D/g, "");
   const waPhone = (p.whatsapp_phone || p.phone || "").replace(/\D/g, "");
   const hasPhone = !!callPhone && callPhone.length >= 6;
   const hasWhatsApp = !!waPhone && waPhone.length >= 6;
+
+  // Fetch rating for this owner
+  const [ratings, setRatings] = useState([]);
+  useEffect(() => {
+    if (!targetUserId) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await base44.entities.Rating.filter({ target_user_id: targetUserId }, "-created_date", 200);
+        if (!cancelled) setRatings(list);
+      } catch (e) {}
+    })();
+    return () => { cancelled = true; };
+  }, [targetUserId]);
+
+  const { average, count } = useMemo(() => {
+    const c = ratings.length;
+    if (c === 0) return { average: 0, count: 0 };
+    return { average: ratings.reduce((a, r) => a + (r.rating || 0), 0) / c, count: c };
+  }, [ratings]);
 
   const trustMarkers = [
     p.owner_verified && { icon: BadgeCheck, text: t("badge_owner_v") },
