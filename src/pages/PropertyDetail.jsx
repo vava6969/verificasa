@@ -7,12 +7,11 @@ import { ro, enGB } from "date-fns/locale";
 import { useCountry } from "@/components/CountryContext";
 import AITourPlayer from "@/components/AITourPlayer";
 import PropertyEditForm from "@/components/PropertyEditForm";
-import PhoneReveal from "@/components/PhoneReveal";
 import PropertyComments from "@/components/PropertyComments";
 import SimilarProperties from "@/components/SimilarProperties";
 import Lightbox from "@/components/Lightbox";
 import ReportModal from "@/components/ReportModal";
-import DateField from "@/components/DateField";
+import ContactPanel from "@/components/ContactPanel";
 import PropertyGoogleMap from "@/components/PropertyGoogleMap";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
@@ -20,8 +19,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
-  Calendar, ShieldCheck, FileText, CheckCircle2, ChevronLeft, ChevronRight, Send, Phone,
-  Heart, MessageCircle, UserCircle2, Clock, Pencil, Box, Loader2, Maximize2, X,
+  Calendar, ShieldCheck, CheckCircle2, ChevronLeft, ChevronRight,
+  Heart, MessageCircle, UserCircle2, Clock, Pencil, Box, Maximize2, X,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
@@ -36,10 +35,7 @@ export default function PropertyDetail() {
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
   const [tab, setTab] = useState("gallery");
-  const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({
-    name: "", email: "", phone: "", occupation: "", estimated_income: "", move_date: "", message: "", preferred_visit_date: "",
-  });
+  const [ownerUser, setOwnerUser] = useState(null);
   const { user } = useAuth();
   const navigate = useNavigate();
   const [saved, setSaved] = useState(false);
@@ -72,6 +68,9 @@ export default function PropertyDetail() {
         if (shouldInc) viewedRef.current.add(id);
         setProperty(shouldInc ? { ...p, views_count: (p.views_count || 0) + 1 } : p);
         setTab(p.ai_tour_verified ? "ai" : "gallery");
+        if (p.created_by_id) {
+          base44.entities.User.get(p.created_by_id).then((u) => { if (!cancelled) setOwnerUser(u); }).catch(() => {});
+        }
         if (shouldInc) {
           base44.functions.invoke("IncrementViews", { property_id: id }).catch(() => {});
         }
@@ -83,84 +82,6 @@ export default function PropertyDetail() {
     })();
     return () => { cancelled = true; };
   }, [id]);
-
-  const handleChange = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-  // Telefonul de contact al cumpărătorului — doar cifre (opțional "+ la început").
-  const handlePhoneChange = (raw) => {
-    const clean = String(raw || "").replace(/[^0-9+]/g, "");
-    const v = clean.startsWith("+") ? "+" + clean.slice(1).replace(/\+/g, "") : clean.replace(/\+/g, "");
-    handleChange("phone", v);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.name || !form.email) {
-      toast({ title: t("requiredComplete"), variant: "destructive" });
-      return;
-    }
-    setSubmitting(true);
-    try {
-      await base44.entities.Inquiry.create({
-        property_id: property.id,
-        property_title: property.title,
-        name: form.name,
-        email: form.email,
-        phone: form.phone,
-        occupation: form.occupation,
-        estimated_income: form.estimated_income ? Number(form.estimated_income) : null,
-        move_date: form.move_date || null,
-        message: form.message,
-        preferred_visit_date: form.preferred_visit_date || null,
-        status: "Nou",
-      });
-      // Trimite mesaj în aplicație (conversație) către proprietar cu toate datele clientului
-      if (user) {
-        try {
-          const conv = await startConversation(user, property);
-          const inquiryLines = [
-            "📋 Cerere nouă de închiriere",
-            `👤 ${form.name}`,
-            `📧 ${form.email}`,
-            form.phone ? `📞 ${form.phone}` : null,
-            form.occupation ? `💼 ${form.occupation}` : null,
-            form.estimated_income ? `💰 Venit estimat: ${form.estimated_income} RON` : null,
-            form.move_date ? `📅 Mutare: ${form.move_date}` : null,
-            form.preferred_visit_date ? `👁️ Vizionare: ${form.preferred_visit_date}` : null,
-            form.message ? `💬 ${form.message}` : null,
-          ].filter(Boolean);
-          await base44.entities.Message.create({
-            conversation_id: conv.id,
-            sender_id: user.id,
-            sender_name: user.full_name || user.email,
-            content: inquiryLines.join("\n"),
-          });
-          await base44.entities.Conversation.update(conv.id, { last_message: `📋 Cerere de la ${form.name}` });
-        } catch (_) { /* best-effort */ }
-      }
-      try {
-        await base44.functions.invoke("NotifyOnNewInquiry", {
-          inquiry: {
-            property_id: property.id,
-            property_title: property.title,
-            name: form.name,
-            email: form.email,
-            phone: form.phone,
-            occupation: form.occupation,
-            estimated_income: form.estimated_income ? Number(form.estimated_income) : null,
-            move_date: form.move_date || null,
-            message: form.message,
-            preferred_visit_date: form.preferred_visit_date || null,
-          },
-        });
-      } catch (_) { /* email/notification is best-effort; don't block the user */ }
-      toast({ title: t("submit_sent"), description: t("submit_sent_desc") });
-      setForm({ name: "", email: "", phone: "", occupation: "", estimated_income: "", move_date: "", message: "", preferred_visit_date: "" });
-    } catch (err) {
-      toast({ title: t("submit_err"), variant: "destructive" });
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -217,7 +138,7 @@ export default function PropertyDetail() {
     if (!user) { navigate("/login"); return; }
     try {
       const conv = await startConversation(user, p);
-      navigate(`/messages?c=${conv.id}`);
+      navigate(`/messages/${conv.id}?prefill=1`);
     } catch (e) { toast({ title: t("pc_err_msg"), variant: "destructive" }); }
   };
 
@@ -522,51 +443,24 @@ export default function PropertyDetail() {
             />
           )}
 
-          {/* RIGHT */}
+          {/* RIGHT — Contact panel */}
           <div className="min-w-0 lg:col-span-1">
-            <div className="sticky top-20 rounded-2xl border border-border bg-white p-4 shadow-soft sm:p-6">
-              <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-mint" />
-                <h3 className="font-heading text-lg font-bold text-navy">{t("contact_h")}</h3>
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">{t("contact_sub")}</p>
-
-              <Button type="button" onClick={handleMessage} className="mt-3 w-full gap-1.5 bg-primary text-primary-foreground hover:opacity-90">
-                <MessageCircle className="h-4 w-4" /> {t("pd_msg_btn")}
-              </Button>
-
-              <form onSubmit={handleSubmit} className="mt-4 space-y-3">
-                <div className="rounded-xl bg-emerald-soft/40 p-3">
-                  <p className="mb-2 flex items-center gap-1 text-xs font-bold text-emerald"><Phone className="h-3.5 w-3.5" /> {t("pd_seller_contact")}</p>
-                  <PhoneReveal phone={p.phone} whatsappPhone={p.whatsapp_phone} />
-                </div>
-                <input required value={form.name} onChange={(e) => handleChange("name", e.target.value)} placeholder={t("ph_name")} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
-                <input required type="email" value={form.email} onChange={(e) => handleChange("email", e.target.value)} placeholder={t("ph_email")} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
-                <input inputMode="numeric" value={form.phone} onChange={(e) => handlePhoneChange(e.target.value)} placeholder={t("ph_phone")} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
-
-                <div className="rounded-xl bg-mint-soft/40 p-3">
-                  <p className="mb-2 text-xs font-semibold text-navy">{t("prequal")}</p>
-                  <div className="space-y-2.5">
-                    <input value={form.occupation} onChange={(e) => handleChange("occupation", e.target.value)} placeholder={t("ph_occupation")} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
-                    <input type="number" value={form.estimated_income} onChange={(e) => handleChange("estimated_income", e.target.value)} placeholder={t("ph_income")} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
-                    <DateField value={form.move_date} onChange={(e) => handleChange("move_date", e.target.value)} placeholder={t("pd_move_label")} className="w-full" />
-                    <DateField value={form.preferred_visit_date} onChange={(e) => handleChange("preferred_visit_date", e.target.value)} placeholder={t("pd_visit_label")} className="w-full" />
-                  </div>
-                </div>
-
-                <textarea value={form.message} onChange={(e) => handleChange("message", e.target.value)} placeholder={t("ph_msg")} rows={3} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card" />
-
-                <Button type="submit" disabled={submitting} className="w-full gradient-mint text-navy shadow-soft hover:opacity-90">
-                  <Send className="h-4 w-4" /> {submitting ? t("sending") : t("btn_send")}
-                </Button>
-              </form>
-
-              <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-muted-foreground">
-                <ShieldCheck className="h-3.5 w-3.5 text-mint" /> {legalInfo.legal2}
-              </div>
+            <div className="sticky top-20">
+              <ContactPanel property={p} ownerUser={ownerUser} onMessage={handleMessage} />
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Mobile sticky CTA */}
+      <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t border-border bg-white/95 px-3 py-2.5 backdrop-blur-md dark:bg-card/95 lg:hidden" style={{ paddingBottom: "calc(0.625rem + env(safe-area-inset-bottom))" }}>
+        <div className="min-w-0 flex-1">
+          <p className="truncate font-heading text-base font-bold text-navy dark:text-foreground">{formatPrice(p.price_monthly, p.currency)}</p>
+          <p className="truncate text-[11px] text-muted-foreground">{p.zone}, {p.city}</p>
+        </div>
+        <Button onClick={handleMessage} className="gap-1.5 bg-emerald text-white shadow-soft hover:bg-emerald/90">
+          <MessageCircle className="h-4 w-4" /> {t("pd_msg_btn")}
+        </Button>
       </div>
     </div>
   );

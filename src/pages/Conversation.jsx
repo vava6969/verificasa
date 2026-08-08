@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate, Link, Navigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams, Link, Navigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { createNotification } from "@/lib/notifications";
@@ -10,16 +10,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Send, ArrowLeft, MoreVertical, Check, CheckCheck, Trash2 } from "lucide-react";
 import { initials, avatarColor } from "@/lib/chatUtils";
+import ChatPropertyCard from "@/components/ChatPropertyCard";
 
 // Full-screen iMessage-style conversation — its own page, no app chrome.
 export default function Conversation() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const prefill = searchParams.get("prefill") === "1";
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [conv, setConv] = useState(null);
   const [messages, setMessages] = useState(null);
   const [text, setText] = useState("");
+  const [pendingRef, setPendingRef] = useState(null);
   const [sending, setSending] = useState(false);
   const [busy, setBusy] = useState(false);
   const bottomRef = useRef(null);
@@ -28,6 +32,25 @@ export default function Conversation() {
     if (!isAuthenticated) return;
     base44.entities.Conversation.get(id).then(setConv).catch(() => setConv(false));
   }, [id, isAuthenticated]);
+
+  // Prefill: când utilizatorul apasă „Trimite mesaj" de pe pagina anunț,
+  // pre-completăm textul șablon și atașăm cardul de proprietate la următorul mesaj.
+  useEffect(() => {
+    if (!prefill || !conv || !conv.property_id || pendingRef) return;
+    (async () => {
+      try {
+        const prop = await base44.entities.Property.get(conv.property_id);
+        setText("Bună ziua, sunt interesat de această proprietate. Aș dori mai multe detalii.");
+        setPendingRef({
+          property_ref_id: prop.id,
+          property_ref_title: prop.title,
+          property_ref_image: prop.images?.[0] || "",
+          property_ref_price: prop.price_monthly,
+          property_ref_currency: prop.currency || "EUR",
+        });
+      } catch { /* best-effort */ }
+    })();
+  }, [prefill, conv, pendingRef]);
 
   const loadMessages = async () => {
     try {
@@ -69,13 +92,16 @@ export default function Conversation() {
     setSending(true);
     const content = text.trim();
     try {
-      await base44.entities.Message.create({
+      const msgData = {
         conversation_id: conv.id,
         sender_id: user.id,
         sender_name: user.full_name || user.email,
         content,
-      });
+      };
+      if (pendingRef) Object.assign(msgData, pendingRef);
+      await base44.entities.Message.create(msgData);
       await base44.entities.Conversation.update(conv.id, { last_message: content });
+      if (pendingRef) setPendingRef(null);
       const recipient = conv.buyer_id === user.id ? conv.seller_id : conv.buyer_id;
       if (recipient && recipient !== user.id) {
         createNotification({
@@ -187,6 +213,7 @@ export default function Conversation() {
                     mine ? "rounded-br-sm bg-emerald text-white" : "rounded-bl-sm bg-white text-foreground dark:bg-card",
                   ].join(" ")}>
                     {m.content}
+                    {m.property_ref_id && <ChatPropertyCard message={m} mine={mine} />}
                   </div>
                   <div className={"flex items-center gap-1 px-1 " + (mine ? "flex-row-reverse" : "flex-row")}>
                     <span className="text-[10px] text-muted-foreground">

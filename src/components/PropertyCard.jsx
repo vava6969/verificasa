@@ -1,10 +1,10 @@
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Play, MapPin, Maximize, BedDouble, ShieldCheck, PawPrint, BadgePercent,
-  TrendingDown, TrendingUp, Eye, Building2, Phone, MessageCircle,
-  ChevronLeft, ChevronRight, Calendar, PhoneOff, Clock,
-  UserCircle2, Box, Crown, Sparkles,
+  MapPin, Maximize, BedDouble, ShieldCheck, PawPrint, BadgePercent,
+  Eye, Building2, Phone, MessageCircle,
+  Calendar, PhoneOff, Clock,
+  Box, Crown, Car, Sofa,
 } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
@@ -14,7 +14,7 @@ import { Image } from "@/components/ui/image";
 import { formatDistanceToNowStrict } from "date-fns";
 import { ro, enGB } from "date-fns/locale";
 
-// Premium listing card inspired by Storia/OLX.
+// Card compact de proprietate — badge-uri ierarhizate, chips icon-only, footer cu agent.
 export default function PropertyCard({ property, hot = false }) {
   const { currency, formatPrice, t, lang } = useCountry();
   const { isAuthenticated, user } = useAuth();
@@ -23,10 +23,10 @@ export default function PropertyCard({ property, hot = false }) {
   const p = property;
   const images = p.images?.length ? p.images : [];
   const [idx, setIdx] = useState(0);
+  const [showExtra, setShowExtra] = useState(false);
   const touchStartX = useRef(null);
 
   const isVerified = p.owner_verified || p.verification_level === "field_certified" || p.ai_tour_verified;
-  const isVideo = !!p.ai_tour_verified;
   const seller = p.seller_role || (p.owner_verified ? "Proprietar" : "Agent");
   const isProprietar = seller === "Proprietar";
   const sellerLabel = isProprietar ? t("pc_seller_landlord") : t("pc_seller_agent");
@@ -35,13 +35,6 @@ export default function PropertyCard({ property, hot = false }) {
   const ron = formatPrice(p.price_monthly, p.currency, "RON");
   const primary = currency === "EUR" ? eur : ron;
   const secondary = currency === "EUR" ? ron : eur;
-
-  const FAIRNESS = {
-    sub_piata: { labelKey: "pc_price_below", cls: "bg-emerald-soft text-emerald", icon: TrendingDown },
-    corect: { labelKey: "pc_price_fair", cls: "bg-gold-soft text-gold-deep", icon: BadgePercent },
-    peste_medie: { labelKey: "pc_price_above", cls: "bg-destructive/10 text-destructive", icon: TrendingUp },
-  };
-  const fairness = p.price_fairness ? FAIRNESS[p.price_fairness] : null;
 
   const go = (e, dir) => {
     e.preventDefault(); e.stopPropagation();
@@ -55,23 +48,33 @@ export default function PropertyCard({ property, hot = false }) {
     if (!isAuthenticated) { navigate("/login"); return; }
     try {
       const conv = await startConversation(user, p);
-      navigate(`/messages?c=${conv.id}`);
+      navigate(`/messages/${conv.id}?prefill=1`);
     } catch (err) {
       toast({ title: t("pc_err_msg"), variant: "destructive" });
     }
   };
 
-  const waPhone = (p.whatsapp_phone || p.phone || "").replace(/\D/g, "");
   const callPhone = (p.phone || "").replace(/\D/g, "");
+  const waPhone = (p.whatsapp_phone || p.phone || "").replace(/\D/g, "");
   const hasPhone = !!callPhone && callPhone.length >= 6;
   const dateLocale = lang === "en" ? "en-GB" : "ro-RO";
   const postedAgo = p.created_date
     ? formatDistanceToNowStrict(new Date(p.created_date), { addSuffix: true, locale: lang === "en" ? enGB : ro })
     : "";
 
+  // Chips secundare — icon-only, max 3 vizibile + popover pentru restul
+  const chips = [];
+  if (p.tour_3d_url) chips.push({ icon: Box, label: t("tab_3d"), cls: "bg-navy/10 text-navy dark:bg-white/10 dark:text-foreground" });
+  if (p.commission_free) chips.push({ icon: BadgePercent, label: t("pc_com0"), cls: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" });
+  if (p.pet_friendly) chips.push({ icon: PawPrint, label: t("pc_pet_btn"), cls: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300" });
+  if (p.furnished) chips.push({ icon: Sofa, label: t("badge_furnished"), cls: "bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300" });
+  if (p.parking) chips.push({ icon: Car, label: t("badge_parking"), cls: "bg-emerald-soft text-emerald" });
+  const visibleChips = chips.slice(0, 3);
+  const extraChips = chips.slice(3);
+
   return (
-    <div className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-glow dark:bg-card ${hot ? "premium-glow border-gold/50" : "border-border"}`}>
-      {/* Cover with slider */}
+    <div className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-glow dark:bg-card ${hot ? "premium-glow border-gold/50" : "border-border"}`}>
+      {/* Cover */}
       <div
         className="relative aspect-[4/3] overflow-hidden touch-pan-y"
         onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
@@ -84,14 +87,15 @@ export default function PropertyCard({ property, hot = false }) {
           }
           touchStartX.current = null;
         }}
+        onClick={toDetail}
       >
         {images.length ? (
-          <Image src={images[idx]} alt={p.title} fittingType="fill" className="h-full w-full transition-transform duration-500 group-hover:scale-[1.04]" />
+          <Image src={images[idx]} alt={p.title} fittingType="fill" className="h-full w-full cursor-pointer transition-transform duration-500 group-hover:scale-[1.04]" />
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-navy/10 to-emerald/20" />
         )}
 
-        {/* Dots indicator only — swipe to navigate */}
+        {/* Dots indicator */}
         {images.length > 1 && (
           <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1">
             {images.slice(0, 6).map((_, i) => (
@@ -100,60 +104,24 @@ export default function PropertyCard({ property, hot = false }) {
           </div>
         )}
 
-        {/* Badges top-left — max 3 visible, rest collapsed as +X */}
-        {(() => {
-          const badges = [];
-          if (isVerified) badges.push(
-            <span key="v" className="flex items-center gap-1 rounded-full bg-emerald px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
-              <ShieldCheck className="h-3.5 w-3.5" /> {t("pc_verified")}
-            </span>
-          );
-          if (p.tour_3d_url) badges.push(
-            <span key="3d" className="flex items-center gap-1 rounded-full bg-navy px-2.5 py-1 text-[11px] font-bold text-mint shadow-soft ring-1 ring-mint/40">
-              <Box className="h-3.5 w-3.5" /> {t("tab_3d")}
-            </span>
-          );
-          if (p.commission_free) badges.push(
-            <span key="cf" className="flex items-center gap-1 rounded-full bg-blue-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
-              <BadgePercent className="h-3 w-3" /> {t("pc_com0")}
-            </span>
-          );
-          if (p.pet_friendly) badges.push(
-            <span key="pet" className="flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold text-slate-800 backdrop-blur">
-              <PawPrint className="h-3 w-3" /> {t("pc_pet_btn")}
-            </span>
-          );
-          const visible = badges.slice(0, 3);
-          const extra = badges.length - visible.length;
-          return (
-            <div className="absolute left-3 top-3 flex flex-col gap-1.5">
-              {visible}
-              {extra > 0 && (
-                <span className="flex items-center justify-center rounded-full bg-navy/80 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur">
-                  +{extra}
-                </span>
-              )}
-            </div>
-          );
-        })()}
+        {/* Badge Verificat — singurul badge permanent pe imagine */}
+        {isVerified && (
+          <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-emerald px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
+            <ShieldCheck className="h-3.5 w-3.5" /> {t("pc_verified")}
+          </span>
+        )}
 
-        {/* Badge RECOMANDAT — premium, oferit doar de admin */}
+        {/* Badge Recomandat — panglică discretă dreapta-sus */}
         {hot && (
           <span className="premium-badge absolute right-3 top-3 flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white">
             <Crown className="h-3 w-3" /> {t("pc_hot")}
           </span>
         )}
 
-
-        {/* Seller role badge + date */}
-        <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
-          <span className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold text-white shadow-soft ${isProprietar ? "bg-emerald" : "bg-blue-600"}`}>
-            <Building2 className="h-3 w-3" /> {sellerLabel}
-          </span>
-        </div>
+        {/* Data postării — discret, dreapta-jos */}
         {p.created_date && (
-          <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-white/85 px-2 py-0.5 text-[10px] font-semibold text-slate-700 backdrop-blur">
-            <Calendar className="h-3 w-3" /> {new Date(p.created_date).toLocaleString(dateLocale, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+          <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-navy-deep/70 px-2 py-0.5 text-[10px] font-medium text-white/90 backdrop-blur">
+            <Calendar className="h-2.5 w-2.5" /> {new Date(p.created_date).toLocaleDateString(dateLocale, { day: "2-digit", month: "2-digit" })}
           </span>
         )}
       </div>
@@ -167,78 +135,81 @@ export default function PropertyCard({ property, hot = false }) {
             {p.zone || p.city ? `${p.zone ? p.zone + ", " : ""}${p.city || ""}` : <span className="italic text-muted-foreground/70">{t("info_missing")}</span>}
           </span>
         </p>
-        {p.created_date && (
-          <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
-            <UserCircle2 className="h-3 w-3 shrink-0 text-emerald" />
-            <span className="truncate font-medium text-foreground/70">{p.posted_by_name || p.owner_name || "VerifiCasa"}</span>
-            <span className="text-foreground/40">·</span>
-            <Clock className="h-3 w-3 shrink-0 text-emerald" />
-            {lang === "en" ? `Posted ${postedAgo}` : `A fost postat ${postedAgo}`}
-          </p>
-        )}
 
-        {/* Specs */}
-        <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-foreground/70">
+        {/* Specs — rând unic compact */}
+        <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-foreground/70">
           {p.rooms != null && <span className="flex items-center gap-1"><BedDouble className="h-3.5 w-3.5 text-emerald" /> {p.rooms} {t("sep_rooms")}</span>}
           {p.surface_sqm != null && <span className="flex items-center gap-1"><Maximize className="h-3.5 w-3.5 text-emerald" /> {p.surface_sqm} mp</span>}
           {p.floor && <span className="flex items-center gap-1"><Building2 className="h-3.5 w-3.5 text-emerald" /> {t("pc_floor")} {p.floor}</span>}
-          {p.building_year && <span className="flex items-center gap-1 text-foreground/60"><Calendar className="h-3.5 w-3.5" /> {p.building_year}</span>}
         </div>
 
-        {/* Phone */}
-        <div className="mt-2.5 flex items-center gap-1.5 text-xs">
-          <Phone className="h-3.5 w-3.5 text-emerald" />
-          {hasPhone ? (
-            <a href={`tel:${callPhone}`} onClick={(e) => e.stopPropagation()} className="font-semibold text-navy hover:text-emerald dark:text-foreground">{p.phone}</a>
-          ) : (
-            <span className="flex items-center gap-1 italic text-muted-foreground"><PhoneOff className="h-3 w-3" /> {t("pc_no_phone")}</span>
-          )}
-        </div>
-
-        {/* Facilități verificate */}
-        {(p.internet_speed_mbps || p.noise_db != null || p.light_orientation || p.water_pressure_ok) && (
-          <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
-            {p.internet_speed_mbps && <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-0.5 font-semibold text-emerald">📶 {p.internet_speed_mbps}Mbps</span>}
-            {p.noise_db != null && p.noise_db <= 45 && <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-0.5 font-semibold text-emerald">🔊 {t("pc_quiet")}</span>}
-            {p.light_orientation && <span className="flex items-center gap-1 rounded-full bg-gold-soft px-2 py-0.5 font-semibold text-gold-deep dark:text-gold">☀️ {p.light_orientation}</span>}
-            {p.water_pressure_ok && <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-0.5 font-semibold text-emerald">💧 {t("pc_water_ok")}</span>}
+        {/* Chips secundare — icon-only, max 3 + popover */}
+        {visibleChips.length > 0 && (
+          <div className="relative mt-2 flex flex-wrap items-center gap-1.5">
+            {visibleChips.map((c, i) => {
+              const Ico = c.icon;
+              return (
+                <span key={i} title={c.label} className={`flex items-center justify-center rounded-full px-2 py-1 text-[11px] font-semibold ${c.cls}`}>
+                  <Ico className="h-3 w-3" />
+                </span>
+              );
+            })}
+            {extraChips.length > 0 && (
+              <button
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowExtra((s) => !s); }}
+                className="flex items-center justify-center rounded-full bg-secondary px-2 py-1 text-[11px] font-bold text-muted-foreground hover:bg-secondary/80"
+              >
+                +{extraChips.length}
+              </button>
+            )}
+            {showExtra && extraChips.length > 0 && (
+              <div className="absolute left-0 top-7 z-10 flex flex-wrap gap-1.5 rounded-xl border border-border bg-white p-2 shadow-glow dark:bg-card">
+                {extraChips.map((c, i) => {
+                  const Ico = c.icon;
+                  return (
+                    <span key={i} className={`flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ${c.cls}`}>
+                      <Ico className="h-3 w-3" /> {c.label}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
         {/* Price */}
-        <div className="mt-3 flex items-end justify-between border-t border-border/60 pt-3">
+        <div className="mt-3 flex items-end justify-between border-t border-border/60 pt-2.5">
           <div>
             <p className="font-heading text-xl font-bold text-navy dark:text-foreground">{primary}<span className="text-xs font-medium text-muted-foreground">{p.transaction_type === "SALE" ? "" : t("pc_permonth")}</span></p>
             <p className="text-[11px] text-muted-foreground">≈ {secondary}</p>
-            {fairness && (
-              <span className={`mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${fairness.cls}`}>
-                <fairness.icon className="h-3 w-3" /> {t(fairness.labelKey)}
-              </span>
-            )}
           </div>
           <span className="flex items-center gap-1 text-[11px] text-muted-foreground"><Eye className="h-3 w-3" /> {p.views_count || 0}</span>
         </div>
       </div>
 
-      {/* Contact buttons */}
-      <div className="grid grid-cols-3 gap-1.5 px-3 pb-3">
-        {waPhone && (
-          <a href={`https://wa.me/${waPhone}?text=${encodeURIComponent(t("pc_wa_msg", { title: p.title }))}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="flex min-w-0 items-center justify-center gap-1 rounded-xl bg-emerald px-1.5 py-2 text-[11px] font-bold text-white transition hover:opacity-90">
-            <span className="truncate">WhatsApp</span>
-          </a>
-        )}
-        {hasPhone ? (
-          <a href={`tel:${callPhone}`} onClick={(e) => e.stopPropagation()} className="flex min-w-0 items-center justify-center gap-1 rounded-xl border border-emerald/40 px-1.5 py-2 text-[11px] font-bold text-emerald transition hover:bg-emerald-soft">
-            <Phone className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">{t("pc_call")}</span>
-          </a>
-        ) : (
-          <span className="flex min-w-0 items-center justify-center gap-1 rounded-xl border border-border px-1.5 py-2 text-[11px] font-bold text-muted-foreground">
-            <PhoneOff className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">{t("pc_call")}</span>
-          </span>
-        )}
-        <button onClick={handleMessage} className="flex min-w-0 items-center justify-center gap-1 rounded-xl bg-primary px-1.5 py-2 text-[11px] font-bold text-primary-foreground transition hover:opacity-90">
-          <MessageCircle className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">{t("pc_message")}</span>
-        </button>
+      {/* Footer — agent + icon buttons */}
+      <div className="flex items-center gap-2 border-t border-border/60 px-3.5 py-2.5">
+        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ${isProprietar ? "bg-emerald" : "bg-blue-600"}`}>
+          {(p.posted_by_name || p.owner_name || "V").charAt(0).toUpperCase()}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[11px] font-semibold text-navy dark:text-foreground">{p.posted_by_name || p.owner_name || "VerifiCasa"}</p>
+          <p className="truncate text-[10px] text-muted-foreground">{sellerLabel}{postedAgo ? ` · ${postedAgo}` : ""}</p>
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
+          {hasPhone ? (
+            <a href={`tel:${callPhone}`} onClick={(e) => e.stopPropagation()} title={t("pc_call")} className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald/30 text-emerald transition hover:bg-emerald-soft">
+              <Phone className="h-3.5 w-3.5" />
+            </a>
+          ) : (
+            <span title={t("pc_no_phone")} className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-muted-foreground/40">
+              <PhoneOff className="h-3.5 w-3.5" />
+            </span>
+          )}
+          <button onClick={handleMessage} title={t("pc_message")} className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald text-white transition hover:bg-emerald/90">
+            <MessageCircle className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
     </div>
   );

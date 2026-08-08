@@ -1,15 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, Maximize, ArrowRight, MessageCircle } from "lucide-react";
+import { X, MapPin, Maximize, ArrowRight, ShieldCheck, BedDouble } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 
 // Sliding bottom-sheet preview shown when tapping a property pin on mobile.
+// Mini-card compact: imagine, badge Verificat, titlu, preț, specificații, 1 buton.
 export default function MapPropertySheet({ property, onClose, lang }) {
   const { formatPrice } = useCountry();
   const en = lang === "en";
+  const isVerified = property.owner_verified || property.verification_level === "field_certified" || property.ai_tour_verified;
 
   return (
     <AnimatePresence>
@@ -40,13 +42,18 @@ export default function MapPropertySheet({ property, onClose, lang }) {
             </button>
 
             <div className="flex gap-3 p-4 pt-3">
-              <Link to={`/property/${property.id}`} className="h-24 w-24 shrink-0 overflow-hidden rounded-xl">
+              <Link to={`/property/${property.id}`} className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl">
                 {property.images?.[0] ? (
                   <Image src={property.images[0]} fittingType="fill" className="h-full w-full" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-secondary">
                     <MapPin className="h-8 w-8 text-muted-foreground/40" />
                   </div>
+                )}
+                {isVerified && (
+                  <span className="absolute left-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-emerald px-1.5 py-0.5 text-[9px] font-bold text-white shadow-soft">
+                    <ShieldCheck className="h-2.5 w-2.5" /> {en ? "Verified" : "Verif."}
+                  </span>
                 )}
               </Link>
 
@@ -59,13 +66,13 @@ export default function MapPropertySheet({ property, onClose, lang }) {
                   <MapPin className="h-3 w-3" /> {property.city}
                   {property.zone ? `, ${property.zone}` : ""}
                 </p>
-                <div className="mt-1.5 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                  {property.surface_sqm && (
-                    <span className="flex items-center gap-1">
-                      <Maximize className="h-3 w-3" /> {property.surface_sqm} mp
-                    </span>
+                <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  {property.rooms != null && (
+                    <span className="flex items-center gap-1"><BedDouble className="h-3 w-3" /> {property.rooms} {en ? "r" : "cam."}</span>
                   )}
-                  {property.rooms != null && <span>{property.rooms} cam.</span>}
+                  {property.surface_sqm && (
+                    <span className="flex items-center gap-1"><Maximize className="h-3 w-3" /> {property.surface_sqm} mp</span>
+                  )}
                   <span className="font-semibold text-emerald">
                     {property.transaction_type === "SALE"
                       ? en ? "Sale" : "Vânzare"
@@ -81,19 +88,6 @@ export default function MapPropertySheet({ property, onClose, lang }) {
                   {en ? "View details" : "Vezi detalii"} <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
-              {property.whatsapp_phone ? (
-                <Button asChild variant="outline" className="gap-1.5 border-emerald text-emerald hover:bg-emerald-soft">
-                  <a href={`https://wa.me/${property.whatsapp_phone}`} target="_blank" rel="noopener noreferrer">
-                    <MessageCircle className="h-4 w-4" /> WhatsApp
-                  </a>
-                </Button>
-              ) : (
-                <Button asChild variant="outline" className="gap-1.5 border-emerald text-emerald hover:bg-emerald-soft">
-                  <Link to={`/property/${property.id}`}>
-                    <MessageCircle className="h-4 w-4" /> {en ? "Message" : "Mesaj"}
-                  </Link>
-                </Button>
-              )}
             </div>
           </motion.div>
         </motion.div>
