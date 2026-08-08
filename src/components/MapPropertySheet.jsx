@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 export default function MapPropertySheet({ property, onClose, lang }) {
   const { formatPrice } = useCountry();
   const en = lang === "en";
-  const isVerified = property.owner_verified || property.verification_level === "field_certified" || property.ai_tour_verified;
+  const isVerified = property?.owner_verified || property?.verification_level === "field_certified" || property?.ai_tour_verified;
 
   return (
     <AnimatePresence>
