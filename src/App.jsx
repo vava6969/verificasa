@@ -94,7 +94,7 @@ const AuthenticatedApp = () => {
         </Route>
       </Route>
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
-        <Route path="/post-property" element={<CountryProvider><PostProperty /></CountryProvider>} />
+        <Route path="/post-property" element={<PostProperty />} />
         <Route path="/messages/:id" element={<Conversation />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
@@ -108,11 +108,13 @@ function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <ScrollToTop />
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
+        <CountryProvider>
+          <Router>
+            <ScrollToTop />
+            <AuthenticatedApp />
+          </Router>
+          <Toaster />
+        </CountryProvider>
       </QueryClientProvider>
     </AuthProvider>
   )
