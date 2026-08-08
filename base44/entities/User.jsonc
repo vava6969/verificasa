@@ -34,6 +34,10 @@
       "type": "string",
       "title": "Avatar URL"
     },
+    "cover_image_url": {
+      "type": "string",
+      "title": "Imagine background profil"
+    },
     "bio": {
       "type": "string",
       "title": "Descriere / Bio",

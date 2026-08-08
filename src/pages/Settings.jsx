@@ -34,6 +34,7 @@ export default function Settings() {
     show_activity_status: user?.show_activity_status !== false,
     email_notify_messages: user?.email_notify_messages !== false,
     email_notify_reviews: user?.email_notify_reviews !== false,
+    cover_image_url: user?.cover_image_url || "",
   });
 
   const [passLoading, setPassLoading] = useState(false);
@@ -50,6 +51,7 @@ export default function Settings() {
         agency_logo_url: form.seller_type === "Agent" ? form.agency_logo_url : "",
         license_number: form.seller_type === "Agent" ? form.license_number : "",
         bio: form.bio,
+        cover_image_url: form.cover_image_url,
         phone_public: form.phone_public,
         whatsapp_visible: form.whatsapp_visible,
         profile_visibility: form.profile_visibility,
@@ -72,6 +74,27 @@ export default function Settings() {
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       set("agency_logo_url", file_url);
+    } catch (e) {}
+  };
+
+  const handleCoverImage = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      set("cover_image_url", file_url);
+      toast({ title: t("st_saved") });
+    } catch (e) {
+      toast({ title: t("st_save"), variant: "destructive" });
+    }
+  };
+
+  const removeCoverImage = async () => {
+    set("cover_image_url", "");
+    try {
+      await base44.auth.updateMe({ cover_image_url: "" });
+      await checkUserAuth();
+      toast({ title: t("st_saved") });
     } catch (e) {}
   };
 
@@ -121,6 +144,43 @@ export default function Settings() {
         {/* PROFILE TAB */}
         {tab === "profile" && (
           <div className="space-y-6">
+            {/* Cover image */}
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
+              <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
+                {lang === "en" ? "Cover image" : "Imagine background"}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {lang === "en" ? "Appears at the top of your public profile." : "Apare în partea de sus a profilului tău public."}
+              </p>
+              <div className="mt-4">
+                <div className="relative h-32 overflow-hidden rounded-xl border border-border sm:h-40">
+                  {form.cover_image_url ? (
+                    <UIImage src={form.cover_image_url} fittingType="fill" className="h-full w-full" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center gradient-emerald">
+                      <span className="text-sm font-medium text-white/80">{lang === "en" ? "No cover image" : "Fără imagine background"}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3 flex items-center gap-2">
+                  <label className="cursor-pointer">
+                    <input type="file" accept="image/*" hidden onChange={handleCoverImage} />
+                    <span className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-semibold text-muted-foreground hover:border-emerald/50 hover:text-emerald">
+                      <Camera className="h-4 w-4" /> {lang === "en" ? "Upload" : "Încarcă"}
+                    </span>
+                  </label>
+                  {form.cover_image_url && (
+                    <button
+                      onClick={removeCoverImage}
+                      className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20"
+                    >
+                      {lang === "en" ? "Remove" : "Elimină"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </section>
+
             {/* Avatar */}
             <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
               <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">{t("st_avatar")}</h2>

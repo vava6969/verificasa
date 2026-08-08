@@ -1,16 +1,20 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { MessageCircle, Phone, ShieldCheck, BadgeCheck, Clock, Home } from "lucide-react";
+import { MessageCircle, Phone, ShieldCheck, BadgeCheck, Clock, Home, Star } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useCountry } from "@/components/CountryContext";
 import { initials, avatarColor } from "@/lib/chatUtils";
 import RatingStars from "@/components/RatingStars";
+import ReviewModal from "@/components/ReviewModal";
 
 // Panou de contact redesignat — fără formular, doar chat + telefon.
 // Înlocuiește vechiul formular de „pre-calificare" cu un card curat tip Zillow.
 export default function ContactPanel({ property, ownerUser, onMessage }) {
   const { t } = useCountry();
+  const { user } = useAuth();
+  const [showReviewModal, setShowReviewModal] = useState(false);
   const p = property;
   const sellerName = p.posted_by_name || p.owner_name || ownerUser?.full_name || "Proprietar";
   const sellerRole = p.seller_role || (p.owner_verified ? "Proprietar" : "Agent");
@@ -74,6 +78,12 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
               <span className="text-xs text-muted-foreground">({count})</span>
             </div>
           )}
+          {count === 0 && (
+            <div className="mt-0.5 flex items-center gap-1">
+              <RatingStars rating={5} size="sm" />
+              <span className="text-xs text-muted-foreground">{t("up_no_reviews")}</span>
+            </div>
+          )}
         </div>
       </Link>
 
@@ -122,6 +132,20 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
       <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
         <ShieldCheck className="h-3.5 w-3.5 text-emerald" /> {t("pd_trust_footer")}
       </div>
+
+      {/* Leave review button — visible only for authenticated non-owner users */}
+      {user && targetUserId && user.id !== targetUserId && ownerUser && (
+        <button
+          onClick={() => setShowReviewModal(true)}
+          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-emerald/30 py-2 text-xs font-semibold text-emerald transition hover:bg-emerald-soft"
+        >
+          <Star className="h-3.5 w-3.5" /> {t("up_leave_review")}
+        </button>
+      )}
+
+      {showReviewModal && ownerUser && (
+        <ReviewModal targetUser={ownerUser} onClose={() => setShowReviewModal(false)} />
+      )}
     </div>
   );
 }

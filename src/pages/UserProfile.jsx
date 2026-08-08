@@ -2,15 +2,16 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft, MessageCircle, BadgeCheck, Building2, Calendar, Loader2, Star, Plus,
+  Bookmark, Share2, Check,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
 import { useToast } from "@/components/ui/use-toast";
-import { startConversation } from "@/lib/conversations";
 import { initials, avatarColor } from "@/lib/chatUtils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Image as UIImage } from "@/components/ui/image";
 import PropertyCard from "@/components/PropertyCard";
 import RatingStars, { RatingBreakdown } from "@/components/RatingStars";
 import ReviewItem from "@/components/ReviewItem";
@@ -28,6 +29,9 @@ export default function UserProfile() {
   const [properties, setProperties] = useState([]);
   const [loadingProps, setLoadingProps] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [shared, setShared] = useState(false);
 
   const en = lang === "en";
   const dateLocale = en ? "en-GB" : "ro-RO";
@@ -51,7 +55,7 @@ export default function UserProfile() {
     return () => { cancelled = true; };
   }, [id]);
 
-  // Load ratings (import the hook logic inline to avoid circular deps)
+  // Load ratings
   const [ratings, setRatings] = useState([]);
   const [loadingRatings, setLoadingRatings] = useState(true);
   useEffect(() => {
@@ -112,10 +116,26 @@ export default function UserProfile() {
     return () => { cancelled = true; };
   }, [tab, id]);
 
+  // Check if profile is saved by current user
+  useEffect(() => {
+    if (!user || !id || user.id === id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await base44.entities.SavedProfile.filter(
+          { user_id: user.id, target_user_id: id },
+          "-created_date",
+          1
+        );
+        if (!cancelled) setProfileSaved(list.length > 0);
+      } catch (e) {}
+    })();
+    return () => { cancelled = true; };
+  }, [user, id]);
+
   const handleMessage = async () => {
     if (!user) { navigate("/login"); return; }
     try {
-      // Create a conversation without a property context (user-to-user)
       const existing = await base44.entities.Conversation.filter(
         { $or: [
           { buyer_id: user.id, seller_id: id },
@@ -142,6 +162,57 @@ export default function UserProfile() {
     }
   };
 
+  const toggleSaveProfile = async () => {
+    if (!user) { navigate("/login"); return; }
+    setSavingProfile(true);
+    try {
+      if (profileSaved) {
+        const list = await base44.entities.SavedProfile.filter(
+          { user_id: user.id, target_user_id: id },
+          "-created_date",
+          10
+        );
+        for (const s of list) await base44.entities.SavedProfile.delete(s.id);
+        setProfileSaved(false);
+        toast({ title: en ? "Profile removed" : "Profil eliminat" });
+      } else {
+        await base44.entities.SavedProfile.create({ user_id: user.id, target_user_id: id });
+        setProfileSaved(true);
+        toast({ title: en ? "Profile saved" : "Profil salvat" });
+      }
+    } catch (e) {
+      toast({ title: t("pc_err_msg"), variant: "destructive" });
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const shareProfile = async () => {
+    const url = window.location.href;
+    const shareData = {
+      title: profile?.full_name || "Profil VerifiCasa",
+      text: en ? `Check out ${profile?.full_name}'s profile on VerifiCasa` : `Profilul lui ${profile?.full_name} pe VerifiCasa`,
+      url,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(url);
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+        toast({ title: en ? "Link copied" : "Link copiat" });
+      }
+    } catch (e) {
+      try {
+        await navigator.clipboard.writeText(url);
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+        toast({ title: en ? "Link copied" : "Link copiat" });
+      } catch {}
+    }
+  };
+
   const isOwnProfile = user?.id === id;
   const isAgent = profile?.seller_type === "Agent" || (profile?.role || "").toUpperCase() === "AGENT";
   const memberSince = profile?.created_date
@@ -154,7 +225,7 @@ export default function UserProfile() {
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-        <Skeleton className="h-32 w-full rounded-2xl" />
+        <Skeleton className="h-40 w-full rounded-2xl" />
         <Skeleton className="mt-4 h-12 w-64 rounded-xl" />
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 rounded-2xl" />)}
@@ -172,22 +243,32 @@ export default function UserProfile() {
     );
   }
 
+  // Default to 5.0 when no reviews (trust score system)
+  const displayAverage = count > 0 ? average : 5;
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
       <Link to="/search" className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-navy dark:hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> {t("up_back")}
       </Link>
 
-      {/* Profile header */}
+      {/* Profile header with cover image */}
       <div className="mt-4 overflow-hidden rounded-3xl border border-border bg-white shadow-soft dark:bg-card">
-        <div className="h-20 gradient-emerald sm:h-24" />
+        <div className="relative h-32 sm:h-40">
+          {profile.cover_image_url ? (
+            <UIImage src={profile.cover_image_url} fittingType="fill" className="h-full w-full" />
+          ) : (
+            <div className="h-full w-full gradient-emerald" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        </div>
         <div className="px-4 pb-5 sm:px-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-end gap-4">
               {profile.avatar_url ? (
-                <img src={profile.avatar_url} alt="" className="-mt-10 h-20 w-20 shrink-0 rounded-2xl border-4 border-white object-cover dark:border-card sm:-mt-12 sm:h-24 sm:w-24" />
+                <img src={profile.avatar_url} alt="" className="-mt-12 h-20 w-20 shrink-0 rounded-2xl border-4 border-white object-cover dark:border-card sm:-mt-14 sm:h-24 sm:w-24" />
               ) : (
-                <span className={`-mt-10 flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border-4 border-white text-2xl font-bold text-white dark:border-card sm:-mt-12 sm:h-24 sm:w-24 ${isAgent ? "bg-blue-600" : "bg-emerald"}`}>
+                <span className={`-mt-12 flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border-4 border-white text-2xl font-bold text-white dark:border-card sm:-mt-14 sm:h-24 sm:w-24 ${isAgent ? "bg-blue-600" : "bg-emerald"}`}>
                   {initials(profile.full_name || profile.email)}
                 </span>
               )}
@@ -211,19 +292,19 @@ export default function UserProfile() {
                     </span>
                   )}
                 </div>
-                {/* Rating compact */}
-                {count > 0 && (
-                  <div className="mt-1.5 flex items-center gap-2">
-                    <RatingStars rating={average} size="sm" showNumber />
-                    <span className="text-xs text-muted-foreground">
-                      {count === 1 ? t("up_review_singular", { count }) : t("up_reviews_count", { count })}
-                    </span>
-                  </div>
-                )}
+                {/* Rating — always visible, defaults to 5.0 when no reviews */}
+                <div className="mt-1.5 flex items-center gap-2">
+                  <RatingStars rating={displayAverage} size="sm" showNumber />
+                  <span className="text-xs text-muted-foreground">
+                    {count > 0
+                      ? (count === 1 ? t("up_review_singular", { count }) : t("up_reviews_count", { count }))
+                      : (en ? "No reviews yet" : "Fără recenzii")}
+                  </span>
+                </div>
               </div>
             </div>
             {/* Actions */}
-            <div className="flex shrink-0 gap-2">
+            <div className="flex shrink-0 flex-wrap gap-2">
               {!isOwnProfile && (
                 <Button onClick={handleMessage} className="gap-2 bg-emerald text-white shadow-soft hover:bg-emerald/90">
                   <MessageCircle className="h-4 w-4" /> {t("up_send_message")}
@@ -234,6 +315,25 @@ export default function UserProfile() {
                   <Star className="h-4 w-4" /> {t("up_leave_review")}
                 </Button>
               )}
+              {!isOwnProfile && user && (
+                <Button
+                  onClick={toggleSaveProfile}
+                  disabled={savingProfile}
+                  variant="outline"
+                  className={`gap-2 ${profileSaved ? "border-emerald bg-emerald-soft text-emerald" : "border-border text-muted-foreground hover:border-emerald/50"}`}
+                >
+                  {profileSaved ? <Check className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
+                  <span className="hidden sm:inline">{profileSaved ? (en ? "Saved" : "Salvat") : (en ? "Save" : "Salvează")}</span>
+                </Button>
+              )}
+              <Button
+                onClick={shareProfile}
+                variant="outline"
+                className="gap-2 border-border text-muted-foreground hover:border-emerald/50 hover:text-emerald"
+              >
+                {shared ? <Check className="h-4 w-4 text-emerald" /> : <Share2 className="h-4 w-4" />}
+                <span className="hidden sm:inline">{en ? "Share" : "Distribuie"}</span>
+              </Button>
             </div>
           </div>
 
@@ -297,7 +397,7 @@ export default function UserProfile() {
             <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-emerald" /></div>
           ) : count === 0 ? (
             <div className="py-16 text-center">
-              <Star className="mx-auto h-10 w-10 text-muted-foreground/30" />
+              <div className="mx-auto flex justify-center"><RatingStars rating={5} size="lg" /></div>
               <p className="mt-3 text-sm text-muted-foreground">{t("up_no_reviews")}</p>
               {!isOwnProfile && user && (
                 <Button onClick={() => setShowReviewModal(true)} variant="outline" className="mt-4 gap-2 border-emerald/30 text-emerald">

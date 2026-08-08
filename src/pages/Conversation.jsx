@@ -36,11 +36,12 @@ export default function Conversation() {
   // Prefill: când utilizatorul apasă „Trimite mesaj" de pe pagina anunț,
   // pre-completăm textul șablon și atașăm cardul de proprietate la următorul mesaj.
   useEffect(() => {
-    if (!prefill || !conv || !conv.property_id || pendingRef) return;
+    if (!prefill || !conv || !conv.property_id || conv.property_id === "direct" || pendingRef) return;
     (async () => {
       try {
         const prop = await base44.entities.Property.get(conv.property_id);
-        setText("Bună ziua, sunt interesat de această proprietate. Aș dori mai multe detalii.");
+        const code = prop.property_code ? `Cod anunț: ${prop.property_code}` : "";
+        setText(`Bună ziua, sunt interesat de această proprietate: ${prop.title}. Aș dori mai multe detalii.${code ? "\n" + code : ""}`);
         setPendingRef({
           property_ref_id: prop.id,
           property_ref_title: prop.title,
@@ -91,6 +92,7 @@ export default function Conversation() {
     if (!text.trim() || !conv) return;
     setSending(true);
     const content = text.trim();
+    const ref = pendingRef;
     try {
       const msgData = {
         conversation_id: conv.id,
@@ -98,10 +100,12 @@ export default function Conversation() {
         sender_name: user.full_name || user.email,
         content,
       };
-      if (pendingRef) Object.assign(msgData, pendingRef);
+      if (ref) Object.assign(msgData, ref);
       await base44.entities.Message.create(msgData);
-      await base44.entities.Conversation.update(conv.id, { last_message: content });
-      if (pendingRef) setPendingRef(null);
+      // Update last_message best-effort — don't fail the whole send if this errors
+      base44.entities.Conversation.update(conv.id, { last_message: content }).catch(() => {});
+      setPendingRef(null);
+      setText("");
       const recipient = conv.buyer_id === user.id ? conv.seller_id : conv.buyer_id;
       if (recipient && recipient !== user.id) {
         createNotification({
@@ -112,8 +116,7 @@ export default function Conversation() {
           actorName: user.full_name || user.email,
         });
       }
-      setText("");
-    } catch {
+    } catch (err) {
       toast({ title: "Eroare la trimitere", variant: "destructive" });
     } finally { setSending(false); }
   };
