@@ -98,9 +98,20 @@ export default function PropertyDetail() {
 
   if (!property) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-24 text-center sm:px-6 lg:px-8">
-        <p className="font-heading text-2xl font-bold text-navy">{t("not_found")}</p>
-        <Button asChild className="mt-4 gradient-mint text-navy"><Link to="/">{t("back_home")}</Link></Button>
+      <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
+          <MapPin className="h-8 w-8 text-muted-foreground/50" />
+        </div>
+        <p className="mt-4 font-heading text-2xl font-bold text-navy dark:text-foreground">{t("not_found")}</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {lang === "en"
+            ? "This listing may have been removed or is no longer available."
+            : "Acest anunț ar fi putut fi șters sau nu mai este disponibil."}
+        </p>
+        <div className="mt-6 flex items-center justify-center gap-2">
+          <Button asChild variant="outline"><Link to="/search">{t("back_results")}</Link></Button>
+          <Button asChild className="bg-emerald text-white hover:bg-emerald/90"><Link to="/">{t("back_home")}</Link></Button>
+        </div>
       </div>
     );
   }

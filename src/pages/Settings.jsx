@@ -15,7 +15,7 @@ import NotificationsPanel from "@/components/NotificationsPanel";
 
 export default function Settings() {
   const { user, checkUserAuth } = useAuth();
-  const { t } = useCountry();
+  const { t, lang } = useCountry();
   const { toast } = useToast();
   const [tab, setTab] = useState("profile");
   const [saving, setSaving] = useState(false);
@@ -36,8 +36,6 @@ export default function Settings() {
     email_notify_reviews: user?.email_notify_reviews !== false,
   });
 
-  // Password form
-  const [passForm, setPassForm] = useState({ current: "", next: "", confirm: "" });
   const [passLoading, setPassLoading] = useState(false);
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
@@ -77,15 +75,15 @@ export default function Settings() {
     } catch (e) {}
   };
 
-  const changePassword = async (e) => {
-    e.preventDefault();
-    // The platform doesn't expose a direct changePassword method for logged-in
-    // users — redirect to the forgot-password flow which sends a reset email.
+  const changePassword = async () => {
+    setPassLoading(true);
     try {
       await base44.auth.resetPasswordRequest?.(user?.email || "");
-      toast({ title: t("st_pass_changed"), description: "Verifică-ți emailul pentru linkul de resetare." });
+      toast({ title: t("st_pass_changed"), description: lang === "en" ? "Check your email for the reset link." : "Verifică-ți emailul pentru linkul de resetare." });
     } catch (e) {
       toast({ title: t("st_pass_error"), description: e.message, variant: "destructive" });
+    } finally {
+      setPassLoading(false);
     }
   };
 
@@ -285,38 +283,22 @@ export default function Settings() {
               <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground">
                 <Lock className="h-4 w-4 text-emerald" /> {t("st_change_password")}
               </h2>
-              <form onSubmit={changePassword} className="mt-4 space-y-3">
-                <input
-                  type="password"
-                  value={passForm.current}
-                  onChange={(e) => setPassForm((f) => ({ ...f, current: e.target.value }))}
-                  placeholder={t("st_current_pass")}
-                  className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
-                />
-                <input
-                  type="password"
-                  value={passForm.next}
-                  onChange={(e) => setPassForm((f) => ({ ...f, next: e.target.value }))}
-                  placeholder={t("st_new_pass")}
-                  className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
-                />
-                <input
-                  type="password"
-                  value={passForm.confirm}
-                  onChange={(e) => setPassForm((f) => ({ ...f, confirm: e.target.value }))}
-                  placeholder={t("st_confirm_pass")}
-                  className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
-                />
-                <Button type="submit" disabled={passLoading} className="w-full gap-2 bg-emerald text-white hover:bg-emerald/90">
-                  {passLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                  {t("st_change_password")}
-                </Button>
-              </form>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {lang === "en"
+                  ? "We'll send a password reset link to your email address."
+                  : "Vom trimite un link de resetare a parolei pe adresa ta de email."}
+              </p>
+              <div className="mt-3 flex items-center gap-2 rounded-xl bg-secondary/50 px-3 py-2.5">
+                <span className="text-sm font-medium text-foreground/80">{user?.email || "—"}</span>
+              </div>
+              <Button onClick={changePassword} disabled={passLoading} className="mt-3 w-full gap-2 bg-emerald text-white hover:bg-emerald/90">
+                {passLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> {lang === "en" ? "Sending..." : "Se trimite..."}</> : <><Lock className="h-4 w-4" /> {t("st_change_password")}</>}
+              </Button>
             </section>
 
             <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
               <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">Aspect</h2>
-              <p className="text-sm text-muted-foreground">Comută între temă deschisă și întunecată.</p>
+              <p className="text-sm text-muted-foreground">{lang === "en" ? "Toggle between light and dark theme." : "Comută între temă deschisă și întunecată."}</p>
               <div className="mt-3"><ThemeToggle withLabel /></div>
             </section>
           </div>

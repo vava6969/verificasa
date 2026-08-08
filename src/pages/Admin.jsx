@@ -118,6 +118,11 @@ export default function Admin() {
     if (!confirm("Stergi definitiv acest anunt?")) return;
     try {
       await base44.entities.Property.delete(p.id);
+      // Clean up orphaned notifications referencing this property
+      try {
+        const propNotifs = await base44.entities.Notification.filter({ link: `/property/${p.id}` }, "-created_date", 100);
+        if (propNotifs.length) await base44.entities.Notification.deleteMany({ link: `/property/${p.id}` });
+      } catch {}
       toast({ title: "Anunt sters" });
       log("delete", "property", p.id, p.title);
       load();
