@@ -71,10 +71,15 @@ export default function BusinessCard({ user: profile, ratings = [], average = 0,
           ref={cardRef}
           className="overflow-hidden rounded-3xl border border-border bg-white shadow-glow dark:bg-card"
         >
-          {/* Header — cover image, taller so both photos are clearly visible */}
-          <div className="relative h-32 w-full overflow-hidden bg-navy">
+          {/* Header — cover image with guaranteed object-fit to prevent squashing */}
+          <div className="relative h-36 w-full overflow-hidden bg-navy">
             {profile?.cover_image_url ? (
-              <img src={profile.cover_image_url} alt="" className="absolute inset-0 h-full w-full object-cover" />
+              <img
+                src={profile.cover_image_url}
+                alt=""
+                className="absolute inset-0 h-full w-full"
+                style={{ objectFit: "cover", objectPosition: "center" }}
+              />
             ) : (
               <div className="absolute inset-0 gradient-navy" />
             )}
@@ -89,7 +94,8 @@ export default function BusinessCard({ user: profile, ratings = [], average = 0,
                 <img
                   src={profile.avatar_url}
                   alt=""
-                  className="h-20 w-20 shrink-0 rounded-full border-4 border-white object-cover shadow-soft dark:border-card"
+                  className="h-20 w-20 shrink-0 rounded-full border-4 border-white shadow-soft dark:border-card"
+                  style={{ objectFit: "cover", objectPosition: "center" }}
                 />
               ) : (
                 <span className={`flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-white text-2xl font-bold text-white shadow-soft dark:border-card ${isAgent ? "bg-blue-600" : "bg-emerald"}`}>
