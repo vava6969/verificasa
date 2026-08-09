@@ -268,9 +268,9 @@ export default function UserProfile() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-end gap-4">
               {profile.avatar_url ? (
-                <img src={profile.avatar_url} alt="" className="-mt-12 h-20 w-20 shrink-0 rounded-2xl border-4 border-white object-cover dark:border-card sm:-mt-14 sm:h-24 sm:w-24" />
+                <img src={profile.avatar_url} alt="" className="-mt-12 h-20 w-20 shrink-0 rounded-full border-4 border-white object-cover dark:border-card sm:-mt-14 sm:h-24 sm:w-24" />
               ) : (
-                <span className={`-mt-12 flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border-4 border-white text-2xl font-bold text-white dark:border-card sm:-mt-14 sm:h-24 sm:w-24 ${isAgent ? "bg-blue-600" : "bg-emerald"}`}>
+                <span className={`-mt-12 flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-white text-2xl font-bold text-white dark:border-card sm:-mt-14 sm:h-24 sm:w-24 ${isAgent ? "bg-blue-600" : "bg-emerald"}`}>
                   {initials(profile.full_name || profile.email)}
                 </span>
               )}
