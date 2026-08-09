@@ -71,32 +71,32 @@ export default function BusinessCard({ user: profile, ratings = [], average = 0,
           ref={cardRef}
           className="overflow-hidden rounded-3xl border border-border bg-white shadow-glow dark:bg-card"
         >
-          {/* Header — cover image with subtle bottom gradient for readability */}
-          <div className="relative h-24 w-full overflow-hidden bg-navy">
+          {/* Header — cover image, taller so both photos are clearly visible */}
+          <div className="relative h-32 w-full overflow-hidden bg-navy">
             {profile?.cover_image_url ? (
               <img src={profile.cover_image_url} alt="" className="absolute inset-0 h-full w-full object-cover" />
             ) : (
               <div className="absolute inset-0 gradient-navy" />
             )}
             {/* Subtle dark gradient at bottom so avatar/name pop, no green tint */}
-            <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/80 via-navy-deep/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/85 via-navy-deep/25 to-transparent" />
           </div>
 
-          {/* Avatar + name — overlapping header */}
+          {/* Avatar + name — circular avatar overlapping the header */}
           <div className="px-5 pb-4">
-            <div className="-mt-10 flex items-end gap-3">
+            <div className="-mt-14 flex items-end gap-3">
               {profile?.avatar_url ? (
                 <img
                   src={profile.avatar_url}
                   alt=""
-                  className="h-16 w-16 rounded-2xl border-4 border-white object-cover shadow-soft dark:border-card"
+                  className="h-20 w-20 shrink-0 rounded-full border-4 border-white object-cover shadow-soft dark:border-card"
                 />
               ) : (
-                <span className={`flex h-16 w-16 items-center justify-center rounded-2xl border-4 border-white text-xl font-bold text-white shadow-soft dark:border-card ${isAgent ? "bg-blue-600" : "bg-emerald"}`}>
+                <span className={`flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-white text-2xl font-bold text-white shadow-soft dark:border-card ${isAgent ? "bg-blue-600" : "bg-emerald"}`}>
                   {initials(profile?.full_name || profile?.email)}
                 </span>
               )}
-              <div className="min-w-0 flex-1 pb-1">
+              <div className="min-w-0 flex-1 pb-2">
                 <div className="flex items-center gap-1.5">
                   <h3 className="truncate font-heading text-lg font-bold text-navy dark:text-foreground">{profile?.full_name || profile?.email}</h3>
                   {profile?.is_verified && <BadgeCheck className="h-4 w-4 shrink-0 text-emerald" />}
