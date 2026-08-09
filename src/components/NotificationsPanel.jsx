@@ -11,6 +11,7 @@ const TYPE_CONFIG = {
   like:     { Icon: Heart,         bg: "bg-rose-100 dark:bg-rose-900/40",   icon: "text-rose-500 dark:text-rose-400",   label: "Apreciere" },
   message:  { Icon: Phone,         bg: "bg-blue-100 dark:bg-blue-900/40",   icon: "text-blue-600 dark:text-blue-400",   label: "Mesaj" },
   property: { Icon: Building2,     bg: "bg-emerald-100 dark:bg-emerald-900/30", icon: "text-emerald dark:text-emerald",   label: "Proprietate" },
+  review:   { Icon: Star,          bg: "bg-amber-100 dark:bg-amber-900/30",   icon: "text-amber-500 dark:text-amber-400", label: "Recenzie" },
   system:   { Icon: Bell,          bg: "bg-secondary dark:bg-secondary",     icon: "text-muted-foreground",              label: "Sistem" },
 };
 
