@@ -27,10 +27,11 @@ export default function ImageCropper({ file, aspectRatio = 1, onSave, onCancel, 
       const r = containerRef.current.getBoundingClientRect();
       setContainerSize({ w: r.width, h: r.height });
     };
-    measure();
+    // Defer to next frame so the aspect-ratio sizing has settled
+    requestAnimationFrame(measure);
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
-  }, []);
+  }, [imgSrc]);
 
   const onImgLoad = () => {
     if (imgRef.current) {
