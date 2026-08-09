@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { Upload, X, Loader2 } from "lucide-react";
 import { Image as UIImage } from "@/components/ui/image";
 import { Field, inputCls } from "./wizardUi";
@@ -67,8 +66,9 @@ export default function StepPhotos({ form, set, uploading, onFiles, agreed, setA
         <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-0.5 h-4 w-4 rounded border-border accent-emerald" />
         <span className="leading-relaxed">
           Sunt de acord cu{" "}
-          <Link to="/terms" className="font-semibold text-emerald hover:underline">Termenii</Link> și{" "}
-          <Link to="/privacy" className="font-semibold text-emerald hover:underline">Politica de confidențialitate</Link>.
+          <a href="/terms" target="_blank" rel="noopener noreferrer" className="font-semibold text-emerald hover:underline">Termenii</a> și{" "}
+          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="font-semibold text-emerald hover:underline">Politica de confidențialitate</a>.
+          <span className="mt-1 block text-xs text-muted-foreground/70">Se deschid într-o pagină nouă — nu pierzi ce ai scris.</span>
         </span>
       </label>
     </div>
