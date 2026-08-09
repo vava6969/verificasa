@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  User, Lock, Bell, Shield, Home, Loader2, Check, Camera, Building2, ChevronRight, Clock,
+  User, Lock, Bell, Shield, Home, Loader2, Check, Camera, Building2, ChevronRight, Clock, Phone, MessageCircle,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
@@ -29,6 +29,8 @@ export default function Settings() {
     agency_logo_url: user?.agency_logo_url || "",
     license_number: user?.license_number || "",
     bio: user?.bio || "",
+    phone: user?.phone || "",
+    whatsapp_phone: user?.whatsapp_phone || "",
     phone_public: user?.phone_public !== false,
     whatsapp_visible: user?.whatsapp_visible !== false,
     profile_visibility: user?.profile_visibility || "public",
@@ -63,6 +65,8 @@ export default function Settings() {
         license_number: form.seller_type === "Agent" ? form.license_number : "",
         bio: form.bio,
         cover_image_url: form.cover_image_url,
+        phone: form.phone,
+        whatsapp_phone: form.whatsapp_phone,
         phone_public: form.phone_public,
         whatsapp_visible: form.whatsapp_visible,
         profile_visibility: form.profile_visibility,
@@ -285,6 +289,43 @@ export default function Settings() {
                 />
               </section>
             )}
+
+            {/* Contact — phone & WhatsApp */}
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
+              <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground">
+                <Phone className="h-4 w-4 text-emerald" /> {lang === "en" ? "Contact details" : "Date de contact"}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {lang === "en" ? "Shown on your business card and public profile." : "Aparate pe cartea ta de vizită și profilul public."}
+              </p>
+              <div className="mt-4 space-y-3">
+                <div>
+                  <label className="mb-1.5 flex items-center gap-1.5 text-sm font-semibold text-navy dark:text-foreground">
+                    <Phone className="h-3.5 w-3.5 text-muted-foreground" /> {lang === "en" ? "Phone" : "Telefon"}
+                  </label>
+                  <input
+                    value={form.phone}
+                    onChange={(e) => set("phone", e.target.value)}
+                    placeholder="07xx xxx xxx"
+                    className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 flex items-center gap-1.5 text-sm font-semibold text-navy dark:text-foreground">
+                    <MessageCircle className="h-3.5 w-3.5 text-muted-foreground" /> WhatsApp
+                  </label>
+                  <input
+                    value={form.whatsapp_phone}
+                    onChange={(e) => set("whatsapp_phone", e.target.value)}
+                    placeholder="407xxxxxxxx (format internațional)"
+                    className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {lang === "en" ? "Include country code, e.g. 40 for Romania." : "Include codul de țară, ex. 40 pentru România."}
+                  </p>
+                </div>
+              </div>
+            </section>
 
             {/* Bio */}
             <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
