@@ -66,13 +66,14 @@ export default function BusinessCard({ user: profile, ratings = [], average = 0,
   return (
     <div className="fixed inset-0 z-[200] flex items-end justify-center bg-black/80 p-4 backdrop-blur-sm sm:items-center" onClick={onClose}>
       <div className="w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
-        {/* The card itself — dark theme */}
+        {/* The card itself — dark theme. relative so the avatar can overlap
+            the cover/body boundary with an explicit z-index. */}
         <div
           ref={cardRef}
-          className="overflow-hidden rounded-3xl border border-[#2d3736] bg-[#161f1d] shadow-2xl"
+          className="relative overflow-hidden rounded-3xl border border-[#2d3736] bg-[#161f1d] shadow-2xl"
         >
-          {/* Cover banner */}
-          <div className="relative h-32 w-full overflow-hidden bg-[#0f1715]">
+          {/* Cover banner — sits behind the avatar (z-0) */}
+          <div className="relative z-0 h-32 w-full overflow-hidden bg-[#0f1715]">
             {profile?.cover_image_url ? (
               <img
                 src={profile.cover_image_url}
@@ -88,21 +89,26 @@ export default function BusinessCard({ user: profile, ratings = [], average = 0,
           </div>
 
           {/* Body */}
-          <div className="px-5 pb-5">
-            {/* Avatar + name — circular avatar overlapping the cover */}
-            <div className="-mt-14 flex items-end gap-3">
+          <div className="relative px-5 pb-5">
+            {/* Avatar — absolutely positioned so it straddles the cover/body
+                boundary. z-10 guarantees it renders ON TOP of the cover. */}
+            <div className="absolute left-5 top-0 z-10 -translate-y-1/2">
               {profile?.avatar_url ? (
                 <img
                   src={profile.avatar_url}
                   alt=""
-                  className="h-20 w-20 shrink-0 rounded-full border-4 border-[#161f1d] shadow-lg"
+                  className="h-20 w-20 rounded-full border-4 border-[#161f1d] shadow-lg"
                   style={{ objectFit: "cover", objectPosition: "center" }}
                 />
               ) : (
-                <span className={`flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-[#161f1d] text-2xl font-bold text-white shadow-lg ${isAgent ? "bg-blue-600" : "bg-emerald"}`}>
+                <span className={`flex h-20 w-20 items-center justify-center rounded-full border-4 border-[#161f1d] text-2xl font-bold text-white shadow-lg ${isAgent ? "bg-blue-600" : "bg-emerald"}`}>
                   {initials(profile?.full_name || profile?.email)}
                 </span>
               )}
+            </div>
+
+            {/* Name block — pushed right so it clears the avatar */}
+            <div className="flex items-end gap-3 pt-10 pl-[5.5rem]">
               <div className="min-w-0 flex-1 pb-1">
                 <div className="flex items-center gap-1.5">
                   <h3 className="truncate font-heading text-lg font-bold text-white">{profile?.full_name || profile?.email}</h3>
