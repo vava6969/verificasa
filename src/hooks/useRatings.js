@@ -45,16 +45,20 @@ export function useUserRatings(targetUserId) {
     return () => { cancelled = true; unsubscribe(); };
   }, [targetUserId]);
 
+  // Progressive stars: starts at 1.0 with no reviews, grows toward the true
+  // average as reviews accumulate (Bayesian average with a prior of 1).
   const { average, count, distribution } = useMemo(() => {
     const count = ratings.length;
-    if (count === 0) return { average: 0, count: 0, distribution: {} };
+    if (count === 0) return { average: 1, count: 0, distribution: {} };
     const sum = ratings.reduce((acc, r) => acc + (r.rating || 0), 0);
     const dist = {};
     ratings.forEach((r) => {
       const s = Math.round(r.rating);
       dist[s] = (dist[s] || 0) + 1;
     });
-    return { average: sum / count, count, distribution: dist };
+    // (sum + prior) / (count + prior_weight) — starts at 1, approaches true avg
+    const progressive = (sum + 1) / (count + 1);
+    return { average: progressive, count, distribution: dist };
   }, [ratings]);
 
   return { ratings, average, count, distribution, loading };

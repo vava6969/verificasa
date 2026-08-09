@@ -43,6 +43,15 @@
     "property_ref_currency": {
       "type": "string",
       "title": "Card proprietate ata\u0219at \u2014 moned\u0103"
+    },
+    "is_system": {
+      "type": "boolean",
+      "default": false,
+      "title": "Mesaj sistem (notificare automat\u0103)"
+    },
+    "system_type": {
+      "type": "string",
+      "title": "Tip mesaj sistem (ex: review_request)"
     }
   },
   "required": [

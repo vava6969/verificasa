@@ -8,9 +8,11 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Send, ArrowLeft, MoreVertical, Check, CheckCheck, Trash2 } from "lucide-react";
+import { Send, ArrowLeft, MoreVertical, Check, CheckCheck, Trash2, Star } from "lucide-react";
 import { initials, avatarColor } from "@/lib/chatUtils";
 import ChatPropertyCard from "@/components/ChatPropertyCard";
+import ReviewModal from "@/components/ReviewModal";
+import VerifiCasaLogo from "@/components/VerifiCasaLogo";
 
 // Full-screen iMessage-style conversation — its own page, no app chrome.
 export default function Conversation() {
@@ -26,12 +28,24 @@ export default function Conversation() {
   const [pendingRef, setPendingRef] = useState(null);
   const [sending, setSending] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [otherUser, setOtherUser] = useState(null);
+  const [showReviewModal, setShowReviewModal] = useState(false);
   const bottomRef = useRef(null);
 
   useEffect(() => {
     if (!isAuthenticated) return;
     base44.entities.Conversation.get(id).then(setConv).catch(() => setConv(false));
   }, [id, isAuthenticated]);
+
+  const otherUserId = conv
+    ? conv.buyer_id === user?.id ? conv.seller_id : conv.buyer_id
+    : null;
+
+  // Fetch the other participant's full user record (avatar, name, etc.)
+  useEffect(() => {
+    if (!otherUserId) return;
+    base44.entities.User.get(otherUserId).then(setOtherUser).catch(() => setOtherUser(null));
+  }, [otherUserId]);
 
   // Prefill: când utilizatorul apasă „Trimite mesaj" de pe pagina anunț,
   // pre-completăm textul șablon și atașăm cardul de proprietate la următorul mesaj.
@@ -57,7 +71,7 @@ export default function Conversation() {
     try {
       const list = await base44.entities.Message.filter({ conversation_id: id }, "created_date", 500);
       setMessages(list);
-      const incoming = list.filter((m) => m.sender_id !== user.id && !m.read_at);
+      const incoming = list.filter((m) => m.sender_id !== user.id && !m.read_at && !m.is_system);
       if (incoming.length) {
         const now = new Date().toISOString();
         await Promise.all(incoming.map((m) => base44.entities.Message.update(m.id, { read_at: now }).catch(() => {})));
@@ -84,8 +98,31 @@ export default function Conversation() {
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   const otherName = conv
-    ? conv.buyer_id === user?.id ? conv.seller_name || "Proprietar" : conv.buyer_name || "Cumpărător"
+    ? conv.buyer_id === user?.id
+      ? conv.seller_name || otherUser?.full_name || "Proprietar"
+      : conv.buyer_name || otherUser?.full_name || "Cumpărător"
     : "";
+
+  const maybeSendReviewRequest = async () => {
+    try {
+      const nonSystemCount = (messages || []).filter((m) => !m.is_system).length + 1;
+      if (nonSystemCount < 3) return;
+      const existing = await base44.entities.Message.filter(
+        { conversation_id: conv.id, is_system: true, system_type: "review_request" },
+        "-created_date", 1
+      ).catch(() => []);
+      if (existing.length === 0) {
+        await base44.entities.Message.create({
+          conversation_id: conv.id,
+          sender_id: "system",
+          sender_name: "VerifiCasa",
+          content: "Sper că am fost pe placul așteptărilor tale, m-ar ajuta foarte mult o recenzie din partea dumneavoastră.",
+          is_system: true,
+          system_type: "review_request",
+        }).catch(() => {});
+      }
+    } catch { /* best-effort */ }
+  };
 
   const send = async (e) => {
     e?.preventDefault();
@@ -102,7 +139,8 @@ export default function Conversation() {
       };
       if (ref) Object.assign(msgData, ref);
       await base44.entities.Message.create(msgData);
-      // Update last_message best-effort — don't fail the whole send if this errors
+      // Auto review-request after 3+ messages (once per conversation)
+      maybeSendReviewRequest();
       base44.entities.Conversation.update(conv.id, { last_message: content }).catch(() => {});
       setPendingRef(null);
       setText("");
@@ -125,7 +163,7 @@ export default function Conversation() {
     if (busy || !messages) return;
     setBusy(true);
     try {
-      const toUpdate = messages.filter((m) => m.sender_id !== user.id && !m.read_at);
+      const toUpdate = messages.filter((m) => m.sender_id !== user.id && !m.read_at && !m.is_system);
       const now = new Date().toISOString();
       await Promise.all(toUpdate.map((m) => base44.entities.Message.update(m.id, { read_at: now }).catch(() => {})));
       loadMessages();
@@ -147,29 +185,41 @@ export default function Conversation() {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#f4f6f9] dark:bg-background">
-      {/* Header */}
+      {/* Header — shows other participant's name + avatar */}
       <div
         className="flex items-center gap-2 border-b border-border bg-white px-3 py-2.5 shadow-sm dark:bg-card sm:px-4"
         style={{ paddingTop: "calc(0.625rem + env(safe-area-inset-top))" }}
       >
         <button
           onClick={() => navigate("/messages")}
-          className="flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary/60"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary/60"
           aria-label="Înapoi la inbox"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
-        <span className={["flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white", avatarColor(id)].join(" ")}>
-          {initials(otherName || "?")}
-        </span>
+        <Link to={otherUserId ? `/profile/${otherUserId}` : "#"} className="shrink-0">
+          {otherUser?.avatar_url ? (
+            <img src={otherUser.avatar_url} alt="" className="h-10 w-10 rounded-full object-cover" />
+          ) : (
+            <span className={["flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold text-white", avatarColor(otherUserId || id)].join(" ")}>
+              {initials(otherName || "?")}
+            </span>
+          )}
+        </Link>
         <div className="min-w-0 flex-1">
           <Link
-            to={conv ? "/property/" + conv.property_id : "#"}
+            to={otherUserId ? `/profile/${otherUserId}` : "#"}
             className="block truncate font-heading text-base font-bold text-navy hover:text-emerald dark:text-foreground"
           >
-            {conv?.property_title || "Proprietate"}
+            {otherName || "Conversație"}
           </Link>
-          <p className="truncate text-xs text-muted-foreground">cu {otherName}</p>
+          {conv?.property_id && conv.property_id !== "direct" ? (
+            <Link to={`/property/${conv.property_id}`} className="block truncate text-xs text-muted-foreground hover:text-emerald">
+              {conv?.property_title || "Proprietate"}
+            </Link>
+          ) : (
+            <p className="truncate text-xs text-muted-foreground">Conversație directă</p>
+          )}
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -199,6 +249,28 @@ export default function Conversation() {
           <div className="py-12 text-center text-sm text-muted-foreground">Niciun mesaj. Fii primul care scrie!</div>
         ) : (
           messages.map((m) => {
+            // System message — review request notification
+            if (m.is_system && m.system_type === "review_request") {
+              return (
+                <div key={m.id} className="flex justify-center px-4 py-2">
+                  <div className="flex max-w-[90%] flex-col items-center gap-2 rounded-2xl border border-gold/30 bg-gradient-to-br from-gold-soft to-amber-50 px-4 py-3 text-center shadow-sm dark:border-gold/20 dark:from-gold-soft/20 dark:to-amber-900/10 sm:max-w-[70%]">
+                    <div className="flex items-center gap-2">
+                      <VerifiCasaLogo size={28} withWordmark={false} />
+                      <span className="text-xs font-bold uppercase tracking-wide text-gold-deep">VerifiCasa</span>
+                    </div>
+                    <p className="text-sm leading-relaxed text-navy dark:text-foreground">{m.content}</p>
+                    {otherUser && (
+                      <button
+                        onClick={() => setShowReviewModal(true)}
+                        className="mt-1 flex items-center gap-1.5 rounded-full bg-emerald px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald/90"
+                      >
+                        <Star className="h-3.5 w-3.5 fill-white" /> Lasă o recenzie
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            }
             const mine = m.sender_id === user.id;
             const readTitle = m.read_at
               ? `Văzut la ${new Date(m.read_at).toLocaleString("ro-RO")}`
@@ -206,9 +278,13 @@ export default function Conversation() {
             return (
               <div key={m.id} className={"flex gap-2 " + (mine ? "justify-end" : "justify-start")}>
                 {!mine && (
-                  <span className={["flex h-7 w-7 shrink-0 self-end items-center justify-center rounded-full text-[11px] font-bold text-white", avatarColor(id)].join(" ")}>
-                    {initials(m.sender_name || "?")}
-                  </span>
+                  otherUser?.avatar_url ? (
+                    <img src={otherUser.avatar_url} alt="" className="h-7 w-7 shrink-0 self-end rounded-full object-cover" />
+                  ) : (
+                    <span className={["flex h-7 w-7 shrink-0 self-end items-center justify-center rounded-full text-[11px] font-bold text-white", avatarColor(otherUserId || id)].join(" ")}>
+                      {initials(m.sender_name || "?")}
+                    </span>
+                  )
                 )}
                 <div className={"flex max-w-[82%] flex-col gap-0.5 sm:max-w-[70%] " + (mine ? "items-end" : "items-start")}>
                   <div className={[
@@ -255,6 +331,10 @@ export default function Conversation() {
           {sending ? <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" /> : <Send className="h-5 w-5" />}
         </Button>
       </form>
+
+      {showReviewModal && otherUser && (
+        <ReviewModal targetUser={otherUser} onClose={() => setShowReviewModal(false)} />
+      )}
     </div>
   );
 }

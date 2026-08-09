@@ -42,8 +42,9 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
 
   const { average, count } = useMemo(() => {
     const c = ratings.length;
-    if (c === 0) return { average: 0, count: 0 };
-    return { average: ratings.reduce((a, r) => a + (r.rating || 0), 0) / c, count: c };
+    if (c === 0) return { average: 1, count: 0 };
+    const sum = ratings.reduce((a, r) => a + (r.rating || 0), 0);
+    return { average: (sum + 1) / (c + 1), count: c };
   }, [ratings]);
 
   const trustMarkers = [
@@ -80,7 +81,7 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
           )}
           {count === 0 && (
             <div className="mt-0.5 flex items-center gap-1">
-              <RatingStars rating={5} size="sm" />
+              <RatingStars rating={1} size="sm" />
               <span className="text-xs text-muted-foreground">{t("up_no_reviews")}</span>
             </div>
           )}

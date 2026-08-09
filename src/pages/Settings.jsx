@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  User, Lock, Bell, Shield, Home, Loader2, Check, Camera, Building2, ChevronRight,
+  User, Lock, Bell, Shield, Home, Loader2, Check, Camera, Building2, ChevronRight, Clock,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
@@ -10,6 +10,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Image as UIImage } from "@/components/ui/image";
 import AvatarUpload from "@/components/AvatarUpload";
+import ImageCropper from "@/components/ImageCropper";
 import ThemeToggle from "@/components/ThemeToggle";
 import NotificationsPanel from "@/components/NotificationsPanel";
 
@@ -38,12 +39,22 @@ export default function Settings() {
   });
 
   const [passLoading, setPassLoading] = useState(false);
+  const [pendingCoverFile, setPendingCoverFile] = useState(null);
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  // Name change restriction: 7-day cooldown after each change
+  const lastNameChange = user?.last_name_change_date ? new Date(user.last_name_change_date) : null;
+  const daysSinceNameChange = lastNameChange
+    ? Math.floor((Date.now() - lastNameChange.getTime()) / (1000 * 60 * 60 * 24))
+    : null;
+  const canChangeName = daysSinceNameChange === null || daysSinceNameChange >= 7;
+  const daysUntilNameChange = canChangeName ? 0 : 7 - daysSinceNameChange;
 
   const saveProfile = async () => {
     setSaving(true);
     try {
+      const nameChanged = form.full_name !== user?.full_name;
       await base44.auth.updateMe({
         full_name: form.full_name,
         seller_type: form.seller_type,
@@ -58,6 +69,7 @@ export default function Settings() {
         show_activity_status: form.show_activity_status,
         email_notify_messages: form.email_notify_messages,
         email_notify_reviews: form.email_notify_reviews,
+        ...(nameChanged ? { last_name_change_date: new Date().toISOString() } : {}),
       });
       await checkUserAuth();
       toast({ title: t("st_saved") });
@@ -77,10 +89,17 @@ export default function Settings() {
     } catch (e) {}
   };
 
-  const handleCoverImage = async (e) => {
+  const handleCoverImage = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setPendingCoverFile(file);
+    if (e.target) e.target.value = "";
+  };
+
+  const handleCoverCropSave = async (blob) => {
+    setPendingCoverFile(null);
     try {
+      const file = new File([blob], "cover.jpg", { type: "image/jpeg" });
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       set("cover_image_url", file_url);
       toast({ title: t("st_saved") });
@@ -180,6 +199,15 @@ export default function Settings() {
                 </div>
               </div>
             </section>
+            {pendingCoverFile && (
+              <ImageCropper
+                file={pendingCoverFile}
+                aspectRatio={3}
+                onSave={handleCoverCropSave}
+                onCancel={() => setPendingCoverFile(null)}
+                title={lang === "en" ? "Adjust cover image" : "Ajustează imaginea background"}
+              />
+            )}
 
             {/* Avatar */}
             <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
@@ -194,8 +222,17 @@ export default function Settings() {
               <input
                 value={form.full_name}
                 onChange={(e) => set("full_name", e.target.value)}
-                className="mt-3 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                disabled={!canChangeName}
+                className="mt-3 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40 disabled:cursor-not-allowed disabled:opacity-60"
               />
+              {!canChangeName && (
+                <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:bg-amber-900/20 dark:text-amber-400">
+                  <Clock className="h-3.5 w-3.5 shrink-0" />
+                  {lang === "en"
+                    ? `You can change your name again in ${daysUntilNameChange} day(s).`
+                    : `Poți schimba numele din nou peste ${daysUntilNameChange} zi(le).`}
+                </div>
+              )}
               <div className="mt-4">
                 <p className="mb-2 text-sm font-semibold text-navy dark:text-foreground">{t("st_seller_type")}</p>
                 <div className="grid grid-cols-2 gap-2">

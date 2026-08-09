@@ -47,8 +47,13 @@ export default function StepPhotos({ form, set, uploading, onFiles, agreed, setA
         <Field label="WhatsApp" hint="Format internațional, ex: 40759...">
           <input inputMode="tel" value={form.whatsapp_phone} onChange={(e) => set({ whatsapp_phone: onlyPhoneDigits(e.target.value) })} placeholder="40759..." className={inputCls} />
         </Field>
-        <Field label="Nume afișat">
-          <input value={form.owner_name} onChange={(e) => set({ owner_name: e.target.value })} placeholder="Nume proprietar" className={inputCls} />
+        <Field label="Nume afișat" hint="Preluat automat din contul tău">
+          <input
+            value={form.owner_name}
+            readOnly
+            placeholder="Nume proprietar"
+            className={inputCls + " cursor-not-allowed bg-secondary/40 text-muted-foreground"}
+          />
         </Field>
         <Field label="Postez ca">
           <select value={form.seller_role} onChange={(e) => set({ seller_role: e.target.value })} className={inputCls}>

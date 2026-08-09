@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowLeft, MessageCircle, BadgeCheck, Building2, Calendar, Loader2, Star, Plus,
-  Bookmark, Share2, Check,
+  Bookmark, Share2, Check, CreditCard,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
@@ -16,6 +16,7 @@ import PropertyCard from "@/components/PropertyCard";
 import RatingStars, { RatingBreakdown } from "@/components/RatingStars";
 import ReviewItem from "@/components/ReviewItem";
 import ReviewModal from "@/components/ReviewModal";
+import BusinessCard from "@/components/BusinessCard";
 
 export default function UserProfile() {
   const { id } = useParams();
@@ -29,6 +30,7 @@ export default function UserProfile() {
   const [properties, setProperties] = useState([]);
   const [loadingProps, setLoadingProps] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showBusinessCard, setShowBusinessCard] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [shared, setShared] = useState(false);
@@ -85,13 +87,15 @@ export default function UserProfile() {
     return () => { cancelled = true; unsubscribe(); };
   }, [id]);
 
+  // Progressive stars: starts at 1.0 with no reviews, grows toward the true
+  // average as reviews accumulate (Bayesian average with a prior of 1).
   const { average, count, distribution } = useMemo(() => {
     const c = ratings.length;
-    if (c === 0) return { average: 0, count: 0, distribution: {} };
+    if (c === 0) return { average: 1, count: 0, distribution: {} };
     const sum = ratings.reduce((acc, r) => acc + (r.rating || 0), 0);
     const dist = {};
     ratings.forEach((r) => { const s = Math.round(r.rating); dist[s] = (dist[s] || 0) + 1; });
-    return { average: sum / c, count: c, distribution: dist };
+    return { average: (sum + 1) / (c + 1), count: c, distribution: dist };
   }, [ratings]);
 
   // Load listings when tab is listings
@@ -243,9 +247,7 @@ export default function UserProfile() {
     );
   }
 
-  // Default to 5.0 when no reviews (trust score system)
-  const displayAverage = count > 0 ? average : 5;
-
+  // Progressive stars: average already starts at 1.0 and grows with reviews
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
       <Link to="/search" className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-navy dark:hover:text-foreground">
@@ -292,9 +294,9 @@ export default function UserProfile() {
                     </span>
                   )}
                 </div>
-                {/* Rating — always visible, defaults to 5.0 when no reviews */}
+                {/* Rating — progressive stars, starts at 1.0 */}
                 <div className="mt-1.5 flex items-center gap-2">
-                  <RatingStars rating={displayAverage} size="sm" showNumber />
+                  <RatingStars rating={average} size="sm" showNumber />
                   <span className="text-xs text-muted-foreground">
                     {count > 0
                       ? (count === 1 ? t("up_review_singular", { count }) : t("up_reviews_count", { count }))
@@ -333,6 +335,14 @@ export default function UserProfile() {
               >
                 {shared ? <Check className="h-4 w-4 text-emerald" /> : <Share2 className="h-4 w-4" />}
                 <span className="hidden sm:inline">{en ? "Share" : "Distribuie"}</span>
+              </Button>
+              <Button
+                onClick={() => setShowBusinessCard(true)}
+                variant="outline"
+                className="gap-2 border-border text-muted-foreground hover:border-emerald/50 hover:text-emerald"
+              >
+                <CreditCard className="h-4 w-4" />
+                <span className="hidden sm:inline">{en ? "Business card" : "Card de vizită"}</span>
               </Button>
             </div>
           </div>
@@ -397,7 +407,7 @@ export default function UserProfile() {
             <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-emerald" /></div>
           ) : count === 0 ? (
             <div className="py-16 text-center">
-              <div className="mx-auto flex justify-center"><RatingStars rating={5} size="lg" /></div>
+              <div className="mx-auto flex justify-center"><RatingStars rating={1} size="lg" /></div>
               <p className="mt-3 text-sm text-muted-foreground">{t("up_no_reviews")}</p>
               {!isOwnProfile && user && (
                 <Button onClick={() => setShowReviewModal(true)} variant="outline" className="mt-4 gap-2 border-emerald/30 text-emerald">
@@ -436,6 +446,9 @@ export default function UserProfile() {
 
       {showReviewModal && (
         <ReviewModal targetUser={profile} onClose={() => setShowReviewModal(false)} />
+      )}
+      {showBusinessCard && (
+        <BusinessCard user={profile} ratings={ratings} average={average} count={count} onClose={() => setShowBusinessCard(false)} />
       )}
     </div>
   );

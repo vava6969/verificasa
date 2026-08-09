@@ -102,6 +102,11 @@
       "type": "string",
       "format": "date-time",
       "title": "Ultima activitate"
+    },
+    "last_name_change_date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Data ultimei schimb\u0103ri de nume"
     }
   }
 }

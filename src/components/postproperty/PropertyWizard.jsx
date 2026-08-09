@@ -35,7 +35,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
   const isAdmin = ADMIN_ROLES.includes((user?.role || "").toUpperCase());
 
   const [step, setStep] = useState(0);
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [form, setForm] = useState({ ...EMPTY_FORM, owner_name: user?.full_name || "" });
   const [chips, setChips] = useState({});
   const [facilities, setFacilities] = useState({});
   const [agreed, setAgreed] = useState(false);
