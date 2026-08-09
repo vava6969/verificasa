@@ -31,6 +31,7 @@ export default function Conversation() {
   const [otherUser, setOtherUser] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const bottomRef = useRef(null);
+  const prefillApplied = useRef(false);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -48,14 +49,19 @@ export default function Conversation() {
   }, [otherUserId]);
 
   // Prefill: când utilizatorul apasă „Trimite mesaj" de pe pagina anunț,
-  // pre-completăm textul șablon și atașăm cardul de proprietate la următorul mesaj.
+  // pre-completăm textul șablon și atașăm cardul de proprietate la primul mesaj.
+  // Se aplică O SINGURĂ DATĂ — doar la prima interacțiune, nu la fiecare mesaj.
   useEffect(() => {
-    if (!prefill || !conv || !conv.property_id || conv.property_id === "direct" || pendingRef) return;
+    if (!prefill || !conv || !conv.property_id || conv.property_id === "direct" || pendingRef || prefillApplied.current) return;
+    // Așteaptă încărcarea mesajelor; dacă conversația are deja mesaje, nu pre-completa
+    if (messages === null) return;
+    if (messages.length > 0) { prefillApplied.current = true; return; }
+    prefillApplied.current = true;
     (async () => {
       try {
         const prop = await base44.entities.Property.get(conv.property_id);
-        const code = prop.property_code ? `Cod anunț: ${prop.property_code}` : "";
-        setText(`Bună ziua, sunt interesat de această proprietate: ${prop.title}. Aș dori mai multe detalii.${code ? "\n" + code : ""}`);
+        const code = prop.property_code ? ` Cod anunț: ${prop.property_code}` : "";
+        setText(`Bună ziua, sunt interesat de această proprietate: ${prop.title}. Aș dori mai multe detalii.${code}`);
         setPendingRef({
           property_ref_id: prop.id,
           property_ref_title: prop.title,
@@ -65,7 +71,7 @@ export default function Conversation() {
         });
       } catch { /* best-effort */ }
     })();
-  }, [prefill, conv, pendingRef]);
+  }, [prefill, conv, pendingRef, messages]);
 
   const loadMessages = async () => {
     try {
