@@ -9,6 +9,7 @@ import HeroCountdown from "@/components/HeroCountdown";
 import InspectieModal from "@/components/InspectieModal";
 import ListeazaPopup from "@/components/ListeazaPopup";
 import MapSearchCTA from "@/components/MapSearchCTA";
+import ActionCards from "@/components/ActionCards";
 import BetaBanner from "@/components/BetaBanner";
 import AboutVerifiCasa from "@/components/AboutVerifiCasa";
 import CircularCarousel from "@/components/ui/circular-carousel";
@@ -84,6 +85,9 @@ export default function Landing() {
           <HeroCountdown />
         </div>
       </section>
+
+      {/* CĂI PRINCIPALE — navigare vizuală, stil Zillow (Buy/Rent/Sell) */}
+      <ActionCards onRequestInspection={() => setShowInspectie(true)} />
 
       {/* VALUE PROPOSITION CAROUSEL */}
       <section className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 lg:px-8">
