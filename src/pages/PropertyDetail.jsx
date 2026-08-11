@@ -5,7 +5,6 @@ import { formatDistanceToNowStrict } from "date-fns";
 import { ro, enGB } from "date-fns/locale";
 
 import { useCountry } from "@/components/CountryContext";
-import AITourPlayer from "@/components/AITourPlayer";
 import PropertyEditForm from "@/components/PropertyEditForm";
 import PropertyComments from "@/components/PropertyComments";
 import SimilarProperties from "@/components/SimilarProperties";
