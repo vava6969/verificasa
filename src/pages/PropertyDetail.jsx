@@ -225,7 +225,7 @@ export default function PropertyDetail() {
             <div className="select-none">
               <div
                 className="relative flex items-center justify-center overflow-hidden rounded-2xl border border-border bg-secondary select-none"
-                style={{ aspectRatio: "4 / 3" }}
+                style={{ aspectRatio: "16 / 10" }}
                 onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
                 onTouchEnd={(e) => {
                   if (touchStartX.current == null) return;
@@ -269,6 +269,16 @@ export default function PropertyDetail() {
                     </span>
                   </>
                 )}
+
+                {/* Salvează — acces rapid direct pe poza principală, ca la Zillow */}
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); toggleSave(); }}
+                  aria-label={saved ? t("pd_saved") : t("pd_save")}
+                  className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-navy-deep/45 text-white backdrop-blur-md transition hover:bg-navy-deep/65"
+                >
+                  <Heart className={`h-4.5 w-4.5 transition ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
+                </button>
               </div>
 
               {images.length > 1 && (
