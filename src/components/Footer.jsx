@@ -6,10 +6,29 @@ import VerifiCasaLogo from "@/components/VerifiCasaLogo";
 import LegalBadges from "@/components/LegalBadges";
 
 export default function Footer() {
-  const { t } = useCountry();
+  const { t, lang } = useCountry();
+  const en = lang === "en";
+  const stats = [
+    { value: "100+", label: en ? "verified properties" : "proprietăți verificate" },
+    { value: "100%", label: en ? "on-site inspected" : "verificate pe teren" },
+    { value: "2", label: en ? "cities, expanding nationwide" : "orașe, extindere națională" },
+  ];
   return (
     <footer className="bg-navy-deep text-white/80">
       <div className="h-20 bg-gradient-to-b from-background to-transparent" />
+
+      {/* TRUST STATS — dovadă socială directă, ca la Zillow */}
+      <div className="border-b border-white/10">
+        <div className="mx-auto grid max-w-7xl grid-cols-3 gap-4 px-4 py-8 sm:px-6 lg:px-8">
+          {stats.map((s, i) => (
+            <div key={i} className="text-center">
+              <p className="font-heading text-2xl font-bold text-white sm:text-4xl">{s.value}</p>
+              <p className="mt-1 text-[11px] text-white/55 sm:text-sm">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-4">
           <div>
