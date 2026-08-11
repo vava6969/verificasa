@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 
 export default function Landing() {
-  const { country, t } = useCountry();
+  const { country, t, lang } = useCountry();
   const [properties, setProperties] = useState(null);
   const [showInspectie, setShowInspectie] = useState(false);
   const [showListeaza, setShowListeaza] = useState(false);
