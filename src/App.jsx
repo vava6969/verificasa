@@ -8,7 +8,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import Layout from '@/components/Layout';
 import Landing from '@/pages/Landing';
-import SearchPage from '@/pages/Search';
+import MapSearch from '@/pages/MapSearch';
 import PropertyDetail from '@/pages/PropertyDetail';
 import Owner from '@/pages/Owner';
 import Login from '@/pages/Login';
@@ -35,7 +35,6 @@ import { CountryProvider } from '@/components/CountryContext';
 import Account from '@/pages/Account';
 import MyReports from '@/pages/MyReports';
 import PostProperty from '@/pages/PostProperty';
-import MapSearch from '@/pages/MapSearch';
 import UserProfile from '@/pages/UserProfile';
 
 const AuthenticatedApp = () => {
@@ -71,7 +70,9 @@ const AuthenticatedApp = () => {
       <Route path="/oauth/consent" element={<OAuthConsent />} />
       <Route element={<Layout />}>
         <Route path="/" element={<Landing />} />
-        <Route path="/search" element={<SearchPage />} />
+        {/* Căutare unificată: listă + hartă + filtre în aceeași pagină, stil Zillow.
+            /search și /map duc la aceeași experiență. */}
+        <Route path="/search" element={<MapSearch />} />
         <Route path="/about" element={<About />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
@@ -81,6 +82,8 @@ const AuthenticatedApp = () => {
         <Route path="/property/:id" element={<PropertyDetail />} />
         <Route path="/profile/:id" element={<UserProfile />} />
         <Route path="/map" element={<MapSearch />} />
+        {/* alias istoric — unele linkuri externe pot indexa /map-search */}
+        <Route path="/map-search" element={<MapSearch />} />
         <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
           <Route path="/owner" element={<Owner />} />
           <Route path="/my-properties" element={<MyProperties />} />
