@@ -277,7 +277,7 @@ export default function PropertyDetail() {
                   aria-label={saved ? t("pd_saved") : t("pd_save")}
                   className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-navy-deep/45 text-white backdrop-blur-md transition hover:bg-navy-deep/65"
                 >
-                  <Heart className={`h-4.5 w-4.5 transition ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
+                  <Heart className={`h-4 w-4 transition ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
                 </button>
               </div>
 
