@@ -10,8 +10,10 @@ import CookieBanner from "@/components/CookieBanner";
 
 export default function Layout() {
   const { pathname } = useLocation();
-  // Admin panel is a dense work surface — no marketing footer there.
-  const hideFooter = pathname.startsWith("/admin") || pathname.startsWith("/messages") || pathname.startsWith("/map");
+  // Admin panel and the unified map+list search are full-height work surfaces
+  // (the map fills the viewport) — no marketing footer there. /search now
+  // renders the same full-height page as /map, so it's excluded too.
+  const hideFooter = pathname.startsWith("/admin") || pathname.startsWith("/messages") || pathname.startsWith("/map") || pathname.startsWith("/search");
   const hideBottomNav = false;
 
   return (
