@@ -628,23 +628,82 @@ export default function MapSearch() {
           showListMobile ? "fixed inset-0 z-[1100] block" : "hidden"
         } md:relative md:z-auto md:block md:w-[400px] md:shrink-0 md:h-full overflow-y-auto border-t md:border-t-0 md:border-l border-border bg-background`}
       >
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background/95 p-3 backdrop-blur">
-          <div>
-            <p className="text-sm font-bold text-navy dark:text-foreground">
-              {visibleProperties.length} {en ? "properties in this area" : "proprietăți în zonă"}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {polygonPoints.length >= 3
-                ? en ? "Filtered by drawn area" : "Filtrat după zona desenată"
-                : en ? "Move the map to update results" : "Mută harta pentru a actualiza"}
-            </p>
+        <div className="sticky top-0 z-10 border-b border-border bg-background/95 p-3 backdrop-blur">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-bold text-navy dark:text-foreground">
+                {visibleProperties.length} {en ? "properties in this area" : "proprietăți în zonă"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {polygonPoints.length >= 3
+                  ? en ? "Filtered by drawn area" : "Filtrat după zona desenată"
+                  : en ? "Move the map to update results" : "Mută harta pentru a actualiza"}
+              </p>
+            </div>
+            <button
+              onClick={() => setShowListMobile(false)}
+              className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary md:hidden"
+            >
+              <X className="h-5 w-5" />
+            </button>
           </div>
-          <button
-            onClick={() => setShowListMobile(false)}
-            className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary md:hidden"
-          >
-            <X className="h-5 w-5" />
-          </button>
+
+          {/* Filtre unificate — aceleași ca pe fostul /search, acum direct lângă hartă */}
+          <div className="mt-3 space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              <select
+                value={cityParam}
+                onChange={(e) => updateCity(e.target.value)}
+                className="w-full rounded-lg border border-border bg-background px-2.5 py-2 text-xs font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
+              >
+                <option value="">{t("sr_city_select")}</option>
+                {cities.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+              <select
+                value={zoneParam}
+                onChange={(e) => updateZone(e.target.value)}
+                disabled={!cityParam}
+                className="w-full rounded-lg border border-border bg-background px-2.5 py-2 text-xs font-medium text-foreground outline-none focus:border-emerald dark:bg-card disabled:opacity-50"
+              >
+                <option value="">{t("sr_zone_select")}</option>
+                {zones.map((z) => <option key={z} value={z}>{z}</option>)}
+              </select>
+            </div>
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <input
+                defaultValue={qParam}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder={t("sr_search_placeholder")}
+                className="w-full rounded-lg border border-border bg-background py-2 pl-8 pr-3 text-xs text-foreground outline-none focus:border-emerald dark:bg-card"
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <SearchFiltersDrawer
+                t={t}
+                filters={VERIF_FILTERS}
+                activeFilters={activeFilters}
+                onToggle={toggleFilter}
+                budget={budget} setBudget={setBudget}
+                roomsMin={roomsMin} setRoomsMin={setRoomsMin}
+                surfaceMin={surfaceMin} setSurfaceMin={setSurfaceMin}
+                fairness={fairness} setFairness={setFairness}
+                fairnessOptions={makeFairness(t)}
+                furnished={furnished} setFurnished={setFurnished}
+                swap={swap} setSwap={setSwap}
+                sort={sort} setSort={setSort}
+                sortOptions={makeSort(t)}
+                onReset={resetFilters}
+              />
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground/70 transition hover:border-emerald/50 dark:bg-card"
+              >
+                <RotateCcw className="h-3.5 w-3.5" /> {t("sr_reset_filters")}
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-3 p-3">
