@@ -282,11 +282,35 @@ export default function MapSearch() {
     [properties]
   );
 
+  // Aceleași criterii ca pe /search, aplicate înainte de filtrarea geografică
+  // (bounds/poligon) — harta și lista arată mereu aceleași rezultate.
+  const filteredGeoProps = useMemo(() => {
+    return geoProps.filter((p) => {
+      if (cityParam && !norm(p.city).includes(norm(cityParam))) return false;
+      if (zoneParam && !norm(`${p.zone || ""} ${p.landmark || ""}`).includes(norm(zoneParam))) return false;
+      if (typeParam && p.property_type !== typeParam) return false;
+      if (qParam) {
+        const hay = norm([p.title, p.zone, p.city, p.landmark, p.description, p.property_type, p.property_code].join(" "));
+        if (!hay.includes(norm(qParam))) return false;
+      }
+      for (const f of VERIF_FILTERS) {
+        if (activeFilters.has(f.key) && !f.test(p)) return false;
+      }
+      if (budget) { const max = parseInt(budget, 10); if (!isNaN(max) && p.price_monthly > max) return false; }
+      if (roomsMin) { const r = parseInt(roomsMin, 10); if (!isNaN(r) && (p.rooms == null || p.rooms < r)) return false; }
+      if (surfaceMin) { const s = parseFloat(surfaceMin); if (!isNaN(s) && (p.surface_sqm == null || p.surface_sqm < s)) return false; }
+      if (furnished && !p.furnished) return false;
+      if (swap && !p.is_swap_available) return false;
+      if (fairness && p.price_fairness !== fairness) return false;
+      return true;
+    });
+  }, [geoProps, cityParam, zoneParam, typeParam, qParam, activeFilters, budget, roomsMin, surfaceMin, furnished, swap, fairness]);
+
   const clusters = useMemo(() => {
-    if (!geoProps.length) return [];
+    if (!filteredGeoProps.length) return [];
     if (zoom < 8) {
       const byCounty = {};
-      geoProps.forEach((p) => {
+      filteredGeoProps.forEach((p) => {
         const county = p.county || "Altele";
         if (!byCounty[county]) byCounty[county] = { count: 0, lat: 0, lng: 0, n: 0, county, type: "county" };
         byCounty[county].count++;
@@ -311,7 +335,7 @@ export default function MapSearch() {
         .filter((c) => c.lat && c.lng);
     } else if (zoom < 12) {
       const byCity = {};
-      geoProps.forEach((p) => {
+      filteredGeoProps.forEach((p) => {
         const city = p.city || "Altele";
         if (!byCity[city]) byCity[city] = { count: 0, lat: 0, lng: 0, n: 0, city, county: p.county, type: "city" };
         byCity[city].count++;
@@ -323,17 +347,17 @@ export default function MapSearch() {
         .map((c) => ({ ...c, lat: c.n > 0 ? c.lat / c.n : 0, lng: c.n > 0 ? c.lng / c.n : 0 }))
         .filter((c) => c.lat && c.lng);
     }
-    return geoProps.map((p) => ({
+    return filteredGeoProps.map((p) => ({
       ...p,
       lat: p.latitude,
       lng: p.longitude,
       count: 1,
       type: "property",
     }));
-  }, [geoProps, zoom]);
+  }, [filteredGeoProps, zoom]);
 
   const visibleProperties = useMemo(() => {
-    let result = geoProps;
+    let result = filteredGeoProps;
     if (bounds) {
       result = result.filter(
         (p) =>
@@ -346,8 +370,11 @@ export default function MapSearch() {
     if (polygonPoints.length >= 3) {
       result = result.filter((p) => pointInPolygon(p.latitude, p.longitude, polygonPoints));
     }
+    if (sort === "price_asc") result = [...result].sort((a, b) => (a.price_monthly || 0) - (b.price_monthly || 0));
+    else if (sort === "price_desc") result = [...result].sort((a, b) => (b.price_monthly || 0) - (a.price_monthly || 0));
+    else if (sort === "newest") result = [...result].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
     return result;
-  }, [geoProps, bounds, polygonPoints]);
+  }, [filteredGeoProps, bounds, polygonPoints, sort]);
 
   // Reset pagination when filters change
   useEffect(() => {
