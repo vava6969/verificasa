@@ -82,8 +82,6 @@ const AuthenticatedApp = () => {
         <Route path="/property/:id" element={<PropertyDetail />} />
         <Route path="/profile/:id" element={<UserProfile />} />
         <Route path="/map" element={<MapSearch />} />
-        {/* alias istoric — unele linkuri externe pot indexa /map-search */}
-        <Route path="/map-search" element={<MapSearch />} />
         <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
           <Route path="/owner" element={<Owner />} />
           <Route path="/my-properties" element={<MyProperties />} />
