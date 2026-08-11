@@ -78,6 +78,11 @@ export default function Landing() {
             <HeroSearch />
           </div>
 
+          <p className="mt-3 flex items-center gap-1.5 text-xs font-medium text-white/70">
+            <ShieldCheck className="h-3.5 w-3.5 text-gold" />
+            {lang === "en" ? "100+ properties, all verified on-site" : "Peste 100 de proprietăți, toate verificate pe teren"}
+          </p>
+
           <Button asChild className="mt-4 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 sm:mt-6">
             <Link to="/post-property"><Plus className="h-4 w-4" /> {t("hdr_add")}</Link>
           </Button>
