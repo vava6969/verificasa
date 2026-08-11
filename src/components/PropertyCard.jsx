@@ -144,24 +144,42 @@ export default function PropertyCard({ property, hot = false }) {
           </div>
         )}
 
-        {/* Badge Verificat — singurul badge permanent pe imagine */}
-        {isVerified && (
-          <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-emerald px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
-            <ShieldCheck className="h-3.5 w-3.5" /> {t("pc_verified")}
-          </span>
-        )}
+        {/* Badge-uri grupate stânga-sus: Verificat + Recomandat */}
+        <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
+          {isVerified && (
+            <span className="flex items-center gap-1 rounded-full bg-emerald px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
+              <ShieldCheck className="h-3.5 w-3.5" /> {t("pc_verified")}
+            </span>
+          )}
+          {hot && (
+            <span className="premium-badge flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white">
+              <Crown className="h-3 w-3" /> {t("pc_hot")}
+            </span>
+          )}
+        </div>
 
-        {/* Badge Recomandat — panglică discretă dreapta-sus */}
-        {hot && (
-          <span className="premium-badge absolute right-3 top-3 flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white">
-            <Crown className="h-3 w-3" /> {t("pc_hot")}
-          </span>
-        )}
+        {/* Salvează — buton inimă, ca la Zillow, dreapta-sus */}
+        <button
+          type="button"
+          onClick={toggleSave}
+          aria-label={saved ? t("pd_unsaved") : t("pd_saved_toast")}
+          disabled={savePending}
+          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-navy-deep/45 text-white backdrop-blur-md transition hover:bg-navy-deep/65 disabled:opacity-60"
+        >
+          <Heart className={`h-4 w-4 transition ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
+        </button>
 
-        {/* Data postării — discret, dreapta-jos */}
+        {/* Data postării — stânga-jos */}
         {p.created_date && (
-          <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-navy-deep/70 px-2 py-0.5 text-[10px] font-medium text-white/90 backdrop-blur">
+          <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full bg-navy-deep/60 px-2 py-0.5 text-[10px] font-medium text-white/90 backdrop-blur">
             <Calendar className="h-2.5 w-2.5" /> {new Date(p.created_date).toLocaleDateString(dateLocale, { day: "2-digit", month: "2-digit" })}
+          </span>
+        )}
+
+        {/* Număr poze — dreapta-jos, ca la Zillow */}
+        {images.length > 0 && (
+          <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-navy-deep/60 px-2 py-0.5 text-[10px] font-semibold text-white/90 backdrop-blur">
+            <Camera className="h-2.5 w-2.5" /> {images.length}
           </span>
         )}
       </div>
