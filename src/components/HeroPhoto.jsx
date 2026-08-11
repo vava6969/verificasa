@@ -36,8 +36,8 @@ export default function HeroPhoto() {
           }}
         />
       </AnimatePresence>
-      <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/55 via-navy/35 to-navy-deep/70" />
-      <div className="absolute inset-0 bg-gradient-to-r from-navy-deep/55 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/65 via-navy/45 to-navy-deep/75" />
+      <div className="absolute inset-0 bg-gradient-to-r from-navy-deep/65 via-navy-deep/15 to-transparent" />
       <div className="hero-fade absolute inset-x-0 bottom-0 h-56 sm:h-72" />
     </div>
   );
