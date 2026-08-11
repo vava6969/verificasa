@@ -1,16 +1,17 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   MapPin, Maximize, BedDouble, ShieldCheck, PawPrint, BadgePercent,
   Eye, Building2, Phone, MessageCircle,
   Calendar, PhoneOff, Clock,
-  Box, Crown, Car, Sofa,
+  Box, Crown, Car, Sofa, Heart, Camera,
 } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { startConversation } from "@/lib/conversations";
 import { Image } from "@/components/ui/image";
+import { base44 } from "@/api/base44Client";
 import { formatDistanceToNowStrict } from "date-fns";
 import { ro, enGB } from "date-fns/locale";
 
@@ -30,6 +31,45 @@ export default function PropertyCard({ property, hot = false }) {
   const seller = p.seller_role || (p.owner_verified ? "Proprietar" : "Agent");
   const isProprietar = seller === "Proprietar";
   const sellerLabel = isProprietar ? t("pc_seller_landlord") : t("pc_seller_agent");
+
+  // Save/favorite — same SavedProperty entity pattern as PropertyDetail, so a
+  // card saved here shows up instantly on /saved and vice versa.
+  const [saved, setSaved] = useState(false);
+  const [savePending, setSavePending] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    if (!user || !p?.id) { setSaved(false); return; }
+    (async () => {
+      try {
+        const list = await base44.entities.SavedProperty.filter({ user_id: user.id, property_id: p.id }, "-created_date", 1);
+        if (!cancelled) setSaved(list.length > 0);
+      } catch (e) { /* noop */ }
+    })();
+    return () => { cancelled = true; };
+  }, [user, p?.id]);
+
+  const toggleSave = async (e) => {
+    e.preventDefault(); e.stopPropagation();
+    if (!isAuthenticated) { navigate("/login"); return; }
+    if (savePending) return;
+    setSavePending(true);
+    try {
+      if (saved) {
+        const list = await base44.entities.SavedProperty.filter({ user_id: user.id, property_id: p.id }, "-created_date", 10);
+        for (const s of list) await base44.entities.SavedProperty.delete(s.id);
+        setSaved(false);
+        toast({ title: t("pd_unsaved") });
+      } else {
+        await base44.entities.SavedProperty.create({ user_id: user.id, property_id: p.id });
+        setSaved(true);
+        toast({ title: t("pd_saved_toast") });
+      }
+    } catch (err) {
+      toast({ title: t("pc_err_msg"), variant: "destructive" });
+    } finally {
+      setSavePending(false);
+    }
+  };
 
   const eur = formatPrice(p.price_monthly, p.currency, "EUR");
   const ron = formatPrice(p.price_monthly, p.currency, "RON");
