@@ -166,11 +166,67 @@ function DrawController({ drawMode, onAddPoint }) {
 }
 
 export default function MapSearch() {
-  const { lang } = useCountry();
+  const { country, lang, t } = useCountry();
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const en = lang === "en";
+
+  // Filtre unificate — aceleași ca pe /search, sincronizate cu URL-ul, astfel
+  // încât harta și lista de rezultate răspund la exact aceleași criterii.
+  const [params, setParams] = useSearchParams();
+  const cityParam = params.get("city") || "";
+  const zoneParam = params.get("zone") || "";
+  const typeParam = params.get("type") || "";
+  const qParam = params.get("q") || "";
+  const [budget, setBudget] = useState("");
+  const [roomsMin, setRoomsMin] = useState("");
+  const [surfaceMin, setSurfaceMin] = useState("");
+  const [furnished, setFurnished] = useState(false);
+  const [swap, setSwap] = useState(false);
+  const [fairness, setFairness] = useState("");
+  const [sort, setSort] = useState("");
+  const [activeFilters, setActiveFilters] = useState(() => {
+    const s = new Set();
+    VERIF_FILTERS.forEach((f) => { if (params.get(f.key) === "1") s.add(f.key); });
+    return s;
+  });
+
+  const cities = useMemo(() => getCities(country), [country]);
+  const zones = useMemo(() => getZones(country, cityParam), [country, cityParam]);
+
+  const updateCity = (val) => setParams((prev) => {
+    const next = new URLSearchParams(prev);
+    if (val) next.set("city", val); else next.delete("city");
+    next.delete("zone");
+    return next;
+  }, { replace: true });
+  const updateZone = (val) => setParams((prev) => {
+    const next = new URLSearchParams(prev);
+    if (val) next.set("zone", val); else next.delete("zone");
+    return next;
+  }, { replace: true });
+  const setQ = (v) => setParams((prev) => {
+    const next = new URLSearchParams(prev);
+    if (v) next.set("q", v); else next.delete("q");
+    return next;
+  }, { replace: true });
+  const toggleFilter = (key) => {
+    setActiveFilters((prev) => {
+      const n = new Set(prev);
+      if (n.has(key)) n.delete(key); else n.add(key);
+      const next = new URLSearchParams(params);
+      if (n.has(key)) next.set(key, "1"); else next.delete(key);
+      setParams(next, { replace: true });
+      return n;
+    });
+  };
+  const resetFilters = () => {
+    setBudget(""); setRoomsMin(""); setSurfaceMin("");
+    setFurnished(false); setSwap(false); setFairness(""); setSort("");
+    setActiveFilters(new Set());
+    setParams(new URLSearchParams(), { replace: true });
+  };
 
   const [properties, setProperties] = useState(null);
   const [bounds, setBounds] = useState(null);
