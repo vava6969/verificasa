@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import {
   MapPin, Maximize, BedDouble, ShieldCheck, PawPrint, BadgePercent,
   Eye, Building2, Phone, MessageCircle,
-  Calendar, PhoneOff, Clock,
+  Calendar, PhoneOff,
   Box, Crown, Car, Sofa, Heart, Camera,
 } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
