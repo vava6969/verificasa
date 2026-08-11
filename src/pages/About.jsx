@@ -58,6 +58,16 @@ const CONTENT = {
     service_owners_d: "Își prezintă proprietățile la cel mai înalt nivel de profesionalism, atrăgând doar clienți cu adevărat interesați și serioși.",
     story_p5: "VerifiCasa nu este doar despre imobile; este despre oameni, timp și încredere. Ceea ce a pornit de la o simplă idee s-a transformat într-un brand dedicat eficienței și transparenței totale.",
     story_p6: "Suntem aici să creștem împreună cu voi, să vă ascultăm poveștile și să ne asigurăm că fie tranzacționați, fie închiriați, toată lumea câștigă.",
+    faq_k: "Întrebări frecvente",
+    faq_h: "Tot ce vrei să știi despre VerifiCasa",
+    faq: [
+      { q: "Cum funcționează verificarea pe teren?", a: "Agenții VerifiCasa inspectează fizic fiecare proprietate înainte de publicare — verificăm actele, starea reală, zgomotul (dB) și presiunea apei, apoi emitem un raport atașat anunțului." },
+      { q: "Ce este turul 3D / AI?", a: "Este un tur virtual generat din pozele proprietarului, pe care îl poți explora online din telefon sau calculator înainte să mergi la o vizionare fizică." },
+      { q: "Cât costă să listez o proprietate?", a: "Publică anunțul gratuit din cont. Detaliile despre pachete, comisioane și contracte se discută direct cu agenții noștri VerifiCasa pe WhatsApp sau email." },
+      { q: "În ce orașe sunteți activi?", a: "Acoperim Iași și Huși în acest moment și ne extindem treptat în toată România." },
+      { q: "Cum contactez un proprietar sau agent?", a: "Direct din anunț — prin mesagerie în platformă, telefon sau WhatsApp, fără să-ți expui numărul până nu decizi tu." },
+      { q: "Pot salva proprietatea sau căutarea pentru mai târziu?", a: "Da — cu un cont gratuit poți salva proprietatea (inima de pe anunț) sau întreaga căutare, ca s-o regăsești oricând în cont." },
+    ],
   },
   en: {
     hero_badge: "VerifiCasa · Real Estate Agency",
@@ -101,6 +111,16 @@ const CONTENT = {
     service_owners_d: "Present their properties at the highest level of professionalism, attracting only genuinely interested and serious clients.",
     story_p5: "VerifiCasa isn't just about properties; it's about people, time and trust. What started as a simple idea has grown into a brand dedicated to total efficiency and transparency.",
     story_p6: "We're here to grow together with you, to listen to your stories and to make sure that whether you're transacting or renting, everyone wins.",
+    faq_k: "Frequently asked questions",
+    faq_h: "Everything you want to know about VerifiCasa",
+    faq: [
+      { q: "How does the on-site verification work?", a: "VerifiCasa agents physically inspect every property before it's published — we check the paperwork, real condition, noise (dB) and water pressure, then issue a report attached to the listing." },
+      { q: "What is the 3D / AI tour?", a: "It's a virtual tour generated from the owner's photos, which you can explore online from your phone or computer before going to an in-person viewing." },
+      { q: "How much does it cost to list a property?", a: "Publishing your listing is free. Package, commission and contract details are discussed directly with our VerifiCasa agents on WhatsApp or email." },
+      { q: "Which cities are you active in?", a: "We currently cover Iași and Huși, and we're gradually expanding across all of Romania." },
+      { q: "How do I contact an owner or agent?", a: "Directly from the listing — via in-app messaging, phone or WhatsApp, without exposing your number until you decide to." },
+      { q: "Can I save a property or a search for later?", a: "Yes — with a free account you can save a property (the heart on the listing) or an entire search, so you can find it again anytime in your account." },
+    ],
   },
 };
 
