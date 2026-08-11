@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import {
@@ -13,11 +13,39 @@ import { useToast } from "@/components/ui/use-toast";
 import PropertyCard from "@/components/PropertyCard";
 import MapPropertySheet from "@/components/MapPropertySheet";
 import MapInfoCards from "@/components/MapInfoCards";
+import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
+import { getCities, getZones } from "@/components/locations";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   MapPin, Heart, X, ArrowLeft, Plus, Minus, PenLine, Trash2, Check, Loader2,
+  Search, Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, RotateCcw,
 } from "lucide-react";
 import { ROMANIA_COUNTIES, ROMANIA_CENTER, ROMANIA_MAX_BOUNDS } from "@/lib/romaniaCounties";
+
+// Aceleași filtre ca pe /search — reutilizate 1:1 aici ca lista și harta
+// să răspundă la exact aceleași criterii, indiferent de unde intri.
+const VERIF_FILTERS = [
+  { key: "ai", labelKey: "tg_ai", icon: Sparkles, test: (p) => !!p.tour_3d_url || !!p.ai_video_url || !!p.ai_tour_verified },
+  { key: "field", labelKey: "tg_field", icon: ShieldCheck, test: (p) => p.owner_verified || p.verification_level === "field_certified" || p.ai_tour_verified },
+  { key: "pet", labelKey: "tg_pet", icon: PawPrint, test: (p) => !!p.pet_friendly },
+  { key: "nofee", labelKey: "tg_nofee", icon: BadgePercent, test: (p) => !!p.commission_free },
+  { key: "studio", labelKey: "type_studio_vc", icon: Home, test: (p) => ["Garsonieră", "Studio"].includes(p.property_type) },
+  { key: "2camere", labelKey: "type_2_vc", icon: Home, test: (p) => p.property_type === "2 Camere" },
+  { key: "parking", labelKey: "sr_parking", icon: Home, test: (p) => !!p.parking },
+];
+const makeFairness = (t) => [
+  { value: "", label: t("sr_fairness_all") },
+  { value: "sub_piata", label: t("sr_fairness_below") },
+  { value: "corect", label: t("sr_fairness_fair") },
+  { value: "peste_medie", label: t("sr_fairness_above") },
+];
+const makeSort = (t) => [
+  { value: "", label: t("sr_sort") },
+  { value: "newest", label: t("sr_sort_newest") },
+  { value: "price_asc", label: t("sr_sort_asc") },
+  { value: "price_desc", label: t("sr_sort_desc") },
+];
+const norm = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 
 const PIN_RENT = "#3b82f6";
 const PIN_SALE = "#00A859";
