@@ -7,6 +7,7 @@ import {
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useCountry } from "@/components/CountryContext";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -222,7 +223,7 @@ export default function About() {
       </section>
 
       {/* TRUST BAR */}
-      <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
         <div className="grid gap-4 rounded-3xl border border-border bg-white p-8 shadow-soft sm:grid-cols-3 dark:bg-card">
           {c.trust.map((b, i) => (
             <div key={i} className="flex items-start gap-3">
@@ -233,6 +234,28 @@ export default function About() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* FAQ — accordion închis, secțiune întunecată, ca la Zillow */}
+      <section className="bg-navy-deep py-16 text-white sm:py-20">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 text-center sm:mb-10">
+            <p className="text-xs font-bold uppercase tracking-wider text-gold">{c.faq_k}</p>
+            <h2 className="mt-1 font-heading text-2xl font-bold sm:text-3xl">{c.faq_h}</h2>
+          </div>
+          <Accordion type="single" collapsible className="divide-y divide-white/10">
+            {c.faq.map((item, i) => (
+              <AccordionItem key={i} value={`faq-${i}`} className="border-white/10">
+                <AccordionTrigger className="font-heading text-base font-semibold text-white hover:no-underline sm:text-lg">
+                  {item.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm leading-relaxed text-white/70 sm:text-base">
+                  {item.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </section>
     </div>
