@@ -13,7 +13,7 @@ export default function ActionCards({ onRequestInspection }) {
 
   const cards = [
     {
-      img: "/images/illustrations/action-search.webp",
+      img: "/images/illustrations/action-search.svg",
       title: en ? "Find a verified rental" : "Caută o chirie verificată",
       desc: en
         ? "Browse listings that have been checked on-site, with real photos and honest pricing."
@@ -22,7 +22,7 @@ export default function ActionCards({ onRequestInspection }) {
       to: "/search",
     },
     {
-      img: "/images/illustrations/action-list.webp",
+      img: "/images/illustrations/action-list.svg",
       title: en ? "List your property" : "Listează-ți proprietatea",
       desc: en
         ? "Post your listing for free and reach tenants looking for verified homes."
@@ -31,7 +31,7 @@ export default function ActionCards({ onRequestInspection }) {
       to: "/post-property",
     },
     {
-      img: "/images/illustrations/action-inspect.webp",
+      img: "/images/illustrations/action-inspect.svg",
       title: en ? "Request an inspection" : "Solicită o inspecție pe teren",
       desc: en
         ? "Our team verifies the property in person, so you rent with no surprises."
