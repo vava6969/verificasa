@@ -379,7 +379,7 @@ export default function MapSearch() {
   // Reset pagination when filters change
   useEffect(() => {
     setDisplayCount(PAGE_SIZE);
-  }, [bounds, polygonPoints]);
+  }, [bounds, polygonPoints, cityParam, zoneParam, typeParam, qParam, activeFilters, budget, roomsMin, surfaceMin, furnished, swap, fairness, sort]);
 
   const displayedProperties = visibleProperties.slice(0, displayCount);
   const hasMore = displayedProperties.length < visibleProperties.length;
