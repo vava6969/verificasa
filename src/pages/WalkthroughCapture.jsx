@@ -290,6 +290,30 @@ export default function WalkthroughCapture() {
     return () => clearInterval(id);
   }, [stage, mode]);
 
+  // Verificare periodică, silențioasă, cât o cameră e încă în procesare la Kiri
+  // Engine — poate dura de la câteva minute până la 20-30 min, după coadă. Așa
+  // nu mai trebuie să apsăm manual "Verifică" din 2 în 2 minute.
+  useEffect(() => {
+    if (stage !== "summary") return;
+    const pendingIds = rooms
+      .filter((r) => r.model_3d_serial && !["success", "failed", "expired"].includes(r.model_3d_status))
+      .map((r) => r.id);
+    if (!pendingIds.length) return;
+    const id = setInterval(() => {
+      pendingIds.forEach((rid) => {
+        base44.functions.invoke("CheckKiriScanStatus", { tour_room_id: rid })
+          .then((res) => {
+            const data = res?.data || res || {};
+            if (data.error) return;
+            setRooms((cur) => cur.map((room) => room.id === rid ? { ...room, model_3d_status: data.status, model_3d_url: data.model_3d_url || room.model_3d_url } : room));
+            if (data.status === "success") toast({ title: en ? "3D model ready!" : "Modelul 3D e gata!" });
+          })
+          .catch(() => {});
+      });
+    }, 15000);
+    return () => clearInterval(id);
+  }, [stage, rooms]);
+
   const previewUrls = useMemo(() => pendingFrames.map((b) => URL.createObjectURL(b)), [pendingFrames]);
   useEffect(() => () => { previewUrls.forEach((u) => URL.revokeObjectURL(u)); }, [previewUrls]);
 
