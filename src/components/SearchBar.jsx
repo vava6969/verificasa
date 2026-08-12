@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, MapPin, Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock } from "lucide-react";
+import { Search, MapPin, Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCountry } from "@/components/CountryContext";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
@@ -24,6 +24,7 @@ export default function SearchBar({ compact = false, onSubmitted }) {
   const TOGGLES = [
     { key: "ai", label: t("tg_ai"), icon: Sparkles },
     { key: "field", label: t("tg_field"), icon: ShieldCheck },
+    { key: "tour360", label: t("tab_tour360"), icon: RotateCw },
     { key: "pet", label: t("tg_pet"), icon: PawPrint },
     { key: "nofee", label: t("tg_nofee"), icon: BadgePercent },
     { key: "garant0", label: t("tg_garant0"), icon: Lock },
