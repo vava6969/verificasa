@@ -73,7 +73,11 @@ export default function PropertyDetail() {
         if (p.created_by_id) {
           base44.entities.User.get(p.created_by_id).then((u) => { if (!cancelled) setOwnerUser(u); }).catch(() => {});
         }
-        if (p.has_walkthrough_tour) {
+        // Vizitatorii văd camerele turului doar după ce proprietarul a apăsat
+        // "Finalizează turul" (has_walkthrough_tour) — dar proprietarul/adminul
+        // trebuie să-și vadă camerele și înainte de asta, cât testează o scanare.
+        const isOwnerOrAdmin = !!user && (["SUPER_ADMIN", "ADMIN"].includes((user.role || "").toUpperCase()) || (user.id && p.created_by_id === user.id));
+        if (p.has_walkthrough_tour || isOwnerOrAdmin) {
           base44.entities.PropertyTourRoom.filter({ property_id: id }, "order_index", 50)
             .then((rows) => { if (!cancelled) setTourRooms(rows || []); })
             .catch(() => {});
