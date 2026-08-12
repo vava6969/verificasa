@@ -10,23 +10,33 @@ import WalkthroughViewer from "@/components/WalkthroughViewer";
 import { useTourOrientation, requestOrientationPermission } from "@/lib/useTourOrientation";
 import {
   X, Home, RotateCw, Sparkles, Camera, Check, Trash2, Plus,
-  Loader2, ChevronLeft, AlertTriangle, Compass,
+  Loader2, ChevronLeft, AlertTriangle, Compass, Video, Box,
 } from "lucide-react";
 
 // Tur ghidat: în loc să tragem poze "oarbe" la interval fix, folosim
 // senzorii de orientare ai telefonului ca să știm exact unde se uită
 // camera și declanșăm captura DOAR când proprietarul e aliniat cu
 // următorul reper și stă suficient de nemișcat (fără blur de mișcare).
-// Cadre uniform distanțate unghiular => playback mult mai neted în viewer.
+// Cadre uniform distanțate unghiular => playback mult mai neted în viewer,
+// plus o panoramă reală lipită automat din ele (vezi panoramaStitch.js).
 // Dacă dispozitivul n-are busolă/giroscop (sau refuză permisiunea pe iOS),
 // trecem automat pe modul vechi, cu temporizator.
+//
+// Pe lângă panoramă, există și un mod "Scanare 3D" (beta): înregistrezi un
+// video scurt plimbându-te prin cameră, îl trimitem la Kiri Engine
+// (serviciu extern, are nevoie de cont + API key propriu — vezi
+// KIRI_ENGINE_API_KEY în Settings → Secrets) și primim înapoi un model 3D
+// real, explorabil liber, nu doar dintr-un punct fix.
 const TARGET_COUNT = 24; // un cadru la fiecare 15°
 const ALIGN_TOLERANCE_DEG = 6;
 const MAX_ANGULAR_VELOCITY = 18; // grade/secundă — sub asta considerăm telefonul "nemișcat"
 const STABLE_DWELL_MS = 160;
 const CAPTURE_INTERVAL_MS = 420; // doar pentru modul fallback (fără senzori)
 const MAX_ROOMS = 10;
+const MAX_RECORD_SECONDS = 170; // sub limita de 3 min a Kiri Engine, cu marjă
 const QUICK_ROOMS = ["Living", "Bucătărie", "Dormitor", "Baie", "Hol", "Balcon / Terasă"];
+
+const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
 export default function WalkthroughCapture() {
   const { id } = useParams();
@@ -39,16 +49,21 @@ export default function WalkthroughCapture() {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [rooms, setRooms] = useState([]); // camere deja salvate (DB + sesiunea curentă)
-  const [stage, setStage] = useState("intro"); // intro | live | aiming | review | summary
+  const [stage, setStage] = useState("intro"); // intro | live | aiming | review | recording | review3d | summary
+  const [captureMode, setCaptureMode] = useState("panorama"); // panorama | scan3d
   const [roomName, setRoomName] = useState("");
   const [cameraError, setCameraError] = useState(null);
   const [pendingFrames, setPendingFrames] = useState([]);
+  const [pendingVideo, setPendingVideo] = useState(null);
   const [saving, setSaving] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [capturedMask, setCapturedMask] = useState(() => Array(TARGET_COUNT).fill(false));
   const [flash, setFlash] = useState(false);
   const [timerCountdown, setTimerCountdown] = useState(3);
   const [timerPhase, setTimerPhase] = useState("countdown"); // countdown | shooting (doar mod fallback)
+  const [recording, setRecording] = useState(false);
+  const [recordSeconds, setRecordSeconds] = useState(0);
+  const [scanBusyRoomId, setScanBusyRoomId] = useState(null);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -57,6 +72,9 @@ export default function WalkthroughCapture() {
   const baseGrabbedRef = useRef(false);
   const anchorRef = useRef(0);
   const dwellTimerRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const recordedChunksRef = useRef([]);
+  const recordTimerRef = useRef(null);
 
   // Senzorii pornesc de cum ajungem pe ecranul cu camera (nu doar în timpul
   // capturii), ca detecția "suportat / nesuportat" să se rezolve din timp.
@@ -79,7 +97,12 @@ export default function WalkthroughCapture() {
         setProperty(p);
         const existing = await base44.entities.PropertyTourRoom.filter({ property_id: id }, "order_index", 100).catch(() => []);
         if (!cancelled && existing?.length) {
-          setRooms(existing.map((r) => ({ id: r.id, room_name: r.room_name, frame_urls: r.frame_urls || [] })));
+          setRooms(existing.map((r) => ({
+            id: r.id, room_name: r.room_name, frame_urls: r.frame_urls || [],
+            panorama_url: r.panorama_url, panorama_vfov_deg: r.panorama_vfov_deg,
+            model_3d_status: r.model_3d_status, model_3d_serial: r.model_3d_serial, model_3d_url: r.model_3d_url,
+            capture_video_url: r.capture_video_url,
+          })));
           setStage("summary");
         }
       } catch (e) {
@@ -95,7 +118,11 @@ export default function WalkthroughCapture() {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
   };
-  useEffect(() => () => { stopCamera(); if (dwellTimerRef.current) clearTimeout(dwellTimerRef.current); }, []);
+  useEffect(() => () => {
+    stopCamera();
+    if (dwellTimerRef.current) clearTimeout(dwellTimerRef.current);
+    if (recordTimerRef.current) clearInterval(recordTimerRef.current);
+  }, []);
 
   // Re-atașează stream-ul existent la revenirea pe ecranul de captură (fără a
   // cere din nou permisiunea camerei între camere).
@@ -172,7 +199,7 @@ export default function WalkthroughCapture() {
     return () => { cancelled = true; clearInterval(interval); };
   }, [stage, mode, timerPhase]);
 
-  // Comun ambelor moduri: când toate cadrele sunt gata, trecem la previzualizare.
+  // Comun ambelor moduri de panoramă: când toate cadrele sunt gata, trecem la previzualizare.
   useEffect(() => {
     if (stage === "aiming" && capturedMask.length && capturedMask.every(Boolean)) {
       setPendingFrames(framesRef.current.slice(0, TARGET_COUNT));
@@ -180,8 +207,19 @@ export default function WalkthroughCapture() {
     }
   }, [capturedMask, stage]);
 
+  // Oprește automat înregistrarea video dacă atinge durata maximă.
+  useEffect(() => {
+    if (stage === "recording" && recording && recordSeconds >= MAX_RECORD_SECONDS) {
+      stopRecording();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recordSeconds, stage, recording]);
+
   const previewUrls = useMemo(() => pendingFrames.map((b) => URL.createObjectURL(b)), [pendingFrames]);
   useEffect(() => () => { previewUrls.forEach((u) => URL.revokeObjectURL(u)); }, [previewUrls]);
+
+  const pendingVideoUrl = useMemo(() => (pendingVideo ? URL.createObjectURL(pendingVideo) : null), [pendingVideo]);
+  useEffect(() => () => { if (pendingVideoUrl) URL.revokeObjectURL(pendingVideoUrl); }, [pendingVideoUrl]);
 
   if (loading) {
     return <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-background"><Loader2 className="h-6 w-6 animate-spin text-emerald" /></div>;
@@ -240,6 +278,11 @@ export default function WalkthroughCapture() {
 
   const beginCapture = () => {
     if (!roomName.trim()) return;
+    if (captureMode === "scan3d") {
+      setStage("recording");
+      startRecording();
+      return;
+    }
     anchorRef.current = heading;
     baseGrabbedRef.current = false;
     framesRef.current = [];
@@ -291,6 +334,98 @@ export default function WalkthroughCapture() {
     }
   };
 
+  const pickVideoMimeType = () => {
+    const candidates = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm", "video/mp4"];
+    return candidates.find((t) => window.MediaRecorder?.isTypeSupported?.(t)) || "";
+  };
+
+  const startRecording = () => {
+    if (!streamRef.current || !window.MediaRecorder) {
+      setCameraError(en ? "Video recording isn't supported on this device." : "Înregistrarea video nu e suportată pe acest dispozitiv.");
+      setStage("live");
+      return;
+    }
+    recordedChunksRef.current = [];
+    const mimeType = pickVideoMimeType();
+    let rec;
+    try {
+      rec = mimeType ? new MediaRecorder(streamRef.current, { mimeType }) : new MediaRecorder(streamRef.current);
+    } catch (e) {
+      setCameraError(en ? "Couldn't start video recording." : "Nu am putut porni înregistrarea video.");
+      setStage("live");
+      return;
+    }
+    rec.ondataavailable = (e) => { if (e.data && e.data.size > 0) recordedChunksRef.current.push(e.data); };
+    rec.onstop = () => {
+      const blob = new Blob(recordedChunksRef.current, { type: rec.mimeType || "video/webm" });
+      setPendingVideo(blob);
+      setStage("review3d");
+    };
+    mediaRecorderRef.current = rec;
+    rec.start();
+    setRecording(true);
+    setRecordSeconds(0);
+    recordTimerRef.current = setInterval(() => setRecordSeconds((s) => s + 1), 1000);
+  };
+
+  const stopRecording = () => {
+    if (recordTimerRef.current) { clearInterval(recordTimerRef.current); recordTimerRef.current = null; }
+    setRecording(false);
+    try { mediaRecorderRef.current?.stop(); } catch (e) {}
+  };
+
+  const retakeScan3d = () => {
+    setPendingVideo(null);
+    setStage("live");
+  };
+
+  const confirmScan3d = async () => {
+    if (!pendingVideo) return;
+    setSaving(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file: pendingVideo });
+      const order_index = rooms.length;
+      const name = roomName.trim();
+      const rec = await base44.entities.PropertyTourRoom.create({
+        property_id: id, room_name: name, order_index, frame_urls: [],
+        capture_video_url: file_url, model_3d_status: "uploading",
+      });
+      setRooms((r) => [...r, { id: rec.id, room_name: name, frame_urls: [], capture_video_url: file_url, model_3d_status: "uploading" }]);
+      setPendingVideo(null);
+      setRoomName("");
+      setStage("summary");
+      toast({ title: en ? "Uploading for 3D scan…" : "Se trimite pentru scanare 3D…" });
+      base44.functions.invoke("StartKiriScan", { tour_room_id: rec.id, video_url: file_url })
+        .then((res) => {
+          const data = res?.data || res || {};
+          setRooms((cur) => cur.map((room) => room.id === rec.id ? { ...room, model_3d_status: data.error ? "failed" : "processing", model_3d_serial: data.serial } : room));
+          if (data.error) toast({ title: data.error, variant: "destructive" });
+        })
+        .catch(() => {
+          setRooms((cur) => cur.map((room) => room.id === rec.id ? { ...room, model_3d_status: "failed" } : room));
+        });
+    } catch (e) {
+      toast({ title: en ? "Couldn't upload the scan video" : "Eroare la încărcarea video-ului de scanare", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const checkScanStatus = async (roomId) => {
+    setScanBusyRoomId(roomId);
+    try {
+      const res = await base44.functions.invoke("CheckKiriScanStatus", { tour_room_id: roomId });
+      const data = res?.data || res || {};
+      if (data.error) { toast({ title: data.error, variant: "destructive" }); return; }
+      setRooms((cur) => cur.map((room) => room.id === roomId ? { ...room, model_3d_status: data.status, model_3d_url: data.model_3d_url || room.model_3d_url } : room));
+      if (data.status === "success") toast({ title: en ? "3D model ready!" : "Modelul 3D e gata!" });
+    } catch (e) {
+      toast({ title: en ? "Couldn't check status" : "Eroare la verificarea statusului", variant: "destructive" });
+    } finally {
+      setScanBusyRoomId(null);
+    }
+  };
+
   const deleteRoom = async (roomId, idx) => {
     setRooms((r) => r.filter((_, i) => i !== idx));
     if (roomId) { try { await base44.entities.PropertyTourRoom.delete(roomId); } catch (e) {} }
@@ -310,7 +445,7 @@ export default function WalkthroughCapture() {
     }
   };
 
-  const cameraStage = ["live", "aiming", "review"].includes(stage);
+  const cameraStage = ["live", "aiming", "review", "recording", "review3d"].includes(stage);
   const nextTargetIdx = capturedMask.findIndex((c) => !c);
   const capturedCount = capturedMask.filter(Boolean).length;
 
@@ -347,7 +482,15 @@ export default function WalkthroughCapture() {
 
             {stage === "live" && (
               <div className="absolute inset-x-0 bottom-0 rounded-t-3xl bg-navy-deep/90 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur-md">
-                <p className="text-xs font-semibold uppercase tracking-wide text-white/60">{en ? "Room name" : "Nume cameră"}</p>
+                <div className="flex gap-1.5">
+                  <button type="button" onClick={() => setCaptureMode("panorama")} className={`flex-1 rounded-lg py-2 text-xs font-bold transition ${captureMode === "panorama" ? "bg-emerald text-white" : "bg-white/10 text-white/60"}`}>
+                    {en ? "360° panorama" : "Panoramă 360°"}
+                  </button>
+                  <button type="button" onClick={() => setCaptureMode("scan3d")} className={`flex-1 rounded-lg py-2 text-xs font-bold transition ${captureMode === "scan3d" ? "bg-emerald text-white" : "bg-white/10 text-white/60"}`}>
+                    {en ? "3D scan (beta)" : "Scanare 3D (beta)"}
+                  </button>
+                </div>
+                <p className="mt-2.5 text-xs font-semibold uppercase tracking-wide text-white/60">{en ? "Room name" : "Nume cameră"}</p>
                 <input
                   value={roomName}
                   onChange={(e) => setRoomName(e.target.value)}
@@ -362,15 +505,24 @@ export default function WalkthroughCapture() {
                   ))}
                 </div>
                 <p className="mt-3 flex items-center gap-1.5 text-xs text-white/60">
-                  <Compass className="h-3.5 w-3.5 shrink-0" />
-                  {mode === "orientation"
-                    ? (en ? "Motion sensors ready — we'll guide you to each frame." : "Senzori de mișcare gata — te ghidăm spre fiecare cadru.")
-                    : mode === "timer"
-                    ? (en ? "No compass sensor found — using simple timed capture." : "Nu am găsit senzor de busolă — folosim captura simplă, cu temporizator.")
-                    : (en ? "Checking your device's motion sensors…" : "Verificăm senzorii de mișcare ai telefonului…")}
+                  {captureMode === "scan3d" ? (
+                    <>
+                      <Video className="h-3.5 w-3.5 shrink-0" />
+                      {en ? "Walk slowly around the room, cover every corner (up to ~3 min)." : "Mergi încet prin cameră, acoperă fiecare colț (până la ~3 min)."}
+                    </>
+                  ) : (
+                    <>
+                      <Compass className="h-3.5 w-3.5 shrink-0" />
+                      {mode === "orientation"
+                        ? (en ? "Motion sensors ready — we'll guide you to each frame." : "Senzori de mișcare gata — te ghidăm spre fiecare cadru.")
+                        : mode === "timer"
+                        ? (en ? "No compass sensor found — using simple timed capture." : "Nu am găsit senzor de busolă — folosim captura simplă, cu temporizator.")
+                        : (en ? "Checking your device's motion sensors…" : "Verificăm senzorii de mișcare ai telefonului…")}
+                    </>
+                  )}
                 </p>
                 <button type="button" onClick={beginCapture} disabled={!roomName.trim()} className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-emerald py-3 text-sm font-bold text-white transition hover:bg-emerald/90 disabled:cursor-not-allowed disabled:opacity-40">
-                  <RotateCw className="h-4 w-4" /> {en ? "Start rotation capture" : "Pornește rotația"}
+                  {captureMode === "scan3d" ? (<><Video className="h-4 w-4" /> {en ? "Start recording" : "Pornește înregistrarea"}</>) : (<><RotateCw className="h-4 w-4" /> {en ? "Start rotation capture" : "Pornește rotația"}</>)}
                 </button>
               </div>
             )}
@@ -413,6 +565,22 @@ export default function WalkthroughCapture() {
                 <p className="text-sm font-medium text-white/80">{en ? "Calibrating…" : "Calibrăm…"}</p>
               </div>
             )}
+
+            {stage === "recording" && (
+              <div className="absolute inset-0 flex flex-col items-center justify-between p-6">
+                <span className="mt-[calc(3rem+env(safe-area-inset-top))] flex items-center gap-2 rounded-full bg-rose-600 px-4 py-2 text-sm font-bold text-white">
+                  <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-white" /> REC {fmtTime(recordSeconds)}
+                </span>
+                <div className="mb-8 flex flex-col items-center gap-4">
+                  <p className="max-w-[260px] text-center text-sm font-semibold text-white drop-shadow">
+                    {en ? "Walk slowly, cover every corner and wall" : "Mergi încet, acoperă fiecare colț și perete"}
+                  </p>
+                  <button type="button" onClick={stopRecording} aria-label={en ? "Stop recording" : "Oprește înregistrarea"} className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-lg">
+                    <span className="h-6 w-6 rounded-md bg-rose-600" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {stage === "review" && (
@@ -424,6 +592,22 @@ export default function WalkthroughCapture() {
                 </button>
                 <button type="button" onClick={confirmRoom} disabled={saving} className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-emerald py-2.5 text-sm font-bold text-white transition hover:bg-emerald/90 disabled:opacity-60">
                   {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />} {saving ? (en ? "Saving…" : "Se salvează…") : (en ? "Save room" : "Salvează camera")}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {stage === "review3d" && (
+            <div className="flex flex-col bg-navy-deep p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+              {pendingVideoUrl && (
+                <video src={pendingVideoUrl} controls playsInline className="aspect-[16/10] w-full rounded-2xl bg-black object-contain" />
+              )}
+              <div className="mt-3 flex gap-2">
+                <button type="button" onClick={retakeScan3d} disabled={saving} className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-white/20 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-50">
+                  <RotateCw className="h-4 w-4" /> {en ? "Retake" : "Reia"}
+                </button>
+                <button type="button" onClick={confirmScan3d} disabled={saving} className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-emerald py-2.5 text-sm font-bold text-white transition hover:bg-emerald/90 disabled:opacity-60">
+                  {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Box className="h-4 w-4" />} {saving ? (en ? "Uploading…" : "Se încarcă…") : (en ? "Send for 3D scan" : "Trimite pentru scanare 3D")}
                 </button>
               </div>
             </div>
@@ -463,6 +647,10 @@ export default function WalkthroughCapture() {
                 ))}
               </div>
 
+              <p className="mt-4 text-xs text-muted-foreground">
+                {en ? "There's also a beta " : "Există și un mod beta de "}<span className="font-semibold text-navy dark:text-foreground">{en ? "3D scan mode" : "„Scanare 3D”"}</span>{en ? " once you start — records a short walkthrough video for a real, explorable 3D model." : " odată ce pornești — înregistrează un video scurt pentru un model 3D real, explorabil."}
+              </p>
+
               {cameraError && (
                 <p className="mt-4 flex items-center justify-center gap-1.5 rounded-lg bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">
                   <AlertTriangle className="h-3.5 w-3.5 shrink-0" /> {cameraError}
@@ -485,12 +673,34 @@ export default function WalkthroughCapture() {
               <div className="mt-5 space-y-2.5">
                 {rooms.map((r, i) => (
                   <div key={r.id || i} className="flex items-center gap-3 rounded-xl border border-border bg-white p-2.5 dark:bg-card">
-                    <div className="h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-secondary">
-                      {r.frame_urls?.[0] && <img src={r.frame_urls[0]} alt={r.room_name} className="h-full w-full object-cover" />}
+                    <div className="flex h-14 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-secondary">
+                      {r.frame_urls?.[0] ? (
+                        <img src={r.frame_urls[0]} alt={r.room_name} className="h-full w-full object-cover" />
+                      ) : r.capture_video_url ? (
+                        <Video className="h-5 w-5 text-muted-foreground" />
+                      ) : null}
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-heading text-sm font-bold text-navy dark:text-foreground">{r.room_name}</p>
-                      <p className="text-xs text-muted-foreground">{r.frame_urls?.length || 0} {en ? "photos" : "poze"}</p>
+                      {r.frame_urls?.length ? (
+                        <p className="text-xs text-muted-foreground">
+                          {r.frame_urls.length} {en ? "photos" : "poze"}{r.panorama_url ? ` · ${en ? "panorama" : "panoramă"}` : ""}
+                        </p>
+                      ) : r.model_3d_status && r.model_3d_status !== "none" ? (
+                        <div className="flex items-center gap-1.5">
+                          <p className={`text-xs font-semibold ${r.model_3d_status === "success" ? "text-emerald" : r.model_3d_status === "failed" ? "text-rose-600" : "text-muted-foreground"}`}>
+                            {r.model_3d_status === "success" ? (en ? "3D model ready" : "Model 3D gata")
+                              : r.model_3d_status === "failed" ? (en ? "Scan failed" : "Scanare eșuată")
+                              : r.model_3d_status === "expired" ? (en ? "Expired" : "Expirat")
+                              : (en ? "Processing 3D scan…" : "Se procesează scanarea 3D…")}
+                          </p>
+                          {r.model_3d_status !== "success" && r.model_3d_status !== "failed" && (
+                            <button type="button" onClick={() => checkScanStatus(r.id)} disabled={scanBusyRoomId === r.id} className="text-[11px] font-bold text-emerald underline disabled:opacity-50">
+                              {scanBusyRoomId === r.id ? "…" : (en ? "Check" : "Verifică")}
+                            </button>
+                          )}
+                        </div>
+                      ) : null}
                     </div>
                     <button type="button" onClick={() => deleteRoom(r.id, i)} aria-label={en ? "Remove room" : "Șterge camera"} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40">
                       <Trash2 className="h-3.5 w-3.5" />
