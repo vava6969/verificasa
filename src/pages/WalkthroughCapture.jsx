@@ -701,9 +701,25 @@ export default function WalkthroughCapture() {
                     </span>
                   )}
                 </div>
-                <div className="mb-8 flex flex-col items-center gap-4">
+
+                {mode === "orientation" && (
+                  <div className="w-full max-w-md px-4">
+                    <CompassTape heading={relHeading} targetCount={SCAN_ZONE_COUNT} capturedMask={scanZonesCovered} nextIndex={nextUncoveredZoneIdx} />
+                  </div>
+                )}
+
+                <div className="mb-8 flex flex-col items-center gap-3">
+                  {scanZoneThumbs.some(Boolean) && (
+                    <div className="flex gap-1.5">
+                      {scanZoneThumbs.map((url, i) => url && (
+                        <div key={i} className="h-10 w-10 overflow-hidden rounded-lg border-2 border-emerald shadow">
+                          <img src={url} alt="" className="h-full w-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   <p className="max-w-[260px] text-center text-sm font-semibold text-white drop-shadow">
-                    {en ? "Walk slowly, cover every corner and wall" : "Mergi încet, acoperă fiecare colț și perete"}
+                    {scanHint}
                   </p>
                   <button type="button" onClick={stopRecording} aria-label={en ? "Stop recording" : "Oprește înregistrarea"} className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-lg">
                     <span className="h-6 w-6 rounded-md bg-rose-600" />
