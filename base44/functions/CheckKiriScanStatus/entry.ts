@@ -36,7 +36,10 @@ export default async function (req: Request): Promise<Response> {
 
     if (status !== "success") {
       await svc.entities.PropertyTourRoom.update(tour_room_id, { model_3d_status: status });
-      return Response.json({ ok: true, status });
+      // Kiri Engine nu documentează un motiv structurat pentru eșec la polling (doar la
+      // upload-ul inițial) — dacă totuși trimite un `msg` diferit de "success", îl afișăm.
+      const detail = status === "failed" && statusJson?.msg && statusJson.msg !== "success" ? statusJson.msg : undefined;
+      return Response.json({ ok: true, status, ...(detail ? { detail } : {}) });
     }
 
     const zipRes = await fetch(`https://api.kiriengine.app/api/v1/open/model/getModelZip?serialize=${encodeURIComponent(room.model_3d_serial)}`, {
