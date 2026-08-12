@@ -212,7 +212,6 @@ export default function WalkthroughCapture() {
     if (stage === "recording" && recording && recordSeconds >= MAX_RECORD_SECONDS) {
       stopRecording();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recordSeconds, stage, recording]);
 
   const previewUrls = useMemo(() => pendingFrames.map((b) => URL.createObjectURL(b)), [pendingFrames]);
