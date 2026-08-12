@@ -233,7 +233,7 @@ export default function PropertyDetail() {
               </button>
             </div>
           ) : tab === "tour360" ? (
-            <WalkthroughViewer rooms={tourRooms.map((r) => ({ room_name: r.room_name, frame_urls: r.frame_urls }))} />
+            <WalkthroughViewer rooms={tourRooms} />
           ) : (
             <div className="select-none">
               <div
