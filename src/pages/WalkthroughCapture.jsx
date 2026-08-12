@@ -583,9 +583,16 @@ export default function WalkthroughCapture() {
 
             {stage === "recording" && (
               <div className="absolute inset-0 flex flex-col items-center justify-between p-6">
-                <span className="mt-[calc(3rem+env(safe-area-inset-top))] flex items-center gap-2 rounded-full bg-rose-600 px-4 py-2 text-sm font-bold text-white">
-                  <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-white" /> REC {fmtTime(recordSeconds)}
-                </span>
+                <div className="mt-[calc(3rem+env(safe-area-inset-top))] flex flex-col items-center gap-2">
+                  <span className="flex items-center gap-2 rounded-full bg-rose-600 px-4 py-2 text-sm font-bold text-white">
+                    <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-white" /> REC {fmtTime(recordSeconds)}
+                  </span>
+                  {mode === "orientation" && (
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold backdrop-blur-md transition-colors ${velocity > MAX_SCAN_PAN_VELOCITY_DEG ? "bg-amber-500/90 text-white" : "bg-white/15 text-white/75"}`}>
+                      {velocity > MAX_SCAN_PAN_VELOCITY_DEG ? (en ? "Slow down — moving too fast" : "Încetinește — te miști prea repede") : (en ? "Good pace" : "Ritm bun")}
+                    </span>
+                  )}
+                </div>
                 <div className="mb-8 flex flex-col items-center gap-4">
                   <p className="max-w-[260px] text-center text-sm font-semibold text-white drop-shadow">
                     {en ? "Walk slowly, cover every corner and wall" : "Mergi încet, acoperă fiecare colț și perete"}
