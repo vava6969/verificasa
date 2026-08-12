@@ -1,29 +1,24 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { MapPin } from "lucide-react";
-import { getCities, getZones } from "@/components/locations";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
 import GooglePlacesAutocomplete from "@/components/GooglePlacesAutocomplete";
 import { Field, inputCls } from "./wizardUi";
 
 export default function StepLocation({ form, set, country }) {
-  const cities = useMemo(() => getCities(country), [country]);
-  const zones = useMemo(() => getZones(country, form.city), [country, form.city]);
-
   return (
     <div className="space-y-5">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Oraș" required>
-          <select value={form.city} onChange={(e) => set({ city: e.target.value, zone: "" })} className={inputCls}>
-            <option value="">Alege orașul</option>
-            {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </Field>
-        <Field label="Zonă / Cartier">
-          <select value={form.zone} onChange={(e) => set({ zone: e.target.value })} disabled={!form.city} className={inputCls}>
-            <option value="">Alege zona</option>
-            {zones.map((z) => <option key={z} value={z}>{z}</option>)}
-          </select>
-        </Field>
-      </div>
+      <Field label="Oraș și zonă" required>
+        <div className={inputCls}>
+          <LocationAutocomplete
+            country={country}
+            value={{ city: form.city, zone: form.zone }}
+            onSelect={({ city, zone }) => set({ city, zone })}
+            placeholder="Scrie orașul (ex: Cluj-Napoca)"
+            includeCounties={false}
+            icon={MapPin}
+          />
+        </div>
+      </Field>
 
       <div className="rounded-2xl border border-emerald/30 bg-emerald-soft/40 p-4 dark:bg-emerald-soft/10">
         <p className="flex items-center gap-2 font-heading text-sm font-bold text-navy dark:text-foreground">
