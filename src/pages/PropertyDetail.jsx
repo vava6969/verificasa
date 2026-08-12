@@ -127,6 +127,9 @@ export default function PropertyDetail() {
   const images = p.images?.length ? p.images : [];
   const isAdmin = user && ["SUPER_ADMIN", "ADMIN"].includes((user.role || "").toUpperCase());
   const canEdit = !!user && (isAdmin || (user.id && p.created_by_id === user.id));
+  // Doar pentru proprietar/admin, ca să poată verifica live cum se publică o scanare 3D,
+  // indiferent de status — tab-ul public "Tur 360°" ascunde intenționat camerele nefinalizate.
+  const scan3dRooms = tourRooms.filter((r) => r.capture_video_url);
 
   const toggleSave = async () => {
     if (!user) { navigate("/login"); return; }
