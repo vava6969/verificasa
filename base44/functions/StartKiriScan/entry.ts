@@ -40,9 +40,10 @@ export default async function (req: Request): Promise<Response> {
     const videoRes = await fetch(video_url);
     if (!videoRes.ok) throw new Error("Nu am putut descărca video-ul de captură pentru trimitere la Kiri Engine.");
     const videoBlob = await videoRes.blob();
+    const ext = videoBlob.type?.includes("mp4") ? "mp4" : "webm";
 
     const form = new FormData();
-    form.append("videoFile", videoBlob, "capture.webm");
+    form.append("videoFile", videoBlob, `capture.${ext}`);
     form.append("modelQuality", "1"); // Medium — echilibru viteză/calitate
     form.append("textureQuality", "1"); // 2K
     form.append("fileFormat", "glb"); // direct afișabil în browser (model-viewer / Three.js)
