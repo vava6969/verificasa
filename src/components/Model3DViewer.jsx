@@ -41,7 +41,6 @@ export default function Model3DViewer({ src, className = "" }) {
   }
 
   return (
-    // eslint-disable-next-line react/no-unknown-property
     <model-viewer
       src={src}
       camera-controls="true"
