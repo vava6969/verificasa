@@ -541,6 +541,25 @@ export default function WalkthroughCapture() {
     }
   };
 
+  // Pentru o cameră care nu are încă model_3d_serial (StartKiriScan n-a apucat să
+  // pornească scanarea cu succes) — retrimitem video-ul deja încărcat, fără să mai
+  // cerem o nouă filmare.
+  const retryScan3d = async (room) => {
+    if (!room.capture_video_url) return;
+    setScanBusyRoomId(room.id);
+    try {
+      const res = await base44.functions.invoke("StartKiriScan", { tour_room_id: room.id, video_url: room.capture_video_url });
+      const data = res?.data || res || {};
+      setRooms((cur) => cur.map((r) => r.id === room.id ? { ...r, model_3d_status: data.error ? "failed" : "processing", model_3d_serial: data.serial } : r));
+      if (data.error) toast({ title: data.error, variant: "destructive" });
+      else toast({ title: en ? "Scan restarted" : "Scanare retrimisă" });
+    } catch (e) {
+      toast({ title: en ? "Couldn't retry" : "Nu am putut retrimite scanarea", description: e?.message, variant: "destructive" });
+    } finally {
+      setScanBusyRoomId(null);
+    }
+  };
+
   const deleteRoom = async (roomId, idx) => {
     setRooms((r) => r.filter((_, i) => i !== idx));
     if (roomId) { try { await base44.entities.PropertyTourRoom.delete(roomId); } catch (e) {} }
