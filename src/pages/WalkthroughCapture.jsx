@@ -60,6 +60,12 @@ const toNamedFile = (blob, baseName, fallbackType) => {
   return new File([blob], `${baseName}.${extFromMime(type)}`, { type: type || fallbackType });
 };
 
+// Împarte cei 360° în SCAN_ZONE_COUNT "colțuri" și spune în care se află telefonul acum.
+const zoneIndexFor = (heading) => {
+  const norm = ((heading % 360) + 360) % 360;
+  return Math.floor(norm / (360 / SCAN_ZONE_COUNT));
+};
+
 export default function WalkthroughCapture() {
   const { id } = useParams();
   const navigate = useNavigate();
