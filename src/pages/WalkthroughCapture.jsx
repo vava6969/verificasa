@@ -631,7 +631,7 @@ export default function WalkthroughCapture() {
                   {captureMode === "scan3d" ? (
                     <>
                       <Video className="h-3.5 w-3.5 shrink-0" />
-                      {en ? "Walk slowly around the room, cover every corner (under 2 minutes)." : "Mergi încet prin cameră, acoperă fiecare colț (sub 2 minute)."}
+                      {en ? "We'll guide you corner by corner while you film — walk slowly (under 2 minutes)." : "Te ghidăm colț cu colț cât filmezi — mergi încet (sub 2 minute)."}
                     </>
                   ) : (
                     <>
