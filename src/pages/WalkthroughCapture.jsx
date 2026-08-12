@@ -863,9 +863,14 @@ export default function WalkthroughCapture() {
                               : r.model_3d_status === "expired" ? (en ? "Expired" : "Expirat")
                               : (en ? "Processing 3D scan…" : "Se procesează scanarea 3D…")}
                           </p>
-                          {r.model_3d_status !== "success" && (
+                          {r.model_3d_status !== "success" && r.model_3d_serial && (
                             <button type="button" onClick={() => checkScanStatus(r.id)} disabled={scanBusyRoomId === r.id} className="text-[11px] font-bold text-emerald underline disabled:opacity-50">
                               {scanBusyRoomId === r.id ? "…" : (en ? "Check" : "Verifică")}
+                            </button>
+                          )}
+                          {r.model_3d_status !== "success" && !r.model_3d_serial && r.capture_video_url && (
+                            <button type="button" onClick={() => retryScan3d(r)} disabled={scanBusyRoomId === r.id} className="text-[11px] font-bold text-emerald underline disabled:opacity-50">
+                              {scanBusyRoomId === r.id ? "…" : (en ? "Retry" : "Retrimite")}
                             </button>
                           )}
                         </div>
