@@ -213,6 +213,11 @@ export default function PropertyDetail() {
                 <span className="flex items-center gap-1.5"><RotateCw className="h-3.5 w-3.5" /> {t("tab_tour360")}</span>
               </button>
             )}
+            {canEdit && scan3dRooms.length > 0 && (
+              <button onClick={() => setTab("scan3d")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "scan3d" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+                <span className="flex items-center gap-1.5"><Video className="h-3.5 w-3.5" /> Scan 3D (test)</span>
+              </button>
+            )}
           </div>
 
           {tab === "3d" ? (
