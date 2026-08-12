@@ -361,3 +361,60 @@ export function getCounties(country) {
   }
   return out.sort((a, b) => a.localeCompare(b, "ro"));
 }
+
+// Diacritic/case-insensitive normalization used for typeahead search and for
+// loose text matching against user input (accents, capitalisation, whitespace).
+export function normText(s) {
+  return (s || "")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+// Type-ahead search across județe (counties), orașe (cities), sectoare
+// (București only) and cartiere/zone, all in one pass. Returns up to
+// `limitPerGroup` matches per category, ranked by match position (prefix
+// matches first) then alphabetically. Matching is diacritic-insensitive so
+// "bucuresti" finds "București".
+export function searchLocations(country, query, { limitPerGroup = 6 } = {}) {
+  const q = normText(query);
+  const empty = { counties: [], cities: [], sectors: [], zones: [] };
+  if (!q) return empty;
+
+  const all = LOCATIONS[country] || [];
+  const counties = [];
+  const cities = [];
+  const sectors = [];
+  const zones = [];
+
+  const seenCounty = new Set();
+  for (const c of all) {
+    if (seenCounty.has(c.county)) continue;
+    const idx = normText(c.county).indexOf(q);
+    if (idx !== -1) {
+      counties.push({ type: "county", label: c.county, county: c.county, matchIndex: idx });
+      seenCounty.add(c.county);
+    }
+  }
+
+  for (const c of all) {
+    const cityIdx = normText(c.city).indexOf(q);
+    if (cityIdx !== -1) {
+      cities.push({ type: "city", label: c.city, city: c.city, county: c.county, matchIndex: cityIdx });
+    }
+    for (const z of c.zones) {
+      const zIdx = normText(z).indexOf(q);
+      if (zIdx === -1) continue;
+      const isSector = /^Sector\s+\d/i.test(z);
+      const entry = { type: isSector ? "sector" : "zone", label: z, zone: z, city: c.city, county: c.county, matchIndex: zIdx };
+      (isSector ? sectors : zones).push(entry);
+    }
+  }
+
+  const rank = (arr) => arr
+    .sort((a, b) => (a.matchIndex - b.matchIndex) || a.label.localeCompare(b.label, "ro"))
+    .slice(0, limitPerGroup);
+
+  return { counties: rank(counties), cities: rank(cities), sectors: rank(sectors), zones: rank(zones) };
+}
