@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { getCities, getZones } from "@/components/locations";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import DateField from "@/components/DateField";
@@ -75,8 +75,6 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  const cities = useMemo(() => getCities("RO"), []);
-  const zones = useMemo(() => getZones("RO", form.city), [form.city]);
   const inputCls = "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card";
   const lab = "text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70";
 
@@ -232,17 +230,16 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       {/* Locație */}
       <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Locație</p>
       <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Oraș">
-          <select value={form.city} onChange={(e) => { upd("city", e.target.value); upd("zone", ""); }} className={inputCls}>
-            <option value="">Oraș</option>
-            {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </Field>
-        <Field label="Zona / Cartier">
-          <select value={form.zone} onChange={(e) => upd("zone", e.target.value)} disabled={!form.city} className={inputCls}>
-            <option value="">Zonă</option>
-            {zones.map((z) => <option key={z} value={z}>{z}</option>)}
-          </select>
+        <Field label="Oraș și zonă">
+          <div className={inputCls}>
+            <LocationAutocomplete
+              country="RO"
+              value={{ city: form.city, zone: form.zone }}
+              onSelect={({ city, zone }) => setForm((f) => ({ ...f, city, zone }))}
+              placeholder="Scrie orașul"
+              includeCounties={false}
+            />
+          </div>
         </Field>
         <Field label="Caută pe Google Maps">
           <GooglePlacesAutocomplete
