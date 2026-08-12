@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import DateField from "@/components/DateField";
 import { Image as UIImage } from "@/components/ui/image";
 import GooglePlacesAutocomplete from "@/components/GooglePlacesAutocomplete";
-import { Upload, Trash2, Camera } from "lucide-react";
+import { Upload, Trash2, Camera, RotateCw, ChevronRight } from "lucide-react";
 import { uploadPhotos } from "@/lib/imageUpload";
 
 const MAX_PHOTOS = 20;
