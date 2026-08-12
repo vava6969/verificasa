@@ -15,7 +15,13 @@ const AUTO_SPIN_MS = 2600;
 const mod = (n, m) => ((n % m) + m) % m;
 
 export default function WalkthroughViewer({ rooms = [], initialRoomIndex = 0, onClose, className = "" }) {
-  const validRooms = useMemo(() => (rooms || []).filter((r) => r?.frame_urls?.length), [rooms]);
+  // O cameră e "gata de afișat" dacă are poze (panoramă pseudo-360), o
+  // panoramă lipită, SAU un model 3D real deja procesat cu succes — altfel
+  // (scanare 3D încă în lucru / eșuată) n-are ce arăta încă, așa că o omitem.
+  const validRooms = useMemo(
+    () => (rooms || []).filter((r) => r?.frame_urls?.length || r?.panorama_url || (r?.model_3d_status === "success" && r?.model_3d_url)),
+    [rooms]
+  );
   const [roomIdx, setRoomIdx] = useState(() => Math.min(initialRoomIndex, Math.max(validRooms.length - 1, 0)));
   const [frameIdx, setFrameIdx] = useState(0);
   const [showHint, setShowHint] = useState(true);
