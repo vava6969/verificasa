@@ -39,6 +39,24 @@ const QUICK_ROOMS = ["Living", "Bucătărie", "Dormitor", "Baie", "Hol", "Balcon
 
 const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
+// Upload-ul de fișiere vrea un obiect File cu nume + extensie (ca să se construiască
+// corect un multipart/form-data) — un Blob simplu (cum iese din canvas.toBlob sau
+// MediaRecorder) nu are nume, ceea ce poate produce un "payload invalid" la unele
+// integrări de upload.
+const extFromMime = (mime) => {
+  if (!mime) return "bin";
+  if (mime.includes("mp4")) return "mp4";
+  if (mime.includes("webm")) return "webm";
+  if (mime.includes("jpeg") || mime.includes("jpg")) return "jpg";
+  if (mime.includes("png")) return "png";
+  return "bin";
+};
+const toNamedFile = (blob, baseName, fallbackType) => {
+  if (typeof File === "undefined" || !(blob instanceof Blob)) return blob;
+  const type = blob.type || fallbackType || "";
+  return new File([blob], `${baseName}.${extFromMime(type)}`, { type: type || fallbackType });
+};
+
 export default function WalkthroughCapture() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -303,9 +321,9 @@ export default function WalkthroughCapture() {
     try {
       const [uploaded, panorama] = await Promise.all([
         Promise.all(
-          pendingFrames.map(async (blob) => {
+          pendingFrames.map(async (blob, i) => {
             const small = await compressImage(blob, 1000, 0.75);
-            const { file_url } = await base44.integrations.Core.UploadFile({ file: small });
+            const { file_url } = await base44.integrations.Core.UploadFile({ file: toNamedFile(small, `frame-${i}`, "image/jpeg") });
             return file_url;
           })
         ),
@@ -314,7 +332,7 @@ export default function WalkthroughCapture() {
       let panorama_url, panorama_vfov_deg;
       if (panorama) {
         try {
-          const up = await base44.integrations.Core.UploadFile({ file: panorama.blob });
+          const up = await base44.integrations.Core.UploadFile({ file: toNamedFile(panorama.blob, "panorama", "image/jpeg") });
           panorama_url = up.file_url;
           panorama_vfov_deg = panorama.vfovDeg;
         } catch (e) { /* panorama e un bonus — dacă upload-ul eșuează, rămânem pe pozele individuale */ }
@@ -395,7 +413,7 @@ export default function WalkthroughCapture() {
     }
     setSaving(true);
     try {
-      const uploadRes = await base44.integrations.Core.UploadFile({ file: pendingVideo });
+      const uploadRes = await base44.integrations.Core.UploadFile({ file: toNamedFile(pendingVideo, `scan-${Date.now()}`, "video/webm") });
       const file_url = uploadRes?.file_url;
       if (!file_url) throw new Error(en ? "Upload succeeded but returned no file URL." : "Upload-ul a reușit dar nu a returnat un URL de fișier.");
       const order_index = rooms.length;
