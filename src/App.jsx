@@ -36,6 +36,7 @@ import Account from '@/pages/Account';
 import MyReports from '@/pages/MyReports';
 import PostProperty from '@/pages/PostProperty';
 import UserProfile from '@/pages/UserProfile';
+import WalkthroughCapture from '@/pages/WalkthroughCapture';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -97,6 +98,8 @@ const AuthenticatedApp = () => {
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route path="/post-property" element={<PostProperty />} />
         <Route path="/messages/:id" element={<Conversation />} />
+        {/* Captură tur virtual 360° — ecran full-screen, fără chrome-ul obișnuit de site */}
+        <Route path="/tur-virtual/:id" element={<WalkthroughCapture />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
