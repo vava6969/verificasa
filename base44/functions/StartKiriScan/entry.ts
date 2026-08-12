@@ -10,28 +10,31 @@ export default async function (req: Request): Promise<Response> {
   try {
     const base44 = createClientFromRequest(req);
     const me = await base44.auth.me().catch(() => null);
-    if (!me?.id) return Response.json({ error: "Trebuie să fii autentificat." }, { status: 401 });
+    // Notă: răspundem mereu cu status 200 și un câmp `error` (nu coduri HTTP 4xx/5xx)
+    // pentru că SDK-ul base44 din browser aruncă o eroare generică ("fail code 4xx/5xx")
+    // pe orice status non-2xx și mesajul nostru detaliat nu mai ajunge la utilizator.
+    if (!me?.id) return Response.json({ error: "Trebuie să fii autentificat." });
 
     const apiKey = secrets.get("Verificasa");
     if (!apiKey) {
-      return Response.json({ error: "Scanarea 3D nu e configurată încă — lipsește secretul Verificasa." }, { status: 400 });
+      return Response.json({ error: "Scanarea 3D nu e configurată încă — lipsește secretul Verificasa." });
     }
 
     let body: any = {};
     try { body = await req.json(); } catch (_) { body = {}; }
     const { tour_room_id, video_url } = body;
     if (!tour_room_id || !video_url) {
-      return Response.json({ error: "tour_room_id și video_url sunt necesare" }, { status: 400 });
+      return Response.json({ error: "tour_room_id și video_url sunt necesare" });
     }
 
     const svc = base44.asServiceRole;
     const room = await svc.entities.PropertyTourRoom.get(tour_room_id).catch(() => null);
-    if (!room) return Response.json({ error: "Camera nu a fost găsită" }, { status: 404 });
+    if (!room) return Response.json({ error: "Camera nu a fost găsită" });
     // doar proprietarul camerei (sau un admin) poate porni o scanare pe ea
     if (room.created_by_id && room.created_by_id !== me.id) {
       const role = (me.role || "").toUpperCase();
       if (!["ADMIN", "SUPER_ADMIN"].includes(role)) {
-        return Response.json({ error: "Nu ai voie să pornești o scanare pentru această cameră." }, { status: 403 });
+        return Response.json({ error: "Nu ai voie să pornești o scanare pentru această cameră." });
       }
     }
 
@@ -58,13 +61,14 @@ export default async function (req: Request): Promise<Response> {
     const kiriJson = await kiriRes.json().catch(() => null);
     if (!kiriRes.ok || !kiriJson || kiriJson.code !== 0) {
       await svc.entities.PropertyTourRoom.update(tour_room_id, { model_3d_status: "failed" });
-      return Response.json({ error: kiriJson?.msg || "Kiri Engine a refuzat cererea." }, { status: 502 });
+      const detail = kiriJson?.msg ? `Kiri Engine: ${kiriJson.msg}` : `Kiri Engine a refuzat cererea (HTTP ${kiriRes.status}).`;
+      return Response.json({ error: detail });
     }
 
     const serial = kiriJson.data?.serialize;
     await svc.entities.PropertyTourRoom.update(tour_room_id, { model_3d_status: "processing", model_3d_serial: serial });
     return Response.json({ ok: true, serial });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ error: error?.message || String(error) });
   }
 }
