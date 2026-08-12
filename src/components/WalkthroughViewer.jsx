@@ -67,7 +67,6 @@ export default function WalkthroughViewer({ rooms = [], initialRoomIndex = 0, on
       autoSpinRafRef.current = requestAnimationFrame(tick);
     }
     return () => { cancelInertia(); cancelAutoSpin(); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomIdx, room?.frame_urls?.length]);
 
   useEffect(() => {
@@ -215,7 +214,6 @@ function CrossfadeStage({ src, alt }) {
       setTopVisible(false);
     }, 150);
     return () => cancelAnimationFrame(raf);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 
   useEffect(() => () => clearTimeout(timeoutRef.current), []);
