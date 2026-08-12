@@ -12,6 +12,7 @@ import Lightbox from "@/components/Lightbox";
 import ReportModal from "@/components/ReportModal";
 import ContactPanel from "@/components/ContactPanel";
 import PropertyGoogleMap from "@/components/PropertyGoogleMap";
+import WalkthroughViewer from "@/components/WalkthroughViewer";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,7 +20,7 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
   Calendar, ShieldCheck, CheckCircle2, ChevronLeft, ChevronRight,
-  Heart, MessageCircle, UserCircle2, Clock, Pencil, Box, Maximize2, X,
+  Heart, MessageCircle, UserCircle2, Clock, Pencil, Box, Maximize2, X, RotateCw,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
@@ -40,6 +41,7 @@ export default function PropertyDetail() {
   const [saved, setSaved] = useState(false);
   const [editing, setEditing] = useState(false);
   const [tour3dFull, setTour3dFull] = useState(false);
+  const [tourRooms, setTourRooms] = useState([]);
   const [showLb, setShowLb] = useState(false);
   const [lbIndex, setLbIndex] = useState(0);
   const viewedRef = useRef(new Set());
@@ -69,6 +71,11 @@ export default function PropertyDetail() {
         setTab(p.ai_tour_verified ? "ai" : "gallery");
         if (p.created_by_id) {
           base44.entities.User.get(p.created_by_id).then((u) => { if (!cancelled) setOwnerUser(u); }).catch(() => {});
+        }
+        if (p.has_walkthrough_tour) {
+          base44.entities.PropertyTourRoom.filter({ property_id: id }, "order_index", 50)
+            .then((rows) => { if (!cancelled) setTourRooms(rows || []); })
+            .catch(() => {});
         }
         if (shouldInc) {
           base44.functions.invoke("IncrementViews", { property_id: id }).catch(() => {});
