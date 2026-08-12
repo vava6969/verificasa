@@ -7,7 +7,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 export default async function (req: Request): Promise<Response> {
   try {
     const base44 = createClientFromRequest(req);
-    const apiKey = secrets.get("KIRI_ENGINE_API_KEY");
+    const apiKey = secrets.get("Verificasa");
     if (!apiKey) return Response.json({ error: "Scanarea 3D nu e configurată încă." }, { status: 400 });
 
     let body: any = {};
