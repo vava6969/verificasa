@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, BedDouble, Maximize, ShieldCheck, Box, Eye } from "lucide-react";
+import { MapPin, BedDouble, Maximize, ShieldCheck, Box, Eye, RotateCw } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { Image } from "@/components/ui/image";
 
@@ -42,6 +42,11 @@ export default function SimilarPropertyCard({ property, hot = false }) {
           {p.tour_3d_url && (
             <span className="flex items-center gap-0.5 rounded-full bg-navy px-2 py-0.5 text-[10px] font-bold text-mint shadow-soft ring-1 ring-mint/40">
               <Box className="h-3 w-3" /> {t("tab_3d")}
+            </span>
+          )}
+          {p.has_walkthrough_tour && (
+            <span className="flex items-center gap-0.5 rounded-full bg-indigo-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-soft">
+              <RotateCw className="h-3 w-3" /> {t("tab_tour360")}
             </span>
           )}
         </div>
