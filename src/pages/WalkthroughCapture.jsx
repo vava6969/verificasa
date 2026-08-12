@@ -92,6 +92,8 @@ export default function WalkthroughCapture() {
   const [recording, setRecording] = useState(false);
   const [recordSeconds, setRecordSeconds] = useState(0);
   const [scanBusyRoomId, setScanBusyRoomId] = useState(null);
+  const [scanZonesCovered, setScanZonesCovered] = useState(() => Array(SCAN_ZONE_COUNT).fill(false));
+  const [scanZoneThumbs, setScanZoneThumbs] = useState(() => Array(SCAN_ZONE_COUNT).fill(null));
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -104,6 +106,10 @@ export default function WalkthroughCapture() {
   const recordedChunksRef = useRef([]);
   const recordTimerRef = useRef(null);
   const recordStartRef = useRef(0);
+  const zoneCoveredRef = useRef(Array(SCAN_ZONE_COUNT).fill(false));
+  const zoneDwellMsRef = useRef(Array(SCAN_ZONE_COUNT).fill(0));
+  const headingRef = useRef(0);
+  const velRef = useRef(0);
 
   // Senzorii pornesc de cum ajungem pe ecranul cu camera (nu doar în timpul
   // capturii), ca detecția "suportat / nesuportat" să se rezolve din timp.
