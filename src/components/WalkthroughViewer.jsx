@@ -23,8 +23,7 @@ export default function WalkthroughViewer({ rooms = [], initialRoomIndex = 0, on
   useEffect(() => {
     setFrameIdx(0);
     frames.forEach((url) => { const img = new Image(); img.src = url; });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomIdx, room?.frame_urls?.length]);
+  }, [roomIdx, room?.frame_urls?.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!showHint) return;
