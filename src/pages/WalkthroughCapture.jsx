@@ -36,6 +36,8 @@ const CAPTURE_INTERVAL_MS = 420; // doar pentru modul fallback (fără senzori)
 const MAX_ROOMS = 10;
 const MAX_RECORD_SECONDS = 100; // clip scurt și predictibil ca mărime — sub orice limită uzuală de upload
 const MAX_SCAN_PAN_VELOCITY_DEG = 45; // prag de "te miști prea repede" în timpul înregistrării video (mai permisiv decât la panoramă, unde stăm pe loc)
+const SCAN_ZONE_COUNT = 4; // "colturile" camerei, ghidate live în timpul înregistrării video
+const ZONE_COVERAGE_MS = 1800; // cât timp cumulat (filmat relativ stabil) într-o zonă o considerăm "acoperită"
 const QUICK_ROOMS = ["Living", "Bucătărie", "Dormitor", "Baie", "Hol", "Balcon / Terasă"];
 
 const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
