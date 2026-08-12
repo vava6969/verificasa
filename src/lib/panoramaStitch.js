@@ -115,7 +115,7 @@ export async function stitchPanorama(frameBlobs) {
     // canvas-ului lângă 0°/360° — desenăm și copia "înfășurată".
     const wideDestW = wideSrcW; // aceeași scară (pxPerDeg) peste tot, deci 1:1
     for (let i = 0; i < n; i++) {
-      const destCenterX = (i + 0.5) * tileW - tileW / 2 + tileW / 2; // = i*tileW + tileW/2, scris explicit pt. claritate
+      const destCenterX = i * tileW + tileW / 2;
       const destX = destCenterX - wideDestW / 2;
       const brightness = brightnessFor(i);
       drawFeatheredSlice(ctx, imgs[i], wideSrcX, wideSrcW, srcH, destX, wideDestW, outH, featherPx, brightness);
