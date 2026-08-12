@@ -48,6 +48,28 @@ export default function PropertyDetail() {
   const viewedRef = useRef(new Set());
   const touchStartX = useRef(null);
 
+  // Cât o scanare 3D e încă în procesare la Kiri Engine (poate dura de la câteva
+  // minute până la 20-30 min, după coadă), verificăm periodic statusul în fundal,
+  // ca tur-ul să apară automat când e gata, fără refresh manual de pagină.
+  useEffect(() => {
+    const pendingIds = (tourRooms || [])
+      .filter((r) => r.model_3d_serial && !["success", "failed", "expired"].includes(r.model_3d_status))
+      .map((r) => r.id);
+    if (!pendingIds.length) return;
+    const id = setInterval(() => {
+      pendingIds.forEach((rid) => {
+        base44.functions.invoke("CheckKiriScanStatus", { tour_room_id: rid })
+          .then((res) => {
+            const data = res?.data || res || {};
+            if (data.error) return;
+            setTourRooms((cur) => cur.map((room) => room.id === rid ? { ...room, model_3d_status: data.status, model_3d_url: data.model_3d_url || room.model_3d_url } : room));
+          })
+          .catch(() => {});
+      });
+    }, 20000);
+    return () => clearInterval(id);
+  }, [tourRooms]);
+
   useEffect(() => {
     let cancelled = false;
     if (!user || !property) return;
