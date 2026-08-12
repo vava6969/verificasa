@@ -422,6 +422,10 @@ export default function WalkthroughCapture() {
       return;
     }
     recordedChunksRef.current = [];
+    zoneCoveredRef.current = Array(SCAN_ZONE_COUNT).fill(false);
+    zoneDwellMsRef.current = Array(SCAN_ZONE_COUNT).fill(0);
+    setScanZonesCovered(Array(SCAN_ZONE_COUNT).fill(false));
+    setScanZoneThumbs((prev) => { prev.forEach((u) => u && URL.revokeObjectURL(u)); return Array(SCAN_ZONE_COUNT).fill(null); });
     const mimeType = pickVideoMimeType();
     // Limităm bitrate-ul ca fișierul să rămână mic și upload-ul rapid/fiabil —
     // Kiri Engine nu are nevoie de calitate maximă, doar de cadre destul de clare.
