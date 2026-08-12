@@ -27,13 +27,6 @@ const CAPTURE_INTERVAL_MS = 420; // doar pentru modul fallback (fără senzori)
 const MAX_ROOMS = 10;
 const QUICK_ROOMS = ["Living", "Bucătărie", "Dormitor", "Baie", "Hol", "Balcon / Terasă"];
 
-const shortestDiff = (from, to) => {
-  let d = (to - from) % 360;
-  if (d > 180) d -= 360;
-  if (d < -180) d += 360;
-  return d;
-};
-
 export default function WalkthroughCapture() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -533,7 +526,7 @@ function CompassTape({ heading, targetCount, capturedMask, nextIndex }) {
   const marks = [];
   for (let i = 0; i < targetCount; i++) {
     const targetDeg = i * stepDeg;
-    const diff = shortestDiff(heading, targetDeg) === targetDeg - heading ? targetDeg - heading : targetDeg - heading;
+    const diff = targetDeg - heading;
     if (Math.abs(diff) <= 80) marks.push({ i, diff, captured: capturedMask[i] });
   }
   return (
