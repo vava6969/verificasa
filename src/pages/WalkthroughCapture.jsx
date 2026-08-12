@@ -33,7 +33,8 @@ const MAX_ANGULAR_VELOCITY = 18; // grade/secundă — sub asta considerăm tele
 const STABLE_DWELL_MS = 160;
 const CAPTURE_INTERVAL_MS = 420; // doar pentru modul fallback (fără senzori)
 const MAX_ROOMS = 10;
-const MAX_RECORD_SECONDS = 170; // sub limita de 3 min a Kiri Engine, cu marjă
+const MAX_RECORD_SECONDS = 100; // clip scurt și predictibil ca mărime — sub orice limită uzuală de upload
+const MAX_SCAN_PAN_VELOCITY_DEG = 45; // prag de "te miști prea repede" în timpul înregistrării video (mai permisiv decât la panoramă, unde stăm pe loc)
 const QUICK_ROOMS = ["Living", "Bucătărie", "Dormitor", "Baie", "Hol", "Balcon / Terasă"];
 
 const fmtTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
@@ -78,7 +79,7 @@ export default function WalkthroughCapture() {
 
   // Senzorii pornesc de cum ajungem pe ecranul cu camera (nu doar în timpul
   // capturii), ca detecția "suportat / nesuportat" să se rezolve din timp.
-  const sensorsActive = stage === "live" || stage === "aiming";
+  const sensorsActive = stage === "live" || stage === "aiming" || stage === "recording";
   const { supported: orientationSupported, heading, velocity } = useTourOrientation({ active: sensorsActive });
   const mode = orientationSupported === null ? "detecting" : orientationSupported ? "orientation" : "timer";
   const relHeading = heading - anchorRef.current;
@@ -327,7 +328,7 @@ export default function WalkthroughCapture() {
       setStage("summary");
       toast({ title: en ? `“${name}” saved` : `Camera „${name}” a fost salvată` });
     } catch (e) {
-      toast({ title: en ? "Couldn't save this room" : "Eroare la salvarea camerei", variant: "destructive" });
+      toast({ title: en ? "Couldn't save this room" : "Eroare la salvarea camerei", description: e?.message, variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -346,9 +347,12 @@ export default function WalkthroughCapture() {
     }
     recordedChunksRef.current = [];
     const mimeType = pickVideoMimeType();
+    // Limităm bitrate-ul ca fișierul să rămână mic și upload-ul rapid/fiabil —
+    // Kiri Engine nu are nevoie de calitate maximă, doar de cadre destul de clare.
+    const recOpts = mimeType ? { mimeType, videoBitsPerSecond: 1_500_000 } : { videoBitsPerSecond: 1_500_000 };
     let rec;
     try {
-      rec = mimeType ? new MediaRecorder(streamRef.current, { mimeType }) : new MediaRecorder(streamRef.current);
+      rec = new MediaRecorder(streamRef.current, recOpts);
     } catch (e) {
       setCameraError(en ? "Couldn't start video recording." : "Nu am putut porni înregistrarea video.");
       setStage("live");
@@ -380,9 +384,20 @@ export default function WalkthroughCapture() {
 
   const confirmScan3d = async () => {
     if (!pendingVideo) return;
+    const MAX_VIDEO_BYTES = 40 * 1024 * 1024; // 40MB — sub limitele tipice de upload ale platformelor serverless
+    if (pendingVideo.size > MAX_VIDEO_BYTES) {
+      toast({
+        title: en ? "Video too large" : "Video prea mare",
+        description: `${Math.round(pendingVideo.size / 1024 / 1024)}MB — ` + (en ? "please retake a shorter recording." : "reia cu o înregistrare mai scurtă."),
+        variant: "destructive",
+      });
+      return;
+    }
     setSaving(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file: pendingVideo });
+      const uploadRes = await base44.integrations.Core.UploadFile({ file: pendingVideo });
+      const file_url = uploadRes?.file_url;
+      if (!file_url) throw new Error(en ? "Upload succeeded but returned no file URL." : "Upload-ul a reușit dar nu a returnat un URL de fișier.");
       const order_index = rooms.length;
       const name = roomName.trim();
       const rec = await base44.entities.PropertyTourRoom.create({
@@ -400,11 +415,12 @@ export default function WalkthroughCapture() {
           setRooms((cur) => cur.map((room) => room.id === rec.id ? { ...room, model_3d_status: data.error ? "failed" : "processing", model_3d_serial: data.serial } : room));
           if (data.error) toast({ title: data.error, variant: "destructive" });
         })
-        .catch(() => {
+        .catch((err) => {
           setRooms((cur) => cur.map((room) => room.id === rec.id ? { ...room, model_3d_status: "failed" } : room));
+          toast({ title: en ? "3D scan couldn't start" : "Scanarea 3D nu a putut porni", description: err?.message, variant: "destructive" });
         });
     } catch (e) {
-      toast({ title: en ? "Couldn't upload the scan video" : "Eroare la încărcarea video-ului de scanare", variant: "destructive" });
+      toast({ title: en ? "Couldn't upload the scan video" : "Eroare la încărcarea video-ului de scanare", description: e?.message, variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -419,7 +435,7 @@ export default function WalkthroughCapture() {
       setRooms((cur) => cur.map((room) => room.id === roomId ? { ...room, model_3d_status: data.status, model_3d_url: data.model_3d_url || room.model_3d_url } : room));
       if (data.status === "success") toast({ title: en ? "3D model ready!" : "Modelul 3D e gata!" });
     } catch (e) {
-      toast({ title: en ? "Couldn't check status" : "Eroare la verificarea statusului", variant: "destructive" });
+      toast({ title: en ? "Couldn't check status" : "Eroare la verificarea statusului", description: e?.message, variant: "destructive" });
     } finally {
       setScanBusyRoomId(null);
     }
@@ -507,7 +523,7 @@ export default function WalkthroughCapture() {
                   {captureMode === "scan3d" ? (
                     <>
                       <Video className="h-3.5 w-3.5 shrink-0" />
-                      {en ? "Walk slowly around the room, cover every corner (up to ~3 min)." : "Mergi încet prin cameră, acoperă fiecare colț (până la ~3 min)."}
+                      {en ? "Walk slowly around the room, cover every corner (under 2 minutes)." : "Mergi încet prin cameră, acoperă fiecare colț (sub 2 minute)."}
                     </>
                   ) : (
                     <>
