@@ -13,6 +13,7 @@ import ReportModal from "@/components/ReportModal";
 import ContactPanel from "@/components/ContactPanel";
 import PropertyGoogleMap from "@/components/PropertyGoogleMap";
 import WalkthroughViewer from "@/components/WalkthroughViewer";
+import Model3DViewer from "@/components/Model3DViewer";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,7 +21,7 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
   Calendar, ShieldCheck, CheckCircle2, ChevronLeft, ChevronRight,
-  Heart, MessageCircle, UserCircle2, Clock, Pencil, Box, Maximize2, X, RotateCw,
+  Heart, MessageCircle, UserCircle2, Clock, Pencil, Box, Maximize2, X, RotateCw, Video,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
