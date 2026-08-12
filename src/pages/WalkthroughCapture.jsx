@@ -305,7 +305,7 @@ export default function WalkthroughCapture() {
           .then((res) => {
             const data = res?.data || res || {};
             if (data.error) return;
-            setRooms((cur) => cur.map((room) => room.id === rid ? { ...room, model_3d_status: data.status, model_3d_url: data.model_3d_url || room.model_3d_url } : room));
+            setRooms((cur) => cur.map((room) => room.id === rid ? { ...room, model_3d_status: data.status, model_3d_url: data.model_3d_url || room.model_3d_url, model_3d_detail: data.detail || room.model_3d_detail } : room));
             if (data.status === "success") toast({ title: en ? "3D model ready!" : "Modelul 3D e gata!" });
             if (data.status === "failed") {
               toast({
@@ -563,7 +563,7 @@ export default function WalkthroughCapture() {
       const res = await base44.functions.invoke("CheckKiriScanStatus", { tour_room_id: roomId });
       const data = res?.data || res || {};
       if (data.error) { toast({ title: data.error, variant: "destructive" }); return; }
-      setRooms((cur) => cur.map((room) => room.id === roomId ? { ...room, model_3d_status: data.status, model_3d_url: data.model_3d_url || room.model_3d_url } : room));
+      setRooms((cur) => cur.map((room) => room.id === roomId ? { ...room, model_3d_status: data.status, model_3d_url: data.model_3d_url || room.model_3d_url, model_3d_detail: data.detail || room.model_3d_detail } : room));
       if (data.status === "success") toast({ title: en ? "3D model ready!" : "Modelul 3D e gata!" });
       if (data.status === "failed") {
         toast({
