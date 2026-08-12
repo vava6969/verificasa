@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
 import { useToast } from "@/components/ui/use-toast";
 import { compressImage } from "@/lib/imageUpload";
+import { stitchPanorama } from "@/lib/panoramaStitch";
 import WalkthroughViewer from "@/components/WalkthroughViewer";
 import { useTourOrientation, requestOrientationPermission } from "@/lib/useTourOrientation";
 import {
@@ -257,17 +258,28 @@ export default function WalkthroughCapture() {
   const confirmRoom = async () => {
     setSaving(true);
     try {
-      const uploaded = await Promise.all(
-        pendingFrames.map(async (blob) => {
-          const small = await compressImage(blob, 1000, 0.75);
-          const { file_url } = await base44.integrations.Core.UploadFile({ file: small });
-          return file_url;
-        })
-      );
+      const [uploaded, panorama] = await Promise.all([
+        Promise.all(
+          pendingFrames.map(async (blob) => {
+            const small = await compressImage(blob, 1000, 0.75);
+            const { file_url } = await base44.integrations.Core.UploadFile({ file: small });
+            return file_url;
+          })
+        ),
+        stitchPanorama(pendingFrames),
+      ]);
+      let panorama_url, panorama_vfov_deg;
+      if (panorama) {
+        try {
+          const up = await base44.integrations.Core.UploadFile({ file: panorama.blob });
+          panorama_url = up.file_url;
+          panorama_vfov_deg = panorama.vfovDeg;
+        } catch (e) { /* panorama e un bonus — dacă upload-ul eșuează, rămânem pe pozele individuale */ }
+      }
       const order_index = rooms.length;
       const name = roomName.trim();
-      const rec = await base44.entities.PropertyTourRoom.create({ property_id: id, room_name: name, order_index, frame_urls: uploaded });
-      setRooms((r) => [...r, { id: rec.id, room_name: name, frame_urls: uploaded }]);
+      const rec = await base44.entities.PropertyTourRoom.create({ property_id: id, room_name: name, order_index, frame_urls: uploaded, panorama_url, panorama_vfov_deg });
+      setRooms((r) => [...r, { id: rec.id, room_name: name, frame_urls: uploaded, panorama_url, panorama_vfov_deg }]);
       setPendingFrames([]);
       setRoomName("");
       setStage("summary");
