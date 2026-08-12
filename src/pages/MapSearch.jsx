@@ -14,7 +14,8 @@ import PropertyCard from "@/components/PropertyCard";
 import MapPropertySheet from "@/components/MapPropertySheet";
 import MapInfoCards from "@/components/MapInfoCards";
 import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
-import { getCities, getZones } from "@/components/locations";
+import { getCounty } from "@/components/locations";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   MapPin, Heart, X, ArrowLeft, Plus, Minus, PenLine, Trash2, Check, Loader2,
@@ -177,6 +178,7 @@ export default function MapSearch() {
   const [params, setParams] = useSearchParams();
   const cityParam = params.get("city") || "";
   const zoneParam = params.get("zone") || "";
+  const countyParam = params.get("county") || "";
   const typeParam = params.get("type") || "";
   const qParam = params.get("q") || "";
   const [budget, setBudget] = useState("");
@@ -192,18 +194,11 @@ export default function MapSearch() {
     return s;
   });
 
-  const cities = useMemo(() => getCities(country), [country]);
-  const zones = useMemo(() => getZones(country, cityParam), [country, cityParam]);
-
-  const updateCity = (val) => setParams((prev) => {
+  const updateLocation = ({ county, city, zone }) => setParams((prev) => {
     const next = new URLSearchParams(prev);
-    if (val) next.set("city", val); else next.delete("city");
-    next.delete("zone");
-    return next;
-  }, { replace: true });
-  const updateZone = (val) => setParams((prev) => {
-    const next = new URLSearchParams(prev);
-    if (val) next.set("zone", val); else next.delete("zone");
+    if (city) next.set("city", city); else next.delete("city");
+    if (zone) next.set("zone", zone); else next.delete("zone");
+    if (!city && county) next.set("county", county); else next.delete("county");
     return next;
   }, { replace: true });
   const setQ = (v) => setParams((prev) => {
@@ -288,6 +283,7 @@ export default function MapSearch() {
     return geoProps.filter((p) => {
       if (cityParam && !norm(p.city).includes(norm(cityParam))) return false;
       if (zoneParam && !norm(`${p.zone || ""} ${p.landmark || ""}`).includes(norm(zoneParam))) return false;
+      if (countyParam && norm(getCounty(p.city)) !== norm(countyParam)) return false;
       if (typeParam && p.property_type !== typeParam) return false;
       if (qParam) {
         const hay = norm([p.title, p.zone, p.city, p.landmark, p.description, p.property_type, p.property_code].join(" "));
@@ -304,7 +300,7 @@ export default function MapSearch() {
       if (fairness && p.price_fairness !== fairness) return false;
       return true;
     });
-  }, [geoProps, cityParam, zoneParam, typeParam, qParam, activeFilters, budget, roomsMin, surfaceMin, furnished, swap, fairness]);
+  }, [geoProps, cityParam, zoneParam, countyParam, typeParam, qParam, activeFilters, budget, roomsMin, surfaceMin, furnished, swap, fairness]);
 
   const clusters = useMemo(() => {
     if (!filteredGeoProps.length) return [];
@@ -379,7 +375,7 @@ export default function MapSearch() {
   // Reset pagination when filters change
   useEffect(() => {
     setDisplayCount(PAGE_SIZE);
-  }, [bounds, polygonPoints, cityParam, zoneParam, typeParam, qParam, activeFilters, budget, roomsMin, surfaceMin, furnished, swap, fairness, sort]);
+  }, [bounds, polygonPoints, cityParam, zoneParam, countyParam, typeParam, qParam, activeFilters, budget, roomsMin, surfaceMin, furnished, swap, fairness, sort]);
 
   const displayedProperties = visibleProperties.slice(0, displayCount);
   const hasMore = displayedProperties.length < visibleProperties.length;
@@ -650,24 +646,14 @@ export default function MapSearch() {
 
           {/* Filtre unificate — aceleași ca pe fostul /search, acum direct lângă hartă */}
           <div className="mt-3 space-y-2">
-            <div className="grid grid-cols-2 gap-2">
-              <select
-                value={cityParam}
-                onChange={(e) => updateCity(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-2.5 py-2 text-xs font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
-              >
-                <option value="">{t("sr_city_select")}</option>
-                {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
-              <select
-                value={zoneParam}
-                onChange={(e) => updateZone(e.target.value)}
-                disabled={!cityParam}
-                className="w-full rounded-lg border border-border bg-background px-2.5 py-2 text-xs font-medium text-foreground outline-none focus:border-emerald dark:bg-card disabled:opacity-50"
-              >
-                <option value="">{t("sr_zone_select")}</option>
-                {zones.map((z) => <option key={z} value={z}>{z}</option>)}
-              </select>
+            <div className="rounded-lg border border-border bg-background px-2.5 py-2 dark:bg-card">
+              <LocationAutocomplete
+                country={country}
+                value={{ county: countyParam, city: cityParam, zone: zoneParam }}
+                onSelect={updateLocation}
+                placeholder={en ? "City, county or area" : "Oraș, județ sau zonă"}
+                inputClassName="text-xs font-medium"
+              />
             </div>
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
