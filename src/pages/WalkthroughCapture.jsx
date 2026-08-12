@@ -272,7 +272,8 @@ export default function WalkthroughCapture() {
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 960 } },
+        // max 1920x1080 — limita documentată de Kiri Engine pentru upload video
+        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280, max: 1920 }, height: { ideal: 960, max: 1080 } },
         audio: false,
       });
       streamRef.current = stream;
