@@ -319,7 +319,7 @@ export const STR = {
     footer_terms: "Termeni & Condiții",
     footer_privacy: "Politica de Confidențialitate",
     footer_guarantee: "Garanția VerifiCasa",
-    footer_coverage: "Acoperire în Iași și Huși. Planificăm să ne extindem în toată România!",
+    footer_coverage: "Căutare disponibilă în toată România — peste 300 de orașe. Verificări pe teren active în Iași și Huși, ne extindem constant.",
     footer_copy: "© 2026 VerifiCasa — Inspecții & Verificări Imobiliare",
     footer_compliance: "🇷🇴 Inspecții fizice · Tururi 3D conforme legislației RO",
     sb_city: "Oraș",
@@ -543,7 +543,7 @@ export const STR = {
     lb_link_copied: "Link copiat ✓",
     similar_h: "Proprietăți similare în zonă",
     similar_sub: "Recomandări din {city} și apropiere",
-    hero_purpose: "VerifiCasa este o platformă imobiliară pentru închirieri sigure și transparente în România (Iași și Huși). Combină tururi 3D immersive, inspecții fizice verificate de agenți și garanții care protejează chiriașul și proprietarul — ca să închiriezi fără surprize neplăcute.",
+    hero_purpose: "VerifiCasa este o platformă imobiliară pentru închirieri sigure și transparente în România. Combină tururi 3D immersive, inspecții fizice verificate de agenți și garanții care protejează chiriașul și proprietarul — ca să închiriezi fără surprize neplăcute.",
     app_name: "VerifiCasa",
     // User profile
     up_back: "Înapoi",
