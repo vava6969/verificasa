@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, MapPin, Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
