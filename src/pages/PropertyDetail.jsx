@@ -243,6 +243,33 @@ export default function PropertyDetail() {
             </div>
           ) : tab === "tour360" ? (
             <WalkthroughViewer rooms={tourRooms} />
+          ) : tab === "scan3d" ? (
+            <div className="space-y-3 rounded-2xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
+              <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-400">
+                <Video className="h-3.5 w-3.5" /> Secțiune de testare — vizibilă doar pentru tine
+              </p>
+              {scan3dRooms.map((r) => (
+                <div key={r.id} className="space-y-2 rounded-xl border border-border bg-white p-3 dark:bg-card">
+                  <div className="flex items-center justify-between">
+                    <p className="font-heading text-sm font-bold text-navy dark:text-foreground">{r.room_name}</p>
+                    <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${r.model_3d_status === "success" ? "bg-emerald-soft text-emerald" : r.model_3d_status === "failed" ? "bg-rose-50 text-rose-600 dark:bg-rose-950/40" : "bg-secondary text-muted-foreground"}`}>
+                      status: {r.model_3d_status || "none"}
+                    </span>
+                  </div>
+                  <p className="break-all text-[11px] text-muted-foreground">serial: {r.model_3d_serial || "—"}</p>
+                  {r.capture_video_url && (
+                    <video src={r.capture_video_url} controls playsInline className="aspect-video w-full rounded-lg bg-black" />
+                  )}
+                  {r.model_3d_status === "success" && r.model_3d_url ? (
+                    <div className="aspect-video w-full overflow-hidden rounded-lg bg-navy-deep">
+                      <Model3DViewer src={r.model_3d_url} />
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">Modelul 3D nu e încă gata (verifică statusul din pagina de captură).</p>
+                  )}
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="select-none">
               <div
