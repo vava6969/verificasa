@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Search, MapPin, Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCountry } from "@/components/CountryContext";
-import { getCities, getZones } from "@/components/locations";
+import LocationAutocomplete from "@/components/LocationAutocomplete";
 
 export default function SearchBar({ compact = false, onSubmitted }) {
   const { country, t } = useCountry();
@@ -29,10 +29,6 @@ export default function SearchBar({ compact = false, onSubmitted }) {
     { key: "garant0", label: t("tg_garant0"), icon: Lock },
   ];
 
-  const cities = useMemo(() => getCities(country), [country]);
-  const zones = useMemo(() => getZones(country, city), [country, city]);
-
-  const handleCity = (v) => { setCity(v); setZone(""); };
   const toggle = (key) => setToggles((cur) => ({ ...cur, [key]: !cur[key] }));
 
   const handleSearch = (e) => {
@@ -52,21 +48,15 @@ export default function SearchBar({ compact = false, onSubmitted }) {
     <form onSubmit={handleSearch} className="w-full">
       <div className="flex flex-col gap-2 md:flex-row md:items-center">
         <div className={inputCls}>
-          <MapPin className="h-4 w-4 shrink-0 text-emerald" />
-          <select value={city} onChange={(e) => handleCity(e.target.value)} className="w-full cursor-pointer bg-transparent text-sm text-foreground outline-none">
-            <option value="">{t("sb_city")}</option>
-            {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </div>
-
-        <div className="hidden h-8 w-px bg-border md:block" />
-
-        <div className={inputCls}>
-          <Search className="h-4 w-4 shrink-0 text-emerald" />
-          <select value={zone} onChange={(e) => setZone(e.target.value)} disabled={!city} className="w-full cursor-pointer bg-transparent text-sm text-foreground outline-none disabled:opacity-50">
-            <option value="">{t("sb_zone")}</option>
-            {zones.map((z) => <option key={z} value={z}>{z}</option>)}
-          </select>
+          <LocationAutocomplete
+            country={country}
+            value={{ city, zone }}
+            onSelect={({ city: c, zone: z }) => { setCity(c); setZone(z); }}
+            placeholder={t("sb_city")}
+            includeCounties={false}
+            icon={MapPin}
+            inputClassName="cursor-pointer"
+          />
         </div>
 
         <div className="hidden h-8 w-px bg-border md:block" />
