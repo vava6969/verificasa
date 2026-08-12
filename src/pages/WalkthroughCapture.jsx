@@ -143,7 +143,6 @@ export default function WalkthroughCapture() {
       clearTimeout(dwellTimerRef.current);
       dwellTimerRef.current = null;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [relHeading, velocity, stage, mode, capturedMask]);
 
   // Mod fallback (fără senzori): countdown, apoi captură la interval fix.
