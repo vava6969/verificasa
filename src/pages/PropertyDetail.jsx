@@ -403,6 +403,11 @@ export default function PropertyDetail() {
                     <Box className="h-3.5 w-3.5" /> {t("tab_3d")}
                   </span>
                 )}
+                {tourRooms.length > 0 && (
+                  <span className="flex items-center gap-1 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-400/15 dark:text-indigo-300">
+                    <RotateCw className="h-3.5 w-3.5" /> {t("badge_tour360")}
+                  </span>
+                )}
                 {p.pet_friendly && (
                   <span className="flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-400/15 dark:text-amber-300">
                     <PawPrint className="h-3.5 w-3.5" /> {t("badge_pet_v")}
