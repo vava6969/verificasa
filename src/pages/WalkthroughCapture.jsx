@@ -565,6 +565,13 @@ export default function WalkthroughCapture() {
       if (data.error) { toast({ title: data.error, variant: "destructive" }); return; }
       setRooms((cur) => cur.map((room) => room.id === roomId ? { ...room, model_3d_status: data.status, model_3d_url: data.model_3d_url || room.model_3d_url } : room));
       if (data.status === "success") toast({ title: en ? "3D model ready!" : "Modelul 3D e gata!" });
+      if (data.status === "failed") {
+        toast({
+          variant: "destructive",
+          title: en ? "3D scan failed" : "Scanarea 3D a eșuat",
+          description: data.detail || (en ? "Kiri Engine could not build a model from this video. Try again with slower, more overlapping coverage of every corner." : "Kiri Engine nu a putut construi un model din acest video. Încearcă din nou, mai lent, acoperind fiecare colț cu suprapunere."),
+        });
+      }
     } catch (e) {
       toast({ title: en ? "Couldn't check status" : "Eroare la verificarea statusului", description: e?.message, variant: "destructive" });
     } finally {
