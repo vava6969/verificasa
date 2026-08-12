@@ -4,7 +4,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 // Pornește o scanare 3D reală (Kiri Engine, https://docs.kiriengine.app) dintr-un
 // video de captură deja urcat în storage-ul aplicației. Cheia Kiri Engine rămâne
 // doar pe server (secret) — nu ajunge niciodată în browser. Necesită secretul
-// KIRI_ENGINE_API_KEY setat în Settings → Secrets ale acestei aplicații
+// Verificasa setat în Settings → Secrets ale acestei aplicații
 // (cont + cheie de la https://www.kiriengine.app/api/keys).
 export default async function (req: Request): Promise<Response> {
   try {
@@ -12,9 +12,9 @@ export default async function (req: Request): Promise<Response> {
     const me = await base44.auth.me().catch(() => null);
     if (!me?.id) return Response.json({ error: "Trebuie să fii autentificat." }, { status: 401 });
 
-    const apiKey = secrets.get("KIRI_ENGINE_API_KEY");
+    const apiKey = secrets.get("Verificasa");
     if (!apiKey) {
-      return Response.json({ error: "Scanarea 3D nu e configurată încă — lipsește secretul KIRI_ENGINE_API_KEY." }, { status: 400 });
+      return Response.json({ error: "Scanarea 3D nu e configurată încă — lipsește secretul Verificasa." }, { status: 400 });
     }
 
     let body: any = {};
