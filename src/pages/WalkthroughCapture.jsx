@@ -450,8 +450,11 @@ export default function WalkthroughCapture() {
           if (data.error) toast({ title: data.error, variant: "destructive" });
         })
         .catch((err) => {
-          setRooms((cur) => cur.map((room) => room.id === rec.id ? { ...room, model_3d_status: "failed" } : room));
-          toast({ title: en ? "3D scan couldn't start" : "Scanarea 3D nu a putut porni", description: err?.message, variant: "destructive" });
+          // O eroare/timeout AICI nu înseamnă neapărat că scanarea a eșuat — request-ul poate
+          // fi reușit pe server (Kiri Engine a primit video-ul) chiar dacă răspunsul n-a
+          // mai ajuns la timp în browser. În loc să presupunem eșec, verificăm statusul real.
+          toast({ title: en ? "Couldn't confirm the scan started — checking real status…" : "Nu am putut confirma pornirea — verificăm statusul real…", description: err?.message });
+          checkScanStatus(rec.id);
         });
     } catch (e) {
       toast({ title: en ? "Couldn't upload the scan video" : "Eroare la încărcarea video-ului de scanare", description: e?.message, variant: "destructive" });
@@ -750,7 +753,7 @@ export default function WalkthroughCapture() {
                               : r.model_3d_status === "expired" ? (en ? "Expired" : "Expirat")
                               : (en ? "Processing 3D scan…" : "Se procesează scanarea 3D…")}
                           </p>
-                          {r.model_3d_status !== "success" && r.model_3d_status !== "failed" && (
+                          {r.model_3d_status !== "success" && (
                             <button type="button" onClick={() => checkScanStatus(r.id)} disabled={scanBusyRoomId === r.id} className="text-[11px] font-bold text-emerald underline disabled:opacity-50">
                               {scanBusyRoomId === r.id ? "…" : (en ? "Check" : "Verifică")}
                             </button>
