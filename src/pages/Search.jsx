@@ -7,7 +7,7 @@ import PropertyCard from "@/components/PropertyCard";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, SlidersHorizontal, ArrowDownUp, BookmarkPlus, RotateCcw, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, SlidersHorizontal, ArrowDownUp, BookmarkPlus, RotateCcw, RotateCw, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
 
@@ -15,6 +15,7 @@ import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
 const VERIF_FILTERS = [
   { key: "ai", labelKey: "tg_ai", icon: Sparkles, test: (p) => !!p.tour_3d_url || !!p.ai_video_url || !!p.ai_tour_verified },
   { key: "field", labelKey: "tg_field", icon: ShieldCheck, test: (p) => p.owner_verified || p.verification_level === "field_certified" || p.ai_tour_verified },
+  { key: "tour360", labelKey: "tab_tour360", icon: RotateCw, test: (p) => !!p.has_walkthrough_tour },
   { key: "pet", labelKey: "tg_pet", icon: PawPrint, test: (p) => !!p.pet_friendly },
   { key: "nofee", labelKey: "tg_nofee", icon: BadgePercent, test: (p) => !!p.commission_free },
   { key: "studio", labelKey: "type_studio_vc", icon: Home, test: (p) => ["Garsonieră", "Studio"].includes(p.property_type) },
