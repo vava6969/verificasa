@@ -327,6 +327,11 @@ export default function WalkthroughCapture() {
       setCameraError(en ? "Your browser doesn't support camera access." : "Browserul tău nu suportă acces la cameră.");
       return;
     }
+    // Cererea de permisiune pentru senzori TREBUIE pornită sincron, în același gest
+    // de tap — dacă mai așteptăm un `await` (ex: getUserMedia) înainte s-o pornim,
+    // se rupe lanțul de "user activation" și iOS Safari o refuză silențios, fără
+    // să mai arate vreun prompt. De-asta o pornim AICI, înainte de orice await.
+    const orientationPromise = requestOrientationPermission().catch(() => false);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         // max 1920x1080 — limita documentată de Kiri Engine pentru upload video
@@ -334,8 +339,7 @@ export default function WalkthroughCapture() {
         audio: false,
       });
       streamRef.current = stream;
-      // Trebuie cerută în același gest de tap ca getUserMedia, altfel iOS refuză silențios.
-      requestOrientationPermission().catch(() => {});
+      await orientationPromise;
       setStage("live");
       setTimeout(() => {
         if (videoRef.current && streamRef.current) {
