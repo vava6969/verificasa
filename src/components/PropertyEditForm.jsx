@@ -228,6 +228,26 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         )}
       </div>
 
+      {/* Tur virtual 360° — captură ghidată din browser, distinctă de Tur 3D (Matterport, admin) */}
+      <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Tur virtual 360°</p>
+      <Link
+        to={`/tur-virtual/${property.id}`}
+        className="flex items-center justify-between gap-3 rounded-xl border border-border bg-white p-3.5 transition hover:border-emerald/40 hover:bg-emerald-soft/40 dark:bg-card"
+      >
+        <div className="flex items-center gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-soft text-emerald"><RotateCw className="h-4 w-4" /></span>
+          <span>
+            <span className="block text-sm font-semibold text-navy dark:text-foreground">
+              {property.has_walkthrough_tour ? "Editează turul virtual 360°" : "Adaugă un tur virtual 360°"}
+            </span>
+            <span className="block text-xs text-muted-foreground">
+              {property.has_walkthrough_tour ? "Tur publicat — adaugă sau șterge camere" : "Captează camerele direct din browser, fără nicio aplicație"}
+            </span>
+          </span>
+        </div>
+        <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+      </Link>
+
       {/* Locație */}
       <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Locație</p>
       <div className="grid gap-3 sm:grid-cols-2">
