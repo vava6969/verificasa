@@ -207,6 +207,11 @@ export default function PropertyDetail() {
                 <span className="flex items-center gap-1.5"><Box className="h-3.5 w-3.5" /> {t("tab_3d")}</span>
               </button>
             )}
+            {tourRooms.length > 0 && (
+              <button onClick={() => setTab("tour360")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "tour360" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+                <span className="flex items-center gap-1.5"><RotateCw className="h-3.5 w-3.5" /> {t("tab_tour360")}</span>
+              </button>
+            )}
           </div>
 
           {tab === "3d" ? (
@@ -227,6 +232,8 @@ export default function PropertyDetail() {
                 <Maximize2 className="h-3.5 w-3.5" /> {lang === "en" ? "Fullscreen" : "Ecran complet"}
               </button>
             </div>
+          ) : tab === "tour360" ? (
+            <WalkthroughViewer rooms={tourRooms.map((r) => ({ room_name: r.room_name, frame_urls: r.frame_urls }))} />
           ) : (
             <div className="select-none">
               <div
