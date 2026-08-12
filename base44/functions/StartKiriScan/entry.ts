@@ -59,13 +59,21 @@ export default async function (req: Request): Promise<Response> {
       body: form,
     });
     const kiriJson = await kiriRes.json().catch(() => null);
-    if (!kiriRes.ok || !kiriJson || kiriJson.code !== 0) {
+    // Verificăm atât `code` cât și `ok` (documentația Kiri arată ambele câmpuri în
+    // răspuns) și forțăm comparația numerică, ca să nu picăm într-un fals-negativ
+    // dacă `code` vine ca string ("0") în loc de număr (0).
+    const kiriSuccess = kiriRes.ok && !!kiriJson && (Number(kiriJson.code) === 0 || kiriJson.ok === true);
+    const serial = kiriJson?.data?.serialize;
+    if (!kiriSuccess || !serial) {
       await svc.entities.PropertyTourRoom.update(tour_room_id, { model_3d_status: "failed" });
-      const detail = kiriJson?.msg ? `Kiri Engine: ${kiriJson.msg}` : `Kiri Engine a refuzat cererea (HTTP ${kiriRes.status}).`;
+      const detail = kiriJson?.msg && kiriJson.msg !== "success"
+        ? `Kiri Engine: ${kiriJson.msg}`
+        : !serial
+        ? "Kiri Engine nu a returnat un identificator de scanare (serialize)."
+        : `Kiri Engine a refuzat cererea (HTTP ${kiriRes.status}).`;
       return Response.json({ error: detail });
     }
 
-    const serial = kiriJson.data?.serialize;
     await svc.entities.PropertyTourRoom.update(tour_room_id, { model_3d_status: "processing", model_3d_serial: serial });
     return Response.json({ ok: true, serial });
   } catch (error) {
