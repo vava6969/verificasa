@@ -7,18 +7,20 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 export default async function (req: Request): Promise<Response> {
   try {
     const base44 = createClientFromRequest(req);
+    // Notă: răspundem mereu cu status 200 și un câmp `error` — pe non-2xx, SDK-ul
+    // base44 din browser aruncă o eroare generică ("fail code NNN") și pierdem mesajul real.
     const apiKey = secrets.get("Verificasa");
-    if (!apiKey) return Response.json({ error: "Scanarea 3D nu e configurată încă." }, { status: 400 });
+    if (!apiKey) return Response.json({ error: "Scanarea 3D nu e configurată încă." });
 
     let body: any = {};
     try { body = await req.json(); } catch (_) { body = {}; }
     const { tour_room_id } = body;
-    if (!tour_room_id) return Response.json({ error: "tour_room_id necesar" }, { status: 400 });
+    if (!tour_room_id) return Response.json({ error: "tour_room_id necesar" });
 
     const svc = base44.asServiceRole;
     const room = await svc.entities.PropertyTourRoom.get(tour_room_id).catch(() => null);
     if (!room?.model_3d_serial) {
-      return Response.json({ error: "Nicio scanare 3D pornită pentru această cameră." }, { status: 400 });
+      return Response.json({ error: "Nicio scanare 3D pornită pentru această cameră." });
     }
     if (room.model_3d_status === "success" && room.model_3d_url) {
       return Response.json({ ok: true, status: "success", model_3d_url: room.model_3d_url });
@@ -56,7 +58,9 @@ export default async function (req: Request): Promise<Response> {
       const glbName = Object.keys(zip.files).find((n) => n.toLowerCase().endsWith(".glb"));
       if (glbName) {
         const glbBlob = await zip.files[glbName].async("blob");
-        const uploaded = await svc.integrations.Core.UploadFile({ file: glbBlob });
+        // File cu nume, nu Blob simplu — evităm același "invalid payload" pățit la upload-ul video.
+        const glbFile = new File([glbBlob], "model.glb", { type: "model/gltf-binary" });
+        const uploaded = await svc.integrations.Core.UploadFile({ file: glbFile });
         if (uploaded?.file_url) finalUrl = uploaded.file_url;
       }
     } catch (_) {
@@ -66,6 +70,6 @@ export default async function (req: Request): Promise<Response> {
     await svc.entities.PropertyTourRoom.update(tour_room_id, { model_3d_status: "success", model_3d_url: finalUrl });
     return Response.json({ ok: true, status: "success", model_3d_url: finalUrl });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ error: error?.message || String(error) });
   }
 }
