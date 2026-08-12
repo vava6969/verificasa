@@ -6,15 +6,33 @@ import { useCountry } from "@/components/CountryContext";
 import { useToast } from "@/components/ui/use-toast";
 import { compressImage } from "@/lib/imageUpload";
 import WalkthroughViewer from "@/components/WalkthroughViewer";
+import { useTourOrientation, requestOrientationPermission } from "@/lib/useTourOrientation";
 import {
   X, Home, RotateCw, Sparkles, Camera, Check, Trash2, Plus,
-  Loader2, ChevronLeft, AlertTriangle,
+  Loader2, ChevronLeft, AlertTriangle, Compass, Gauge,
 } from "lucide-react";
 
-const FRAMES_PER_ROOM = 16;
-const CAPTURE_INTERVAL_MS = 480;
+// Tur ghidat: în loc să tragem poze "oarbe" la interval fix, folosim
+// senzorii de orientare ai telefonului ca să știm exact unde se uită
+// camera și declanșăm captura DOAR când proprietarul e aliniat cu
+// următorul reper și stă suficient de nemișcat (fără blur de mișcare).
+// Cadre uniform distanțate unghiular => playback mult mai neted în viewer.
+// Dacă dispozitivul n-are busolă/giroscop (sau refuză permisiunea pe iOS),
+// trecem automat pe modul vechi, cu temporizator.
+const TARGET_COUNT = 24; // un cadru la fiecare 15°
+const ALIGN_TOLERANCE_DEG = 6;
+const MAX_ANGULAR_VELOCITY = 18; // grade/secundă — sub asta considerăm telefonul "nemișcat"
+const STABLE_DWELL_MS = 160;
+const CAPTURE_INTERVAL_MS = 420; // doar pentru modul fallback (fără senzori)
 const MAX_ROOMS = 10;
 const QUICK_ROOMS = ["Living", "Bucătărie", "Dormitor", "Baie", "Hol", "Balcon / Terasă"];
+
+const shortestDiff = (from, to) => {
+  let d = (to - from) % 360;
+  if (d > 180) d -= 360;
+  if (d < -180) d += 360;
+  return d;
+};
 
 export default function WalkthroughCapture() {
   const { id } = useParams();
@@ -27,18 +45,31 @@ export default function WalkthroughCapture() {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [rooms, setRooms] = useState([]); // camere deja salvate (DB + sesiunea curentă)
-  const [stage, setStage] = useState("intro"); // intro | live | countdown | capturing | review | summary
+  const [stage, setStage] = useState("intro"); // intro | live | aiming | review | summary
   const [roomName, setRoomName] = useState("");
   const [cameraError, setCameraError] = useState(null);
-  const [countdown, setCountdown] = useState(3);
-  const [captureProgress, setCaptureProgress] = useState(0);
   const [pendingFrames, setPendingFrames] = useState([]);
   const [saving, setSaving] = useState(false);
   const [finishing, setFinishing] = useState(false);
+  const [capturedMask, setCapturedMask] = useState(() => Array(TARGET_COUNT).fill(false));
+  const [flash, setFlash] = useState(false);
+  const [timerCountdown, setTimerCountdown] = useState(3);
+  const [timerPhase, setTimerPhase] = useState("countdown"); // countdown | shooting (doar mod fallback)
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const framesRef = useRef([]);
+  const baseGrabbedRef = useRef(false);
+  const anchorRef = useRef(0);
+  const dwellTimerRef = useRef(null);
+
+  // Senzorii pornesc de cum ajungem pe ecranul cu camera (nu doar în timpul
+  // capturii), ca detecția "suportat / nesuportat" să se rezolve din timp.
+  const sensorsActive = stage === "live" || stage === "aiming";
+  const { supported: orientationSupported, heading, velocity } = useTourOrientation({ active: sensorsActive });
+  const mode = orientationSupported === null ? "detecting" : orientationSupported ? "orientation" : "timer";
+  const relHeading = heading - anchorRef.current;
 
   useEffect(() => {
     document.title = "Tur virtual 360° · VerifiCasa";
@@ -70,7 +101,7 @@ export default function WalkthroughCapture() {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
   };
-  useEffect(() => () => stopCamera(), []);
+  useEffect(() => () => { stopCamera(); if (dwellTimerRef.current) clearTimeout(dwellTimerRef.current); }, []);
 
   // Re-atașează stream-ul existent la revenirea pe ecranul de captură (fără a
   // cere din nou permisiunea camerei între camere).
@@ -81,36 +112,80 @@ export default function WalkthroughCapture() {
     }
   }, [stage]);
 
+  const grabFrameFor = (idx) => {
+    const video = videoRef.current, canvas = canvasRef.current;
+    if (!video || !canvas || !video.videoWidth) return;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      framesRef.current[idx] = blob;
+      setCapturedMask((m) => { if (m[idx]) return m; const n = [...m]; n[idx] = true; return n; });
+      setFlash(true);
+      if (navigator.vibrate) { try { navigator.vibrate(20); } catch (e) {} }
+      setTimeout(() => setFlash(false), 140);
+    }, "image/jpeg", 0.88);
+  };
+
+  // Modul ghidat: capturăm cadrul 0 imediat, apoi așteptăm alinierea +
+  // nemișcarea pentru fiecare reper următor.
   useEffect(() => {
-    if (stage !== "countdown") return;
-    if (countdown <= 0) { setStage("capturing"); return; }
-    const t = setTimeout(() => setCountdown((c) => c - 1), 700);
-    return () => clearTimeout(t);
-  }, [stage, countdown]);
+    if (stage !== "aiming" || mode !== "orientation") return;
+    const nextIdx = capturedMask.findIndex((c) => !c);
+    if (nextIdx === -1) return;
+    if (nextIdx === 0) {
+      if (!baseGrabbedRef.current) { baseGrabbedRef.current = true; grabFrameFor(0); }
+      return;
+    }
+    const target = nextIdx * (360 / TARGET_COUNT);
+    const diff = target - relHeading;
+    const aligned = Math.abs(diff) < ALIGN_TOLERANCE_DEG;
+    const slow = velocity < MAX_ANGULAR_VELOCITY;
+    if (aligned && slow) {
+      if (!dwellTimerRef.current) {
+        dwellTimerRef.current = setTimeout(() => { grabFrameFor(nextIdx); dwellTimerRef.current = null; }, STABLE_DWELL_MS);
+      }
+    } else if (dwellTimerRef.current) {
+      clearTimeout(dwellTimerRef.current);
+      dwellTimerRef.current = null;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [relHeading, velocity, stage, mode, capturedMask]);
+
+  // Mod fallback (fără senzori): countdown, apoi captură la interval fix.
+  useEffect(() => {
+    if (stage !== "aiming" || mode !== "timer") return;
+    setTimerPhase("countdown");
+    setTimerCountdown(3);
+  }, [stage, mode]);
 
   useEffect(() => {
-    if (stage !== "capturing") return;
+    if (stage !== "aiming" || mode !== "timer" || timerPhase !== "countdown") return;
+    if (timerCountdown <= 0) { setTimerPhase("shooting"); return; }
+    const t = setTimeout(() => setTimerCountdown((c) => c - 1), 700);
+    return () => clearTimeout(t);
+  }, [stage, mode, timerPhase, timerCountdown]);
+
+  useEffect(() => {
+    if (stage !== "aiming" || mode !== "timer" || timerPhase !== "shooting") return;
     let cancelled = false;
-    const frames = [];
-    const grab = () => {
-      const video = videoRef.current, canvas = canvasRef.current;
-      if (cancelled || !video || !canvas || !video.videoWidth) return;
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob((blob) => {
-        if (cancelled || !blob) return;
-        frames.push(blob);
-        setCaptureProgress(frames.length);
-        if (frames.length >= FRAMES_PER_ROOM) {
-          setPendingFrames(frames);
-          setStage("review");
-        }
-      }, "image/jpeg", 0.85);
-    };
-    const interval = setInterval(grab, CAPTURE_INTERVAL_MS);
+    let i = 0;
+    const interval = setInterval(() => {
+      if (cancelled || i >= TARGET_COUNT) return;
+      grabFrameFor(i);
+      i += 1;
+    }, CAPTURE_INTERVAL_MS);
     return () => { cancelled = true; clearInterval(interval); };
-  }, [stage]);
+  }, [stage, mode, timerPhase]);
+
+  // Comun ambelor moduri: când toate cadrele sunt gata, trecem la previzualizare.
+  useEffect(() => {
+    if (stage === "aiming" && capturedMask.length && capturedMask.every(Boolean)) {
+      setPendingFrames(framesRef.current.slice(0, TARGET_COUNT));
+      setStage("review");
+    }
+  }, [capturedMask, stage]);
 
   const previewUrls = useMemo(() => pendingFrames.map((b) => URL.createObjectURL(b)), [pendingFrames]);
   useEffect(() => () => { previewUrls.forEach((u) => URL.revokeObjectURL(u)); }, [previewUrls]);
@@ -152,8 +227,9 @@ export default function WalkthroughCapture() {
         audio: false,
       });
       streamRef.current = stream;
+      // Trebuie cerută în același gest de tap ca getUserMedia, altfel iOS refuză silențios.
+      requestOrientationPermission().catch(() => {});
       setStage("live");
-      // videoRef se atașează prin efectul de mai sus, imediat ce elementul se montează
       setTimeout(() => {
         if (videoRef.current && streamRef.current) {
           videoRef.current.srcObject = streamRef.current;
@@ -171,12 +247,20 @@ export default function WalkthroughCapture() {
 
   const beginCapture = () => {
     if (!roomName.trim()) return;
-    setCaptureProgress(0);
-    setCountdown(3);
-    setStage("countdown");
+    anchorRef.current = heading;
+    baseGrabbedRef.current = false;
+    framesRef.current = [];
+    setCapturedMask(Array(TARGET_COUNT).fill(false));
+    setStage("aiming");
   };
 
-  const retake = () => { setPendingFrames([]); setStage("live"); };
+  const retake = () => {
+    framesRef.current = [];
+    baseGrabbedRef.current = false;
+    setCapturedMask(Array(TARGET_COUNT).fill(false));
+    setPendingFrames([]);
+    setStage("live");
+  };
 
   const confirmRoom = async () => {
     setSaving(true);
@@ -222,7 +306,21 @@ export default function WalkthroughCapture() {
     }
   };
 
-  const cameraStage = ["live", "countdown", "capturing", "review"].includes(stage);
+  const cameraStage = ["live", "aiming", "review"].includes(stage);
+  const nextTargetIdx = capturedMask.findIndex((c) => !c);
+  const capturedCount = capturedMask.filter(Boolean).length;
+
+  let aimStatus = null;
+  if (mode === "orientation" && nextTargetIdx > 0) {
+    const target = nextTargetIdx * (360 / TARGET_COUNT);
+    const diff = target - relHeading;
+    const aligned = Math.abs(diff) < ALIGN_TOLERANCE_DEG;
+    const slow = velocity < MAX_ANGULAR_VELOCITY;
+    if (aligned && slow) aimStatus = en ? "Hold still…" : "Perfect, ține telefonul nemișcat…";
+    else if (aligned && !slow) aimStatus = en ? "Almost — slow down" : "Aproape! Încetinește puțin";
+    else if (diff < 0) aimStatus = en ? "You passed the mark — go back a little" : "Ai trecut de reper — revino puțin";
+    else aimStatus = en ? "Keep turning slowly" : "Continuă să te rotești încet";
+  }
 
   return (
     <div className="min-h-screen bg-[#f4f6f9] dark:bg-background">
@@ -232,6 +330,7 @@ export default function WalkthroughCapture() {
         <div className="fixed inset-0 z-50 flex flex-col bg-black">
           <div className="relative flex-1 overflow-hidden">
             <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
+            {flash && <div className="pointer-events-none absolute inset-0 bg-white/25" />}
 
             <button type="button" onClick={exit} aria-label={en ? "Close" : "Închide"} className="absolute left-3 top-[calc(0.75rem+env(safe-area-inset-top))] z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md">
               <X className="h-5 w-5" />
@@ -258,8 +357,13 @@ export default function WalkthroughCapture() {
                     </button>
                   ))}
                 </div>
-                <p className="mt-3 text-xs text-white/60">
-                  {en ? "Stand in the center of the room, hold the phone at chest height." : "Stai în centrul camerei, ține telefonul la nivelul pieptului."}
+                <p className="mt-3 flex items-center gap-1.5 text-xs text-white/60">
+                  <Compass className="h-3.5 w-3.5 shrink-0" />
+                  {mode === "orientation"
+                    ? (en ? "Motion sensors ready — we'll guide you to each frame." : "Senzori de mișcare gata — te ghidăm spre fiecare cadru.")
+                    : mode === "timer"
+                    ? (en ? "No compass sensor found — using simple timed capture." : "Nu am găsit senzor de busolă — folosim captura simplă, cu temporizator.")
+                    : (en ? "Checking your device's motion sensors…" : "Verificăm senzorii de mișcare ai telefonului…")}
                 </p>
                 <button type="button" onClick={beginCapture} disabled={!roomName.trim()} className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-emerald py-3 text-sm font-bold text-white transition hover:bg-emerald/90 disabled:cursor-not-allowed disabled:opacity-40">
                   <RotateCw className="h-4 w-4" /> {en ? "Start rotation capture" : "Pornește rotația"}
@@ -267,22 +371,42 @@ export default function WalkthroughCapture() {
               </div>
             )}
 
-            {stage === "countdown" && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/50">
-                <span className="font-heading text-7xl font-extrabold text-white">{countdown > 0 ? countdown : "!"}</span>
-                <p className="text-sm font-medium text-white/80">{en ? "Get ready to slowly turn around" : "Pregătește-te să te rotești încet"}</p>
+            {stage === "aiming" && mode === "orientation" && (
+              <div className="absolute inset-0 flex flex-col justify-between">
+                <div className="mt-[calc(3.5rem+env(safe-area-inset-top))] px-4">
+                  <CompassTape heading={relHeading} targetCount={TARGET_COUNT} capturedMask={capturedMask} nextIndex={nextTargetIdx} />
+                </div>
+                <div className="mb-8 flex flex-col items-center gap-3 px-6">
+                  <div className="relative flex h-20 w-20 items-center justify-center text-emerald">
+                    <ProgressRing progress={capturedCount / TARGET_COUNT} />
+                    <span className="absolute font-heading text-sm font-bold text-white">{capturedCount}/{TARGET_COUNT}</span>
+                  </div>
+                  <p className="max-w-[260px] text-center text-sm font-semibold text-white">{aimStatus}</p>
+                </div>
               </div>
             )}
 
-            {stage === "capturing" && (
+            {stage === "aiming" && mode === "timer" && timerPhase === "countdown" && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/50">
+                <span className="font-heading text-7xl font-extrabold text-white">{timerCountdown > 0 ? timerCountdown : "!"}</span>
+                <p className="text-sm font-medium text-white/80">{en ? "Get ready to slowly turn around" : "Pregătește-te să te rotești încet"}</p>
+              </div>
+            )}
+            {stage === "aiming" && mode === "timer" && timerPhase === "shooting" && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/35">
                 <div className="relative flex h-24 w-24 items-center justify-center text-emerald">
-                  <ProgressRing progress={captureProgress / FRAMES_PER_ROOM} />
-                  <span className="absolute font-heading text-lg font-bold text-white">{captureProgress}/{FRAMES_PER_ROOM}</span>
+                  <ProgressRing progress={capturedCount / TARGET_COUNT} />
+                  <span className="absolute font-heading text-lg font-bold text-white">{capturedCount}/{TARGET_COUNT}</span>
                 </div>
                 <p className="max-w-[220px] text-center text-sm font-medium text-white/85">
                   {en ? "Turn slowly in one full circle" : "Rotește-te încet, o singură tură completă"}
                 </p>
+              </div>
+            )}
+            {stage === "aiming" && mode === "detecting" && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/40">
+                <Loader2 className="h-7 w-7 animate-spin text-white" />
+                <p className="text-sm font-medium text-white/80">{en ? "Calibrating…" : "Calibrăm…"}</p>
               </div>
             )}
           </div>
@@ -318,14 +442,14 @@ export default function WalkthroughCapture() {
                 {en ? "Add a 360° virtual tour" : "Adaugă un tur virtual 360°"}
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                {en ? "Direct from your browser — no app to install. Follow 3 steps for each room." : "Direct din browser, fără nicio aplicație. Urmează 3 pași pentru fiecare cameră."}
+                {en ? "Direct from your browser — no app to install. We guide you to every frame, like a compass." : "Direct din browser, fără nicio aplicație. Te ghidăm spre fiecare cadru, ca o busolă."}
               </p>
 
               <div className="mt-6 grid gap-4 text-left sm:grid-cols-3">
                 {[
                   { icon: Home, t: en ? "Pick a room" : "Alege o cameră", d: en ? "Give it a name (e.g. Living room)." : "Dă-i un nume (ex: Living)." },
-                  { icon: RotateCw, t: en ? "Turn around slowly" : "Rotește-te încet pe loc", d: en ? "One full circle, phone at chest height." : "O tură completă, telefonul la piept." },
-                  { icon: Camera, t: en ? "We auto-capture" : "Captăm automat", d: en ? "16 photos are stitched into a look-around tour." : "16 poze devin un tur pe care vizitatorii îl pot roti." },
+                  { icon: Compass, t: en ? "Follow the guide" : "Urmărește ghidul", d: en ? "A marker shows exactly where to aim next." : "Un reper îți arată exact unde să ochești." },
+                  { icon: Camera, t: en ? "We auto-capture" : "Captăm automat", d: en ? "24 precisely-aimed photos become a smooth look-around tour." : "24 de cadre aliniate precis devin un tur pe care vizitatorii îl pot roti lin." },
                 ].map((s, i) => (
                   <div key={i} className="rounded-2xl border border-border bg-white p-4 dark:bg-card">
                     <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-soft text-emerald"><s.icon className="h-4.5 w-4.5" /></span>
@@ -396,6 +520,39 @@ export default function WalkthroughCapture() {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// Bandă orizontală tip busolă: fiecare reper e poziționat după diferența
+// unghiulară față de direcția curentă, ca într-un HUD de navigație — reperele
+// "alunecă" spre centru pe măsură ce te rotești spre ele.
+function CompassTape({ heading, targetCount, capturedMask, nextIndex }) {
+  const stepDeg = 360 / targetCount;
+  const PX_PER_DEG = 3;
+  const marks = [];
+  for (let i = 0; i < targetCount; i++) {
+    const targetDeg = i * stepDeg;
+    const diff = shortestDiff(heading, targetDeg) === targetDeg - heading ? targetDeg - heading : targetDeg - heading;
+    if (Math.abs(diff) <= 80) marks.push({ i, diff, captured: capturedMask[i] });
+  }
+  return (
+    <div className="relative mx-auto h-16 max-w-md overflow-hidden rounded-2xl bg-black/30 backdrop-blur-sm">
+      <div className="absolute left-1/2 top-0 z-10 h-full w-0.5 -translate-x-1/2 bg-emerald" />
+      <div className="absolute left-1/2 top-0.5 z-10 -translate-x-1/2 text-[10px] font-bold text-emerald">▼</div>
+      {marks.map(({ i, diff, captured }) => (
+        <div
+          key={i}
+          className="absolute top-1/2 flex -translate-y-1/2 flex-col items-center transition-[left] duration-100 ease-linear"
+          style={{ left: `calc(50% + ${diff * PX_PER_DEG}px)` }}
+        >
+          <span
+            className={`flex h-3 w-3 items-center justify-center rounded-full border-2 transition-colors ${
+              captured ? "border-emerald bg-emerald" : i === nextIndex ? "scale-125 border-white bg-white/30" : "border-white/40 bg-transparent"
+            }`}
+          />
+        </div>
+      ))}
     </div>
   );
 }
