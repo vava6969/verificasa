@@ -88,7 +88,18 @@ export default function WalkthroughViewer({ rooms = [], initialRoomIndex = 0, on
 
   useEffect(() => () => { cancelInertia(); cancelAutoSpin(); }, []);
 
-  if (!room) return null;
+  if (!room) {
+    // Există camere înregistrate, dar niciuna nu e încă gata de afișat (ex: scanare 3D
+    // încă în procesare) — mai bine un mesaj clar decât un gol neașteptat.
+    if ((rooms || []).length > 0) {
+      return (
+        <div className={`flex aspect-[16/10] w-full items-center justify-center rounded-2xl border border-border bg-secondary text-center text-sm text-muted-foreground ${className}`}>
+          Turul se procesează încă — revino în câteva minute.
+        </div>
+      );
+    }
+    return null;
+  }
 
   const onPointerDown = (e) => {
     if (frames.length < 2) return;
