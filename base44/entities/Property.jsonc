@@ -304,6 +304,11 @@
       "default": false,
       "title": "Disponibil schimb de chirie"
     },
+    "has_walkthrough_tour": {
+      "type": "boolean",
+      "default": false,
+      "title": "Are tur 360 (walkthrough)"
+    },
     "external_inspection_pending": {
       "type": "boolean",
       "default": false,
