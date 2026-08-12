@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { fixWebmDuration } from "@fix-webm-duration/fix";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
@@ -94,6 +95,7 @@ export default function WalkthroughCapture() {
   const mediaRecorderRef = useRef(null);
   const recordedChunksRef = useRef([]);
   const recordTimerRef = useRef(null);
+  const recordStartRef = useRef(0);
 
   // Senzorii pornesc de cum ajungem pe ecranul cu camera (nu doar în timpul
   // capturii), ca detecția "suportat / nesuportat" să se rezolve din timp.
@@ -378,13 +380,26 @@ export default function WalkthroughCapture() {
       return;
     }
     rec.ondataavailable = (e) => { if (e.data && e.data.size > 0) recordedChunksRef.current.push(e.data); };
-    rec.onstop = () => {
-      const blob = new Blob(recordedChunksRef.current, { type: rec.mimeType || "video/webm" });
-      setPendingVideo(blob);
+    rec.onstop = async () => {
+      const rawBlob = new Blob(recordedChunksRef.current, { type: rec.mimeType || "video/webm" });
+      const durationMs = Math.max(1000, Date.now() - recordStartRef.current);
+      // Chrome (MediaRecorder) scrie fișiere webm FĂRĂ durata în metadate (bug cunoscut) —
+      // multe servicii (inclusiv Kiri Engine) resping un asemenea video ca "nu îndeplinește
+      // cerințele". Petic-uim durata direct în blob înainte de upload.
+      let finalBlob = rawBlob;
+      if ((rec.mimeType || "").includes("webm")) {
+        try {
+          finalBlob = await fixWebmDuration(rawBlob, durationMs);
+        } catch (err) {
+          finalBlob = rawBlob;
+        }
+      }
+      setPendingVideo(finalBlob);
       setStage("review3d");
     };
     mediaRecorderRef.current = rec;
     rec.start();
+    recordStartRef.current = Date.now();
     setRecording(true);
     setRecordSeconds(0);
     recordTimerRef.current = setInterval(() => setRecordSeconds((s) => s + 1), 1000);
