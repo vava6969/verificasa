@@ -9,7 +9,7 @@ import WalkthroughViewer from "@/components/WalkthroughViewer";
 import { useTourOrientation, requestOrientationPermission } from "@/lib/useTourOrientation";
 import {
   X, Home, RotateCw, Sparkles, Camera, Check, Trash2, Plus,
-  Loader2, ChevronLeft, AlertTriangle, Compass, Gauge,
+  Loader2, ChevronLeft, AlertTriangle, Compass,
 } from "lucide-react";
 
 // Tur ghidat: în loc să tragem poze "oarbe" la interval fix, folosim
