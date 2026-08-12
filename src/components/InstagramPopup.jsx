@@ -94,7 +94,7 @@ export default function InstagramPopup() {
         <div className="px-5 py-4">
           <h3 className="font-heading text-lg font-bold text-navy">Urmărește-ne pe Instagram!</h3>
           <p className="mt-0.5 text-sm font-semibold text-emerald">@{HANDLE}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Noutăți imobiliare din Iași și Huși</p>
+          <p className="mt-1 text-xs text-muted-foreground">Noutăți imobiliare din toată România</p>
 
           <a
             href={URL}
