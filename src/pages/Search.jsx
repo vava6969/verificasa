@@ -7,7 +7,7 @@ import PropertyCard from "@/components/PropertyCard";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, SlidersHorizontal, ArrowDownUp, BookmarkPlus, RotateCcw, RotateCw, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, BookmarkPlus, RotateCcw, RotateCw, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
 
