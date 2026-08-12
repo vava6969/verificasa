@@ -249,6 +249,47 @@ export default function WalkthroughCapture() {
     }
   }, [recordSeconds, stage, recording]);
 
+  // Ținem mereu la zi ultima orientare/viteză în refs, ca bucla de mai jos să le
+  // citească fără să se re-creeze de fiecare dată când senzorul trimite un update.
+  useEffect(() => { headingRef.current = relHeading; velRef.current = velocity; }, [relHeading, velocity]);
+
+  const grabZoneThumb = (zoneIdx) => {
+    const video = videoRef.current, canvas = canvasRef.current;
+    if (!video || !canvas || !video.videoWidth) return;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      setScanZoneThumbs((prev) => {
+        const next = [...prev];
+        next[zoneIdx] = URL.createObjectURL(blob);
+        return next;
+      });
+    }, "image/jpeg", 0.6);
+    if (navigator.vibrate) { try { navigator.vibrate(15); } catch (e) {} }
+  };
+
+  // Ghidare live "colț cu colț" cât timp filmezi: împărțim rotația în
+  // SCAN_ZONE_COUNT zone, acumulăm timp petrecut (relativ stabil) în zona
+  // curentă și o marcăm "acoperită" + salvăm un cadru-martor când trece pragul.
+  useEffect(() => {
+    if (stage !== "recording" || mode !== "orientation") return;
+    const TICK_MS = 200;
+    const id = setInterval(() => {
+      if (velRef.current >= MAX_SCAN_PAN_VELOCITY_DEG) return;
+      const zoneIdx = zoneIndexFor(headingRef.current);
+      if (zoneCoveredRef.current[zoneIdx]) return;
+      zoneDwellMsRef.current[zoneIdx] += TICK_MS;
+      if (zoneDwellMsRef.current[zoneIdx] >= ZONE_COVERAGE_MS) {
+        zoneCoveredRef.current[zoneIdx] = true;
+        grabZoneThumb(zoneIdx);
+        setScanZonesCovered([...zoneCoveredRef.current]);
+      }
+    }, TICK_MS);
+    return () => clearInterval(id);
+  }, [stage, mode]);
+
   const previewUrls = useMemo(() => pendingFrames.map((b) => URL.createObjectURL(b)), [pendingFrames]);
   useEffect(() => () => { previewUrls.forEach((u) => URL.revokeObjectURL(u)); }, [previewUrls]);
 
