@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { RotateCw, ChevronLeft, ChevronRight, X, Move, View } from "lucide-react";
+import { RotateCw, ChevronLeft, ChevronRight, X, Move, View, Box } from "lucide-react";
 import PanoramaViewer from "@/components/PanoramaViewer";
+import Model3DViewer from "@/components/Model3DViewer";
 
 // Pseudo-360° "privește în jur" viewer. Fiecare cameră e o secvență de poze
 // aliniate unghiular (vezi WalkthroughCapture + useTourOrientation). Tragi cu
@@ -28,7 +29,9 @@ export default function WalkthroughViewer({ rooms = [], initialRoomIndex = 0, on
 
   const room = validRooms[roomIdx];
   const frames = room?.frame_urls || [];
-  const hasPanorama = !!room?.panorama_url;
+  const hasModel3d = room?.model_3d_status === "success" && !!room?.model_3d_url;
+  const hasPanorama = !!room?.panorama_url && !hasModel3d;
+  const interactiveNative = hasModel3d || hasPanorama;
 
   const cancelInertia = () => {
     if (inertiaRafRef.current) { cancelAnimationFrame(inertiaRafRef.current); inertiaRafRef.current = null; }
@@ -132,26 +135,28 @@ export default function WalkthroughViewer({ rooms = [], initialRoomIndex = 0, on
   return (
     <div className={`relative select-none overflow-hidden rounded-2xl border border-border bg-navy-deep shadow-soft ${className}`}>
       <div
-        className={`relative aspect-[16/10] w-full touch-none ${hasPanorama ? "" : dragging ? "cursor-grabbing" : frames.length > 1 ? "cursor-grab" : ""}`}
-        onPointerDown={hasPanorama ? undefined : onPointerDown}
-        onPointerMove={hasPanorama ? undefined : onPointerMove}
-        onPointerUp={hasPanorama ? undefined : endDrag}
-        onPointerCancel={hasPanorama ? undefined : endDrag}
-        onPointerLeave={hasPanorama ? undefined : endDrag}
+        className={`relative aspect-[16/10] w-full touch-none ${interactiveNative ? "" : dragging ? "cursor-grabbing" : frames.length > 1 ? "cursor-grab" : ""}`}
+        onPointerDown={interactiveNative ? undefined : onPointerDown}
+        onPointerMove={interactiveNative ? undefined : onPointerMove}
+        onPointerUp={interactiveNative ? undefined : endDrag}
+        onPointerCancel={interactiveNative ? undefined : endDrag}
+        onPointerLeave={interactiveNative ? undefined : endDrag}
       >
-        {hasPanorama ? (
+        {hasModel3d ? (
+          <Model3DViewer src={room.model_3d_url} />
+        ) : hasPanorama ? (
           <PanoramaViewer src={room.panorama_url} vfovDeg={room.panorama_vfov_deg || 50} />
         ) : (
           <CrossfadeStage src={frames[frameIdx]} alt={room.room_name} />
         )}
 
-        {hasPanorama && (
+        {(hasModel3d || hasPanorama) && (
           <span className="pointer-events-none absolute left-1/2 top-3 flex -translate-x-1/2 items-center gap-1 rounded-full bg-emerald/90 px-2.5 py-1 text-[10px] font-bold text-white">
-            <View className="h-3 w-3" /> Panoramă 360°
+            {hasModel3d ? <><Box className="h-3 w-3" /> Model 3D</> : <><View className="h-3 w-3" /> Panoramă 360°</>}
           </span>
         )}
 
-        {showHint && !hasPanorama && !autoSpin && frames.length > 1 && (
+        {showHint && !interactiveNative && !autoSpin && frames.length > 1 && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-navy-deep/25">
             <span className="flex items-center gap-2 rounded-full bg-navy-deep/70 px-4 py-2 text-xs font-semibold text-white backdrop-blur">
               <Move className="h-3.5 w-3.5" /> Trage pentru a privi în jur
