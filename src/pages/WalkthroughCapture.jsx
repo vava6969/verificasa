@@ -572,6 +572,18 @@ export default function WalkthroughCapture() {
     else aimStatus = en ? "Keep turning slowly" : "Continuă să te rotești încet";
   }
 
+  const nextUncoveredZoneIdx = scanZonesCovered.findIndex((c) => !c);
+  let scanHint = en ? "Walk slowly, cover every corner and wall" : "Mergi încet, acoperă fiecare colț și perete";
+  if (mode === "orientation") {
+    if (nextUncoveredZoneIdx === -1) {
+      scanHint = en ? "Full coverage! Stop whenever you're ready." : "Acoperire completă! Poți opri când vrei.";
+    } else if (!scanZonesCovered[zoneIndexFor(relHeading)]) {
+      scanHint = en ? "Filming this corner — hold it steady" : "Filmezi acest colț — ține telefonul stabil";
+    } else {
+      scanHint = en ? "Now rotate slowly to the next corner" : "Acum rotește-te încet spre următorul colț";
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#f4f6f9] dark:bg-background">
       <canvas ref={canvasRef} className="hidden" />
