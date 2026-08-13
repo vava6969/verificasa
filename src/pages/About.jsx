@@ -36,8 +36,8 @@ const CONTENT = {
     steps_h: "Pași simpli, de la anunț la chei",
     steps: [
       { icon: Search, title: "1. Cauți sau publici", desc: "Răsfoiești anunțuri verificate sau îți publici propria proprietate în câteva minute." },
-      { icon: ClipboardCheck, title: "2. Inspecție pe teren", desc: "Echipa VerifiCasa inspectează fizic locul și verifică actele pentru transparență 100%." },
-      { icon: Camera, title: "3. Tur 360° & promovare", desc: "Realizăm turul interactiv și poze, apoi îți propunem pachetul ideal de promovare." },
+      { icon: ClipboardCheck, title: "2. Verificare online", desc: "Verificăm poze, acte și preț înainte de publicare, pentru transparență 100%." },
+      { icon: Camera, title: "3. Scor & promovare", desc: "Anunțul primește un scor de încredere, apoi îți propunem pachetul ideal de promovare." },
       { icon: Handshake, title: "4. Contract & chei", desc: "Selectăm clientul potrivit și facilităm contractul și predarea — fără bătăi de cap." },
     ],
     trust: [
