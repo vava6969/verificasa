@@ -39,6 +39,7 @@ export function CircularCarousel({
   const [internalIndex, setInternalIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const intervalRef = useRef(null);
   const containerRef = useRef(null);
@@ -71,12 +72,12 @@ export function CircularCarousel({
   const prev = useCallback(() => goTo(activeIndex - 1), [activeIndex, goTo]);
 
   useEffect(() => {
-    if (!autoPlay || isHovered || isFocused) return;
+    if (!autoPlay || isHovered || isFocused || isDragging) return;
     intervalRef.current = setInterval(next, autoPlayInterval);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [autoPlay, autoPlayInterval, isHovered, isFocused, next]);
+  }, [autoPlay, autoPlayInterval, isHovered, isFocused, isDragging, next]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -106,8 +107,21 @@ export function CircularCarousel({
         className,
       )}
     >
-      {/* Track */}
-      <div className="relative h-[240px] w-full overflow-hidden sm:h-[280px]">
+      {/* Track — draggabil orizontal (mouse/touch); dragConstraints la 0 face din
+          drag doar un gest de swipe (elastic, revine mereu la loc) — poziția
+          reală a cărților rămâne controlată de activeIndex, ca și înainte. */}
+      <motion.div
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.12}
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={(e, info) => {
+          setIsDragging(false);
+          if (info.offset.x < -60 || info.velocity.x < -400) next();
+          else if (info.offset.x > 60 || info.velocity.x > 400) prev();
+        }}
+        className="relative h-[240px] w-full touch-pan-y overflow-hidden sm:h-[280px]"
+      >
         <AnimatePresence mode="popLayout">
           {items.map((item, i) => {
             const pos = getItemPosition(i, activeIndex, total, radiusX, radiusY);
@@ -172,7 +186,7 @@ export function CircularCarousel({
             );
           })}
         </AnimatePresence>
-      </div>
+      </motion.div>
 
       {/* Counter */}
       <div className="pointer-events-none flex flex-col items-center">
