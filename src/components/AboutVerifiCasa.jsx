@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ShieldCheck, Gauge, MessageSquare, Video, ArrowRight,
@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 
 export default function AboutVerifiCasa() {
+  const [activeAudience, setActiveAudience] = useState(0);
   const services = [
     { icon: ShieldCheck, title: "Verificare online", desc: "Verificăm fiecare anunț înainte de publicare: poze, acte de proprietate și corectitudinea prețului." },
     { icon: Gauge, title: "Scor de încredere", desc: "Fiecare proprietate primește automat un scor de încredere, calculat din completitudinea și calitatea anunțului." },
@@ -14,11 +15,11 @@ export default function AboutVerifiCasa() {
   ];
 
   const audience = [
-    { icon: Home, label: "Proprietari" },
-    { icon: Users, label: "Chiriași" },
-    { icon: Building2, label: "Administratori" },
-    { icon: UserCheck, label: "Cumpărători" },
-    { icon: Briefcase, label: "Profesioniști imobiliari" },
+    { icon: Home, label: "Proprietari", tint: "bg-emerald", desc: "Publici anunțul și primești automat un scor de încredere." },
+    { icon: Users, label: "Chiriași", tint: "bg-gold", desc: "Cauți sigur, cu recenzii reale de la alți chiriași." },
+    { icon: Building2, label: "Administratori", tint: "bg-mint", desc: "Gestionezi mai multe proprietăți dintr-un singur cont." },
+    { icon: UserCheck, label: "Cumpărători", tint: "bg-emerald", desc: "Vezi doar anunțuri verificate, fără timp pierdut." },
+    { icon: Briefcase, label: "Profesioniști imobiliari", tint: "bg-gold", desc: "Îiți listezi portofoliul și construiești reputație online." },
   ];
 
   return (
@@ -58,17 +59,38 @@ export default function AboutVerifiCasa() {
         ))}
       </div>
 
-      {/* Cui se adresează */}
-      <div className="mt-5 rounded-2xl surface-card p-4 sm:mt-12 sm:p-8">
-        <h3 className="text-center font-heading text-sm font-bold text-navy dark:text-foreground sm:text-lg">
+      {/* Cui se adresează — panou glassmorphism interactiv */}
+      <div className="relative mt-5 overflow-hidden rounded-3xl bg-gradient-to-br from-navy via-navy-deep to-navy p-5 sm:mt-12 sm:p-10">
+        <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-emerald/30 blur-3xl animate-blob" />
+        <div className="pointer-events-none absolute -left-8 bottom-0 h-36 w-36 rounded-full bg-gold/25 blur-3xl animate-blob" style={{ animationDelay: "2s" }} />
+        <div className="pointer-events-none absolute right-1/3 top-1/2 h-28 w-28 rounded-full bg-mint/20 blur-3xl animate-blob" style={{ animationDelay: "4s" }} />
+
+        <h3 className="relative text-center font-heading text-base font-bold text-white sm:text-2xl">
           Cui se adresează
         </h3>
-        <div className="mt-3 flex flex-wrap justify-center gap-1.5 sm:mt-6 sm:gap-3">
+
+        <div className="relative mt-5 grid grid-cols-2 gap-3 sm:mt-8 sm:grid-cols-5 sm:gap-4">
           {audience.map((a, i) => (
-            <div key={i} className="flex items-center gap-1.5 rounded-full border border-border bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-navy dark:bg-white/5 dark:text-foreground sm:gap-2 sm:px-4 sm:py-2 sm:text-sm">
-              <a.icon className="h-3 w-3 text-emerald sm:h-4 sm:w-4" /> {a.label}
-            </div>
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActiveAudience(i)}
+              className={`group flex flex-col items-center gap-2 rounded-2xl border p-3 text-center backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 sm:p-4 ${
+                activeAudience === i
+                  ? "border-white/40 bg-white/20"
+                  : "border-white/10 bg-white/5 hover:border-white/25 hover:bg-white/10"
+              }`}
+            >
+              <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${a.tint} transition-transform duration-300 group-hover:scale-110 sm:h-12 sm:w-12`}>
+                <a.icon className="h-5 w-5 text-white sm:h-6 sm:w-6" />
+              </span>
+              <span className="text-[11px] font-semibold text-white sm:text-sm">{a.label}</span>
+            </button>
           ))}
+        </div>
+
+        <div className="relative mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-center text-xs text-white/80 backdrop-blur-xl transition-all duration-300 sm:mt-6 sm:text-sm">
+          {audience[activeAudience].desc}
         </div>
       </div>
 
