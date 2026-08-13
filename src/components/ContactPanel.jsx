@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { MessageCircle, Phone, ShieldCheck, BadgeCheck, Clock, Home, Star } from "lucide-react";
+import { MessageCircle, Phone, ShieldCheck, BadgeCheck, Clock, Star } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -49,7 +49,7 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
 
   const trustMarkers = [
     p.owner_verified && { icon: BadgeCheck, text: t("badge_owner_v") },
-    (p.verification_level === "field_certified" || p.inspection_report_url) && { icon: Home, text: t("pd_trust_inspection") },
+    typeof p.trust_score === "number" && p.trust_score >= 40 && { icon: ShieldCheck, text: t("pd_trust_inspection") },
     { icon: Clock, text: t("pd_trust_response") },
   ].filter(Boolean);
 
