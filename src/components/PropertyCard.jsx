@@ -103,12 +103,16 @@ export default function PropertyCard({ property, hot = false }) {
     : "";
 
   // Chips secundare — icon-only, max 3 vizibile + popover pentru restul
+  // Toate chip-urile folosesc acum un singur stil neutru, consistent — culoarea
+  // e rezervată pentru semnale importante (badge-ul Verificat, Hot), nu pentru
+  // fiecare facilitate în parte.
+  const CHIP_CLS = "bg-secondary text-foreground/65 dark:bg-white/10 dark:text-foreground/70";
   const chips = [];
-  if (p.tour_3d_url) chips.push({ icon: Box, label: t("tab_3d"), cls: "bg-navy/10 text-navy dark:bg-white/10 dark:text-foreground" });
-  if (p.commission_free) chips.push({ icon: BadgePercent, label: t("pc_com0"), cls: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" });
-  if (p.pet_friendly) chips.push({ icon: PawPrint, label: t("pc_pet_btn"), cls: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300" });
-  if (p.furnished) chips.push({ icon: Sofa, label: t("badge_furnished"), cls: "bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300" });
-  if (p.parking) chips.push({ icon: Car, label: t("badge_parking"), cls: "bg-emerald-soft text-emerald" });
+  if (p.tour_3d_url) chips.push({ icon: Box, label: t("tab_3d"), cls: CHIP_CLS });
+  if (p.commission_free) chips.push({ icon: BadgePercent, label: t("pc_com0"), cls: CHIP_CLS });
+  if (p.pet_friendly) chips.push({ icon: PawPrint, label: t("pc_pet_btn"), cls: CHIP_CLS });
+  if (p.furnished) chips.push({ icon: Sofa, label: t("badge_furnished"), cls: CHIP_CLS });
+  if (p.parking) chips.push({ icon: Car, label: t("badge_parking"), cls: CHIP_CLS });
   const visibleChips = chips.slice(0, 3);
   const extraChips = chips.slice(3);
 
