@@ -1,16 +1,14 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  ShieldCheck, Gauge, MessageSquare, Video, ArrowRight,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function AboutVerifiCasa() {
   const [activeAudience, setActiveAudience] = useState(0);
   const services = [
-    { icon: ShieldCheck, title: "Verificare online", desc: "Verificăm fiecare anunț înainte de publicare: poze, acte de proprietate și corectitudinea prețului." },
-    { icon: Gauge, title: "Scor de încredere", desc: "Fiecare proprietate primește automat un scor de încredere, calculat din completitudinea și calitatea anunțului." },
-    { icon: MessageSquare, title: "Recenzii & comunitate", desc: "Chiriașii pot lăsa recenzii, ca să știi la ce te aștepți încă înainte să suni proprietarul." },
-    { icon: Video, title: "Tur 3D opțional", desc: "Proprietarii pot adăuga un tur virtual Matterport al locuinței, disponibil prin Plan Pro." },
+    { img: "/images/generated/icon-shield-check.png", title: "Verificare online", desc: "Verificăm fiecare anunț înainte de publicare: poze, acte de proprietate și corectitudinea prețului." },
+    { img: "/images/generated/icon-gauge.png", title: "Scor de încredere", desc: "Fiecare proprietate primește automat un scor de încredere, calculat din completitudinea și calitatea anunțului." },
+    { img: "/images/generated/icon-chat.png", title: "Recenzii & comunitate", desc: "Chiriașii pot lăsa recenzii, ca să știi la ce te aștepți încă înainte să suni proprietarul." },
+    { img: "/images/generated/icon-video.png", title: "Tur 3D opțional", desc: "Proprietarii pot adăuga un tur virtual Matterport al locuinței, disponibil prin Plan Pro." },
   ];
 
   const audience = [
