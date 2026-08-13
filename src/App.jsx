@@ -97,7 +97,6 @@ const AuthenticatedApp = () => {
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route path="/post-property" element={<PostProperty />} />
         <Route path="/messages/:id" element={<Conversation />} />
-        {/* Captură tur virtual 360° — ecran full-screen, fără chrome-ul obișnuit de site */}
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
