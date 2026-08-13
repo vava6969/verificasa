@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, BedDouble, Maximize, ShieldCheck, Box, Eye, RotateCw } from "lucide-react";
+import { MapPin, BedDouble, Maximize, ShieldCheck, Box, Eye } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { Image } from "@/components/ui/image";
 
@@ -12,7 +12,9 @@ export default function SimilarPropertyCard({ property, hot = false }) {
   const p = property;
   const images = p.images?.length ? p.images : [];
 
-  const isVerified = p.owner_verified || p.verification_level === "field_certified" || p.ai_tour_verified;
+  const trustScore = typeof p.trust_score === "number" ? p.trust_score : 0;
+  const isHighTrust = trustScore >= 75;
+  const isVerified = trustScore >= 40;
 
   const eur = formatPrice(p.price_monthly, p.currency, "EUR");
   const ron = formatPrice(p.price_monthly, p.currency, "RON");
@@ -34,19 +36,18 @@ export default function SimilarPropertyCard({ property, hot = false }) {
 
         {/* Badges */}
         <div className="absolute left-2 top-2 flex flex-col gap-1">
-          {isVerified && (
+          {isHighTrust ? (
+            <span className="flex items-center gap-0.5 rounded-full bg-navy px-2 py-0.5 text-[10px] font-bold text-mint shadow-soft ring-1 ring-mint/40">
+              <ShieldCheck className="h-3 w-3" /> {t("pc_trust_high")}
+            </span>
+          ) : isVerified ? (
             <span className="flex items-center gap-0.5 rounded-full bg-emerald px-2 py-0.5 text-[10px] font-bold text-white shadow-soft">
               <ShieldCheck className="h-3 w-3" /> {t("pc_verified")}
             </span>
-          )}
+          ) : null}
           {p.tour_3d_url && (
             <span className="flex items-center gap-0.5 rounded-full bg-navy px-2 py-0.5 text-[10px] font-bold text-mint shadow-soft ring-1 ring-mint/40">
               <Box className="h-3 w-3" /> {t("tab_3d")}
-            </span>
-          )}
-          {p.has_walkthrough_tour && (
-            <span className="flex items-center gap-0.5 rounded-full bg-indigo-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-soft">
-              <RotateCw className="h-3 w-3" /> {t("tab_tour360")}
             </span>
           )}
         </div>
