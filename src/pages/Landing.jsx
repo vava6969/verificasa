@@ -16,9 +16,14 @@ import CircularCarousel from "@/components/ui/circular-carousel";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  ShieldCheck, ArrowRight, Video, FileText, FileCheck, Gauge, Lock, Home, Plus,
-  UserCheck, Flag, Clock, BadgePercent, MessageSquare,
+  ShieldCheck, ArrowRight, FileText, Home, Plus,
 } from "lucide-react";
+
+function iconImg(src) {
+  return function IconImg({ className = "" }) {
+    return <img src={src} alt="" className={`object-contain ${className}`} />;
+  };
+}
 
 export default function Landing() {
   const { country, t, lang } = useCountry();
@@ -27,15 +32,15 @@ export default function Landing() {
   const [showListeaza, setShowListeaza] = useState(false);
 
   const carouselItems = [
-    { id: "1", icon: Video, title: t("vp1_t"), description: t("vp1_d") },
-    { id: "2", icon: ShieldCheck, title: t("vp2_t"), description: t("vp2_d") },
-    { id: "3", icon: Lock, title: t("vp3_t"), description: t("vp3_d") },
-    { id: "4", icon: FileText, title: t("vp4_t"), description: t("vp4_d") },
-    { id: "5", icon: UserCheck, title: t("vp5_t"), description: t("vp5_d") },
-    { id: "6", icon: Flag, title: t("vp6_t"), description: t("vp6_d") },
-    { id: "7", icon: Clock, title: t("vp7_t"), description: t("vp7_d") },
-    { id: "8", icon: BadgePercent, title: t("vp8_t"), description: t("vp8_d") },
-    { id: "9", icon: MessageSquare, title: t("vp9_t"), description: t("vp9_d") },
+    { id: "1", icon: iconImg("/images/generated/icon-video.png"), title: t("vp1_t"), description: t("vp1_d") },
+    { id: "2", icon: iconImg("/images/generated/icon-shield-check.png"), title: t("vp2_t"), description: t("vp2_d") },
+    { id: "3", icon: iconImg("/images/generated/icon-lock.png"), title: t("vp3_t"), description: t("vp3_d") },
+    { id: "4", icon: iconImg("/images/generated/icon-document.png"), title: t("vp4_t"), description: t("vp4_d") },
+    { id: "5", icon: iconImg("/images/generated/icon-user-check.png"), title: t("vp5_t"), description: t("vp5_d") },
+    { id: "6", icon: iconImg("/images/generated/icon-flag.png"), title: t("vp6_t"), description: t("vp6_d") },
+    { id: "7", icon: iconImg("/images/generated/icon-clock.png"), title: t("vp7_t"), description: t("vp7_d") },
+    { id: "8", icon: iconImg("/images/generated/icon-percent-badge.png"), title: t("vp8_t"), description: t("vp8_d") },
+    { id: "9", icon: iconImg("/images/generated/icon-chat.png"), title: t("vp9_t"), description: t("vp9_d") },
   ];
   useEffect(() => {
     let cancelled = false;
@@ -173,13 +178,16 @@ export default function Landing() {
 
             <div className="mt-5 grid grid-cols-2 gap-2 sm:mt-8 sm:grid-cols-4 sm:gap-3">
               {[
-                { icon: ShieldCheck, label: t("b_verified") },
-                { icon: Gauge, label: t("b_measure") },
-                { icon: FileText, label: t("b_report") },
-                { icon: FileCheck, label: t("b_docs") },
+                { icon: iconImg("/images/generated/icon-shield-check.png"), label: t("b_verified") },
+                { icon: iconImg("/images/generated/icon-gauge.png"), label: t("b_measure") },
+                { icon: iconImg("/images/generated/icon-document.png"), label: t("b_report") },
+                { icon: iconImg("/images/generated/icon-document-check.png"), label: t("b_docs") },
               ].map((b, i) => (
                 <div key={i} className="flex items-center gap-2 rounded-xl border border-border/50 bg-white/60 px-3 py-2.5 text-xs font-semibold text-foreground/80 backdrop-blur-md dark:border-white/10 dark:bg-white/5 dark:text-white/80">
-                  <b.icon className="h-4 w-4 shrink-0 text-emerald" /> {b.label}
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white p-0.5 ring-1 ring-black/5">
+                    <b.icon className="h-full w-full" />
+                  </span>
+                  {b.label}
                 </div>
               ))}
             </div>
