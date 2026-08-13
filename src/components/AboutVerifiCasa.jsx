@@ -15,11 +15,11 @@ export default function AboutVerifiCasa() {
   ];
 
   const audience = [
-    { icon: Home, label: "Proprietari", tint: "bg-emerald", desc: "Publici anunțul și primești automat un scor de încredere." },
-    { icon: Users, label: "Chiriași", tint: "bg-gold", desc: "Cauți sigur, cu recenzii reale de la alți chiriași." },
-    { icon: Building2, label: "Administratori", tint: "bg-mint", desc: "Gestionezi mai multe proprietăți dintr-un singur cont." },
-    { icon: UserCheck, label: "Cumpărători", tint: "bg-emerald", desc: "Vezi doar anunțuri verificate, fără timp pierdut." },
-    { icon: Briefcase, label: "Profesioniști imobiliari", tint: "bg-gold", desc: "Îiți listezi portofoliul și construiești reputație online." },
+    { img: "/images/generated/icon-proprietari.png", label: "Proprietari", desc: "Publici anunțul și primești automat un scor de încredere." },
+    { img: "/images/generated/icon-chiriasi.png", label: "Chiriași", desc: "Cauți sigur, cu recenzii reale de la alți chiriași." },
+    { img: "/images/generated/icon-administratori.png", label: "Administratori", desc: "Gestionezi mai multe proprietăți dintr-un singur cont." },
+    { img: "/images/generated/icon-cumparatori.png", label: "Cumpărători", desc: "Vezi doar anunțuri verificate, fără timp pierdut." },
+    { img: "/images/generated/icon-agenti.png", label: "Profesioniști imobiliari", desc: "Îiți listezi portofoliul și construiești reputație online." },
   ];
 
   return (
@@ -81,8 +81,8 @@ export default function AboutVerifiCasa() {
                   : "border-white/10 bg-white/5 hover:border-white/25 hover:bg-white/10"
               }`}
             >
-              <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${a.tint} transition-transform duration-300 group-hover:scale-110 sm:h-12 sm:w-12`}>
-                <a.icon className="h-5 w-5 text-white sm:h-6 sm:w-6" />
+              <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-white p-1.5 shadow-soft transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
+                <img src={a.img} alt="" className="h-full w-full object-contain" />
               </span>
               <span className="text-[11px] font-semibold text-white sm:text-sm">{a.label}</span>
             </button>
