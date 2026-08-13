@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import {
-  ShieldCheck, Video, Users, FileText, BadgeCheck, Lock, MapPin, Sparkles,
+  ShieldCheck, Users, FileText, BadgeCheck, Lock, MapPin, Sparkles,
   Search, ClipboardCheck, Camera, Handshake, ArrowRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
