@@ -1,24 +1,23 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import {
-  ShieldCheck, Video, FileText, Home, Users, Building2,
-  UserCheck, Search, Briefcase, ArrowRight,
+  ShieldCheck, Gauge, MessageSquare, Video, ArrowRight,
+  Home, Users, Building2, UserCheck, Briefcase,
 } from "lucide-react";
 
 export default function AboutVerifiCasa() {
   const services = [
-    { icon: Video, title: "Tururi 3D & AI", desc: "Tururi virtuale Matterport și randări AI pentru proprietăți imobiliare.", image: "/images/about/tururi-3d.webp" },
-    { icon: ShieldCheck, title: "Inspecții & Verificări", desc: "Audit profesional de proprietăți, rapoarte de inspecție și verificări on-site.", image: "/images/about/inspectii.webp" },
-    { icon: FileText, title: "Gestionare documente", desc: "Administrarea rapoartelor, contractelor și documentelor într-un mediu securizat.", image: "/images/about/documente.webp" },
-    { icon: Search, title: "Căutare & listare", desc: "Platformă de listare și descoperire a proprietăților cu filtre avansate.", image: "/images/about/cautare.webp" },
+    { icon: ShieldCheck, title: "Verificare online", desc: "Verificăm fiecare anunț înainte de publicare: poze, acte de proprietate și corectitudinea prețului." },
+    { icon: Gauge, title: "Scor de încredere", desc: "Fiecare proprietate primește automat un scor de încredere, calculat din completitudinea și calitatea anunțului." },
+    { icon: MessageSquare, title: "Recenzii & comunitate", desc: "Chiriașii pot lăsa recenzii, ca să știi la ce te aștepți încă înainte să suni proprietarul." },
+    { icon: Video, title: "Tur 3D opțional", desc: "Proprietarii pot adăuga un tur virtual Matterport al locuinței, disponibil prin Plan Pro." },
   ];
 
   const audience = [
-    { icon: ShieldCheck, label: "Inspectori" },
     { icon: Home, label: "Proprietari" },
+    { icon: Users, label: "Chiriași" },
     { icon: Building2, label: "Administratori" },
     { icon: UserCheck, label: "Cumpărători" },
-    { icon: Users, label: "Chiriași" },
     { icon: Briefcase, label: "Profesioniști imobiliari" },
   ];
 
@@ -28,44 +27,33 @@ export default function AboutVerifiCasa() {
       <div className="text-center">
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald sm:text-xs">Despre VerifiCasa</p>
         <h2 className="mt-1.5 font-heading text-lg font-bold leading-snug text-navy dark:text-foreground sm:text-3xl">
-          Platforma de inspecții și verificări imobiliare
+          Piața online pentru chirii verificate
         </h2>
         <p className="mx-auto mt-2 max-w-3xl text-[13px] leading-relaxed text-muted-foreground sm:mt-4 sm:text-base">
-          VerifiCasa este o platformă online dedicată gestionării inspecțiilor și verificărilor
-          imobiliare. Platforma permite administrarea proprietăților, organizarea rapoartelor de
-          inspecție, gestionarea documentelor și colaborarea într-un mediu securizat.
+          Proprietarii își publică singuri anunțurile, iar VerifiCasa verifică online fiecare
+          anunț — poze, acte și preț — și calculează automat un scor de încredere. Chiriașii pot
+          lăsa recenzii, iar un tur 3D al locuinței este disponibil opțional, prin Plan Pro.
         </p>
       </div>
 
-      {/* Servicii — imagine tematică + Read More, card interactiv cu hover lift */}
+      {/* Servicii — carduri cu iconițe, hover lift */}
       <div className="mt-5 grid grid-cols-1 gap-4 sm:mt-10 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
         {services.map((s, i) => (
           <div
             key={i}
-            className="group relative flex flex-col overflow-hidden rounded-3xl surface-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)]"
+            className="group relative flex flex-col overflow-hidden rounded-3xl surface-card p-4 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] sm:p-5"
           >
-            <div className="relative aspect-[4/3] overflow-hidden">
-              <img
-                src={s.image}
-                alt={s.title}
-                loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/55 via-navy-deep/0 to-navy-deep/0" />
-              <div className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-xl bg-white/90 text-emerald shadow-soft backdrop-blur">
-                <s.icon className="h-4 w-4" />
-              </div>
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-soft text-emerald transition-transform duration-300 group-hover:scale-110 sm:h-12 sm:w-12">
+              <s.icon className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
-            <div className="flex flex-1 flex-col p-4 sm:p-5">
-              <h3 className="font-heading text-sm font-bold text-navy dark:text-foreground sm:text-base">{s.title}</h3>
-              <p className="mt-1.5 flex-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">{s.desc}</p>
-              <Link
-                to="/about"
-                className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-emerald transition-all duration-200 group-hover:gap-2 sm:text-sm"
-              >
-                Află mai multe <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-              </Link>
-            </div>
+            <h3 className="mt-3 font-heading text-sm font-bold text-navy dark:text-foreground sm:text-base">{s.title}</h3>
+            <p className="mt-1.5 flex-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">{s.desc}</p>
+            <Link
+              to="/about"
+              className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-emerald transition-all duration-200 group-hover:gap-2 sm:text-sm"
+            >
+              Află mai multe <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </Link>
           </div>
         ))}
       </div>
