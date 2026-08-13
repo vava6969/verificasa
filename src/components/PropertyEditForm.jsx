@@ -312,20 +312,32 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
           Nu există încă plată reală, deci arătăm doar teaser-ul încuiat; link-ul
           efectiv se setează momentan manual, de admin, mai jos. */}
       {!isAdmin && (
-        <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-dashed border-border bg-secondary/30 p-3.5">
-          <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-secondary text-muted-foreground">
+        form.tour_3d_url ? (
+          <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald/30 bg-emerald-soft/40 p-3.5">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-soft text-emerald">
               <Video className="h-4 w-4" />
             </span>
             <span>
-              <span className="block text-sm font-semibold text-navy dark:text-foreground">Tur 3D (Matterport)</span>
-              <span className="block text-xs text-muted-foreground">Adaugă link-ul tău către tur — disponibil cu Plan Pro</span>
+              <span className="block text-sm font-semibold text-navy dark:text-foreground">Tur 3D (Matterport) activ</span>
+              <span className="block text-xs text-muted-foreground">Turul tău virtual este vizibil pe anunț</span>
             </span>
           </div>
-          <span className="flex shrink-0 items-center gap-1 rounded-full bg-gold-soft px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-gold-deep">
-            <Lock className="h-3 w-3" /> Plan Pro
-          </span>
-        </div>
+        ) : (
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-dashed border-border bg-secondary/30 p-3.5">
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-secondary text-muted-foreground">
+                <Video className="h-4 w-4" />
+              </span>
+              <span>
+                <span className="block text-sm font-semibold text-navy dark:text-foreground">Tur 3D (Matterport)</span>
+                <span className="block text-xs text-muted-foreground">Adaugă link-ul tău către tur — disponibil cu Plan Pro</span>
+              </span>
+            </div>
+            <span className="flex shrink-0 items-center gap-1 rounded-full bg-gold-soft px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-gold-deep">
+              <Lock className="h-3 w-3" /> Plan Pro
+            </span>
+          </div>
+        )
       )}
 
       {/* Badge-uri & verificări — admin only */}
