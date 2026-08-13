@@ -245,6 +245,16 @@ export default function PropertyDetail() {
                   </div>
                 )}
 
+                {/* Preîncărcăm pozele vecine (stânga/dreapta) la aceeași dimensiune ca poza
+                    principală, ca navigarea next/prev să pară instantă în loc să
+                    reîncarce vizibil de fiecare dată. */}
+                {images.length > 1 && (
+                  <div className="pointer-events-none absolute inset-0 opacity-0" aria-hidden="true">
+                    <Image src={images[(activeImage + 1) % images.length]} fittingType="fill" className="h-full w-full" />
+                    <Image src={images[(activeImage - 1 + images.length) % images.length]} fittingType="fill" className="h-full w-full" />
+                  </div>
+                )}
+
                 {images.length > 1 && (
                   <>
                     <button
