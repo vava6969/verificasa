@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ShieldCheck, Gauge, MessageSquare, Video, ArrowRight,
-  Home, Users, Building2, UserCheck, Briefcase,
 } from "lucide-react";
 
 export default function AboutVerifiCasa() {
@@ -19,7 +18,7 @@ export default function AboutVerifiCasa() {
     { img: "/images/generated/icon-chiriasi.png", label: "Chiriași", desc: "Cauți sigur, cu recenzii reale de la alți chiriași." },
     { img: "/images/generated/icon-administratori.png", label: "Administratori", desc: "Gestionezi mai multe proprietăți dintr-un singur cont." },
     { img: "/images/generated/icon-cumparatori.png", label: "Cumpărători", desc: "Vezi doar anunțuri verificate, fără timp pierdut." },
-    { img: "/images/generated/icon-agenti.png", label: "Profesioniști imobiliari", desc: "Îiți listezi portofoliul și construiești reputație online." },
+    { img: "/images/generated/icon-agenti.png", label: "Profesioniști imobiliari", desc: "Îți listezi portofoliul și construiești reputație online." },
   ];
 
   return (
