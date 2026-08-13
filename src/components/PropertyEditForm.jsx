@@ -308,6 +308,26 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         </Field>
       </div>
 
+      {/* Tur 3D (Matterport) — self-serve pentru proprietar, deblocat cu Plan Pro.
+          Nu există încă plată reală, deci arătăm doar teaser-ul încuiat; link-ul
+          efectiv se setează momentan manual, de admin, mai jos. */}
+      {!isAdmin && (
+        <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-dashed border-border bg-secondary/30 p-3.5">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-secondary text-muted-foreground">
+              <Video className="h-4 w-4" />
+            </span>
+            <span>
+              <span className="block text-sm font-semibold text-navy dark:text-foreground">Tur 3D (Matterport)</span>
+              <span className="block text-xs text-muted-foreground">Adaugă link-ul tău către tur — disponibil cu Plan Pro</span>
+            </span>
+          </div>
+          <span className="flex shrink-0 items-center gap-1 rounded-full bg-gold-soft px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-gold-deep">
+            <Lock className="h-3 w-3" /> Plan Pro
+          </span>
+        </div>
+      )}
+
       {/* Badge-uri & verificări — admin only */}
       {isAdmin && (
         <>
@@ -320,7 +340,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
             </Field>
             <label className="flex items-center gap-2 self-end pb-2"><input type="checkbox" checked={form.owner_verified} onChange={(e) => upd("owner_verified", e.target.checked)} /> Proprietar verificat</label>
             <label className="flex items-center gap-2 self-end pb-2"><input type="checkbox" checked={form.ai_tour_verified} onChange={(e) => upd("ai_tour_verified", e.target.checked)} /> Activare badge Tur 3D</label>
-            <Field label="Link Tur 3D (Matterport — doar admin)">
+            <Field label="Link Tur 3D (Matterport — admin, Plan Pro)">
               <input value={form.tour_3d_url} onChange={(e) => upd("tour_3d_url", e.target.value)} placeholder="https://my.matterport.com/show/?m=..." className={inputCls} />
             </Field>
             <Field label="Tur Video URL">
