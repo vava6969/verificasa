@@ -16,8 +16,8 @@ export default function ActionCards({ onRequestInspection }) {
       img: "/images/illustrations/action-search.svg",
       title: en ? "Find a verified rental" : "Caută o chirie verificată",
       desc: en
-        ? "Browse listings that have been checked on-site, with real photos and honest pricing."
-        : "Răsfoiește anunțuri verificate pe teren, cu poze reale și prețuri corecte.",
+        ? "Browse listings that have been verified online, with real photos and honest pricing."
+        : "Răsfoiește anunțuri verificate online, cu poze reale și prețuri corecte.",
       cta: en ? "Search properties" : "Caută proprietăți",
       to: "/search",
     },
@@ -32,11 +32,11 @@ export default function ActionCards({ onRequestInspection }) {
     },
     {
       img: "/images/illustrations/action-inspect.svg",
-      title: en ? "Request an inspection" : "Solicită o inspecție pe teren",
+      title: en ? "Request a verification" : "Solicită o verificare",
       desc: en
-        ? "Our team verifies the property in person, so you rent with no surprises."
-        : "Echipa noastră verifică proprietatea la fața locului, fără surprize la mutare.",
-      cta: en ? "Request inspection" : "Solicită inspecție",
+        ? "Our team verifies the listing online — photos, paperwork and price — so you rent with no surprises."
+        : "Echipa noastră verifică anunțul online — poze, acte și preț — fără surprize la mutare.",
+      cta: en ? "Request verification" : "Solicită verificare",
       to: null,
     },
   ];
