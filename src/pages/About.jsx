@@ -63,10 +63,9 @@ const CONTENT = {
     faq_h: "Tot ce vrei să știi despre VerifiCasa",
     faq: [
       { q: "Cum funcționează verificarea?", a: "Verificăm online fiecare anunț înainte de publicare — poze, acte și preț — și calculăm un scor de încredere atașat anunțului." },
-      { q: "IGNORE_OLD", a: "IGNORE_OLD_TO_DROP — verificăm actele, starea reală, zgomotul (dB) și presiunea apei, apoi emitem un raport atașat anunțului." },
-      { q: "Ce este turul 3D / AI?", a: "Este un tur virtual generat din pozele proprietarului, pe care îl poți explora online din telefon sau calculator înainte să mergi la o vizionare fizică." },
-      { q: "Cât costă să listez o proprietate?", a: "Publică anunțul gratuit din cont. Detaliile despre pachete, comisioane și contracte se discută direct cu agenții noștri VerifiCasa pe WhatsApp sau email." },
-      { q: "În ce orașe sunteți activi?", a: "Poți căuta în toată România — peste 300 de orașe și cartiere sunt deja în platformă. Verificările pe teren pornesc din Iași și Huși și se extind constant." },
+      { q: "Ce este turul 3D?", a: "Proprietarul poate adăuga propriul tur 3D, realizat cu Matterport, disponibil cu Plan Pro — îl poți explora online din telefon sau calculator înainte de o vizionare." },
+      { q: "Cât costă să listez o proprietate?", a: "Publicarea anunțului și verificarea de bază sunt gratuite. Detaliile despre Plan Pro se discută direct cu echipa VerifiCasa pe WhatsApp sau email." },
+      { q: "În ce orașe sunteți activi?", a: "Poți căuta în toată România — peste 300 de orașe și cartiere sunt deja în platformă. Verificarea este online, deci disponibilă peste tot, din prima zi." },
       { q: "Cum contactez un proprietar sau agent?", a: "Direct din anunț — prin mesagerie în platformă, telefon sau WhatsApp, fără să-ți expui numărul până nu decizi tu." },
       { q: "Pot salva proprietatea sau căutarea pentru mai târziu?", a: "Da — cu un cont gratuit poți salva proprietatea (inima de pe anunț) sau întreaga căutare, ca s-o regăsești oricând în cont." },
     ],
