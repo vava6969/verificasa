@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { MapPin } from "lucide-react";
-import { Image } from "@/components/ui/image";
 import { useCountry } from "@/components/CountryContext";
 import { Button } from "@/components/ui/button";
 
@@ -12,14 +11,11 @@ export default function MapSearchCTA() {
 
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-border shadow-soft dark:border-white/10">
-      {/* Full-bleed illustration */}
-      <Image
-        src="https://media.base44.com/images/public/6a5ef7d63008cd71560dfe14/c39d91807_image.png"
+      {/* Full-bleed illustration — generată cu Higgsfield, tema hartă/verificare */}
+      <img
+        src="/images/generated/map-search-cta-v1.png"
         alt="Toate proprietățile pe hartă"
-        fittingType="fill"
-        focalPointX={0.75}
-        focalPointY={0.3}
-        className="absolute inset-0 h-full w-full scale-105 transition-transform duration-700 ease-out group-hover:scale-110"
+        className="absolute inset-0 h-full w-full object-cover scale-105 transition-transform duration-700 ease-out group-hover:scale-110"
       />
 
       {/* Gradient scrim so the text stays readable over any photo */}
