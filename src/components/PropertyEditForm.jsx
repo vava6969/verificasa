@@ -161,6 +161,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         payload.tour_3d_url = form.tour_3d_url;
       }
       await base44.entities.Property.update(property.id, payload);
+      base44.functions.invoke("ComputeTrustScore", { property_id: property.id }).catch(() => {});
       toast({ title: "Anunț actualizat" });
       onDone();
     } catch (err) {
