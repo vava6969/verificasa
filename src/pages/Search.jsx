@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, BookmarkPlus, RotateCcw, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
+import { RevealGroup, RevealItem } from "@/components/ui/reveal";
 
 // VerifiCasa verification filters — each applies a real-property predicate.
 const VERIF_FILTERS = [
@@ -264,9 +265,13 @@ export default function SearchPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {paged.map((p) => <PropertyCard key={p.id} property={p} />)}
-          </div>
+          <RevealGroup className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {paged.map((p) => (
+              <RevealItem key={p.id}>
+                <PropertyCard property={p} />
+              </RevealItem>
+            ))}
+          </RevealGroup>
 
           {totalPages > 1 && (() => {
             const MAX_VISIBLE = 5;
