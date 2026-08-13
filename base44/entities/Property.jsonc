@@ -309,6 +309,11 @@
       "default": false,
       "title": "Are tur 360 (walkthrough)"
     },
+    "trust_score": {
+      "type": "number",
+      "default": 0,
+      "title": "Scor de incredere (calculat automat)"
+    },
     "external_inspection_pending": {
       "type": "boolean",
       "default": false,
