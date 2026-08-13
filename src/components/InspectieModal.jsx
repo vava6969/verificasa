@@ -22,9 +22,9 @@ const ROLES = [
 
 const PACKAGES = [
   { value: "Verificare Standard",   emoji: "✅" },
-  { value: "Tur 3D + Foto",         emoji: "📸" },
-  { value: "Inspecție Completă",    emoji: "🛡️" },
-  { value: "Audit Premium",         emoji: "🏆" },
+  { value: "Verificare Acte",       emoji: "📄" },
+  { value: "Verificare Completă",   emoji: "🛡️" },
+  { value: "Plan Pro",              emoji: "🏆" },
 ];
 
 export default function InspectieModal({ open, onClose }) {
@@ -119,7 +119,7 @@ export default function InspectieModal({ open, onClose }) {
             <div>
               <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">Autentificare necesară</h3>
               <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
-                Pentru a solicita o inspecție, trebuie să fii autentificat. Datele tale de contact se preiau automat din cont, iar cererea este mai ușor de procesat.
+                Pentru a solicita o verificare, trebuie să fii autentificat. Datele tale de contact se preiau automat din cont, iar cererea este mai ușor de procesată.
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-2.5">
