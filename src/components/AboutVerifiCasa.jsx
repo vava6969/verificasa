@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 
 export default function AboutVerifiCasa() {
   const [activeAudience, setActiveAudience] = useState(0);
@@ -22,7 +23,7 @@ export default function AboutVerifiCasa() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-16 lg:px-8">
       {/* Despre VerifiCasa */}
-      <div className="text-center">
+      <Reveal className="text-center">
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald sm:text-xs">Despre VerifiCasa</p>
         <h2 className="mt-1.5 font-heading text-lg font-bold leading-snug text-navy dark:text-foreground sm:text-3xl">
           Piața online pentru chirii verificate
@@ -32,12 +33,12 @@ export default function AboutVerifiCasa() {
           anunț — poze, acte și preț — și calculează automat un scor de încredere. Chiriașii pot
           lăsa recenzii, iar un tur 3D al locuinței este disponibil opțional, prin Plan Pro.
         </p>
-      </div>
+      </Reveal>
 
       {/* Servicii — carduri cu iconițe, hover lift */}
-      <div className="mt-5 grid grid-cols-1 gap-4 sm:mt-10 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+      <RevealGroup className="mt-5 grid grid-cols-1 gap-4 sm:mt-10 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
         {services.map((s, i) => (
-          <div
+          <RevealItem
             key={i}
             className="group relative flex flex-col overflow-hidden rounded-3xl surface-card p-4 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] sm:p-5"
           >
@@ -52,12 +53,12 @@ export default function AboutVerifiCasa() {
             >
               Află mai multe <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
             </Link>
-          </div>
+          </RevealItem>
         ))}
-      </div>
+      </RevealGroup>
 
       {/* Cui se adresează — panou glassmorphism interactiv */}
-      <div className="relative mt-5 overflow-hidden rounded-3xl bg-gradient-to-br from-navy via-navy-deep to-navy p-5 sm:mt-12 sm:p-10">
+      <Reveal className="relative mt-5 overflow-hidden rounded-3xl bg-gradient-to-br from-navy via-navy-deep to-navy p-5 sm:mt-12 sm:p-10">
         <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-emerald/30 blur-3xl animate-blob" />
         <div className="pointer-events-none absolute -left-8 bottom-0 h-36 w-36 rounded-full bg-gold/25 blur-3xl animate-blob" style={{ animationDelay: "2s" }} />
         <div className="pointer-events-none absolute right-1/3 top-1/2 h-28 w-28 rounded-full bg-mint/20 blur-3xl animate-blob" style={{ animationDelay: "4s" }} />
@@ -89,7 +90,7 @@ export default function AboutVerifiCasa() {
         <div className="relative mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-center text-xs text-white/80 backdrop-blur-xl transition-all duration-300 sm:mt-6 sm:text-sm">
           {audience[activeAudience].desc}
         </div>
-      </div>
+      </Reveal>
 
       {/* Contact rapid */}
       <div className="mt-4 flex justify-center sm:mt-8">
