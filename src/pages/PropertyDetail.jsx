@@ -12,8 +12,6 @@ import Lightbox from "@/components/Lightbox";
 import ReportModal from "@/components/ReportModal";
 import ContactPanel from "@/components/ContactPanel";
 import PropertyGoogleMap from "@/components/PropertyGoogleMap";
-import WalkthroughViewer from "@/components/WalkthroughViewer";
-import Model3DViewer from "@/components/Model3DViewer";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -21,7 +19,7 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
   Calendar, ShieldCheck, CheckCircle2, ChevronLeft, ChevronRight,
-  Heart, MessageCircle, UserCircle2, Clock, Pencil, Box, Maximize2, X, RotateCw, Video,
+  Heart, MessageCircle, UserCircle2, Clock, Pencil, Box, Maximize2, X,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
@@ -42,33 +40,10 @@ export default function PropertyDetail() {
   const [saved, setSaved] = useState(false);
   const [editing, setEditing] = useState(false);
   const [tour3dFull, setTour3dFull] = useState(false);
-  const [tourRooms, setTourRooms] = useState([]);
   const [showLb, setShowLb] = useState(false);
   const [lbIndex, setLbIndex] = useState(0);
   const viewedRef = useRef(new Set());
   const touchStartX = useRef(null);
-
-  // Cât o scanare 3D e încă în procesare la Kiri Engine (poate dura de la câteva
-  // minute până la 20-30 min, după coadă), verificăm periodic statusul în fundal,
-  // ca tur-ul să apară automat când e gata, fără refresh manual de pagină.
-  useEffect(() => {
-    const pendingIds = (tourRooms || [])
-      .filter((r) => r.model_3d_serial && !["success", "failed", "expired"].includes(r.model_3d_status))
-      .map((r) => r.id);
-    if (!pendingIds.length) return;
-    const id = setInterval(() => {
-      pendingIds.forEach((rid) => {
-        base44.functions.invoke("CheckKiriScanStatus", { tour_room_id: rid })
-          .then((res) => {
-            const data = res?.data || res || {};
-            if (data.error) return;
-            setTourRooms((cur) => cur.map((room) => room.id === rid ? { ...room, model_3d_status: data.status, model_3d_url: data.model_3d_url || room.model_3d_url } : room));
-          })
-          .catch(() => {});
-      });
-    }, 20000);
-    return () => clearInterval(id);
-  }, [tourRooms]);
 
   useEffect(() => {
     let cancelled = false;
@@ -94,15 +69,6 @@ export default function PropertyDetail() {
         setTab(p.ai_tour_verified ? "ai" : "gallery");
         if (p.created_by_id) {
           base44.entities.User.get(p.created_by_id).then((u) => { if (!cancelled) setOwnerUser(u); }).catch(() => {});
-        }
-        // Vizitatorii văd camerele turului doar după ce proprietarul a apăsat
-        // "Finalizează turul" (has_walkthrough_tour) — dar proprietarul/adminul
-        // trebuie să-și vadă camerele și înainte de asta, cât testează o scanare.
-        const isOwnerOrAdmin = !!user && (["SUPER_ADMIN", "ADMIN"].includes((user.role || "").toUpperCase()) || (user.id && p.created_by_id === user.id));
-        if (p.has_walkthrough_tour || isOwnerOrAdmin) {
-          base44.entities.PropertyTourRoom.filter({ property_id: id }, "order_index", 50)
-            .then((rows) => { if (!cancelled) setTourRooms(rows || []); })
-            .catch(() => {});
         }
         if (shouldInc) {
           base44.functions.invoke("IncrementViews", { property_id: id }).catch(() => {});
@@ -153,9 +119,6 @@ export default function PropertyDetail() {
   const images = p.images?.length ? p.images : [];
   const isAdmin = user && ["SUPER_ADMIN", "ADMIN"].includes((user.role || "").toUpperCase());
   const canEdit = !!user && (isAdmin || (user.id && p.created_by_id === user.id));
-  // Doar pentru proprietar/admin, ca să poată verifica live cum se publică o scanare 3D,
-  // indiferent de status — tab-ul public "Tur 360°" ascunde intenționat camerele nefinalizate.
-  const scan3dRooms = tourRooms.filter((r) => r.capture_video_url);
 
   const toggleSave = async () => {
     if (!user) { navigate("/login"); return; }
@@ -237,16 +200,6 @@ export default function PropertyDetail() {
                 <span className="flex items-center gap-1.5"><Box className="h-3.5 w-3.5" /> {t("tab_3d")}</span>
               </button>
             )}
-            {tourRooms.length > 0 && (
-              <button onClick={() => setTab("tour360")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "tour360" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
-                <span className="flex items-center gap-1.5"><RotateCw className="h-3.5 w-3.5" /> {t("tab_tour360")}</span>
-              </button>
-            )}
-            {canEdit && scan3dRooms.length > 0 && (
-              <button onClick={() => setTab("scan3d")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "scan3d" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
-                <span className="flex items-center gap-1.5"><Video className="h-3.5 w-3.5" /> Scan 3D (test)</span>
-              </button>
-            )}
           </div>
 
           {tab === "3d" ? (
@@ -266,35 +219,6 @@ export default function PropertyDetail() {
               >
                 <Maximize2 className="h-3.5 w-3.5" /> {lang === "en" ? "Fullscreen" : "Ecran complet"}
               </button>
-            </div>
-          ) : tab === "tour360" ? (
-            <WalkthroughViewer rooms={tourRooms} />
-          ) : tab === "scan3d" ? (
-            <div className="space-y-3 rounded-2xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
-              <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-400">
-                <Video className="h-3.5 w-3.5" /> Secțiune de testare — vizibilă doar pentru tine
-              </p>
-              {scan3dRooms.map((r) => (
-                <div key={r.id} className="space-y-2 rounded-xl border border-border bg-white p-3 dark:bg-card">
-                  <div className="flex items-center justify-between">
-                    <p className="font-heading text-sm font-bold text-navy dark:text-foreground">{r.room_name}</p>
-                    <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${r.model_3d_status === "success" ? "bg-emerald-soft text-emerald" : r.model_3d_status === "failed" ? "bg-rose-50 text-rose-600 dark:bg-rose-950/40" : "bg-secondary text-muted-foreground"}`}>
-                      status: {r.model_3d_status || "none"}
-                    </span>
-                  </div>
-                  <p className="break-all text-[11px] text-muted-foreground">serial: {r.model_3d_serial || "—"}</p>
-                  {r.capture_video_url && (
-                    <video src={r.capture_video_url} controls playsInline className="aspect-video w-full rounded-lg bg-black" />
-                  )}
-                  {r.model_3d_status === "success" && r.model_3d_url ? (
-                    <div className="aspect-video w-full overflow-hidden rounded-lg bg-navy-deep">
-                      <Model3DViewer src={r.model_3d_url} />
-                    </div>
-                  ) : (
-                    <p className="text-xs text-muted-foreground">Modelul 3D nu e încă gata (verifică statusul din pagina de captură).</p>
-                  )}
-                </div>
-              ))}
             </div>
           ) : (
             <div className="select-none">
@@ -463,11 +387,6 @@ export default function PropertyDetail() {
                 {p.tour_3d_url && (
                   <span className="flex items-center gap-1 rounded-full bg-navy px-3 py-1 text-xs font-semibold text-mint ring-1 ring-mint/40">
                     <Box className="h-3.5 w-3.5" /> {t("tab_3d")}
-                  </span>
-                )}
-                {tourRooms.length > 0 && (
-                  <span className="flex items-center gap-1 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 dark:bg-indigo-400/15 dark:text-indigo-300">
-                    <RotateCw className="h-3.5 w-3.5" /> {t("badge_tour360")}
                   </span>
                 )}
                 {p.pet_friendly && (
