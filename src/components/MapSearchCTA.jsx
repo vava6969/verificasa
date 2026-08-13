@@ -15,7 +15,7 @@ export default function MapSearchCTA() {
       <img
         src="/images/generated/map-search-cta-v1.png"
         alt="Toate proprietățile pe hartă"
-        className="absolute inset-0 h-full w-full object-cover scale-105 transition-transform duration-700 ease-out group-hover:scale-110"
+        className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
       />
 
       {/* Gradient scrim so the text stays readable over any photo */}
