@@ -395,6 +395,7 @@ export const STR = {
     countdown_mins: "Minute",
     countdown_btn: "Află mai multe",
     pc_verified: "Verificat",
+    pc_trust_high: "Încredere ridicată",
     pc_com0: "Comision 0%",
     pc_pet_btn: "Pet Friendly",
     pc_floor: "Etaj",
