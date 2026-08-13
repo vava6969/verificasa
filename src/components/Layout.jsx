@@ -10,10 +10,10 @@ import CookieBanner from "@/components/CookieBanner";
 
 export default function Layout() {
   const { pathname } = useLocation();
-  // Admin panel and the unified map+list search are full-height work surfaces
-  // (the map fills the viewport) — no marketing footer there. /search now
-  // renders the same full-height page as /map, so it's excluded too.
-  const hideFooter = pathname.startsWith("/admin") || pathname.startsWith("/messages") || pathname.startsWith("/map") || pathname.startsWith("/search");
+  // Footerul e o secțiune de marketing/legal — îl arătăm doar pe paginile unde
+  // are sens (homepage, contact și paginile legale), nu în restul aplicației.
+  const FOOTER_PATHS = ["/", "/contact", "/terms", "/privacy", "/data-deletion", "/cookies"];
+  const showFooter = FOOTER_PATHS.includes(pathname);
   const hideBottomNav = false;
 
   return (
@@ -24,7 +24,7 @@ export default function Layout() {
         <main className="flex-1 overflow-x-hidden pb-16 md:pb-0">
           <Outlet />
         </main>
-        {!hideFooter && <Footer />}
+        {showFooter && <Footer />}
         {!hideBottomNav && <BottomNav />}
         <InstagramPopup />
         <CookieBanner />
