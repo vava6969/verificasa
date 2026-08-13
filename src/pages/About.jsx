@@ -18,17 +18,17 @@ const fadeUp = {
 // Romanian content is provided verbatim as requested; English is a faithful translation.
 const CONTENT = {
   ro: {
-    hero_badge: "VerifiCasa · Agenție imobiliară",
+    hero_badge: "VerifiCasa · Platformă imobiliară verificată",
     hero_h: "Chirii & vânzări verificate, fără surprize.",
-    hero_p1: "VerifiCasa este o platformă imobiliară și agenție care combină tehnologia AI cu inspecții fizice reale.",
+    hero_p1: "VerifiCasa este o platformă imobiliară unde proprietarii publică liber, iar noi verificăm fiecare anunț online înainte de publicare.",
     hero_p2: "Economisim timpul tău, oferim transparență totală și construim încredere între proprietari și chiriași/cumpărători.",
     cta_search: "Caută proprietăți",
     cta_list: "Publică un anunț",
     pillars_k: "Ce facem",
-    pillars_h: "Tehnologie + oameni pe teren",
+    pillars_h: "Verificare online, la fiecare anunț",
     pillars: [
-      { icon: Video, title: "Tur Interactiv AI 360°", desc: "Generăm tururi virtuale din pozele proprietății, astfel încât chiriașii explorează locul online — economisind timp pentru toți." },
-      { icon: ShieldCheck, title: "Verificare fizică pe teren", desc: "Agenții noștri inspectează personal fiecare proprietate și emit un raport cu stare, zgomot, presiune apă și acte." },
+      { icon: ShieldCheck, title: "Verificare online", desc: "Verificăm fiecare anunț înainte de publicare — poze, acte și preț — direct online, fără vizite pe teren." },
+      { icon: BadgeCheck, title: "Scor de încredere", desc: "Fiecare proprietate primește un scor calculat automat, ca să știi dintr-o privire cât de sigur este anunțul." },
       { icon: Users, title: "Selectarea clienților potriviți", desc: "Filtrăm chiriașii și cumpărătorii calificați, ca să nu pierzi timp cu vizionări inutile." },
       { icon: Lock, title: "Comisioane corecte & siguranță", desc: "Condiții transparente, fără taxe ascunse sau garanții exagerate. Pachete avantajoase pentru vânzare și închiriere." },
     ],
