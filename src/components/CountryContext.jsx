@@ -34,7 +34,7 @@ export function CountryProvider({ children }) {
   const legalInfo = useMemo(
     () => ({
       legal1: "Conform ANPC · Protecția Consumatorului",
-      legal2: "Inspecții fizice verificate",
+      legal2: "Verificare online a fiecărui anunț",
       commission: "Comision corect · 0% chiriași pe selectate",
       tenantFee: "Fără comision chiriași · Protecție consumator",
     }),
