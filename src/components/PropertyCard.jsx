@@ -27,7 +27,11 @@ export default function PropertyCard({ property, hot = false }) {
   const [showExtra, setShowExtra] = useState(false);
   const touchStartX = useRef(null);
 
-  const isVerified = p.owner_verified || p.verification_level === "field_certified" || p.ai_tour_verified;
+  // Scor de încredere calculat automat (0-100, vezi funcia ComputeTrustScore) —
+  // înlocuiește vechea logică bazată doar pe flag-uri manuale de admin.
+  const trustScore = typeof p.trust_score === "number" ? p.trust_score : 0;
+  const isHighTrust = trustScore >= 75;
+  const isVerified = trustScore >= 40;
   const seller = p.seller_role || (p.owner_verified ? "Proprietar" : "Agent");
   const isProprietar = seller === "Proprietar";
   const sellerLabel = isProprietar ? t("pc_seller_landlord") : t("pc_seller_agent");
@@ -150,11 +154,15 @@ export default function PropertyCard({ property, hot = false }) {
 
         {/* Badge-uri grupate stânga-sus: Verificat + Recomandat */}
         <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
-          {isVerified && (
+          {isHighTrust ? (
+            <span className="flex items-center gap-1 rounded-full bg-navy px-2.5 py-1 text-[11px] font-bold text-mint shadow-soft ring-1 ring-mint/40">
+              <ShieldCheck className="h-3.5 w-3.5" /> {t("pc_trust_high")}
+            </span>
+          ) : isVerified ? (
             <span className="flex items-center gap-1 rounded-full bg-emerald px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
               <ShieldCheck className="h-3.5 w-3.5" /> {t("pc_verified")}
             </span>
-          )}
+          ) : null}
           {hot && (
             <span className="premium-badge flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white">
               <Crown className="h-3 w-3" /> {t("pc_hot")}
