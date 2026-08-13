@@ -974,6 +974,7 @@ export const STR = {
     countdown_mins: "Minutes",
     countdown_btn: "Learn more",
     pc_verified: "Verified",
+    pc_trust_high: "High trust",
     pc_com0: "0% Commission",
     pc_pet_btn: "Pet Friendly",
     pc_floor: "Floor",
