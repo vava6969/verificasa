@@ -4,21 +4,24 @@
     <meta charset="UTF-8" />
     <script>
       try {
+        // Light mode e mereu default pentru vizitatori noi, indiferent de preferința
+        // sistemului lor de operare — dark mode se activează doar dacă userul îl alege
+        // explicit (salvat în vc_theme). Nu mai citim prefers-color-scheme aici.
         var t = localStorage.getItem("vc_theme");
-        if (t === "dark" || (!t && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        if (t === "dark") {
           document.documentElement.classList.add("dark");
         }
       } catch (e) {}
     </script>
     <link rel="icon" type="image/svg+xml" href="https://base44.com/logo_v2.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="VerifiCasa — platformă imobiliară pentru închirieri verificate: tururi 3D immersive, inspecții fizice verificate de agenți și garanții care protejează chiriașul și proprietarul. Iași și Huși, România." />
+    <meta name="description" content="VerifiCasa — platformă imobiliară pentru închirieri verificate online: fiecare anunț este verificat înainte de publicare și primește un scor de încredere. România." />
     <meta name="application-name" content="VerifiCasa" />
     <meta property="og:site_name" content="VerifiCasa" />
-    <meta property="og:title" content="VerifiCasa — Chirii verificate pe teren și online" />
-    <meta property="og:description" content="VerifiCasa transformă închirierile: tururi 3D immersive, inspecții fizice verificate și garanții care protejează chiriașul și proprietarul." />
+    <meta property="og:title" content="VerifiCasa — Chirii verificate online" />
+    <meta property="og:description" content="VerifiCasa verifică online fiecare anunț — poze, acte și preț — și îiți arată un scor de încredere pentru fiecare proprietate." />
     <link rel="manifest" href="/manifest.json" />
-    <title>VerifiCasa — Chirii verificate pe teren și online</title>
+    <title>VerifiCasa — Chirii verificate online</title>
   </head>
   <body>
     <div id="root"></div>
