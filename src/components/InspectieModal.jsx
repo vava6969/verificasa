@@ -99,17 +99,17 @@ export default function InspectieModal({ open, onClose }) {
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-navy-deep/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative z-10 flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-border bg-white shadow-2xl dark:bg-card">
-        {/* Header */}
-        <div className="gradient-navy shrink-0 p-6 text-white">
-          <button onClick={onClose} aria-label={t("ins_close")} className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/30">
+        {/* Header — poză de fundal generată cu Higgsfield + scrim, text jos-stânga */}
+        <div className="relative shrink-0 overflow-hidden">
+          <img src="/images/generated/inspectie-header-v1.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/92 via-navy-deep/55 to-navy-deep/15" />
+          <button onClick={onClose} aria-label={t("ins_close")} className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition hover:bg-white/30">
             <X className="h-5 w-5" />
           </button>
-          <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald/20 text-emerald"><ShieldCheck className="h-6 w-6" /></span>
-            <div>
-              <h3 className="font-heading text-xl font-bold">{t("ins_title")}</h3>
-              <p className="text-sm text-white/70">{t("ins_sub")}</p>
-            </div>
+          <div className="relative flex min-h-[136px] flex-col justify-end p-6 text-white">
+            <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald/25 text-emerald backdrop-blur-sm"><ShieldCheck className="h-5 w-5" /></span>
+            <h3 className="font-heading text-xl font-bold">{t("ins_title")}</h3>
+            <p className="text-sm text-white/80">{t("ins_sub")}</p>
           </div>
         </div>
 
