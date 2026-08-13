@@ -19,7 +19,7 @@ import LocationAutocomplete from "@/components/LocationAutocomplete";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   MapPin, Heart, X, ArrowLeft, Plus, Minus, PenLine, Trash2, Check, Loader2,
-  Search, Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, RotateCcw, RotateCw,
+  Search, Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, RotateCcw,
 } from "lucide-react";
 import { ROMANIA_COUNTIES, ROMANIA_CENTER, ROMANIA_MAX_BOUNDS } from "@/lib/romaniaCounties";
 
@@ -28,7 +28,6 @@ import { ROMANIA_COUNTIES, ROMANIA_CENTER, ROMANIA_MAX_BOUNDS } from "@/lib/roma
 const VERIF_FILTERS = [
   { key: "ai", labelKey: "tg_ai", icon: Sparkles, test: (p) => !!p.tour_3d_url || !!p.ai_video_url || !!p.ai_tour_verified },
   { key: "field", labelKey: "tg_field", icon: ShieldCheck, test: (p) => p.owner_verified || p.verification_level === "field_certified" || p.ai_tour_verified },
-  { key: "tour360", labelKey: "tab_tour360", icon: RotateCw, test: (p) => !!p.has_walkthrough_tour },
   { key: "pet", labelKey: "tg_pet", icon: PawPrint, test: (p) => !!p.pet_friendly },
   { key: "nofee", labelKey: "tg_nofee", icon: BadgePercent, test: (p) => !!p.commission_free },
   { key: "studio", labelKey: "type_studio_vc", icon: Home, test: (p) => ["Garsonieră", "Studio"].includes(p.property_type) },
