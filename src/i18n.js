@@ -274,7 +274,7 @@ export const STR = {
     hero_badge_verified: "🇷🇴 Platformă Verificată de Închirieri",
     hero_h1_a: "Chirii verificate online.",
     hero_h1_b: "Fără surprize neplăcute.",
-    hero_sub: "VerifiCasa verifică online fiecare anunț — poze, acte și preț — și îiți arată un scor de încredere pentru fiecare proprietate.",
+    hero_sub: "VerifiCasa verifică online fiecare anunț — poze, acte și preț — și îți arată un scor de încredere pentru fiecare proprietate.",
     comfort_metro: "Drum la metrou (min)",
     comfort_noise: "Scor liniște (dB)",
     comfort_wifi: "Viteză internet (Mbps)",
