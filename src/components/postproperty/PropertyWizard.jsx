@@ -122,6 +122,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
         property_id: created.id, title: form.title, owner_name: form.owner_name || "",
       }).catch(() => {});
     }
+    base44.functions.invoke("ComputeTrustScore", { property_id: created.id }).catch(() => {});
     toast(isAdmin
       ? { title: "Anunț publicat", description: "Este vizibil acum în lista publică." }
       : { title: "Anunț trimis spre aprobare", description: "Un administrator îl va verifica în curând." });
