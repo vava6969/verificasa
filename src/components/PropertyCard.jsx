@@ -4,7 +4,7 @@ import {
   MapPin, Maximize, BedDouble, ShieldCheck, PawPrint, BadgePercent,
   Eye, Building2, Phone, MessageCircle,
   Calendar, PhoneOff,
-  Box, Crown, Car, Sofa, Heart, Camera, RotateCw,
+  Box, Crown, Car, Sofa, Heart, Camera,
 } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
@@ -105,7 +105,6 @@ export default function PropertyCard({ property, hot = false }) {
   // Chips secundare — icon-only, max 3 vizibile + popover pentru restul
   const chips = [];
   if (p.tour_3d_url) chips.push({ icon: Box, label: t("tab_3d"), cls: "bg-navy/10 text-navy dark:bg-white/10 dark:text-foreground" });
-  if (p.has_walkthrough_tour) chips.push({ icon: RotateCw, label: t("tab_tour360"), cls: "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300" });
   if (p.commission_free) chips.push({ icon: BadgePercent, label: t("pc_com0"), cls: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" });
   if (p.pet_friendly) chips.push({ icon: PawPrint, label: t("pc_pet_btn"), cls: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300" });
   if (p.furnished) chips.push({ icon: Sofa, label: t("badge_furnished"), cls: "bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300" });
