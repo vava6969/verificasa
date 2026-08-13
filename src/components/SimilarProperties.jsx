@@ -5,6 +5,7 @@ import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import SimilarPropertyCard from "@/components/SimilarPropertyCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Reveal } from "@/components/ui/reveal";
 
 // Până la 6 proprietăți similare, din același oraș, recomandate după vizualizări.
 // Afișate într-un carusel orizontal (scroll stânga→dreapta) cu buton "Vezi toate".
@@ -54,7 +55,7 @@ export default function SimilarProperties({ property }) {
   if (items.length === 0) return null;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-white p-3 shadow-soft sm:p-6">
+    <Reveal className="overflow-hidden rounded-2xl border border-border bg-white p-3 shadow-soft sm:p-6">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
           <Sparkles className="h-5 w-5 shrink-0 text-gold" />
@@ -99,6 +100,6 @@ export default function SimilarProperties({ property }) {
           <p className="text-[11px] text-muted-foreground">{property.city}</p>
         </Link>
       </div>
-    </div>
+    </Reveal>
   );
 }
