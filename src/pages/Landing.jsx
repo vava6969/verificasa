@@ -13,6 +13,7 @@ import ActionCards from "@/components/ActionCards";
 import BetaBanner from "@/components/BetaBanner";
 import AboutVerifiCasa from "@/components/AboutVerifiCasa";
 import CircularCarousel from "@/components/ui/circular-carousel";
+import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -101,10 +102,10 @@ export default function Landing() {
 
       {/* VALUE PROPOSITION CAROUSEL */}
       <section className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 lg:px-8">
-        <div className="mb-3 text-center sm:mb-5">
+        <Reveal className="mb-3 text-center sm:mb-5">
           <p className="text-xs font-bold uppercase tracking-wider text-emerald">De ce VerifiCasa?</p>
           <h2 className="mt-1 font-heading text-xl font-bold text-navy sm:text-2xl">Transparență și încredere, pas cu pas</h2>
-        </div>
+        </Reveal>
         <CircularCarousel items={carouselItems} />
       </section>
 
@@ -113,12 +114,14 @@ export default function Landing() {
 
       {/* MAP SEARCH CTA */}
       <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
-        <MapSearchCTA />
+        <Reveal>
+          <MapSearchCTA />
+        </Reveal>
       </section>
 
       {/* FEATURED PROPERTIES */}
       <section id="featured" className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 sm:pb-16 lg:px-8">
-        <div className="mb-5 flex items-end justify-between sm:mb-8">
+        <Reveal className="mb-5 flex items-end justify-between sm:mb-8">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-emerald">{t("featured_kicker")}</p>
             <h2 className="mt-1 font-heading text-2xl font-bold text-navy sm:text-3xl">{t("featured_h")}</h2>
@@ -126,7 +129,7 @@ export default function Landing() {
           <Link to="/search" className="flex items-center gap-1 text-sm font-semibold text-emerald hover:underline">
             {t("view_all")} <ArrowRight className="h-4 w-4" />
           </Link>
-        </div>
+        </Reveal>
 
         {properties === null ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -139,9 +142,13 @@ export default function Landing() {
             <p className="text-sm text-muted-foreground">{t("featured_none_d")}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
-            {display.map((p) => <PropertyCard key={p.id} property={p} hot />)}
-          </div>
+          <RevealGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+            {display.map((p) => (
+              <RevealItem key={p.id}>
+                <PropertyCard property={p} hot />
+              </RevealItem>
+            ))}
+          </RevealGroup>
         )}
 
         {display.length > 0 && (
@@ -155,7 +162,7 @@ export default function Landing() {
 
       {/* SOLICITĂ O INSPECȚIE CTA */}
       <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 sm:pb-20 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-emerald-soft to-gold-soft p-6 shadow-soft sm:p-12 dark:border-white/10 dark:gradient-navy">
+        <Reveal className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-emerald-soft to-gold-soft p-6 shadow-soft sm:p-12 dark:border-white/10 dark:gradient-navy">
           <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-emerald/25 blur-2xl animate-blob" />
           <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-gold/25 blur-2xl animate-blob" style={{ animationDelay: "2.5s" }} />
           <div className="absolute right-1/3 -bottom-8 h-32 w-32 rounded-full bg-emerald/20 blur-2xl animate-blob" style={{ animationDelay: "4s" }} />
@@ -192,7 +199,7 @@ export default function Landing() {
               ))}
             </div>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       <InspectieModal open={showInspectie} onClose={() => setShowInspectie(false)} />
