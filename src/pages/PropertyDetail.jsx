@@ -372,13 +372,18 @@ export default function PropertyDetail() {
                 </div>
               </div>
 
-              {/* BADGES */}
+              {/* BADGES — scorul de încredere (0-100, calculat automat) înlocuiește
+                  vechiul badge static "Proprietar verificat" */}
               <div className="mt-4 flex flex-wrap gap-2">
-                {p.owner_verified && (
-                  <span className="flex items-center gap-1 rounded-full bg-mint-soft px-3 py-1 text-xs font-semibold text-navy">
-                    <BadgeCheck className="h-3.5 w-3.5" /> {t("badge_owner_v")}
+                {p.trust_score >= 75 ? (
+                  <span className="flex items-center gap-1 rounded-full bg-navy px-3 py-1 text-xs font-semibold text-mint ring-1 ring-mint/40">
+                    <BadgeCheck className="h-3.5 w-3.5" /> {t("pc_trust_high")}
                   </span>
-                )}
+                ) : p.trust_score >= 40 ? (
+                  <span className="flex items-center gap-1 rounded-full bg-mint-soft px-3 py-1 text-xs font-semibold text-navy">
+                    <BadgeCheck className="h-3.5 w-3.5" /> {t("pc_verified")}
+                  </span>
+                ) : null}
                 {p.ai_tour_verified && (
                   <span className="flex items-center gap-1 rounded-full bg-navy px-3 py-1 text-xs font-semibold text-mint">
                     <Sparkles className="h-3.5 w-3.5" /> {t("badge_aitour_v")}
