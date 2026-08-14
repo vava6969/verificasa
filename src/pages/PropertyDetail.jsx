@@ -523,25 +523,31 @@ export default function PropertyDetail() {
             </div>
 
             {/* MAP */}
-            <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-soft">
-              <div className="border-b border-border p-4">
-                <h3 className="font-heading font-bold text-navy">{t("map_h")}</h3>
-                <p className="text-xs text-muted-foreground">{t("map_sub")}</p>
-                <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-emerald">
-                  <MapPin className="h-3 w-3" />
-                  {p.latitude && p.longitude ? t("map_exact") : t("map_approx")}
-                </p>
+            <Reveal>
+              <div className="overflow-hidden rounded-3xl border border-border/70 bg-white shadow-soft transition-shadow duration-300 hover:shadow-[0_20px_50px_-20px_rgba(16,24,40,0.3)] dark:bg-card">
+                <div className="flex items-center gap-3 border-b border-border p-4">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald/15 text-emerald">
+                    <MapPin className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <h3 className="font-heading font-bold text-navy dark:text-foreground">{t("map_h")}</h3>
+                    <p className="text-xs text-muted-foreground">{t("map_sub")}</p>
+                  </div>
+                  <span className="ml-auto flex items-center gap-1 rounded-full bg-emerald-soft px-2.5 py-1 text-[11px] font-medium text-emerald">
+                    {p.latitude && p.longitude ? t("map_exact") : t("map_approx")}
+                  </span>
+                </div>
+                <MapPreview
+                  lat={p.latitude}
+                  lng={p.longitude}
+                  title={p.title}
+                  landmark={p.landmark}
+                  zone={p.zone}
+                  city={p.city}
+                  t={t}
+                />
               </div>
-              <MapPreview
-                lat={p.latitude}
-                lng={p.longitude}
-                title={p.title}
-                landmark={p.landmark}
-                zone={p.zone}
-                city={p.city}
-                t={t}
-              />
-            </div>
+            </Reveal>
 
             {/* COMMENTS */}
             <PropertyComments property={p} />
