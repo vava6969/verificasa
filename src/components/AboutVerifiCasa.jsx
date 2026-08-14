@@ -42,8 +42,9 @@ export default function AboutVerifiCasa() {
             key={i}
             className="group relative flex flex-col overflow-hidden rounded-3xl surface-card p-4 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] sm:p-5"
           >
-            <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-white p-1.5 shadow-soft ring-1 ring-black/5 transition-transform duration-300 group-hover:scale-110 sm:h-12 sm:w-12">
-              <img src={s.img} alt="" className="h-full w-full object-contain" />
+            <div className="relative flex h-11 w-11 items-center justify-center sm:h-12 sm:w-12">
+              <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/15 to-gold/10 blur-[6px] transition-transform duration-300 group-hover:scale-110" />
+              <img src={s.img} alt="" className="relative h-full w-full object-contain drop-shadow-[0_4px_10px_rgba(16,24,40,0.16)] transition-transform duration-300 group-hover:scale-110" />
             </div>
             <h3 className="mt-3 font-heading text-sm font-bold text-navy dark:text-foreground sm:text-base">{s.title}</h3>
             <p className="mt-1.5 flex-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">{s.desc}</p>
