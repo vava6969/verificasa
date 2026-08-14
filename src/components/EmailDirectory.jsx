@@ -214,11 +214,11 @@ export default function EmailDirectory() {
             <ul className="space-y-1.5 text-amber-700/90 dark:text-amber-200/80">
               <li className="flex items-start gap-2">
                 <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald" />
-                <span><strong>Singurele adrese oficiale</strong> sunt cele listate mai sus pe domeniile <span className="font-mono font-semibold">verificasa.ro</span> și <span className="font-mono font-semibold">verificasa.site</span>. Orice alt email este fals și înșelătorie.</span>
+                <span><strong>Singurele adrese oficiale</strong> sunt cele listate mai sus pe domeniul <span className="font-mono font-semibold">verificasa.ro</span>. Orice alt email este fals și înșelătorie.</span>
               </li>
               <li className="flex items-start gap-2">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-emerald" />
-                <span>Emailurile de sistem (notificări, aprobări, cereri) se vor primi <strong>exclusiv</strong> de la <span className="font-mono font-semibold">birou@verificasa.site</span>.</span>
+                <span>Emailurile de sistem (notificări, aprobări, cereri) se vor primi <strong>exclusiv</strong> de la <span className="font-mono font-semibold">birou@verificasa.ro</span>.</span>
               </li>
               <li className="flex items-start gap-2">
                 <Instagram className="mt-0.5 h-4 w-4 shrink-0 text-emerald" />
