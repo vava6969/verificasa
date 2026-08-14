@@ -68,8 +68,8 @@ const CONTENT = {
     faq_h: "Tot ce vrei să știi despre VerifiCasa",
     faq: [
       { q: "Cum funcționează verificarea?", a: "Verificăm online fiecare anunț înainte de publicare — poze, acte și preț — și calculăm un scor de încredere atașat anunțului." },
-      { q: "Ce este turul 3D?", a: "Proprietarul poate adăuga propriul tur 3D, realizat cu Matterport, disponibil cu Plan Pro — îl poți explora online din telefon sau calculator înainte de o vizionare." },
-      { q: "Cât costă să listez o proprietate?", a: "Publicarea anunțului și verificarea de bază sunt gratuite. Detaliile despre Plan Pro se discută direct cu echipa VerifiCasa pe WhatsApp sau email." },
+      { q: "Ce este turul 3D?", a: "Proprietarul poate adăuga propriul tur 3D, realizat cu aplicația noastră integrată VerifiCasa 3D, disponibilă cu Plan Pro — îl poți explora online din telefon sau calculator înainte de o vizionare." },
+      { q: "Cât costă să listez o proprietate?", a: "Publicarea anunțului și verificarea de bază sunt gratuite. Detaliile despre planurile disponibile se vor regăsi pe site sau aplicația mobilă, în rubrica special destinată acestui plan." },
       { q: "În ce orașe sunteți activi?", a: "Poți căuta în toată România — peste 300 de orașe și cartiere sunt deja în platformă. Verificarea este online, deci disponibilă peste tot, din prima zi." },
       { q: "Cum contactez un proprietar sau agent?", a: "Direct din anunț — prin mesagerie în platformă, telefon sau WhatsApp, fără să-ți expui numărul până nu decizi tu." },
       { q: "Pot salva proprietatea sau căutarea pentru mai târziu?", a: "Da — cu un cont gratuit poți salva proprietatea (inima de pe anunț) sau întreaga căutare, ca s-o regăsești oricând în cont." },
@@ -121,8 +121,8 @@ const CONTENT = {
     faq_h: "Everything you want to know about VerifiCasa",
     faq: [
       { q: "How does verification work?", a: "We verify every listing online before it's published — photos, paperwork and price — and calculate a trust score attached to the listing." },
-      { q: "What is the 3D tour?", a: "Owners can add their own 3D tour, built with Matterport, available with the Pro plan — you can explore it online from your phone or computer before an in-person viewing." },
-      { q: "How much does it cost to list a property?", a: "Publishing your listing and basic verification are free. Pro plan details are discussed directly with the VerifiCasa team on WhatsApp or email." },
+      { q: "What is the 3D tour?", a: "Owners can add their own 3D tour, built with our own integrated VerifiCasa 3D app, available with the Pro plan — you can explore it online from your phone or computer before an in-person viewing." },
+      { q: "How much does it cost to list a property?", a: "Publishing your listing and basic verification are free. Details about the available plans can be found on the site or mobile app, in the section dedicated to that plan." },
       { q: "Which cities are you active in?", a: "You can search anywhere in Romania — over 300 cities and neighbourhoods are already on the platform. Verification is online, so it's available everywhere from day one." },
       { q: "How do I contact an owner or agent?", a: "Directly from the listing — via in-app messaging, phone or WhatsApp, without exposing your number until you decide to." },
       { q: "Can I save a property or a search for later?", a: "Yes — with a free account you can save a property (the heart on the listing) or an entire search, so you can find it again anytime in your account." },
