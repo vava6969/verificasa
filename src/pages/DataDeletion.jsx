@@ -31,8 +31,8 @@ export default function DataDeletion() {
         <p>Pentru a solicita ștergerea completă a datelor, contactați-ne la:</p>
         <div className="mt-3 flex items-center gap-2 rounded-lg border border-border bg-secondary/40 p-4">
           <Mail className="h-5 w-5 text-emerald" />
-          <a href="mailto:birou@verificasa.site" className="font-semibold text-emerald hover:underline">
-            birou@verificasa.site
+          <a href="mailto:birou@verificasa.ro" className="font-semibold text-emerald hover:underline">
+            birou@verificasa.ro
           </a>
         </div>
         <p className="mt-3 text-sm">
