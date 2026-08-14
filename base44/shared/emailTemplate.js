@@ -5,7 +5,7 @@
 const LOGO_URL =
   "https://media.base44.com/images/public/6a5ef7d63008cd71560dfe14/4317025d6_Gemini_Generated_Image_al0itkal0itkal0i.png";
 
-export const APP_URL = "https://verificasa.site";
+export const APP_URL = "https://verificasa.ro";
 export const CONTACT_EMAIL = "contact@verificasa.ro";
 
 // Category config: banner color, icon, highlight-box tint.
