@@ -13,7 +13,7 @@ export default function MapSearchCTA() {
     <div className="group relative overflow-hidden rounded-2xl border border-border shadow-soft dark:border-white/10">
       {/* Full-bleed illustration — generată cu Higgsfield, tema hartă/verificare */}
       <img
-        src="/images/generated/map-search-cta-v1.png"
+        src="/images/generated/map-search-cta-v3.png"
         alt="Toate proprietățile pe hartă"
         className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
       />
