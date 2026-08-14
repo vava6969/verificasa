@@ -63,8 +63,7 @@ export default function Contact() {
           </a>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          Domenii verificate: <span className="font-mono font-semibold">www.verificasa.ro</span> &{" "}
-          <span className="font-mono font-semibold">www.verificasa.site</span>
+          Domeniu verificat: <span className="font-mono font-semibold">www.verificasa.ro</span>
         </p>
       </section>
 
