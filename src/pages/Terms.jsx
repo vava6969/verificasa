@@ -252,7 +252,7 @@ export default function Terms() {
         <p>
           14.3. Înainte de a apela la SAL, recomandăm soluționarea amiabilă prin contactarea
           noastră la{" "}
-          <a href="mailto:birou@verificasa.site" className="text-primary hover:underline">birou@verificasa.site</a>.
+          <a href="mailto:birou@verificasa.ro" className="text-primary hover:underline">birou@verificasa.ro</a>.
         </p>
       </section>
 
@@ -306,7 +306,7 @@ export default function Terms() {
         <p>
           17.3. Puteți semnala conținut inadecvat folosind sistemul de raportare din platformă
           sau la{" "}
-          <a href="mailto:birou@verificasa.site" className="text-primary hover:underline">birou@verificasa.site</a>.
+          <a href="mailto:birou@verificasa.ro" className="text-primary hover:underline">birou@verificasa.ro</a>.
         </p>
       </section>
 
@@ -319,7 +319,7 @@ export default function Terms() {
           acești Termeni la:
         </p>
         <ul className="list-disc space-y-1 pl-5">
-          <li>E-mail: <a href="mailto:birou@verificasa.site" className="text-primary hover:underline">birou@verificasa.site</a></li>
+          <li>E-mail: <a href="mailto:birou@verificasa.ro" className="text-primary hover:underline">birou@verificasa.ro</a></li>
           <li>WhatsApp / Telefon: disponibile în pagina de Contact</li>
           <li>Instagram: <a href="https://instagram.com/verificasaro" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">@verificasaro</a></li>
         </ul>
