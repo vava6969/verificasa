@@ -354,7 +354,7 @@ export default function PropertyDetail() {
                   aria-label={saved ? t("pd_saved") : t("pd_save")}
                   className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-black/30 text-white shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-110 hover:bg-black/50 active:scale-95"
                 >
-                  <Heart className={`h-4.5 w-4.5 transition ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
+                  <Heart className={`h-5 w-5 transition ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
                 </button>
                 {images.length > 0 && (
                   <span className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur-md">
