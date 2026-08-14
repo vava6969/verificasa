@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { motion, animate } from "framer-motion";
+import { motion, animate, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { formatDistanceToNowStrict } from "date-fns";
 import { ro, enGB } from "date-fns/locale";
@@ -21,6 +21,7 @@ import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
   Calendar, ShieldCheck, CheckCircle2, ChevronLeft, ChevronRight,
   Heart, MessageCircle, UserCircle2, Clock, Pencil, Box, Maximize2, X,
+  Wifi, VolumeX, Sun, Droplet, Expand,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
@@ -281,15 +282,36 @@ export default function PropertyDetail() {
                   touchStartX.current = null;
                 }}
               >
-                {images[activeImage] ? (
-                  <button type="button" onClick={() => { setLbIndex(activeImage); setShowLb(true); }} className="h-full w-full cursor-zoom-in">
-                    <Image src={images[activeImage]} alt={p.title} fittingType="fill" className="h-full w-full" />
-                  </button>
-                ) : (
+                <AnimatePresence mode="wait">
+                  {images[activeImage] && (
+                    <motion.button
+                      key={activeImage}
+                      type="button"
+                      onClick={() => { setLbIndex(activeImage); setShowLb(true); }}
+                      className="h-full w-full cursor-zoom-in overflow-hidden"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                    >
+                      <motion.div
+                        className="h-full w-full"
+                        initial={{ scale: 1 }}
+                        animate={{ scale: 1.045 }}
+                        transition={{ duration: 10, ease: "linear" }}
+                      >
+                        <Image src={images[activeImage]} alt={p.title} fittingType="fill" className="h-full w-full" />
+                      </motion.div>
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+                {!images[activeImage] && (
                   <div className="flex aspect-video w-full max-w-3xl items-center justify-center bg-gradient-to-br from-navy/10 to-mint/20 text-muted-foreground">
                     <span className="text-sm">Fără poze</span>
                   </div>
                 )}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/35 to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/20 to-transparent" />
 
                 {/* Preîncărcăm pozele vecine (stânga/dreapta) la aceeași dimensiune ca poza
                     principală, ca navigarea next/prev să pară instantă în loc să
