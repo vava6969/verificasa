@@ -159,8 +159,9 @@ export function CircularCarousel({
               >
                 <div className="flex w-full items-center gap-2.5 overflow-hidden">
                   {Icon && (
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-black/5">
-                      <Icon className="h-7 w-7" />
+                    <span className="relative flex h-9 w-9 shrink-0 items-center justify-center">
+                      <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/15 to-gold/10 blur-[5px]" />
+                      <Icon className="relative h-7 w-7 drop-shadow-[0_3px_8px_rgba(16,24,40,0.18)]" />
                     </span>
                   )}
                   <h3
