@@ -308,7 +308,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         </Field>
       </div>
 
-      {/* Tur 3D (Matterport) — self-serve pentru proprietar, deblocat cu Plan Pro.
+      {/* Tur 3D (aplicație proprie VerifiCasa) — self-serve pentru proprietar, deblocat cu Plan Pro.
           Nu există încă plată reală, deci arătăm doar teaser-ul încuiat; link-ul
           efectiv se setează momentan manual, de admin, mai jos. */}
       {!isAdmin && (
@@ -318,7 +318,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
               <Video className="h-4 w-4" />
             </span>
             <span>
-              <span className="block text-sm font-semibold text-navy dark:text-foreground">Tur 3D (Matterport) activ</span>
+              <span className="block text-sm font-semibold text-navy dark:text-foreground">Tur 3D activ</span>
               <span className="block text-xs text-muted-foreground">Turul tău virtual este vizibil pe anunț</span>
             </span>
           </div>
@@ -329,7 +329,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
                 <Video className="h-4 w-4" />
               </span>
               <span>
-                <span className="block text-sm font-semibold text-navy dark:text-foreground">Tur 3D (Matterport)</span>
+                <span className="block text-sm font-semibold text-navy dark:text-foreground">Tur 3D</span>
                 <span className="block text-xs text-muted-foreground">Adaugă link-ul tău către tur — disponibil cu Plan Pro</span>
               </span>
             </div>
@@ -352,8 +352,8 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
             </Field>
             <label className="flex items-center gap-2 self-end pb-2"><input type="checkbox" checked={form.owner_verified} onChange={(e) => upd("owner_verified", e.target.checked)} /> Proprietar verificat</label>
             <label className="flex items-center gap-2 self-end pb-2"><input type="checkbox" checked={form.ai_tour_verified} onChange={(e) => upd("ai_tour_verified", e.target.checked)} /> Activare badge Tur 3D</label>
-            <Field label="Link Tur 3D (Matterport — admin, Plan Pro)">
-              <input value={form.tour_3d_url} onChange={(e) => upd("tour_3d_url", e.target.value)} placeholder="https://my.matterport.com/show/?m=..." className={inputCls} />
+            <Field label="Link Tur 3D (admin, Plan Pro)">
+              <input value={form.tour_3d_url} onChange={(e) => upd("tour_3d_url", e.target.value)} placeholder="https://tur3d.verificasa.ro/property/..." className={inputCls} />
             </Field>
             <Field label="Tur Video URL">
               <input value={form.ai_video_url} onChange={(e) => upd("ai_video_url", e.target.value)} placeholder="https://..." className={inputCls} />
