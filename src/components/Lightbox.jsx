@@ -101,15 +101,15 @@ export default function Lightbox({ images, index, onClose, onIndex, saved = fals
           touchX.current = null;
         }}
       >
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           {images[current] ? (
             <motion.div
               key={current}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="flex max-h-full max-w-full items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="absolute inset-0 flex items-center justify-center px-2 sm:px-16"
             >
               <Image src={images[current]} alt={`${title || "VerifiCasa"} ${current + 1}`} fittingType="fit" className="max-h-full max-w-full" />
             </motion.div>
