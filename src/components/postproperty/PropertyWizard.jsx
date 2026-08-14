@@ -192,12 +192,22 @@ export default function PropertyWizard({ onDone, onCancel }) {
       </div>
 
       {/* Step body */}
-      <div className="px-4 py-5 sm:px-6 sm:py-6">
-        {step === 0 && <StepBasics form={form} set={set} />}
-        {step === 1 && <StepLocation form={form} set={set} country={country} />}
-        {step === 2 && <StepDetails form={form} set={set} />}
-        {step === 3 && <StepFeatures form={form} set={set} chips={chips} setChips={setChips} facilities={facilities} setFacilities={setFacilities} />}
-        {step === 4 && <StepPhotos form={form} set={set} uploading={uploading} onFiles={handleFile} agreed={agreed} setAgreed={setAgreed} />}
+      <div className="overflow-hidden px-4 py-5 sm:px-6 sm:py-6">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, x: 16 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -16 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+          >
+            {step === 0 && <StepBasics form={form} set={set} />}
+            {step === 1 && <StepLocation form={form} set={set} country={country} />}
+            {step === 2 && <StepDetails form={form} set={set} />}
+            {step === 3 && <StepFeatures form={form} set={set} chips={chips} setChips={setChips} facilities={facilities} setFacilities={setFacilities} />}
+            {step === 4 && <StepPhotos form={form} set={set} uploading={uploading} onFiles={handleFile} agreed={agreed} setAgreed={setAgreed} />}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* Nav */}
