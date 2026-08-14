@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useCountry } from "@/components/CountryContext";
 
 const TARGET = new Date("2026-08-28T10:00:00");
@@ -17,10 +18,47 @@ function diff() {
   };
 }
 
+// Cifră unică cu tranziție tip "odometru" (inspirat din NumberFlow) — cifra
+// veche alunecă în sus și dispare, cea nouă intră de jos, fără să schimbe
+// dimensiunea sau layout-ul existent al countdown-ului.
+function RollingDigit({ char, reduceMotion }) {
+  if (reduceMotion) {
+    return <span className="tabular-nums">{char}</span>;
+  }
+  return (
+    <span className="relative inline-grid w-[0.62em] overflow-hidden text-center align-top">
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.span
+          key={char}
+          initial={{ y: "70%", opacity: 0 }}
+          animate={{ y: "0%", opacity: 1 }}
+          exit={{ y: "-70%", opacity: 0 }}
+          transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+          className="tabular-nums"
+          style={{ gridArea: "1 / 1" }}
+        >
+          {char}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+}
+
+function RollingDigits({ value, reduceMotion }) {
+  return (
+    <span className="inline-flex">
+      {String(value).split("").map((char, i) => (
+        <RollingDigit key={i} char={char} reduceMotion={reduceMotion} />
+      ))}
+    </span>
+  );
+}
+
 // Slim launch strip that lives inside the hero section.
 export default function HeroCountdown() {
   const { t } = useCountry();
   const [time, setTime] = useState(diff());
+  const reduceMotion = useReducedMotion();
   useEffect(() => {
     const id = setInterval(() => setTime(diff()), 1000);
     return () => clearInterval(id);
@@ -29,7 +67,7 @@ export default function HeroCountdown() {
   const unit = (v, label) => (
     <div className="flex flex-col items-center">
       <span className="font-heading text-lg font-bold tabular-nums text-white sm:text-2xl">
-        {String(v).padStart(2, "0")}
+        <RollingDigits value={String(v).padStart(2, "0")} reduceMotion={reduceMotion} />
       </span>
       <span className="text-[8px] font-semibold uppercase tracking-[0.16em] text-white/50 sm:text-[9px]">{label}</span>
     </div>
