@@ -204,7 +204,7 @@ export default function About() {
             <p>{c.story_p1}</p>
             <p>{c.story_p2}</p>
             <p>{c.story_p3}</p>
-            <p className="font-heading text-lg font-bold text-navy dark:text-foreground">{c.story_birth}</p>
+            <p className="border-l-[3px] border-gold pl-4 font-heading text-xl font-bold italic text-navy dark:text-foreground">{c.story_birth}</p>
             <p>{c.story_p4}</p>
 
             <h3 className="font-heading text-xl font-bold text-navy dark:text-foreground pt-2">{c.service_h}</h3>
@@ -234,13 +234,21 @@ export default function About() {
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {c.steps.map((s, i) => (
-            <motion.div key={i} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={fadeUp} className="group relative rounded-2xl border border-border bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] dark:bg-card">
+            <motion.div key={i} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={fadeUp} className="group relative overflow-hidden rounded-2xl border border-border bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] dark:bg-card">
+              <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-3 select-none font-heading text-6xl font-black leading-none text-navy/[0.06] dark:text-white/[0.05]">
+                {String(i + 1).padStart(2, "0")}
+              </span>
               <span className="relative flex h-11 w-11 items-center justify-center">
                 <span className="absolute inset-0 rounded-full bg-gradient-to-br from-navy/10 to-emerald/15 blur-[6px] transition-transform duration-300 group-hover:scale-110" />
                 <s.icon className="relative h-full w-full drop-shadow-[0_4px_10px_rgba(16,24,40,0.16)] transition-transform duration-300 group-hover:scale-110" />
               </span>
-              <h3 className="mt-4 font-heading text-base font-bold text-navy dark:text-foreground">{s.title}</h3>
-              <p className="mt-1.5 text-sm text-muted-foreground">{s.desc}</p>
+              <h3 className="relative mt-4 font-heading text-base font-bold text-navy dark:text-foreground">{s.title.replace(/^\d+\.\s*/, "")}</h3>
+              <p className="relative mt-1.5 text-sm text-muted-foreground">{s.desc}</p>
+              {i < c.steps.length - 1 && (
+                <span className="absolute -right-[13px] top-1/2 z-10 hidden h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-white shadow-soft dark:bg-card lg:flex">
+                  <ArrowRight className="h-3 w-3 text-emerald" />
+                </span>
+              )}
             </motion.div>
           ))}
         </div>
@@ -248,19 +256,23 @@ export default function About() {
 
       {/* TRUST BAR */}
       <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
-        <div className="grid gap-4 rounded-3xl border border-border bg-white p-8 shadow-soft sm:grid-cols-3 dark:bg-card">
-          {c.trust.map((b, i) => (
-            <div key={i} className="flex items-start gap-3">
-              <span className="relative flex h-10 w-10 shrink-0 items-center justify-center">
-                <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/15 to-gold/10 blur-[5px]" />
-                <b.icon className="relative h-full w-full drop-shadow-[0_3px_8px_rgba(16,24,40,0.15)]" />
-              </span>
-              <div>
-                <p className="font-heading text-sm font-bold text-navy dark:text-foreground">{b.title}</p>
-                <p className="text-xs text-muted-foreground">{b.desc}</p>
+        <div className="relative overflow-hidden rounded-3xl bg-navy-deep p-8 shadow-[0_30px_70px_-30px_rgba(16,24,40,0.5)]">
+          <div className="pointer-events-none absolute -left-12 -top-12 h-48 w-48 rounded-full bg-emerald/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-12 -right-8 h-40 w-40 rounded-full bg-gold/15 blur-3xl" />
+          <div className="relative grid gap-5 sm:grid-cols-3">
+            {c.trust.map((b, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <span className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+                  <span className="absolute inset-0 rounded-full bg-white/10 blur-[5px]" />
+                  <b.icon className="relative h-full w-full drop-shadow-[0_3px_8px_rgba(0,0,0,0.35)]" />
+                </span>
+                <div>
+                  <p className="font-heading text-sm font-bold text-white">{b.title}</p>
+                  <p className="text-xs text-white/60">{b.desc}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
