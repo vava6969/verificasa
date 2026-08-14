@@ -25,6 +25,7 @@ import {
 import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
 import { createNotification } from "@/lib/notifications";
+import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 
 // Inelul scorului de încredere — elementul "semnătură" al paginii: singurul
 // număr care contează cu adevărat aici se desenează la scroll, nu stă static.
@@ -353,9 +354,9 @@ export default function PropertyDetail() {
         </div>
 
         {/* KEY STATS BAR */}
-        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+        <RevealGroup className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3" stagger={0.06}>
           {stats.map((s, i) => (
-            <div key={i} className="flex items-center gap-2 rounded-xl border border-border bg-white px-2.5 py-2 shadow-soft dark:bg-card">
+            <RevealItem key={i} y={14} className="flex items-center gap-2 rounded-xl border border-border bg-white px-2.5 py-2 shadow-soft dark:bg-card">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-soft">
                 <s.icon className="h-3.5 w-3.5 text-emerald" />
               </span>
@@ -363,9 +364,9 @@ export default function PropertyDetail() {
                 <p className="truncate font-heading text-sm font-bold leading-tight text-navy dark:text-foreground">{s.value}</p>
                 <p className="truncate text-[10px] uppercase tracking-wide text-muted-foreground">{s.label}</p>
               </div>
-            </div>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
 
             {editing && (
               <PropertyEditForm
@@ -535,7 +536,9 @@ export default function PropertyDetail() {
           {/* RIGHT — Contact panel */}
           <div className="min-w-0 lg:col-span-1">
             <div className="sticky top-20">
-              <ContactPanel property={p} ownerUser={ownerUser} onMessage={handleMessage} />
+              <Reveal>
+                <ContactPanel property={p} ownerUser={ownerUser} onMessage={handleMessage} />
+              </Reveal>
             </div>
           </div>
         </div>
