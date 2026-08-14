@@ -73,7 +73,7 @@ export default function Saved() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-6 flex items-center gap-3">
-        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald text-white"><Bookmark className="h-5 w-5" /></span>
+        <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald to-emerald/80 text-white shadow-soft"><Bookmark className="h-5 w-5" /></span>
         <div>
           <h1 className="font-heading text-2xl font-bold text-navy dark:text-foreground">Salvate</h1>
           <p className="text-sm text-muted-foreground">Proprietățile și profilurile pe care le-ai păstrat.</p>
@@ -107,8 +107,11 @@ export default function Saved() {
             {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)}
           </div>
         ) : properties.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border py-20 text-center">
-            <Home className="mx-auto h-10 w-10 text-muted-foreground/40" />
+          <div className="rounded-3xl border border-dashed border-border bg-gradient-to-b from-secondary/40 to-transparent py-20 text-center">
+            <span className="relative mx-auto flex h-16 w-16 items-center justify-center">
+              <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/20 to-gold/10 blur-md" />
+              <Home className="relative h-8 w-8 text-emerald/70" />
+            </span>
             <p className="mt-3 font-heading text-lg font-semibold text-navy dark:text-foreground">Niciun anunț salvat</p>
             <p className="text-sm text-muted-foreground">Apasă inima pe un anunț sau „Salvează" pe pagina de detaliu.</p>
             <Button asChild className="mt-4 bg-emerald text-white"><Link to="/search">Caută proprietăți</Link></Button>
@@ -134,8 +137,11 @@ export default function Saved() {
             {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-2xl" />)}
           </div>
         ) : profileUsers.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border py-20 text-center">
-            <UserCircle className="mx-auto h-10 w-10 text-muted-foreground/40" />
+          <div className="rounded-3xl border border-dashed border-border bg-gradient-to-b from-secondary/40 to-transparent py-20 text-center">
+            <span className="relative mx-auto flex h-16 w-16 items-center justify-center">
+              <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/20 to-gold/10 blur-md" />
+              <UserCircle className="relative h-8 w-8 text-emerald/70" />
+            </span>
             <p className="mt-3 font-heading text-lg font-semibold text-navy dark:text-foreground">Niciun profil salvat</p>
             <p className="text-sm text-muted-foreground">Salvează profiluri de proprietari sau agenți pentru a le găsi rapid.</p>
             <Button asChild className="mt-4 bg-emerald text-white"><Link to="/search">Caută proprietăți</Link></Button>
