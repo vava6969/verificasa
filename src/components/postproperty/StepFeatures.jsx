@@ -15,19 +15,19 @@ export default function StepFeatures({ form, set, chips, setChips, facilities, s
     <div className="space-y-6">
       <Group title="Facilități verificate" note="Apar evidențiate în pagina anunțului.">
         {CHIP_OPTS.map((c) => (
-          <Chip key={c.key} emoji={c.emoji} label={c.label} active={!!chips[c.key]} onClick={() => setChips((s) => ({ ...s, [c.key]: !s[c.key] }))} />
+          <Chip key={c.key} icon={c.icon} label={c.label} active={!!chips[c.key]} onClick={() => setChips((s) => ({ ...s, [c.key]: !s[c.key] }))} />
         ))}
       </Group>
 
       <Group title="Dotări">
         {FACILITY_OPTS.map((c) => (
-          <Chip key={c.key} emoji={c.emoji} label={c.label} active={!!facilities[c.key]} onClick={() => setFacilities((s) => ({ ...s, [c.key]: !s[c.key] }))} />
+          <Chip key={c.key} icon={c.icon} label={c.label} active={!!facilities[c.key]} onClick={() => setFacilities((s) => ({ ...s, [c.key]: !s[c.key] }))} />
         ))}
       </Group>
 
       <Group title="Opțiuni" note="Apar automat în filtrele de căutare.">
         {OPTION_OPTS.map((c) => (
-          <Chip key={c.key} emoji={c.emoji} label={c.label} active={!!form[c.key]} onClick={() => set({ [c.key]: !form[c.key] })} />
+          <Chip key={c.key} icon={c.icon} label={c.label} active={!!form[c.key]} onClick={() => set({ [c.key]: !form[c.key] })} />
         ))}
       </Group>
     </div>
