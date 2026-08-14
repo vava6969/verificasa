@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { LoadingButton } from "@/components/ui/loading-button";
-import { ArrowLeft, ArrowRight, Home, MapPin, Ruler, Sparkles, Camera } from "lucide-react";
+import { ArrowLeft, ArrowRight, Home, MapPin, Ruler, Sparkles, Camera, Check } from "lucide-react";
 import confetti from "canvas-confetti";
 import { generateUniquePropertyCode } from "@/lib/propertyCode";
 import { uploadPhotos } from "@/lib/imageUpload";
@@ -177,8 +177,56 @@ export default function PropertyWizard({ onDone, onCancel }) {
           <p className="hidden text-xs text-muted-foreground sm:block">{Current.sub}</p>
         </div>
 
-        <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-          <div className="h-full rounded-full gradient-emerald transition-all duration-500" style={{ width: `${progress}%` }} />
+        <div className="relative mt-4 h-2 w-full overflow-hidden rounded-full bg-secondary">
+          <motion.div
+            className="relative h-full overflow-hidden rounded-full gradient-emerald"
+            animate={{
+              width: `${progress}%`,
+              boxShadow: [
+                "0 0 6px 0 rgba(0,168,89,0.45)",
+                "0 0 14px 3px rgba(0,168,89,0.75)",
+                "0 0 6px 0 rgba(0,168,89,0.45)",
+              ],
+            }}
+            transition={{
+              width: { duration: 0.5, ease: "easeOut" },
+              boxShadow: { duration: 1.6, repeat: Infinity, ease: "easeInOut" },
+            }}
+          >
+            <motion.span
+              className="absolute inset-y-0 w-10 bg-white/50"
+              style={{ filter: "blur(3px)" }}
+              animate={{ x: ["-2.5rem", "calc(100% + 2.5rem)"] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+            />
+          </motion.div>
+        </div>
+
+        {/* Pași parcurși */}
+        <div className="mt-4 flex items-center">
+          {STEPS.map((s, i) => (
+            <React.Fragment key={s.id}>
+              <motion.span
+                animate={{
+                  scale: i === step ? 1.08 : 1,
+                  boxShadow: i === step ? "0 0 0 4px rgba(0,168,89,0.16)" : "0 0 0 0 rgba(0,168,89,0)",
+                }}
+                transition={{ duration: 0.3 }}
+                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 text-[10px] font-bold ${
+                  i < step
+                    ? "border-emerald bg-emerald text-white"
+                    : i === step
+                    ? "border-emerald bg-card text-emerald"
+                    : "border-border bg-secondary text-muted-foreground/50"
+                }`}
+              >
+                {i < step ? <Check className="h-3 w-3" /> : i + 1}
+              </motion.span>
+              {i < STEPS.length - 1 && (
+                <span className={`mx-1 h-0.5 flex-1 rounded-full transition-colors duration-500 ${i < step ? "bg-emerald" : "bg-border"}`} />
+              )}
+            </React.Fragment>
+          ))}
         </div>
 
         <div className="mt-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
