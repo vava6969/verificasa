@@ -271,18 +271,28 @@ export default function About() {
             <p className="text-xs font-bold uppercase tracking-wider text-gold">{c.faq_k}</p>
             <h2 className="mt-1 font-heading text-2xl font-bold sm:text-3xl">{c.faq_h}</h2>
           </div>
-          <Accordion type="single" collapsible className="divide-y divide-white/10">
-            {c.faq.map((item, i) => (
-              <AccordionItem key={i} value={`faq-${i}`} className="border-white/10">
-                <AccordionTrigger className="font-heading text-base font-semibold text-white hover:no-underline sm:text-lg">
-                  {item.q}
-                </AccordionTrigger>
-                <AccordionContent className="text-sm leading-relaxed text-white/70 sm:text-base">
-                  {item.a}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={{ show: { transition: { staggerChildren: 0.07 } } }}
+            className="space-y-2.5"
+          >
+            <Accordion type="single" collapsible className="space-y-2.5">
+              {c.faq.map((item, i) => (
+                <motion.div key={i} variants={fadeUp}>
+                  <AccordionItem value={`faq-${i}`} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] px-4 transition-colors duration-300 hover:bg-white/[0.06] data-[state=open]:border-emerald/40 data-[state=open]:bg-white/[0.06] sm:px-5">
+                    <AccordionTrigger className="font-heading text-base font-semibold text-white hover:text-emerald sm:text-lg">
+                      {item.q}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm leading-relaxed text-white/70 sm:text-base">
+                      {item.a}
+                    </AccordionContent>
+                  </AccordionItem>
+                </motion.div>
+              ))}
+            </Accordion>
+          </motion.div>
         </div>
       </section>
     </div>
