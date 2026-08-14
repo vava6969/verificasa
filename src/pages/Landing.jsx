@@ -191,9 +191,7 @@ export default function Landing() {
                 { icon: iconImg("/images/generated/icon-document-check.png"), label: t("b_docs") },
               ].map((b, i) => (
                 <div key={i} className="flex items-center gap-2 rounded-xl border border-border/50 bg-white/60 px-3 py-2.5 text-xs font-semibold text-foreground/80 backdrop-blur-md dark:border-white/10 dark:bg-white/5 dark:text-white/80">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white p-0.5 ring-1 ring-black/5">
-                    <b.icon className="h-full w-full" />
-                  </span>
+                  <b.icon className="h-6 w-6 shrink-0 drop-shadow-[0_2px_5px_rgba(16,24,40,0.15)]" />
                   {b.label}
                 </div>
               ))}
