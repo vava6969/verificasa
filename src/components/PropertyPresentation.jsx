@@ -91,8 +91,12 @@ export default function PropertyPresentation({ images, title }) {
               <motion.div
                 className="h-full w-full"
                 initial={{ scale: 1.02, x: "0%", y: "0%" }}
-                animate={reduceMotion ? {} : { scale: 1.14, x: PANS[i % PANS.length].x, y: PANS[i % PANS.length].y }}
-                transition={{ duration: SLIDE_MS / 1000 + 1.1, ease: "linear" }}
+                animate={
+                  reduceMotion
+                    ? {}
+                    : { scale: [1.02, 1.18, 1.02], x: ["0%", PANS[i % PANS.length].x, "0%"], y: ["0%", PANS[i % PANS.length].y, "0%"] }
+                }
+                transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
               >
                 <Image src={img} alt={`${title || ""} ${i + 1}`} fittingType="fill" className="h-full w-full pointer-events-none" />
               </motion.div>
