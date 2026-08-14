@@ -282,17 +282,17 @@ export default function PropertyDetail() {
                   touchStartX.current = null;
                 }}
               >
-                <AnimatePresence mode="wait">
+                <AnimatePresence>
                   {images[activeImage] && (
                     <motion.button
                       key={activeImage}
                       type="button"
                       onClick={() => { setLbIndex(activeImage); setShowLb(true); }}
-                      className="h-full w-full cursor-zoom-in overflow-hidden"
+                      className="absolute inset-0 h-full w-full cursor-zoom-in overflow-hidden"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.4, ease: "easeOut" }}
+                      transition={{ duration: 0.5, ease: "easeOut" }}
                     >
                       <motion.div
                         className="h-full w-full"
