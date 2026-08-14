@@ -1,5 +1,5 @@
 import React from "react";
-import { Mail, MapPin, ShieldCheck, Instagram, Music2 } from "lucide-react";
+import { Mail, MapPin, ShieldCheck, Instagram, Music2, FileText, Lock, Trash2, Cookie, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCountry } from "@/components/CountryContext";
 import VerifiCasaLogo from "@/components/VerifiCasaLogo";
@@ -37,31 +37,65 @@ export default function Footer() {
 
           <div>
             <h4 className="font-heading text-sm font-semibold uppercase tracking-wider text-gold">{t("f_legal")}</h4>
-            <ul className="mt-4 space-y-2.5 text-sm text-white/60">
-              <li className="flex items-start gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald" />{t("footer_anpc")}</li>
-              <li><Link to="/terms" className="hover:text-emerald">{t("footer_terms")}</Link></li>
-              <li><Link to="/privacy" className="hover:text-emerald">{t("footer_privacy")}</Link></li>
-              <li><Link to="/data-deletion" className="hover:text-emerald">Ștergerea Datelor</Link></li>
-              <li><Link to="/cookies" className="hover:text-emerald">Politica de Cookies</Link></li>
-              <li><Link to="/contact" className="hover:text-emerald">Contact</Link></li>
+            <ul className="mt-4 space-y-1">
+              <li className="flex items-start gap-2.5 py-1 text-sm text-white/60">
+                <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald" />{t("footer_anpc")}
+              </li>
+              <li>
+                <Link to="/terms" className="group flex items-center gap-2.5 rounded-lg py-1.5 text-sm text-white/60 transition-colors duration-200 hover:text-emerald">
+                  <FileText className="h-3.5 w-3.5 shrink-0 text-white/35 transition-colors duration-200 group-hover:text-emerald" />{t("footer_terms")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy" className="group flex items-center gap-2.5 rounded-lg py-1.5 text-sm text-white/60 transition-colors duration-200 hover:text-emerald">
+                  <Lock className="h-3.5 w-3.5 shrink-0 text-white/35 transition-colors duration-200 group-hover:text-emerald" />{t("footer_privacy")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/data-deletion" className="group flex items-center gap-2.5 rounded-lg py-1.5 text-sm text-white/60 transition-colors duration-200 hover:text-emerald">
+                  <Trash2 className="h-3.5 w-3.5 shrink-0 text-white/35 transition-colors duration-200 group-hover:text-emerald" />Ștergerea Datelor
+                </Link>
+              </li>
+              <li>
+                <Link to="/cookies" className="group flex items-center gap-2.5 rounded-lg py-1.5 text-sm text-white/60 transition-colors duration-200 hover:text-emerald">
+                  <Cookie className="h-3.5 w-3.5 shrink-0 text-white/35 transition-colors duration-200 group-hover:text-emerald" />Politica de Cookies
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="group flex items-center gap-2.5 rounded-lg py-1.5 text-sm text-white/60 transition-colors duration-200 hover:text-emerald">
+                  <MessageCircle className="h-3.5 w-3.5 shrink-0 text-white/35 transition-colors duration-200 group-hover:text-emerald" />Contact
+                </Link>
+              </li>
             </ul>
             <LegalBadges />
           </div>
 
           <div>
             <h4 className="font-heading text-sm font-semibold uppercase tracking-wider text-gold">{t("f_contact")}</h4>
-            <ul className="mt-4 space-y-2.5 text-sm text-white/60">
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-emerald" />
-                <a href="mailto:contact@verificasa.site" className="hover:text-emerald">contact@verificasa.site</a>
+            <ul className="mt-4 space-y-2">
+              <li>
+                <a href="mailto:contact@verificasa.site" className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald/30 hover:bg-white/[0.06]">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald/15 text-emerald transition-transform duration-200 group-hover:scale-110">
+                    <Mail className="h-4 w-4" />
+                  </span>
+                  contact@verificasa.site
+                </a>
               </li>
-              <li className="flex items-center gap-2">
-                <Instagram className="h-4 w-4 text-emerald" />
-                <a href="https://instagram.com/verificasaro" target="_blank" rel="noopener noreferrer" className="hover:text-emerald">@verificasaro</a>
+              <li>
+                <a href="https://instagram.com/verificasaro" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/30 hover:bg-white/[0.06]">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink-500/25 via-fuchsia-500/25 to-amber-400/25 text-gold transition-transform duration-200 group-hover:scale-110">
+                    <Instagram className="h-4 w-4" />
+                  </span>
+                  @verificasaro
+                </a>
               </li>
-              <li className="flex items-center gap-2">
-                <Music2 className="h-4 w-4 text-emerald" />
-                <a href="https://tiktok.com/@verificasaro" target="_blank" rel="noopener noreferrer" className="hover:text-emerald">verificasaro</a>
+              <li>
+                <a href="https://tiktok.com/@verificasaro" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/[0.06]">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition-transform duration-200 group-hover:scale-110">
+                    <Music2 className="h-4 w-4" />
+                  </span>
+                  verificasaro
+                </a>
               </li>
             </ul>
             <p className="mt-4 flex items-start gap-2 text-xs font-semibold text-white/70">
