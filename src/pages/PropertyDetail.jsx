@@ -12,6 +12,7 @@ import SimilarProperties from "@/components/SimilarProperties";
 import Lightbox from "@/components/Lightbox";
 import ReportModal from "@/components/ReportModal";
 import ContactPanel from "@/components/ContactPanel";
+import PropertyPresentation from "@/components/PropertyPresentation";
 import PropertyGoogleMap from "@/components/PropertyGoogleMap";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
   Calendar, ShieldCheck, CheckCircle2, ChevronLeft, ChevronRight,
   Heart, MessageCircle, UserCircle2, Clock, Pencil, Box, Maximize2, X,
-  Wifi, VolumeX, Sun, Droplet, Expand,
+  Wifi, VolumeX, Sun, Droplet, Expand, Film,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
@@ -242,6 +243,11 @@ export default function PropertyDetail() {
             <button onClick={() => setTab("gallery")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "gallery" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
               {t("tab_gallery")} ({images.length})
             </button>
+            {images.length > 0 && (
+              <button onClick={() => setTab("presentation")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "presentation" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+                <span className="flex items-center gap-1.5"><Film className="h-3.5 w-3.5" /> {lang === "en" ? "Showcase" : "Prezentare"}</span>
+              </button>
+            )}
             {p.tour_3d_url && (
               <button onClick={() => setTab("3d")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "3d" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
                 <span className="flex items-center gap-1.5"><Box className="h-3.5 w-3.5" /> {t("tab_3d")}</span>
@@ -267,6 +273,8 @@ export default function PropertyDetail() {
                 <Maximize2 className="h-3.5 w-3.5" /> {lang === "en" ? "Fullscreen" : "Ecran complet"}
               </button>
             </div>
+          ) : tab === "presentation" ? (
+            <PropertyPresentation images={images} title={p.title} />
           ) : (
             <div className="select-none">
               <div
