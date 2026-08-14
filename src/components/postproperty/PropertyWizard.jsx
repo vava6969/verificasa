@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
@@ -151,8 +152,20 @@ export default function PropertyWizard({ onDone, onCancel }) {
       <div className="border-b border-border/60 px-4 pb-4 pt-5 sm:px-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-navy text-emerald">
-              <Current.icon className="h-5 w-5" />
+            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-navy-deep shadow-soft">
+              <span className="absolute inset-0 bg-gradient-to-br from-emerald/25 to-transparent" />
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={step}
+                  initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.6, rotate: 8 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                  className="relative flex items-center justify-center text-emerald"
+                >
+                  <Current.icon className="h-5 w-5" />
+                </motion.span>
+              </AnimatePresence>
             </span>
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-emerald">
