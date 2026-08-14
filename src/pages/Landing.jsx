@@ -164,9 +164,14 @@ export default function Landing() {
       <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 sm:pb-20 lg:px-8">
         <Reveal className="group relative overflow-hidden rounded-3xl border border-white/10 p-6 shadow-[0_30px_80px_-30px_rgba(16,24,40,0.5)] sm:p-12">
           <img
+            src="/images/generated/owner-cta-bg-mobile-v1.png"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-[65%_center] transition-transform duration-700 ease-out group-hover:scale-105 sm:hidden"
+          />
+          <img
             src="/images/generated/owner-cta-bg-v1.png"
             alt=""
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            className="absolute inset-0 hidden h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 sm:block"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-navy-deep/92 via-navy-deep/75 to-navy-deep/25" />
           <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-emerald/20 blur-2xl animate-blob" />
