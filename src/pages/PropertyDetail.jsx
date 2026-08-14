@@ -470,59 +470,55 @@ export default function PropertyDetail() {
                 {typeof p.trust_score === "number" && <TrustScoreRing score={p.trust_score} />}
                 <div className="flex flex-1 flex-wrap gap-2">
                 {p.trust_score >= 75 ? (
-                  <span className="flex items-center gap-1 rounded-full bg-navy px-3 py-1 text-xs font-semibold text-mint ring-1 ring-mint/40">
+                  <span className="flex items-center gap-1.5 rounded-full bg-navy px-3 py-1.5 text-xs font-semibold text-mint ring-1 ring-mint/40">
                     <BadgeCheck className="h-3.5 w-3.5" /> {t("pc_trust_high")}
                   </span>
                 ) : p.trust_score >= 40 ? (
-                  <span className="flex items-center gap-1 rounded-full bg-mint-soft px-3 py-1 text-xs font-semibold text-navy">
+                  <span className="flex items-center gap-1.5 rounded-full bg-navy px-3 py-1.5 text-xs font-semibold text-mint ring-1 ring-mint/40">
                     <BadgeCheck className="h-3.5 w-3.5" /> {t("pc_verified")}
                   </span>
                 ) : null}
                 {p.ai_tour_verified && (
-                  <span className="flex items-center gap-1 rounded-full bg-navy px-3 py-1 text-xs font-semibold text-mint">
-                    <Sparkles className="h-3.5 w-3.5" /> {t("badge_aitour_v")}
+                  <span className="flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground/70 dark:bg-white/10">
+                    <Sparkles className="h-3.5 w-3.5 text-emerald" /> {t("badge_aitour_v")}
                   </span>
                 )}
                 {p.tour_3d_url && (
-                  <span className="flex items-center gap-1 rounded-full bg-navy px-3 py-1 text-xs font-semibold text-mint ring-1 ring-mint/40">
-                    <Box className="h-3.5 w-3.5" /> {t("tab_3d")}
+                  <span className="flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground/70 dark:bg-white/10">
+                    <Box className="h-3.5 w-3.5 text-emerald" /> {t("tab_3d")}
                   </span>
                 )}
                 {p.pet_friendly && (
-                  <span className="flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-400/15 dark:text-amber-300">
-                    <PawPrint className="h-3.5 w-3.5" /> {t("badge_pet_v")}
+                  <span className="flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground/70 dark:bg-white/10">
+                    <PawPrint className="h-3.5 w-3.5 text-emerald" /> {t("badge_pet_v")}
                   </span>
                 )}
                 {p.parking && (
-                  <span className="flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800 dark:bg-blue-400/15 dark:text-blue-300">
-                    <Car className="h-3.5 w-3.5" /> {t("badge_parking")}
+                  <span className="flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground/70 dark:bg-white/10">
+                    <Car className="h-3.5 w-3.5 text-emerald" /> {t("badge_parking")}
                   </span>
                 )}
                 {p.furnished && (
-                  <span className="flex items-center gap-1 rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-800 dark:bg-purple-400/15 dark:text-purple-300">
-                    <CheckCircle2 className="h-3.5 w-3.5" /> {t("badge_furnished")}
+                  <span className="flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground/70 dark:bg-white/10">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald" /> {t("badge_furnished")}
                   </span>
                 )}
                 </div>
               </div>
 
-              <div className="mt-4 rounded-xl bg-mint-soft/60 p-3">
-                <p className="flex items-center gap-2 text-xs font-semibold text-navy">
-                  <ShieldCheck className="h-4 w-4" /> {legalInfo.tenantFee}
+              <div className="mt-4 space-y-2.5 rounded-2xl border border-border bg-secondary/40 p-4">
+                <p className="flex items-center gap-2 text-xs font-semibold text-navy dark:text-foreground">
+                  <ShieldCheck className="h-4 w-4 text-emerald" /> {legalInfo.tenantFee}
                 </p>
-              </div>
-
                 {(p.internet_speed_mbps || p.noise_db != null || p.light_orientation || p.water_pressure_ok) && (
-                  <div className="mt-4 rounded-xl border border-border bg-secondary/40 p-4">
-                    <p className="mb-2 text-xs font-bold uppercase tracking-wide text-foreground/60">{t("pd_facilities_h")}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {p.internet_speed_mbps && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald"><Wifi className="h-3.5 w-3.5" /> {t("pd_fac_internet")} {p.internet_speed_mbps} Mbps</span>}
-                      {p.noise_db != null && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald"><VolumeX className="h-3.5 w-3.5" /> {t("pd_fac_noise")} {p.noise_db} dB</span>}
-                      {p.light_orientation && <span className="flex items-center gap-1.5 rounded-full bg-gold-soft px-3 py-1 text-xs font-semibold text-gold-deep dark:text-gold"><Sun className="h-3.5 w-3.5" /> {t("pd_fac_orientation")} {p.light_orientation}</span>}
-                      {p.water_pressure_ok && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald"><Droplet className="h-3.5 w-3.5" /> {t("pd_fac_water")}</span>}
-                    </div>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1.5 border-t border-border/60 pt-2.5 text-xs font-medium text-muted-foreground">
+                    {p.internet_speed_mbps && <span className="flex items-center gap-1.5"><Wifi className="h-3.5 w-3.5 text-emerald" /> {t("pd_fac_internet")} {p.internet_speed_mbps} Mbps</span>}
+                    {p.noise_db != null && <span className="flex items-center gap-1.5"><VolumeX className="h-3.5 w-3.5 text-emerald" /> {t("pd_fac_noise")} {p.noise_db} dB</span>}
+                    {p.light_orientation && <span className="flex items-center gap-1.5"><Sun className="h-3.5 w-3.5 text-emerald" /> {t("pd_fac_orientation")} {p.light_orientation}</span>}
+                    {p.water_pressure_ok && <span className="flex items-center gap-1.5"><Droplet className="h-3.5 w-3.5 text-emerald" /> {t("pd_fac_water")}</span>}
                   </div>
                 )}
+              </div>
 
               <h2 className="mt-6 font-heading text-lg font-bold text-navy">{t("desc_h")}</h2>
               <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
