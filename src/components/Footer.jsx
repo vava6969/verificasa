@@ -74,11 +74,11 @@ export default function Footer() {
             <h4 className="font-heading text-sm font-semibold uppercase tracking-wider text-gold">{t("f_contact")}</h4>
             <ul className="mt-4 space-y-2">
               <li>
-                <a href="mailto:contact@verificasa.site" className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald/30 hover:bg-white/[0.06]">
+                <a href="mailto:contact@verificasa.ro" className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald/30 hover:bg-white/[0.06]">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald/15 text-emerald transition-transform duration-200 group-hover:scale-110">
                     <Mail className="h-4 w-4" />
                   </span>
-                  contact@verificasa.site
+                  contact@verificasa.ro
                 </a>
               </li>
               <li>
