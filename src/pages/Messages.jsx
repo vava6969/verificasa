@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { useNavigate, useSearchParams, Navigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
@@ -116,8 +117,10 @@ export default function Messages() {
   return (
     <div className="mx-auto flex h-[calc(100vh-7rem)] w-full max-w-2xl flex-col overflow-hidden bg-[#f4f6f9] dark:bg-background lg:h-[calc(100vh-3.5rem)]">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border bg-white px-4 py-3 dark:bg-card">
-        <div className="flex items-center gap-2">
+      <div className="relative flex items-center justify-between overflow-hidden border-b border-border bg-white px-4 py-3 dark:bg-card">
+        <div className="absolute -right-8 -top-10 h-28 w-28 rounded-full bg-emerald/10 blur-2xl" />
+        <div className="relative flex items-center gap-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald/15 text-emerald"><MessageCircle className="h-4 w-4" /></span>
           <h1 className="font-heading text-xl font-bold text-navy dark:text-foreground">Mesaje</h1>
           {totalUnread > 0 && (
             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
@@ -162,22 +165,28 @@ export default function Messages() {
             {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-16 rounded-2xl" />)}
           </div>
         ) : filteredConvs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 px-6 py-16 text-center">
-            <MessageCircle className="h-10 w-10 text-muted-foreground/30" />
+          <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
+            <span className="relative flex h-16 w-16 items-center justify-center">
+              <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/20 to-gold/10 blur-md" />
+              <MessageCircle className="relative h-8 w-8 text-emerald/70" />
+            </span>
             <p className="text-sm text-muted-foreground">
               {convSearch ? "Nicio conversație găsită." : "Nicio conversație încă. Deschide un anunț și apasă Mesaj."}
             </p>
           </div>
         ) : (
           <>
-            {visibleConvs.map((c) => {
+            {visibleConvs.map((c, idx) => {
               const otherId = c.buyer_id === user?.id ? c.seller_id : c.buyer_id;
               const otherN = c.buyer_id === user?.id ? c.seller_name : c.buyer_name;
               const unread = c._unread || 0;
               const avatarUrl = avatarMap[otherId];
               return (
-                <div
+                <motion.div
                   key={c.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, delay: Math.min(idx, 8) * 0.03 }}
                   onClick={() => navigate("/messages/" + c.id)}
                   className="group flex w-full cursor-pointer items-center gap-3 border-b border-border/50 bg-white px-4 py-3 text-left transition-colors hover:bg-secondary/40 dark:bg-card"
                 >
@@ -223,7 +232,7 @@ export default function Messages() {
                       <Trash2 className="h-4 w-4" />
                     )}
                   </button>
-                </div>
+                </motion.div>
               );
             })}
             {hasMore && (
