@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useCallback, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, Share2, Heart } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Share2, Heart, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useCountry } from "@/components/CountryContext";
 import { Image } from "@/components/ui/image";
@@ -8,6 +8,38 @@ import { Image } from "@/components/ui/image";
 // Galerie fullscreen (lightbox) pentru imaginile unui anunț.
 // Responsive PC + mobil: swipe stânga/dreapta, săgeți mari la margini,
 // thumbnail-uri jos, controale sus (iesire, contor, distribuire, salvare).
+function LightboxImage({ src, alt }) {
+  const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setLoaded(false);
+    setFailed(false);
+  }, [src]);
+
+  return (
+    <>
+      {!loaded && !failed && (
+        <Loader2 className="h-8 w-8 animate-spin text-white/50" />
+      )}
+      {failed ? (
+        <div className="flex flex-col items-center gap-2 text-white/60">
+          <span className="text-sm">Imaginea nu a putut fi încărcată.</span>
+        </div>
+      ) : (
+        <img
+          src={src}
+          alt={alt}
+          draggable={false}
+          onLoad={() => setLoaded(true)}
+          onError={() => setFailed(true)}
+          className={`max-h-full max-w-full w-auto h-auto select-none object-contain transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+        />
+      )}
+    </>
+  );
+}
+
 export default function Lightbox({ images, index, onClose, onIndex, saved = false, onToggleSave, title }) {
   const { t } = useCountry();
   const { toast } = useToast();
@@ -111,7 +143,12 @@ export default function Lightbox({ images, index, onClose, onIndex, saved = fals
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="absolute inset-0 flex items-center justify-center px-2 sm:px-16"
             >
-              <Image src={images[current]} alt={`${title || "VerifiCasa"} ${current + 1}`} fittingType="fit" className="h-full w-full" />
+              {/* Plain <img>, deliberat NU componenta Image/useSize: aici imaginea
+                  stă imbricată în absolute + flex + flex (items-center), unde un
+                  wrapper cu înaltime procentuală a picat să se măsoare corect
+                  (ecran negru, "poza nu se încarcă"). Un <img> simplu cu
+                  max-h-full/max-w-full nu depinde de nicio măsurătoare JS. */}
+              <LightboxImage src={images[current]} alt={`${title || "VerifiCasa"} ${current + 1}`} />
             </motion.div>
           ) : (
             <div className="text-sm text-white/60">{t("info_missing")}</div>
