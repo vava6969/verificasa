@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, BookmarkPlus, RotateCcw, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
-import { RevealGroup, RevealItem } from "@/components/ui/reveal";
+import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 
 // VerifiCasa verification filters — each applies a real-property predicate.
 const VERIF_FILTERS = [
@@ -180,7 +180,7 @@ export default function SearchPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+      <Reveal className="mb-6 flex flex-wrap items-end justify-between gap-3" y={16}>
         <div>
           <h1 className="font-heading text-2xl font-bold text-navy">
             {cityParam || zoneParam || typeParam || qParam ? t("sr_results") : t("sr_all")}
@@ -201,7 +201,7 @@ export default function SearchPage() {
             <BookmarkPlus className="h-4 w-4" /> {t("sr_save_search")}
           </Button>
         </div>
-      </div>
+      </Reveal>
 
       {/* City / zone selectors */}
       <div className="mb-5 flex flex-wrap items-center gap-3">
