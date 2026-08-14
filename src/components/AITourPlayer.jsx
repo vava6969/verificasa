@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Play, Pause, Sparkles, Volume2, Maximize2, BadgeCheck } from "lucide-react";
+import { Play, Pause, Volume2, Maximize2, BadgeCheck } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 
 export default function AITourPlayer({ videoUrl, poster, title }) {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
-  User, Plus, Home, LogOut, Heart, MessageCircle, Settings, ShieldCheck,
+  User, Plus, Home, LogOut, MessageCircle, Settings, ShieldCheck,
   LayoutDashboard, Bookmark, Search, ChevronDown, Globe, Check, Bell, Moon, Sun, Flag,
 } from "lucide-react";
 import {
@@ -11,7 +11,6 @@ import {
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useNotifications } from "@/hooks/useNotifications";
-import { Button } from "@/components/ui/button";
 import VerifiCasaLogo from "@/components/VerifiCasaLogo";
 import ThemeToggle from "@/components/ThemeToggle";
 

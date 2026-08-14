@@ -1,21 +1,16 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
-import { getCities, getZones, getCounty } from "@/components/locations";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Camera, Eye, MessageSquare, FileText, TrendingUp, Upload, Plus, Download, Wifi, Volume2, Sun, Droplet, MapPin,
+  Camera, Eye, MessageSquare, FileText, Plus, Download,
 } from "lucide-react";
 import OwnerCharts from "@/components/OwnerCharts";
 import PropertyWizard from "@/components/postproperty/PropertyWizard";
-import DateField from "@/components/DateField";
-import GooglePlacesAutocomplete from "@/components/GooglePlacesAutocomplete";
-import { generateUniquePropertyCode } from "@/lib/propertyCode";
 
 // Sanitizează intrările telefon la doar cifre (opțional "+" la început pentru internațional).
 const onlyPhoneDigits = (v) => {

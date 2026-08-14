@@ -6,7 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import PropertyCard from "@/components/PropertyCard";
-import { Bookmark, Trash2, Home, UserCircle, Star } from "lucide-react";
+import { Bookmark, Trash2, Home, UserCircle } from "lucide-react";
 import { initials, avatarColor } from "@/lib/chatUtils";
 import RatingStars from "@/components/RatingStars";
 

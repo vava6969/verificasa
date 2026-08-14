@@ -1,7 +1,7 @@
 import React from "react";
 import LegalPage from "@/components/LegalPage";
 import { Link } from "react-router-dom";
-import { Cookie, ShieldCheck, BarChart3, Settings2 } from "lucide-react";
+import { ShieldCheck, BarChart3, Settings2 } from "lucide-react";
 
 export default function CookiePolicy() {
   return (

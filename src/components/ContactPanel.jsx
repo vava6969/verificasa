@@ -5,7 +5,7 @@ import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useCountry } from "@/components/CountryContext";
-import { initials, avatarColor } from "@/lib/chatUtils";
+import { initials } from "@/lib/chatUtils";
 import RatingStars from "@/components/RatingStars";
 import ReviewModal from "@/components/ReviewModal";
 

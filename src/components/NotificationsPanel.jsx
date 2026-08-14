@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Bell, MessageCircle, Heart, MessageSquare, Home, Star, CheckCheck, Phone, Tag, Building2 } from "lucide-react";
+import { Bell, Heart, MessageSquare, Star, CheckCheck, Phone, Building2 } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
 import { cn } from "@/lib/utils";
 

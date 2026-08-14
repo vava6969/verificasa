@@ -8,7 +8,7 @@ import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
 import { useToast } from "@/components/ui/use-toast";
-import { initials, avatarColor } from "@/lib/chatUtils";
+import { initials } from "@/lib/chatUtils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Image as UIImage } from "@/components/ui/image";
