@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, Share2, Heart } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useCountry } from "@/components/CountryContext";
@@ -64,7 +65,13 @@ export default function Lightbox({ images, index, onClose, onIndex, saved = fals
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-navy-deep/95 backdrop-blur-sm">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      className="fixed inset-0 z-[100] flex flex-col bg-navy-deep/95 backdrop-blur-sm"
+    >
       {/* Header controls */}
       <div className="flex items-center justify-between px-4 py-4 text-white sm:px-6">
         <button onClick={onClose} aria-label={t("lb_close")} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/20">
@@ -94,11 +101,22 @@ export default function Lightbox({ images, index, onClose, onIndex, saved = fals
           touchX.current = null;
         }}
       >
-        {images[current] ? (
-          <Image src={images[current]} alt={`${title || "VerifiCasa"} ${current + 1}`} fittingType="fit" className="max-h-full max-w-full" />
-        ) : (
-          <div className="text-sm text-white/60">{t("info_missing")}</div>
-        )}
+        <AnimatePresence mode="wait">
+          {images[current] ? (
+            <motion.div
+              key={current}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="flex max-h-full max-w-full items-center justify-center"
+            >
+              <Image src={images[current]} alt={`${title || "VerifiCasa"} ${current + 1}`} fittingType="fit" className="max-h-full max-w-full" />
+            </motion.div>
+          ) : (
+            <div className="text-sm text-white/60">{t("info_missing")}</div>
+          )}
+        </AnimatePresence>
 
         {/* Side arrows — PC & mobil */}
         {total > 1 && (
@@ -127,6 +145,6 @@ export default function Lightbox({ images, index, onClose, onIndex, saved = fals
           ))}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
