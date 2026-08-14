@@ -1,13 +1,18 @@
 import React from "react";
 import { motion } from "framer-motion";
-import {
-  ShieldCheck, Users, FileText, BadgeCheck, Lock, MapPin, Sparkles,
-  Search, ClipboardCheck, Camera, Handshake, ArrowRight,
-} from "lucide-react";
+import { Sparkles, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useCountry } from "@/components/CountryContext";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+
+// Iconță custom (glossy, transparentă) — același limbaj vizual ca restul site-ului,
+// nu Lucide generic.
+function iconImg(src) {
+  return function IconImg({ className = "" }) {
+    return <img src={src} alt="" className={`object-contain ${className}`} />;
+  };
+}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -27,23 +32,23 @@ const CONTENT = {
     pillars_k: "Ce facem",
     pillars_h: "Verificare online, la fiecare anunț",
     pillars: [
-      { icon: ShieldCheck, title: "Verificare online", desc: "Verificăm fiecare anunț înainte de publicare — poze, acte și preț — direct online, fără vizite pe teren." },
-      { icon: BadgeCheck, title: "Scor de încredere", desc: "Fiecare proprietate primește un scor calculat automat, ca să știi dintr-o privire cât de sigur este anunțul." },
-      { icon: Users, title: "Selectarea clienților potriviți", desc: "Filtrăm chiriașii și cumpărătorii calificați, ca să nu pierzi timp cu vizionări inutile." },
-      { icon: Lock, title: "Comisioane corecte & siguranță", desc: "Condiții transparente, fără taxe ascunse sau garanții exagerate. Pachete avantajoase pentru vânzare și închiriere." },
+      { icon: iconImg("/images/generated/icon-shield-check.png"), title: "Verificare online", desc: "Verificăm fiecare anunț înainte de publicare — poze, acte și preț — direct online, fără vizite pe teren." },
+      { icon: iconImg("/images/generated/icon-gauge.png"), title: "Scor de încredere", desc: "Fiecare proprietate primește un scor calculat automat, ca să știi dintr-o privire cât de sigur este anunțul." },
+      { icon: iconImg("/images/generated/icon-users-check.png"), title: "Selectarea clienților potriviți", desc: "Filtrăm chiriașii și cumpărătorii calificați, ca să nu pierzi timp cu vizionări inutile." },
+      { icon: iconImg("/images/generated/icon-lock.png"), title: "Comisioane corecte & siguranță", desc: "Condiții transparente, fără taxe ascunse sau garanții exagerate. Pachete avantajoase pentru vânzare și închiriere." },
     ],
     steps_k: "Cum colaborăm",
     steps_h: "Pași simpli, de la anunț la chei",
     steps: [
-      { icon: Search, title: "1. Cauți sau publici", desc: "Răsfoiești anunțuri verificate sau îți publici propria proprietate în câteva minute." },
-      { icon: ClipboardCheck, title: "2. Verificare online", desc: "Verificăm poze, acte și preț înainte de publicare, pentru transparență 100%." },
-      { icon: Camera, title: "3. Scor & promovare", desc: "Anunțul primește un scor de încredere, apoi îți propunem pachetul ideal de promovare." },
-      { icon: Handshake, title: "4. Contract & chei", desc: "Selectăm clientul potrivit și facilităm contractul și predarea — fără bătăi de cap." },
+      { icon: iconImg("/images/generated/icon-search.png"), title: "1. Cauți sau publici", desc: "Răsfoiești anunțuri verificate sau îți publici propria proprietate în câteva minute." },
+      { icon: iconImg("/images/generated/icon-document-check.png"), title: "2. Verificare online", desc: "Verificăm poze, acte și preț înainte de publicare, pentru transparență 100%." },
+      { icon: iconImg("/images/generated/icon-camera-verify.png"), title: "3. Scor & promovare", desc: "Anunțul primește un scor de încredere, apoi îți propunem pachetul ideal de promovare." },
+      { icon: iconImg("/images/generated/icon-handshake.png"), title: "4. Contract & chei", desc: "Selectăm clientul potrivit și facilităm contractul și predarea — fără bătăi de cap." },
     ],
     trust: [
-      { icon: BadgeCheck, title: "Verificare online", desc: "Verificăm poze, acte și preț înainte de publicare." },
-      { icon: FileText, title: "Contracte transparente", desc: "Comisioane corecte, fără taxe ascunse." },
-      { icon: MapPin, title: "Acoperire națională", desc: "Căutare disponibilă în toată România, din prima zi." },
+      { icon: iconImg("/images/generated/icon-gauge.png"), title: "Verificare online", desc: "Verificăm poze, acte și preț înainte de publicare." },
+      { icon: iconImg("/images/generated/icon-document.png"), title: "Contracte transparente", desc: "Comisioane corecte, fără taxe ascunse." },
+      { icon: iconImg("/images/generated/icon-map-pin.png"), title: "Acoperire națională", desc: "Căutare disponibilă în toată România, din prima zi." },
     ],
     story_k: "Cum s-a născut VerifiCasa",
     story_h: "De la o problemă reală la o soluție inteligentă",
@@ -80,23 +85,23 @@ const CONTENT = {
     pillars_k: "What we do",
     pillars_h: "Online verification, on every listing",
     pillars: [
-      { icon: ShieldCheck, title: "Online verification", desc: "We verify every listing before it's published — photos, paperwork and price — entirely online, no site visits." },
-      { icon: BadgeCheck, title: "Trust score", desc: "Every property gets an automatically calculated score, so you know at a glance how reliable the listing is." },
-      { icon: Users, title: "Screening the right clients", desc: "We filter qualified tenants and buyers, so you don't waste time on pointless viewings." },
-      { icon: Lock, title: "Fair fees & safety", desc: "Transparent terms, no hidden charges or inflated guarantees. Advantageous packages for sale and rent." },
+      { icon: iconImg("/images/generated/icon-shield-check.png"), title: "Online verification", desc: "We verify every listing before it's published — photos, paperwork and price — entirely online, no site visits." },
+      { icon: iconImg("/images/generated/icon-gauge.png"), title: "Trust score", desc: "Every property gets an automatically calculated score, so you know at a glance how reliable the listing is." },
+      { icon: iconImg("/images/generated/icon-users-check.png"), title: "Screening the right clients", desc: "We filter qualified tenants and buyers, so you don't waste time on pointless viewings." },
+      { icon: iconImg("/images/generated/icon-lock.png"), title: "Fair fees & safety", desc: "Transparent terms, no hidden charges or inflated guarantees. Advantageous packages for sale and rent." },
     ],
     steps_k: "How we work together",
     steps_h: "Simple steps, from listing to keys",
     steps: [
-      { icon: Search, title: "1. Search or list", desc: "Browse verified listings or publish your own property in a few minutes." },
-      { icon: ClipboardCheck, title: "2. Online verification", desc: "We verify photos, paperwork and price before publishing, for 100% transparency." },
-      { icon: Camera, title: "3. Score & promotion", desc: "The listing gets a trust score, then we propose the ideal promotion package." },
-      { icon: Handshake, title: "4. Contract & keys", desc: "We select the right client and facilitate the contract and handover — hassle-free." },
+      { icon: iconImg("/images/generated/icon-search.png"), title: "1. Search or list", desc: "Browse verified listings or publish your own property in a few minutes." },
+      { icon: iconImg("/images/generated/icon-document-check.png"), title: "2. Online verification", desc: "We verify photos, paperwork and price before publishing, for 100% transparency." },
+      { icon: iconImg("/images/generated/icon-camera-verify.png"), title: "3. Score & promotion", desc: "The listing gets a trust score, then we propose the ideal promotion package." },
+      { icon: iconImg("/images/generated/icon-handshake.png"), title: "4. Contract & keys", desc: "We select the right client and facilitate the contract and handover — hassle-free." },
     ],
     trust: [
-      { icon: BadgeCheck, title: "Online verification", desc: "We verify photos, paperwork and price before publishing." },
-      { icon: FileText, title: "Transparent contracts", desc: "Fair commissions, no hidden fees." },
-      { icon: MapPin, title: "Nationwide coverage", desc: "Search available across Romania, from day one." },
+      { icon: iconImg("/images/generated/icon-gauge.png"), title: "Online verification", desc: "We verify photos, paperwork and price before publishing." },
+      { icon: iconImg("/images/generated/icon-document.png"), title: "Transparent contracts", desc: "Fair commissions, no hidden fees." },
+      { icon: iconImg("/images/generated/icon-map-pin.png"), title: "Nationwide coverage", desc: "Search available across Romania, from day one." },
     ],
     story_k: "How VerifiCasa was born",
     story_h: "From a real problem to a smart solution",
@@ -133,6 +138,12 @@ export default function About() {
     <div className="bg-secondary/30">
       {/* HERO */}
       <section className="relative overflow-hidden bg-navy-deep text-white">
+        <img
+          src="/images/generated/about-hero.png"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-45"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/80 via-navy-deep/70 to-navy-deep/90" />
         <div className="absolute -left-16 -top-16 h-64 w-64 rounded-full bg-emerald/20 blur-3xl" />
         <div className="absolute -bottom-20 -right-10 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
         <div className="relative mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
@@ -164,8 +175,11 @@ export default function About() {
         </div>
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={{ show: { transition: { staggerChildren: 0.1 } } }} className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {c.pillars.map((p, i) => (
-            <motion.div key={i} variants={fadeUp} className="flex flex-col rounded-2xl border border-border bg-white p-6 shadow-soft dark:bg-card">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-soft text-emerald"><p.icon className="h-6 w-6" /></div>
+            <motion.div key={i} variants={fadeUp} className="group flex flex-col rounded-2xl border border-border bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] dark:bg-card">
+              <div className="relative flex h-12 w-12 items-center justify-center">
+                <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/15 to-gold/10 blur-[6px] transition-transform duration-300 group-hover:scale-110" />
+                <p.icon className="relative h-full w-full drop-shadow-[0_4px_10px_rgba(16,24,40,0.16)] transition-transform duration-300 group-hover:scale-110" />
+              </div>
               <h3 className="mt-4 font-heading text-lg font-bold text-navy dark:text-foreground">{p.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
             </motion.div>
@@ -174,9 +188,15 @@ export default function About() {
       </section>
 
       {/* OUR STORY */}
-      <section className="mx-auto max-w-3xl px-4 pb-16 sm:px-6 lg:px-8">
-        <div className="rounded-3xl border border-border bg-white p-7 shadow-soft dark:bg-card sm:p-9">
-          <div className="text-center">
+      <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
+        <div className="grid gap-6 lg:grid-cols-5 lg:items-start">
+          <div className="lg:sticky lg:top-24 lg:col-span-2">
+            <div className="overflow-hidden rounded-3xl shadow-soft">
+              <img src="/images/generated/about-story.png" alt="" className="h-72 w-full object-cover lg:h-[480px]" />
+            </div>
+          </div>
+          <div className="rounded-3xl border border-border bg-white p-7 shadow-soft dark:bg-card sm:p-9 lg:col-span-3">
+          <div className="text-center lg:text-left">
             <p className="text-xs font-bold uppercase tracking-wider text-emerald">{c.story_k}</p>
             <h2 className="mt-1 font-heading text-2xl font-bold text-navy dark:text-foreground sm:text-3xl">{c.story_h}</h2>
           </div>
@@ -202,6 +222,7 @@ export default function About() {
             <p>{c.story_p5}</p>
             <p>{c.story_p6}</p>
           </div>
+          </div>
         </div>
       </section>
 
@@ -213,8 +234,11 @@ export default function About() {
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {c.steps.map((s, i) => (
-            <motion.div key={i} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={fadeUp} className="relative rounded-2xl border border-border bg-white p-6 shadow-soft dark:bg-card">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-navy text-emerald"><s.icon className="h-5 w-5" /></span>
+            <motion.div key={i} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={fadeUp} className="group relative rounded-2xl border border-border bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] dark:bg-card">
+              <span className="relative flex h-11 w-11 items-center justify-center">
+                <span className="absolute inset-0 rounded-full bg-gradient-to-br from-navy/10 to-emerald/15 blur-[6px] transition-transform duration-300 group-hover:scale-110" />
+                <s.icon className="relative h-full w-full drop-shadow-[0_4px_10px_rgba(16,24,40,0.16)] transition-transform duration-300 group-hover:scale-110" />
+              </span>
               <h3 className="mt-4 font-heading text-base font-bold text-navy dark:text-foreground">{s.title}</h3>
               <p className="mt-1.5 text-sm text-muted-foreground">{s.desc}</p>
             </motion.div>
@@ -227,7 +251,10 @@ export default function About() {
         <div className="grid gap-4 rounded-3xl border border-border bg-white p-8 shadow-soft sm:grid-cols-3 dark:bg-card">
           {c.trust.map((b, i) => (
             <div key={i} className="flex items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-soft text-emerald"><b.icon className="h-5 w-5" /></span>
+              <span className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+                <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/15 to-gold/10 blur-[5px]" />
+                <b.icon className="relative h-full w-full drop-shadow-[0_3px_8px_rgba(16,24,40,0.15)]" />
+              </span>
               <div>
                 <p className="font-heading text-sm font-bold text-navy dark:text-foreground">{b.title}</p>
                 <p className="text-xs text-muted-foreground">{b.desc}</p>
