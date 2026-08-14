@@ -65,16 +65,16 @@ export default function HeroCountdown() {
   }, []);
 
   const unit = (v, label) => (
-    <div className="flex flex-col items-center">
-      <span className="font-heading text-lg font-bold tabular-nums text-white sm:text-2xl">
+    <div className="flex flex-col items-center gap-1.5">
+      <span className="flex h-11 min-w-[2.4rem] items-center justify-center rounded-xl border border-white/15 bg-gradient-to-b from-white/[0.14] to-white/[0.04] px-1.5 font-heading text-2xl font-extrabold tabular-nums text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] sm:h-14 sm:min-w-[3.1rem] sm:text-4xl">
         <RollingDigits value={String(v).padStart(2, "0")} reduceMotion={reduceMotion} />
       </span>
-      <span className="text-[8px] font-semibold uppercase tracking-[0.16em] text-white/50 sm:text-[9px]">{label}</span>
+      <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/55 sm:text-[10px]">{label}</span>
     </div>
   );
 
   return (
-    <div className="mt-5 flex w-full max-w-2xl flex-col items-center gap-3 rounded-2xl border border-white/15 bg-black/25 px-4 py-3 backdrop-blur-md sm:mt-8 sm:flex-row sm:justify-between sm:px-6">
+    <div className="mt-5 flex w-full max-w-2xl flex-col items-center gap-4 rounded-3xl border border-white/15 bg-black/30 px-5 py-4 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-md sm:mt-8 sm:flex-row sm:justify-between sm:px-7 sm:py-5">
       <div className="text-center sm:text-left">
         <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-emerald">
           <span className="relative flex h-1.5 w-1.5">
@@ -83,22 +83,25 @@ export default function HeroCountdown() {
           </span>
           {t("countdown_badge")}
         </span>
-        <p className="mt-0.5 text-xs font-medium text-white/80 sm:text-sm">{t("countdown_h")}</p>
+        <p className="mt-1 text-sm font-semibold text-white sm:text-base">{t("countdown_h")}</p>
       </div>
 
       <div className="flex items-center gap-4 sm:gap-5">
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3">
           {unit(time.days, t("countdown_days"))}
+          <span className="pb-4 font-heading text-xl font-bold text-white/25 sm:text-2xl">:</span>
           {unit(time.hours, t("countdown_hours"))}
+          <span className="pb-4 font-heading text-xl font-bold text-white/25 sm:text-2xl">:</span>
           {unit(time.mins, t("countdown_mins"))}
+          <span className="pb-4 font-heading text-xl font-bold text-white/25 sm:text-2xl">:</span>
           {unit(time.secs, "SEC")}
         </div>
         <Link
           to="/about"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/25 text-white transition hover:bg-white/10"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/25 text-white transition hover:border-emerald hover:bg-emerald/20 sm:h-10 sm:w-10"
           aria-label={t("countdown_btn")}
         >
-          <ArrowRight className="h-4 w-4" />
+          <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
         </Link>
       </div>
     </div>
