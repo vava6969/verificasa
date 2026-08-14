@@ -270,7 +270,7 @@ export default function PropertyDetail() {
           ) : (
             <div className="select-none">
               <div
-                className="relative flex items-center justify-center overflow-hidden rounded-2xl border border-border bg-secondary select-none"
+                className="relative flex items-center justify-center overflow-hidden rounded-3xl border border-border/60 bg-secondary shadow-[0_30px_80px_-30px_rgba(16,24,40,0.4)] select-none"
                 style={{ aspectRatio: "16 / 10" }}
                 onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
                 onTouchEnd={(e) => {
@@ -329,7 +329,7 @@ export default function PropertyDetail() {
                       type="button"
                       onClick={() => setActiveImage((i) => (i - 1 + images.length) % images.length)}
                       aria-label="Imaginea anterioară"
-                      className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition hover:bg-white/30"
+                      className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-110 hover:bg-white/35 active:scale-95 sm:h-12 sm:w-12"
                     >
                       <ChevronLeft className="h-5 w-5" />
                     </button>
@@ -337,11 +337,11 @@ export default function PropertyDetail() {
                       type="button"
                       onClick={() => setActiveImage((i) => (i + 1) % images.length)}
                       aria-label="Imaginea următoare"
-                      className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition hover:bg-white/30"
+                      className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-110 hover:bg-white/35 active:scale-95 sm:h-12 sm:w-12"
                     >
                       <ChevronRight className="h-5 w-5" />
                     </button>
-                    <span className="absolute bottom-3 right-3 rounded-full bg-navy-deep/70 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-md">
+                    <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-black/45 px-3 py-1.5 text-xs font-semibold tabular-nums text-white backdrop-blur-md">
                       {activeImage + 1} / {images.length}
                     </span>
                   </>
@@ -352,10 +352,15 @@ export default function PropertyDetail() {
                   type="button"
                   onClick={(e) => { e.stopPropagation(); toggleSave(); }}
                   aria-label={saved ? t("pd_saved") : t("pd_save")}
-                  className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-navy-deep/45 text-white backdrop-blur-md transition hover:bg-navy-deep/65"
+                  className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-black/30 text-white shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-110 hover:bg-black/50 active:scale-95"
                 >
-                  <Heart className={`h-4 w-4 transition ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
+                  <Heart className={`h-4.5 w-4.5 transition ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
                 </button>
+                {images.length > 0 && (
+                  <span className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur-md">
+                    <Expand className="h-3 w-3" /> {lang === "en" ? "Click to zoom" : "Apasă pentru zoom"}
+                  </span>
+                )}
               </div>
 
               {images.length > 1 && (
@@ -364,7 +369,7 @@ export default function PropertyDetail() {
                     <button
                       key={i}
                       onClick={() => setActiveImage(i)}
-                      className={`h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 bg-navy-deep transition ${activeImage === i ? "border-mint" : "border-transparent opacity-80 hover:opacity-100"}`}
+                      className={`h-16 w-24 shrink-0 overflow-hidden rounded-xl border-2 bg-navy-deep shadow-sm transition-all duration-200 sm:h-20 sm:w-28 ${activeImage === i ? "scale-[1.03] border-emerald ring-2 ring-emerald/30" : "border-transparent opacity-70 hover:scale-[1.02] hover:opacity-100"}`}
                     >
                       <Image src={img} alt={`thumb ${i}`} fittingType="fill" className="h-full w-full" />
                     </button>
