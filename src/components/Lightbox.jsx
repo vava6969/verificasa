@@ -111,7 +111,7 @@ export default function Lightbox({ images, index, onClose, onIndex, saved = fals
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="absolute inset-0 flex items-center justify-center px-2 sm:px-16"
             >
-              <Image src={images[current]} alt={`${title || "VerifiCasa"} ${current + 1}`} fittingType="fit" className="max-h-full max-w-full" />
+              <Image src={images[current]} alt={`${title || "VerifiCasa"} ${current + 1}`} fittingType="fit" className="h-full w-full" />
             </motion.div>
           ) : (
             <div className="text-sm text-white/60">{t("info_missing")}</div>
