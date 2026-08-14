@@ -120,33 +120,43 @@ export default function Header() {
           )}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="text-xs text-muted-foreground">{t("hdr_myaccount")}</DropdownMenuLabel>
-        <DropdownMenuItem onClick={() => navigate("/")}><LayoutDashboard className="mr-2 h-4 w-4" /> {t("hdr_dashboard")}</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/messages")}><MessageCircle className="mr-2 h-4 w-4" /> {t("hdr_messages")}</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/settings")}>
-          <Bell className="mr-2 h-4 w-4" /> Notificări
+      <DropdownMenuContent align="end" className="w-64 origin-top-right p-1.5">
+        <div className="flex items-center gap-2.5 px-2 py-2">
+          {user?.avatar_url ? (
+            <img src={user.avatar_url} alt="" className="h-9 w-9 rounded-full object-cover" />
+          ) : (
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-soft text-emerald"><User className="h-4.5 w-4.5" /></span>
+          )}
+          <div className="min-w-0">
+            <p className="truncate text-sm font-bold text-navy dark:text-foreground">{greeting}</p>
+            <p className="text-[11px] text-muted-foreground">{t("hdr_myaccount")}</p>
+          </div>
+        </div>
+        <DropdownMenuSeparator />
+        <MenuRow onClick={() => navigate("/")} icon={LayoutDashboard} color="bg-sky-500/15 text-sky-600 dark:text-sky-400" label={t("hdr_dashboard")} />
+        <MenuRow onClick={() => navigate("/messages")} icon={MessageCircle} color="bg-emerald/15 text-emerald" label={t("hdr_messages")} />
+        <MenuRow onClick={() => navigate("/settings")} icon={Bell} color="bg-amber-500/15 text-amber-600 dark:text-amber-400" label="Notificări">
           {unreadCount > 0 && (
             <span className="ml-auto rounded-full bg-rose-500 px-1.5 py-0.5 text-[10px] font-bold text-white">{unreadCount > 9 ? "9+" : unreadCount}</span>
           )}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/saved")}><Bookmark className="mr-2 h-4 w-4" /> {t("hdr_saved")}</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/searches")}><Search className="mr-2 h-4 w-4" /> {t("hdr_searches")}</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/my-reports")}><Flag className="mr-2 h-4 w-4" /> Rapoartele mele</DropdownMenuItem>
+        </MenuRow>
+        <MenuRow onClick={() => navigate("/saved")} icon={Bookmark} color="bg-rose-500/15 text-rose-500" label={t("hdr_saved")} />
+        <MenuRow onClick={() => navigate("/searches")} icon={Search} color="bg-violet-500/15 text-violet-600 dark:text-violet-400" label={t("hdr_searches")} />
+        <MenuRow onClick={() => navigate("/my-reports")} icon={Flag} color="bg-orange-500/15 text-orange-600 dark:text-orange-400" label="Rapoartele mele" />
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate("/post-property")}><Plus className="mr-2 h-4 w-4" /> {t("hdr_add_listing")}</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/my-properties")}><Home className="mr-2 h-4 w-4" /> {t("hdr_myprops")}</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/settings")}><Settings className="mr-2 h-4 w-4" /> {t("hdr_settings")}</DropdownMenuItem>
+        <MenuRow onClick={() => navigate("/post-property")} icon={Plus} color="bg-emerald/15 text-emerald" label={t("hdr_add_listing")} />
+        <MenuRow onClick={() => navigate("/my-properties")} icon={Home} color="bg-navy/10 text-navy dark:bg-white/10 dark:text-foreground" label={t("hdr_myprops")} />
+        <MenuRow onClick={() => navigate("/settings")} icon={Settings} color="bg-slate-500/15 text-slate-600 dark:text-slate-400" label={t("hdr_settings")} />
         {canAdmin && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate("/admin")}><ShieldCheck className="mr-2 h-4 w-4" /> {t("hdr_admin")}</DropdownMenuItem>
+            <MenuRow onClick={() => navigate("/admin")} icon={ShieldCheck} color="bg-gold/20 text-gold-deep dark:text-gold" label={t("hdr_admin")} />
           </>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => { document.getElementById("account-menu")?.scrollIntoView({ behavior: "smooth", block: "start" }); navigate("/account#account-menu"); }}><Settings className="mr-2 h-4 w-4" /> Preferințe cont</DropdownMenuItem>
+        <MenuRow onClick={() => { document.getElementById("account-menu")?.scrollIntoView({ behavior: "smooth", block: "start" }); navigate("/account#account-menu"); }} icon={Settings} color="bg-navy/10 text-navy dark:bg-white/10 dark:text-foreground" label="Preferințe cont" />
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => logout()}><LogOut className="mr-2 h-4 w-4" /> {t("hdr_logout")}</DropdownMenuItem>
+        <MenuRow onClick={() => logout()} icon={LogOut} color="bg-rose-500/15 text-rose-500" label={t("hdr_logout")} />
       </DropdownMenuContent>
     </DropdownMenu>
   );
