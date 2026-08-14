@@ -4,14 +4,17 @@ import { Link } from "react-router-dom";
 import { useCountry } from "@/components/CountryContext";
 import VerifiCasaLogo from "@/components/VerifiCasaLogo";
 import LegalBadges from "@/components/LegalBadges";
+import { Reveal } from "@/components/ui/reveal";
 
 export default function Footer() {
   const { t } = useCountry();
   return (
-    <footer className="bg-navy-deep text-white/80">
+    <footer className="relative overflow-hidden bg-navy-deep text-white/80">
       <div className="h-20 bg-gradient-to-b from-background to-transparent" />
+      <div className="pointer-events-none absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-emerald/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 top-10 h-56 w-56 rounded-full bg-gold/10 blur-3xl" />
 
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+      <Reveal className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-4">
           <div>
             <VerifiCasaLogo size={44} tagline={false} tone="light" />
@@ -71,7 +74,7 @@ export default function Footer() {
           <p>{t("footer_copy")}</p>
           <p>{t("footer_compliance")}</p>
         </div>
-      </div>
+      </Reveal>
     </footer>
   );
 }
