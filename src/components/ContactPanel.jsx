@@ -54,19 +54,28 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
   ].filter(Boolean);
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card sm:p-6">
+    <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-white shadow-[0_25px_60px_-25px_rgba(16,24,40,0.35)] dark:bg-card">
+      <div className="h-[3px] bg-gradient-to-r from-emerald via-gold to-emerald" />
+      <div className="p-5 sm:p-6">
       <h3 className="font-heading text-base font-bold text-navy dark:text-foreground">{t("contact_h")}</h3>
       <p className="mt-0.5 text-xs text-muted-foreground">{t("contact_sub")}</p>
 
       {/* Agent identity */}
-      <Link to={targetUserId ? `/profile/${targetUserId}` : "#"} className="mt-4 flex items-center gap-3 rounded-xl p-1 -m-1 transition hover:bg-secondary/50">
-        {avatarUrl ? (
-          <img src={avatarUrl} alt={sellerName} className="h-14 w-14 shrink-0 rounded-full object-cover" />
-        ) : (
-          <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-base font-bold text-white ${isProprietar ? "bg-emerald" : "bg-blue-600"}`}>
-            {initials(sellerName)}
-          </span>
-        )}
+      <Link to={targetUserId ? `/profile/${targetUserId}` : "#"} className="mt-4 flex items-center gap-3 rounded-xl p-1.5 -m-1.5 transition-colors duration-200 hover:bg-secondary/50">
+        <span className="relative shrink-0">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt={sellerName} className="h-14 w-14 rounded-full object-cover ring-2 ring-emerald/20" />
+          ) : (
+            <span className={`flex h-14 w-14 items-center justify-center rounded-full text-base font-bold text-white ring-2 ring-emerald/20 ${isProprietar ? "bg-emerald" : "bg-blue-600"}`}>
+              {initials(sellerName)}
+            </span>
+          )}
+          {p.owner_verified && (
+            <span className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-emerald text-white ring-2 ring-white dark:ring-card">
+              <BadgeCheck className="h-3 w-3" />
+            </span>
+          )}
+        </span>
         <div className="min-w-0">
           <p className="truncate font-heading text-sm font-bold text-navy hover:text-emerald dark:text-foreground">{sellerName}</p>
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -89,14 +98,14 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
       </Link>
 
       {/* Primary CTA */}
-      <Button onClick={onMessage} className="mt-4 w-full gap-2 bg-emerald text-white shadow-soft hover:bg-emerald/90" size="lg">
+      <Button onClick={onMessage} className="mt-4 w-full gap-2 bg-emerald text-white shadow-soft transition-transform duration-200 hover:scale-[1.015] hover:bg-emerald/90 active:scale-[0.98]" size="lg">
         <MessageCircle className="h-5 w-5" /> {t("pd_msg_btn")}
       </Button>
 
       {/* Secondary actions */}
       <div className="mt-2 grid grid-cols-2 gap-2">
         {hasPhone ? (
-          <Button asChild variant="outline" className="gap-1.5 border-emerald/30 text-emerald hover:bg-emerald-soft">
+          <Button asChild variant="outline" className="gap-1.5 border-emerald/30 text-emerald transition-transform duration-200 hover:scale-[1.015] hover:bg-emerald-soft active:scale-[0.98]">
             <a href={`tel:${callPhone}`}><Phone className="h-4 w-4" /> {t("pc_call")}</a>
           </Button>
         ) : (
@@ -105,7 +114,7 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
           </Button>
         )}
         {hasWhatsApp ? (
-          <Button asChild variant="outline" className="gap-1.5 border-emerald/30 text-emerald hover:bg-emerald-soft">
+          <Button asChild variant="outline" className="gap-1.5 border-emerald/30 text-emerald transition-transform duration-200 hover:scale-[1.015] hover:bg-emerald-soft active:scale-[0.98]">
             <a href={`https://wa.me/${waPhone}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>
           </Button>
         ) : (
@@ -119,18 +128,21 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
       <div className="my-4 h-px bg-border" />
 
       {/* Trust markers */}
-      <ul className="space-y-2">
+      <div className="space-y-1.5">
         {trustMarkers.map((m, i) => {
           const Ico = m.icon;
           return (
-            <li key={i} className="flex items-center gap-2 text-xs text-foreground/70">
-              <Ico className="h-4 w-4 shrink-0 text-emerald" /> {m.text}
-            </li>
+            <div key={i} className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 text-xs font-medium text-foreground/75 transition-colors duration-200 hover:bg-secondary/50">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald/12 text-emerald">
+                <Ico className="h-3.5 w-3.5" />
+              </span>
+              {m.text}
+            </div>
           );
         })}
-      </ul>
+      </div>
 
-      <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
+      <div className="mt-4 flex items-center justify-center gap-1.5 rounded-full bg-secondary/50 py-2 text-[11px] font-medium text-muted-foreground">
         <ShieldCheck className="h-3.5 w-3.5 text-emerald" /> {t("pd_trust_footer")}
       </div>
 
@@ -138,7 +150,7 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
       {user && targetUserId && user.id !== targetUserId && ownerUser && (
         <button
           onClick={() => setShowReviewModal(true)}
-          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-emerald/30 py-2 text-xs font-semibold text-emerald transition hover:bg-emerald-soft"
+          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-emerald/30 py-2 text-xs font-semibold text-emerald transition-colors duration-200 hover:bg-emerald-soft"
         >
           <Star className="h-3.5 w-3.5" /> {t("up_leave_review")}
         </button>
@@ -147,6 +159,7 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
       {showReviewModal && ownerUser && (
         <ReviewModal targetUser={ownerUser} onClose={() => setShowReviewModal(false)} />
       )}
+      </div>
     </div>
   );
 }
