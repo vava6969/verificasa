@@ -34,6 +34,7 @@ export default function InspectieModal({ open, onClose }) {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({ name: "", email: "", phone: "", role: "Proprietar", address_or_url: "", package_interest: "", message: "" });
   const [sending, setSending] = useState(false);
+  const [errors, setErrors] = useState({});
 
   // Reset/lifecycle: rulează STRICT la deschidere/închidere, nu la orice
   // schimbare de referință a obiectului `user` din context (altfel un refresh
@@ -59,19 +60,29 @@ export default function InspectieModal({ open, onClose }) {
 
   const needsAuth = !isLoadingAuth && !isAuthenticated;
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
+  const clearError = (field) => setErrors((er) => (er[field] ? { ...er, [field]: undefined } : er));
 
+  // Returnează un obiect { field: mesaj } cu TOATE câmpurile lipsă de la pasul
+  // `s` — folosit atât pentru a bloca avansarea cât și pentru a evidenția
+  // vizual (border roșu + mesaj) exact câmpurile necompletate, nu doar un toast.
   const validateStep = (s) => {
+    const e = {};
     if (s === 0) {
-      if (!form.name.trim()) return "Completează numele tău.";
-      if (!form.email.trim()) return "Completează emailul.";
+      if (!form.name.trim()) e.name = "Completează numele tău.";
+      if (!form.email.trim()) e.email = "Completează emailul.";
     }
-    if (s === 1 && !form.address_or_url.trim()) return "Adaugă adresa sau link-ul anunțului.";
-    return null;
+    if (s === 1 && !form.address_or_url.trim()) e.address_or_url = "Adaugă adresa sau link-ul anunțului.";
+    return e;
   };
 
   const next = () => {
-    const err = validateStep(step);
-    if (err) { toast({ title: err, variant: "destructive" }); return; }
+    const errs = validateStep(step);
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      toast({ title: Object.values(errs)[0], variant: "destructive" });
+      return;
+    }
+    setErrors({});
     setStep((s) => Math.min(STEPS.length - 1, s + 1));
   };
   const back = () => {
@@ -82,8 +93,8 @@ export default function InspectieModal({ open, onClose }) {
   const submit = async (e) => {
     e.preventDefault();
     for (let s = 0; s <= 1; s++) {
-      const err = validateStep(s);
-      if (err) { setStep(s); toast({ title: err, variant: "destructive" }); return; }
+      const errs = validateStep(s);
+      if (Object.keys(errs).length) { setStep(s); setErrors(errs); toast({ title: Object.values(errs)[0], variant: "destructive" }); return; }
     }
     setSending(true);
     try {
@@ -205,10 +216,12 @@ export default function InspectieModal({ open, onClose }) {
                 </Field>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Field label="Nume" required>
-                    <input value={form.name} readOnly={isAuthenticated} onChange={(e) => set({ name: e.target.value })} placeholder={t("ins_ph_name")} className={inputCls + (isAuthenticated ? " cursor-not-allowed bg-secondary/50" : "")} required />
+                    <input value={form.name} readOnly={isAuthenticated} onChange={(e) => { set({ name: e.target.value }); clearError("name"); }} placeholder={t("ins_ph_name")} className={inputCls + (isAuthenticated ? " cursor-not-allowed bg-secondary/50" : "") + (errors.name ? " border-rose-400 focus:border-rose-400 focus:ring-rose-200" : "")} required />
+                    {errors.name && <p className="mt-1 text-[11px] font-semibold text-rose-500">{errors.name}</p>}
                   </Field>
                   <Field label="Email" required>
-                    <input type="email" value={form.email} readOnly={isAuthenticated} onChange={(e) => set({ email: e.target.value })} placeholder={t("ins_ph_email")} className={inputCls + (isAuthenticated ? " cursor-not-allowed bg-secondary/50" : "")} required />
+                    <input type="email" value={form.email} readOnly={isAuthenticated} onChange={(e) => { set({ email: e.target.value }); clearError("email"); }} placeholder={t("ins_ph_email")} className={inputCls + (isAuthenticated ? " cursor-not-allowed bg-secondary/50" : "") + (errors.email ? " border-rose-400 focus:border-rose-400 focus:ring-rose-200" : "")} required />
+                    {errors.email && <p className="mt-1 text-[11px] font-semibold text-rose-500">{errors.email}</p>}
                   </Field>
                 </div>
                 {isAuthenticated && (
@@ -224,7 +237,8 @@ export default function InspectieModal({ open, onClose }) {
             {step === 1 && (
               <div className="space-y-4">
                 <Field label="Adresă / Link anunț" required hint="Adresa fizică a proprietății sau link-ul anunțului VerifiCasa">
-                  <input value={form.address_or_url} onChange={(e) => set({ address_or_url: e.target.value })} placeholder={t("ins_ph_addr")} className={inputCls} required />
+                  <input value={form.address_or_url} onChange={(e) => { set({ address_or_url: e.target.value }); clearError("address_or_url"); }} placeholder={t("ins_ph_addr")} className={inputCls + (errors.address_or_url ? " border-rose-400 focus:border-rose-400 focus:ring-rose-200" : "")} required />
+                  {errors.address_or_url && <p className="mt-1 text-[11px] font-semibold text-rose-500">{errors.address_or_url}</p>}
                 </Field>
                 <Field label="Pachet de interes" hint="Alege serviciul dorit">
                   <div className="grid grid-cols-2 gap-2.5">
