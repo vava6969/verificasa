@@ -114,8 +114,8 @@ export default function Privacy() {
           Datele de autentificare (inclusiv cele Google) sunt păstrate pe durata activă a
           contului. Utilizatorul poate solicita ștergerea completă a datelor personale în orice
           moment prin contactarea noastră la{" "}
-          <a href="mailto:birou@verificasa.site" className="text-primary hover:underline">
-            birou@verificasa.site
+          <a href="mailto:birou@verificasa.ro" className="text-primary hover:underline">
+            birou@verificasa.ro
           </a>
           . Cererile sunt procesate într-un termen rezonabil.
         </p>
@@ -250,7 +250,7 @@ export default function Privacy() {
           prelucrării datelor cu caracter personal conform art. 4 alin. 7 GDPR.
         </p>
         <p>
-          <strong>Date de contact:</strong> birou@verificasa.site · Instagram @verificasaro ·
+          <strong>Date de contact:</strong> birou@verificasa.ro · Instagram @verificasaro ·
           detaliile complete în pagina de Contact.
         </p>
         <p>
