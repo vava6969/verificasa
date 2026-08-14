@@ -3,27 +3,25 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const VISIBLE_COUNT = 5;
-
-function getItemPosition(index, activeIndex, total, radiusX, radiusY) {
+function getItemPosition(index, activeIndex, total, radiusX, radiusY, visibleCount) {
   const offset = index - activeIndex;
-  const half = Math.floor(VISIBLE_COUNT / 2);
+  const half = Math.floor(visibleCount / 2);
   let adjustedOffset = offset;
 
   if (offset > half) adjustedOffset = offset - total;
   if (offset < -half) adjustedOffset = offset + total;
 
-  if (Math.abs(adjustedOffset) > half * 2) return null;
+  if (Math.abs(adjustedOffset) > half) return null;
 
-  const angle = (adjustedOffset / VISIBLE_COUNT) * Math.PI;
+  const angle = (adjustedOffset / visibleCount) * Math.PI;
   const x = Math.sin(angle) * radiusX;
   const y = (1 - Math.cos(angle)) * radiusY;
 
   const distance = Math.abs(adjustedOffset);
   const maxDistance = half + 1;
   const scale = Math.max(0.72, 1 - (distance / maxDistance) * 0.22);
-  const opacity = Math.max(0.18, 1 - (distance / maxDistance) * 0.72);
-  const zIndex = VISIBLE_COUNT - distance;
+  const opacity = distance === 0 ? 1 : Math.max(0, 0.55 - (distance / maxDistance) * 0.55);
+  const zIndex = visibleCount - distance;
 
   return { x, y, scale, opacity, zIndex, adjustedOffset };
 }
@@ -47,8 +45,9 @@ export function CircularCarousel({
   const activeIndex = controlledIndex ?? internalIndex;
   const total = items.length;
 
-  const radiusX = isMobile ? 38 : 190;
-  const radiusY = isMobile ? 12 : 55;
+  const visibleCount = isMobile ? 3 : 5;
+  const radiusX = isMobile ? 130 : 190;
+  const radiusY = isMobile ? 18 : 55;
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 640);
@@ -124,7 +123,7 @@ export function CircularCarousel({
       >
         <AnimatePresence mode="popLayout">
           {items.map((item, i) => {
-            const pos = getItemPosition(i, activeIndex, total, radiusX, radiusY);
+            const pos = getItemPosition(i, activeIndex, total, radiusX, radiusY, visibleCount);
             if (!pos) return null;
 
             const isActive = i === activeIndex;
@@ -150,11 +149,12 @@ export function CircularCarousel({
                 aria-label={item.title}
                 aria-selected={isActive}
                 role="option"
+                tabIndex={isActive ? 0 : -1}
                 className={cn(
-                  "absolute inset-0 m-auto flex h-40 w-52 cursor-pointer flex-col items-start gap-2 overflow-hidden rounded-2xl border border-border bg-card p-4 backdrop-blur-sm transition-shadow duration-300 sm:h-44 sm:w-64",
+                  "absolute inset-0 m-auto flex h-36 w-44 cursor-pointer flex-col items-start gap-2 overflow-hidden rounded-2xl border border-border bg-card p-3.5 shadow-soft transition-[filter] duration-300 sm:h-44 sm:w-64 sm:p-4",
                   isActive
-                    ? "shadow-soft ring-1 ring-emerald/50"
-                    : "shadow-soft blur-[2px]",
+                    ? "pointer-events-auto ring-1 ring-emerald/50"
+                    : "pointer-events-none blur-[1.5px]",
                 )}
               >
                 <div className="flex w-full items-center gap-2.5 overflow-hidden">
