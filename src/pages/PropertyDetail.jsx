@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { motion, animate } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { formatDistanceToNowStrict } from "date-fns";
 import { ro, enGB } from "date-fns/locale";
@@ -24,6 +25,50 @@ import {
 import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
 import { createNotification } from "@/lib/notifications";
+
+// Inelul scorului de încredere — elementul "semnătură" al paginii: singurul
+// număr care contează cu adevărat aici se desenează la scroll, nu stă static.
+function TrustScoreRing({ score = 0, size = 64 }) {
+  const clamped = Math.max(0, Math.min(100, Math.round(score)));
+  const [display, setDisplay] = useState(0);
+  const started = useRef(false);
+  const radius = (size - 8) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const color = clamped >= 75 ? "#00A85A" : clamped >= 40 ? "#C9A15C" : "#94A3B8";
+
+  return (
+    <motion.div
+      className="relative shrink-0"
+      style={{ width: size, height: size }}
+      onViewportEnter={() => {
+        if (started.current) return;
+        started.current = true;
+        animate(0, clamped, {
+          duration: 1.1,
+          ease: [0.22, 1, 0.36, 1],
+          onUpdate: (v) => setDisplay(Math.round(v)),
+        });
+      }}
+      viewport={{ once: true, margin: "-40px" }}
+    >
+      <svg width={size} height={size} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={5} className="text-border" />
+        <motion.circle
+          cx={size / 2} cy={size / 2} r={radius} fill="none"
+          stroke={color} strokeWidth={5} strokeLinecap="round"
+          strokeDasharray={circumference}
+          initial={{ strokeDashoffset: circumference }}
+          whileInView={{ strokeDashoffset: circumference * (1 - clamped / 100) }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="font-heading text-sm font-extrabold text-navy dark:text-foreground">{display}</span>
+      </div>
+    </motion.div>
+  );
+}
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -384,7 +429,9 @@ export default function PropertyDetail() {
 
               {/* BADGES — scorul de încredere (0-100, calculat automat) înlocuiește
                   vechiul badge static "Proprietar verificat" */}
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                {typeof p.trust_score === "number" && <TrustScoreRing score={p.trust_score} />}
+                <div className="flex flex-1 flex-wrap gap-2">
                 {p.trust_score >= 75 ? (
                   <span className="flex items-center gap-1 rounded-full bg-navy px-3 py-1 text-xs font-semibold text-mint ring-1 ring-mint/40">
                     <BadgeCheck className="h-3.5 w-3.5" /> {t("pc_trust_high")}
@@ -419,6 +466,7 @@ export default function PropertyDetail() {
                     <CheckCircle2 className="h-3.5 w-3.5" /> {t("badge_furnished")}
                   </span>
                 )}
+                </div>
               </div>
 
               <div className="mt-4 rounded-xl bg-mint-soft/60 p-3">
