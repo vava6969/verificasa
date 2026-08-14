@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { X, ShieldCheck, Send, ArrowLeft, ArrowRight, User, Home, MessageSquare, CheckCircle2, LogIn, Lock } from "lucide-react";
+import { X, ShieldCheck, Send, ArrowLeft, ArrowRight, User, Home, MessageSquare, CheckCircle2, LogIn, Lock, KeyRound, Handshake, FileText, Trophy } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useToast } from "@/components/ui/use-toast";
 import { useCountry } from "@/components/CountryContext";
@@ -15,16 +15,16 @@ const STEPS = [
 ];
 
 const ROLES = [
-  { value: "Proprietar",          emoji: "🏠", labelKey: "ins_role_owner" },
-  { value: "Chiriaș/Cumpărător",  emoji: "🔑", labelKey: "ins_role_tenant" },
-  { value: "Agent",               emoji: "🤝", labelKey: "ins_role_agent" },
+  { value: "Proprietar",          icon: Home,      labelKey: "ins_role_owner" },
+  { value: "Chiriaș/Cumpărător",  icon: KeyRound,  labelKey: "ins_role_tenant" },
+  { value: "Agent",               icon: Handshake, labelKey: "ins_role_agent" },
 ];
 
 const PACKAGES = [
-  { value: "Verificare Standard",   emoji: "✅" },
-  { value: "Verificare Acte",       emoji: "📄" },
-  { value: "Verificare Completă",   emoji: "🛡️" },
-  { value: "Plan Pro",              emoji: "🏆" },
+  { value: "Verificare Standard",   icon: CheckCircle2 },
+  { value: "Verificare Acte",       icon: FileText },
+  { value: "Verificare Completă",   icon: ShieldCheck },
+  { value: "Plan Pro",              icon: Trophy },
 ];
 
 export default function InspectieModal({ open, onClose }) {
@@ -35,18 +35,25 @@ export default function InspectieModal({ open, onClose }) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", role: "Proprietar", address_or_url: "", package_interest: "", message: "" });
   const [sending, setSending] = useState(false);
 
+  // Reset/lifecycle: rulează STRICT la deschidere/închidere, nu la orice
+  // schimbare de referință a obiectului `user` din context (altfel un refresh
+  // silențios al auth-ului în timp ce modalul e deschis reseta wizard-ul înapoi
+  // la pasul 1 și părea că "se închide").
   useEffect(() => {
     if (!open) return;
     setStep(0);
-    // Preia automat numele și emailul din contul utilizatorului autentificat.
-    if (isAuthenticated && user) {
-      setForm((f) => ({ ...f, name: user.full_name || "", email: user.email || "" }));
-    }
     const onEsc = (e) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", onEsc);
     document.body.style.overflow = "hidden";
     return () => { document.removeEventListener("keydown", onEsc); document.body.style.overflow = ""; };
-  }, [open, isAuthenticated, user]);
+  }, [open]);
+
+  // Preia automat numele și emailul din contul utilizatorului autentificat —
+  // separat de efectul de mai sus, ca să nu resetețe pasul curent.
+  useEffect(() => {
+    if (!open || !isAuthenticated || !user) return;
+    setForm((f) => ({ ...f, name: user.full_name || f.name, email: user.email || f.email }));
+  }, [open, isAuthenticated, user?.full_name, user?.email]);
 
   if (!open) return null;
 
@@ -166,7 +173,19 @@ export default function InspectieModal({ open, onClose }) {
         </div>
 
         {/* Step body */}
-        <form onSubmit={submit} className="flex min-h-0 flex-1 flex-col">
+        <form
+          onSubmit={submit}
+          onKeyDown={(e) => {
+            // Enter într-un câmp de tip input NU trebuie să trimită formularul
+            // înainte de pasul final — altfel cererea pleacă fără mesaj și modalul
+            // se închide direct din pasul 1 sau 2, sărind peste pasul "Mesaj".
+            if (e.key === "Enter" && step < STEPS.length - 1) {
+              e.preventDefault();
+              next();
+            }
+          }}
+          className="flex min-h-0 flex-1 flex-col"
+        >
           <div className="flex-1 overflow-y-auto px-5 py-5">
             {/* Step 0 — Rol & Contact */}
             {step === 0 && (
@@ -178,7 +197,7 @@ export default function InspectieModal({ open, onClose }) {
                         key={r.value}
                         active={form.role === r.value}
                         onClick={() => set({ role: r.value })}
-                        emoji={r.emoji}
+                        icon={r.icon}
                         title={t(r.labelKey)}
                       />
                     ))}
@@ -223,7 +242,7 @@ export default function InspectieModal({ open, onClose }) {
                               : "border-border bg-white text-foreground/70 hover:border-emerald/40 dark:bg-card")
                           }
                         >
-                          <span className="text-lg leading-none">{p.emoji}</span> {p.value}
+                          <p.icon className={"h-4 w-4 shrink-0 " + (active ? "text-emerald" : "text-muted-foreground")} /> {p.value}
                         </button>
                       );
                     })}
