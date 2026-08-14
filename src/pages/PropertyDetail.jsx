@@ -13,6 +13,7 @@ import Lightbox from "@/components/Lightbox";
 import ReportModal from "@/components/ReportModal";
 import ContactPanel from "@/components/ContactPanel";
 import PropertyPresentation from "@/components/PropertyPresentation";
+import PropertyDescription from "@/components/PropertyDescription";
 import PropertyGoogleMap from "@/components/PropertyGoogleMap";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
@@ -521,9 +522,12 @@ export default function PropertyDetail() {
               </div>
 
               <h2 className="mt-6 font-heading text-lg font-bold text-navy">{t("desc_h")}</h2>
-              <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-                {p.description || <span className="italic text-muted-foreground/70">{t("info_missing")}</span>}
-              </p>
+              <PropertyDescription
+                text={p.description}
+                emptyLabel={t("info_missing")}
+                moreLabel={lang === "en" ? "Read more" : "Află mai mult"}
+                lessLabel={lang === "en" ? "Show less" : "Arată mai puțin"}
+              />
             </div>
 
             {/* MAP */}
