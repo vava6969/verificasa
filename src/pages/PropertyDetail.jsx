@@ -411,7 +411,7 @@ export default function PropertyDetail() {
                 <div className="min-w-0 flex-1">
                   <h1 className="font-heading text-xl font-bold text-navy sm:text-3xl">{p.title}</h1>
                   <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4" /> {p.zone}, {p.city}{p.landmark ? ` · 📍 ${p.landmark}` : ""}, {p.country === "UK" ? t("pd_country_uk") : t("pd_country_ro")}
+                    <MapPin className="h-4 w-4" /> {p.zone}, {p.city}{p.landmark ? ` · ${p.landmark}` : ""}, {p.country === "UK" ? t("pd_country_uk") : t("pd_country_ro")}
                   </p>
                   {p.created_date && (
                     <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
@@ -508,10 +508,10 @@ export default function PropertyDetail() {
                   <div className="mt-4 rounded-xl border border-border bg-secondary/40 p-4">
                     <p className="mb-2 text-xs font-bold uppercase tracking-wide text-foreground/60">{t("pd_facilities_h")}</p>
                     <div className="flex flex-wrap gap-2">
-                      {p.internet_speed_mbps && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald">📶 {t("pd_fac_internet")} {p.internet_speed_mbps} Mbps</span>}
-                      {p.noise_db != null && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald">🔊 {t("pd_fac_noise")} {p.noise_db} dB</span>}
-                      {p.light_orientation && <span className="flex items-center gap-1.5 rounded-full bg-gold-soft px-3 py-1 text-xs font-semibold text-gold-deep dark:text-gold">☀️ {t("pd_fac_orientation")} {p.light_orientation}</span>}
-                      {p.water_pressure_ok && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald">💧 {t("pd_fac_water")}</span>}
+                      {p.internet_speed_mbps && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald"><Wifi className="h-3.5 w-3.5" /> {t("pd_fac_internet")} {p.internet_speed_mbps} Mbps</span>}
+                      {p.noise_db != null && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald"><VolumeX className="h-3.5 w-3.5" /> {t("pd_fac_noise")} {p.noise_db} dB</span>}
+                      {p.light_orientation && <span className="flex items-center gap-1.5 rounded-full bg-gold-soft px-3 py-1 text-xs font-semibold text-gold-deep dark:text-gold"><Sun className="h-3.5 w-3.5" /> {t("pd_fac_orientation")} {p.light_orientation}</span>}
+                      {p.water_pressure_ok && <span className="flex items-center gap-1.5 rounded-full bg-emerald-soft px-3 py-1 text-xs font-semibold text-emerald"><Droplet className="h-3.5 w-3.5" /> {t("pd_fac_water")}</span>}
                     </div>
                   </div>
                 )}
