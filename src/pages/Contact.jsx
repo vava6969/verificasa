@@ -1,7 +1,7 @@
 import React from "react";
 import LegalPage from "@/components/LegalPage";
 import EmailDirectory from "@/components/EmailDirectory";
-import { Instagram, MapPin, Clock, ShieldCheck } from "lucide-react";
+import { MapPin, Clock } from "lucide-react";
 
 export default function Contact() {
   return (
@@ -35,12 +35,32 @@ export default function Contact() {
           Social Media & Domenii verificate
         </h2>
         <div className="mt-3 flex flex-wrap items-center gap-3">
-          <a href="https://instagram.com/verificasaro" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary/40 px-3 py-2 text-sm font-semibold text-emerald hover:underline">
-            <Instagram className="h-4 w-4" /> @verificasaro
+          <a
+            href="https://instagram.com/verificasaro"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-2.5 rounded-xl border border-border bg-secondary/40 py-1.5 pl-1.5 pr-3.5 text-sm font-semibold text-navy transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/40 hover:bg-secondary/60 dark:text-foreground"
+          >
+            <img
+              src="/images/generated/icon-instagram-v1.png"
+              alt=""
+              className="h-8 w-8 shrink-0 object-contain transition-transform duration-200 group-hover:scale-110"
+            />
+            @verificasaro
           </a>
-          <span className="inline-flex items-center gap-2 rounded-lg border border-border bg-secondary/40 px-3 py-2 text-sm font-semibold text-emerald">
-            <ShieldCheck className="h-4 w-4" /> TikTok: verificasaro
-          </span>
+          <a
+            href="https://tiktok.com/@verificasaro"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-2.5 rounded-xl border border-border bg-secondary/40 py-1.5 pl-1.5 pr-3.5 text-sm font-semibold text-navy transition-all duration-200 hover:-translate-y-0.5 hover:border-navy/30 hover:bg-secondary/60 dark:text-foreground dark:hover:border-white/30"
+          >
+            <img
+              src="/images/generated/icon-tiktok-v1.png"
+              alt=""
+              className="h-8 w-8 shrink-0 object-contain transition-transform duration-200 group-hover:scale-110"
+            />
+            @verificasaro
+          </a>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
           Domenii verificate: <span className="font-mono font-semibold">www.verificasa.ro</span> &{" "}
@@ -54,7 +74,11 @@ export default function Contact() {
         </h2>
         <div className="mt-3 flex items-start gap-2">
           <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-emerald" />
-          <p>România — Iași, Huși și zone limitrofe.</p>
+          <p>
+            <span className="mr-1">🇷🇴</span>
+            Oferim servicii de verificare în toată România — peste 300 de orașe acoperite, cu
+            validare online pentru fiecare anunț publicat.
+          </p>
         </div>
       </section>
 
