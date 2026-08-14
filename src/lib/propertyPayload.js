@@ -1,4 +1,8 @@
 import { getCounty } from "@/components/locations";
+import {
+  Wifi, VolumeX, Sun, Droplet, Snowflake, Sunset, ArrowUpDown, Flame, Layers,
+  Armchair, ChefHat, Tv, Shirt, Trees, Car, PawPrint, Tag,
+} from "lucide-react";
 
 export const MAX_PHOTOS = 20;
 export const MIN_PHOTOS = 3;
@@ -20,29 +24,29 @@ export const EMPTY_FORM = {
 };
 
 export const CHIP_OPTS = [
-  { key: "wifi", emoji: "📶", label: "Internet / Wi-Fi", feature: "📶 Internet / Wi-Fi" },
-  { key: "noise", emoji: "🔊", label: "Zonă liniștită", feature: "🔊 Zonă liniștită" },
-  { key: "light", emoji: "☀️", label: "Orientare / Luminozitate", feature: "☀️ Orientare Sud" },
-  { key: "water", emoji: "💧", label: "Presiune apă verificată", feature: "💧 Presiune apă OK" },
+  { key: "wifi", icon: Wifi, emoji: "📶", label: "Internet / Wi-Fi", feature: "📶 Internet / Wi-Fi" },
+  { key: "noise", icon: VolumeX, emoji: "🔊", label: "Zonă liniștită", feature: "🔊 Zonă liniștită" },
+  { key: "light", icon: Sun, emoji: "☀️", label: "Orientare / Luminozitate", feature: "☀️ Orientare Sud" },
+  { key: "water", icon: Droplet, emoji: "💧", label: "Presiune apă verificată", feature: "💧 Presiune apă OK" },
 ];
 
 export const FACILITY_OPTS = [
-  { key: "ac", emoji: "❄️", label: "Aer Condiționat" },
-  { key: "balcon", emoji: "🌇", label: "Balcon" },
-  { key: "lift", emoji: "🛗", label: "Lift" },
-  { key: "centrala", emoji: "🔥", label: "Centrală proprie" },
-  { key: "termopan", emoji: "🪟", label: "Geamuri Termopan" },
-  { key: "mobilat", emoji: "🛋️", label: "Mobilat complet" },
-  { key: "bucatarie", emoji: "🍽️", label: "Bucătărie utilată" },
-  { key: "tv", emoji: "📺", label: "Smart TV" },
-  { key: "masina_spalat", emoji: "🧺", label: "Mașină de spălat" },
-  { key: "terasa", emoji: "🌿", label: "Terasă / Grădină" },
+  { key: "ac", icon: Snowflake, emoji: "❄️", label: "Aer Condiționat" },
+  { key: "balcon", icon: Sunset, emoji: "🌇", label: "Balcon" },
+  { key: "lift", icon: ArrowUpDown, emoji: "🛗", label: "Lift" },
+  { key: "centrala", icon: Flame, emoji: "🔥", label: "Centrală proprie" },
+  { key: "termopan", icon: Layers, emoji: "🪟", label: "Geamuri Termopan" },
+  { key: "mobilat", icon: Armchair, emoji: "🛋️", label: "Mobilat complet" },
+  { key: "bucatarie", icon: ChefHat, emoji: "🍽️", label: "Bucătărie utilată" },
+  { key: "tv", icon: Tv, emoji: "📺", label: "Smart TV" },
+  { key: "masina_spalat", icon: Shirt, emoji: "🧺", label: "Mașină de spălat" },
+  { key: "terasa", icon: Trees, emoji: "🌿", label: "Terasă / Grădină" },
 ];
 
 export const OPTION_OPTS = [
-  { key: "parking", emoji: "🅿️", label: "Parcare" },
-  { key: "pet_friendly", emoji: "🐾", label: "Pet Friendly" },
-  { key: "commission_free", emoji: "🆓", label: "Fără Comision" },
+  { key: "parking", icon: Car, emoji: "🅿️", label: "Parcare" },
+  { key: "pet_friendly", icon: PawPrint, emoji: "🐾", label: "Pet Friendly" },
+  { key: "commission_free", icon: Tag, emoji: "🆓", label: "Fără Comision" },
 ];
 
 // Builds the Property entity payload from wizard/form state.
