@@ -181,7 +181,7 @@ export default function CookiePolicy() {
           Conform GDPR și Legii 506/2004, aveți dreptul de a accesa, rectifica, șterge
           datele și de a vă opune prelucrării. Pentru exercitarea drepturilor,
           contactați-ne la{" "}
-          <a href="mailto:birou@verificasa.site" className="text-primary hover:underline">birou@verificasa.site</a>.
+          <a href="mailto:birou@verificasa.ro" className="text-primary hover:underline">birou@verificasa.ro</a>.
           Puteți depune o plângere la ANSPDCP (<a href="https://www.dataprotection.ro" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">www.dataprotection.ro</a>).
         </p>
       </section>
