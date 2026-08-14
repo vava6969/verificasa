@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   User, Lock, Bell, Shield, Home, Loader2, Check, Camera, Building2, ChevronRight, Clock, Phone, MessageCircle,
+  Image as ImageIcon, FileText, Moon, Mail,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
@@ -169,8 +170,8 @@ export default function Settings() {
           <div className="space-y-6">
             {/* Cover image */}
             <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
-              <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">
-                {lang === "en" ? "Cover image" : "Imagine background"}
+              <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground">
+                <ImageIcon className="h-4 w-4 text-emerald" /> {lang === "en" ? "Cover image" : "Imagine background"}
               </h2>
               <p className="text-sm text-muted-foreground">
                 {lang === "en" ? "Appears at the top of your public profile." : "Apare în partea de sus a profilului tău public."}
@@ -215,14 +216,14 @@ export default function Settings() {
 
             {/* Avatar */}
             <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
-              <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">{t("st_avatar")}</h2>
+              <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground"><Camera className="h-4 w-4 text-emerald" /> {t("st_avatar")}</h2>
               <p className="text-sm text-muted-foreground">Va apărea în comentarii, chat și pe profilul tău public.</p>
               <div className="mt-4"><AvatarUpload /></div>
             </section>
 
             {/* Name + role */}
             <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
-              <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">{t("st_full_name")}</h2>
+              <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground"><User className="h-4 w-4 text-emerald" /> {t("st_full_name")}</h2>
               <input
                 value={form.full_name}
                 onChange={(e) => set("full_name", e.target.value)}
@@ -329,7 +330,7 @@ export default function Settings() {
 
             {/* Bio */}
             <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
-              <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">{t("st_bio")}</h2>
+              <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground"><FileText className="h-4 w-4 text-emerald" /> {t("st_bio")}</h2>
               <textarea
                 value={form.bio}
                 onChange={(e) => set("bio", e.target.value)}
@@ -435,7 +436,7 @@ export default function Settings() {
             </section>
 
             <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
-              <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">Aspect</h2>
+              <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground"><Moon className="h-4 w-4 text-emerald" /> Aspect</h2>
               <p className="text-sm text-muted-foreground">{lang === "en" ? "Toggle between light and dark theme." : "Comută între temă deschisă și întunecată."}</p>
               <div className="mt-3"><ThemeToggle withLabel /></div>
             </section>
@@ -466,7 +467,7 @@ export default function Settings() {
 
       {/* Account data */}
       <section className="mt-6 rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
-        <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">Date cont</h2>
+        <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground"><Mail className="h-4 w-4 text-emerald" /> Date cont</h2>
         <dl className="mt-3 text-sm">
           <div className="flex justify-between border-b border-border/50 py-2"><dt className="text-muted-foreground">Email</dt><dd className="font-semibold text-navy dark:text-foreground">{user?.email || "—"}</dd></div>
           <div className="flex justify-between py-2"><dt className="text-muted-foreground">Rol</dt><dd className="font-semibold text-navy dark:text-foreground">{(user?.role || "—").toUpperCase()}</dd></div>
