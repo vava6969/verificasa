@@ -99,6 +99,17 @@ export default function Header() {
     );
   };
 
+  // One row inside the account dropdown: colored icon badge + label.
+  const MenuRow = ({ onClick, icon: Icon, color, label, children }) => (
+    <DropdownMenuItem onClick={onClick} className="cursor-pointer gap-2.5 rounded-lg py-2">
+      <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${color}`}>
+        <Icon className="h-3.5 w-3.5" />
+      </span>
+      <span className="font-medium">{label}</span>
+      {children}
+    </DropdownMenuItem>
+  );
+
   // Shared profile dropdown trigger + content (used in both desktop and mobile rows).
   const ProfileMenu = ({ mobile = false }) => (
     <DropdownMenu>
