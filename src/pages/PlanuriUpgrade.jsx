@@ -108,8 +108,8 @@ const PLANS = [
     monthly: 35,
     yearly: 336, // 35 × 12 × 0.8
     popular: false,
-    iconImg: "/images/generated/plan-icon-basic-v1.png",
-    badgeImg: "/images/generated/plan-badge-basic-v1.png",
+    iconImg: "/images/generated/plan-icon-basic-v2.png",
+    badgeImg: "/images/generated/plan-badge-basic-v2.png",
     features: [
       { icon: <Briefcase size={20} />, text: "1 anunț activ pe platformă" },
       { icon: <Database size={20} />, text: "Galerie foto/video standard" },
@@ -125,8 +125,8 @@ const PLANS = [
     monthly: 50,
     yearly: 480, // 50 × 12 × 0.8
     popular: true,
-    iconImg: "/images/generated/plan-icon-pro-v1.png",
-    badgeImg: "/images/generated/plan-badge-pro-v1.png",
+    iconImg: "/images/generated/plan-icon-pro-v2.png",
+    badgeImg: "/images/generated/plan-badge-pro-v2.png",
     features: [
       { icon: <Briefcase size={20} />, text: "Până la 5 anunțuri active" },
       { icon: <Database size={20} />, text: "Galerie extinsă, până la 250MB/fișier" },
@@ -143,8 +143,8 @@ const PLANS = [
     yearly: 863.9, // 89.99 × 12 × 0.8
     decimals: true,
     popular: false,
-    iconImg: "/images/generated/plan-icon-agent-v1.png",
-    badgeImg: "/images/generated/plan-badge-agent-v1.png",
+    iconImg: "/images/generated/plan-icon-agent-v2.png",
+    badgeImg: "/images/generated/plan-badge-agent-v2.png",
     features: [
       { icon: <Briefcase size={20} />, text: "Anunțuri nelimitate" },
       { icon: <Database size={20} />, text: "Stocare nelimitată" },
@@ -169,30 +169,29 @@ function PlanCard({ plan, annual }) {
 
   return (
     <Card
-      className={`relative overflow-visible border-neutral-200 dark:border-white/10 ${
+      className={`relative border-neutral-200 dark:border-white/10 ${
         plan.popular ? "bg-blue-50 ring-2 ring-blue-500 dark:bg-blue-950/30" : "bg-white dark:bg-neutral-900"
       }`}
     >
-      {plan.badgeImg && (
-        <img
-          src={plan.badgeImg}
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-3 -top-3 z-20 h-16 w-16 drop-shadow-lg sm:-right-4 sm:-top-4 sm:h-20 sm:w-20"
-        />
-      )}
       <CardHeader className="text-left">
-        <div className="mb-2 flex items-start justify-between gap-2">
-          <div className="flex items-center gap-3">
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
             {plan.iconImg && (
               <img
                 src={plan.iconImg}
                 alt=""
                 aria-hidden="true"
-                className="h-11 w-11 shrink-0 drop-shadow sm:h-12 sm:w-12"
+                className="h-9 w-9 shrink-0 object-contain drop-shadow sm:h-10 sm:w-10"
               />
             )}
-            <h3 className="text-2xl font-semibold text-gray-900 dark:text-white sm:text-3xl">{plan.name}</h3>
+            {plan.badgeImg && (
+              <img
+                src={plan.badgeImg}
+                alt=""
+                aria-hidden="true"
+                className="h-9 w-9 shrink-0 object-contain drop-shadow sm:h-10 sm:w-10"
+              />
+            )}
           </div>
           {plan.popular && (
             <span className="shrink-0 rounded-full bg-blue-500 px-3 py-1 text-sm font-medium text-white">
@@ -200,6 +199,7 @@ function PlanCard({ plan, annual }) {
             </span>
           )}
         </div>
+        <h3 className="mb-2 text-2xl font-semibold text-gray-900 dark:text-white sm:text-3xl">{plan.name}</h3>
         <p className="mb-4 text-sm text-gray-600 dark:text-neutral-400">{plan.description}</p>
         <div className="flex items-baseline">
           <span className="text-4xl font-semibold text-gray-900 dark:text-white">
