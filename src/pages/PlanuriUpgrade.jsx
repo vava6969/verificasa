@@ -106,7 +106,7 @@ const PLANS = [
     name: "VerifiCasa Basic",
     description: "Ideal pentru proprietarii care listează ocazional un singur imobil.",
     monthly: 35,
-    yearly: 336, // 35 × 12 × 0.8
+    yearly: 338, // preț anual fixat manual
     popular: false,
     features: [
       { icon: <Briefcase size={20} />, text: "1 anunț activ pe platformă" },
