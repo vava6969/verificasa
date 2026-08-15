@@ -247,9 +247,7 @@ function PlanCard({ plan, annual }) {
               <span className="mr-3 mt-0.5 grid place-content-center text-neutral-800 dark:text-neutral-300">
                 {feature.icon}
               </span>
-              {/* Beneficiile sunt blurate intenționat — pachetele finale nu sunt
-                  încă stabilite; doar structura vizuală (identică referinței) e gata. */}
-              <span className="select-none text-sm text-gray-600 blur-[4px] dark:text-neutral-400">
+              <span className="text-sm text-gray-600 dark:text-neutral-400">
                 {feature.text}
               </span>
             </li>
@@ -264,7 +262,7 @@ function PlanCard({ plan, annual }) {
                 <span className="mr-3 mt-0.5 grid h-6 w-6 place-content-center rounded-full border border-blue-500 bg-green-50">
                   <CheckCheck className="h-4 w-4 text-blue-500" />
                 </span>
-                <span className="select-none text-sm text-gray-600 blur-[4px] dark:text-neutral-400">{item}</span>
+                <span className="text-sm text-gray-600 dark:text-neutral-400">{item}</span>
               </li>
             ))}
           </ul>
@@ -321,11 +319,6 @@ export default function PlanuriUpgrade() {
         <Reveal as="div" index={2}>
           <PricingSwitch annual={annual} onSwitch={setAnnual} />
         </Reveal>
-
-        <p className="mx-auto mt-4 max-w-md text-center text-xs text-gray-500 dark:text-neutral-500">
-          Planurile sunt în pregătire — prețurile sunt orientative, iar beneficiile complete vor fi publicate în
-          curând.
-        </p>
 
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 py-6 md:grid-cols-3">
           {PLANS.map((plan, i) => (
