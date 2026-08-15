@@ -15,6 +15,7 @@ const EMAILS = [
     badge: "Suport",
     accent: "emerald",
     hero: true,
+    bg: "/images/generated/illo-contact-v1.png",
   },
   {
     email: "reclamatii@verificasa.ro",
@@ -23,6 +24,7 @@ const EMAILS = [
     icon: ShieldAlert,
     badge: "Încredere & Siguranță",
     accent: "rose",
+    bg: "/images/generated/illo-reclamatii-v1.png",
   },
   {
     email: "parteneri@verificasa.ro",
@@ -31,6 +33,7 @@ const EMAILS = [
     icon: Handshake,
     badge: "B2B",
     accent: "blue",
+    bg: "/images/generated/illo-parteneri-v1.png",
   },
   {
     email: "marketing@verificasa.ro",
@@ -39,6 +42,7 @@ const EMAILS = [
     icon: Megaphone,
     badge: "Media",
     accent: "amber",
+    bg: "/images/generated/illo-marketing-v1.png",
   },
   {
     email: "cariere@verificasa.ro",
@@ -47,6 +51,7 @@ const EMAILS = [
     icon: Briefcase,
     badge: "Recrutare",
     accent: "violet",
+    bg: "/images/generated/illo-cariere-v1.png",
   },
   {
     email: "legal@verificasa.ro",
@@ -55,6 +60,7 @@ const EMAILS = [
     icon: Scale,
     badge: "Legal",
     accent: "slate",
+    bg: "/images/generated/illo-legal-v1.png",
   },
   {
     email: "birou@verificasa.ro",
@@ -63,6 +69,7 @@ const EMAILS = [
     icon: Building2,
     badge: "Admin",
     accent: "cyan",
+    bg: "/images/generated/illo-birou-v1.png",
   },
 ];
 
@@ -100,9 +107,17 @@ function EmailCard({ item, index }) {
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.5, delay: (index % 2) * 0.08, ease: "easeOut" }}
       whileHover={{ y: -6, scale: 1.01 }}
-      className={`group relative flex flex-col gap-3 rounded-2xl border border-white/50 bg-white/40 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_30px_-14px_rgba(27,34,44,0.18)] backdrop-blur-2xl transition-all hover:border-gold/50 hover:bg-white/55 dark:border-white/10 dark:bg-white/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_10px_36px_-16px_rgba(0,0,0,0.7)] dark:hover:bg-white/[0.08] ${isHero ? "sm:col-span-2 " + a.glow : ""} ${a.ring} hover:ring-2`}
+      className={`group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-white/50 bg-white/40 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_30px_-14px_rgba(27,34,44,0.18)] backdrop-blur-2xl transition-all hover:border-gold/50 hover:bg-white/55 dark:border-white/10 dark:bg-white/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_10px_36px_-16px_rgba(0,0,0,0.7)] dark:hover:bg-white/[0.08] ${isHero ? "sm:col-span-2 " + a.glow : ""} ${a.ring} hover:ring-2`}
     >
-      <div className="flex items-start justify-between gap-3">
+      {item.bg && (
+        <img
+          src={item.bg}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-8 -right-6 z-0 h-36 w-36 object-contain opacity-[0.15] transition-transform duration-500 ease-out group-hover:scale-110 group-hover:opacity-[0.22] dark:opacity-[0.22] dark:group-hover:opacity-[0.3] sm:h-40 sm:w-40"
+        />
+      )}
+      <div className="relative z-10 flex items-start justify-between gap-3">
         <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${a.iconBg}`}>
           <Icon className="h-5 w-5" />
         </div>
@@ -111,14 +126,14 @@ function EmailCard({ item, index }) {
         </span>
       </div>
 
-      <div>
+      <div className="relative z-10">
         <h3 className={`font-heading font-bold text-navy dark:text-foreground ${isHero ? "text-lg" : "text-base"}`}>
           {item.label}
         </h3>
         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
       </div>
 
-      <div className="mt-auto flex items-center justify-between gap-2 pt-1">
+      <div className="relative z-10 mt-auto flex items-center justify-between gap-2 pt-1">
         <span className="flex items-center gap-1.5 truncate font-semibold text-emerald">
           <Mail className="h-3.5 w-3.5 shrink-0" />
           <span className="truncate text-sm">{item.email}</span>
@@ -137,7 +152,7 @@ function EmailCard({ item, index }) {
         </div>
       </div>
       {copied && (
-        <span className="absolute -top-2 right-3 rounded-full bg-emerald px-2 py-0.5 text-[10px] font-bold text-white shadow">
+        <span className="absolute -top-2 right-3 z-20 rounded-full bg-emerald px-2 py-0.5 text-[10px] font-bold text-white shadow">
           Copiat!
         </span>
       )}
