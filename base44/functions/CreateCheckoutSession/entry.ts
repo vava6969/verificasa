@@ -4,9 +4,10 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 // Creează o sesiune Stripe Checkout (mod abonament) pentru planul + intervalul
 // cerut din pagina „Planuri Upgrade” și returnează URL-ul de plată către care
 // frontend-ul redirecționează browserul. Cheia secretă Stripe rămâne doar pe
-// server — necesită secretul STRIPE_SECRET_KEY setat în Settings → Secrets ale
-// acestei aplicații (Stripe Dashboard → Developers → API keys → Secret key;
-// sk_test_... pentru sandbox, sk_live_... după lansare).
+// server — necesită secretul StripeTest setat în Settings → Secrets ale acestei
+// aplicații (Stripe Dashboard → Developers → API keys, momentan sk_test_...
+// din sandbox-ul Stripe; la lansare, adaugă un secret separat cu cheia live
+// și schimbă numele de mai jos).
 //
 // Prețurile sunt cele create în Stripe (mod test) pentru VerifiCasa Basic/Pro/Agent,
 // lunar + anual, în RON — vezi PlanuriUpgrade.jsx pentru sumele afișate în UI.
@@ -25,9 +26,9 @@ export default async function (req: Request): Promise<Response> {
     // non-2xx și mesajul nostru detaliat nu mai ajunge la utilizator.
     if (!me?.id) return Response.json({ error: "Trebuie să fii autentificat." });
 
-    const secretKey = secrets.get("STRIPE_SECRET_KEY");
+    const secretKey = secrets.get("StripeTest");
     if (!secretKey) {
-      return Response.json({ error: "Plățile nu sunt configurate încă — lipsește secretul STRIPE_SECRET_KEY." });
+      return Response.json({ error: "Plățile nu sunt configurate încă — lipsește secretul StripeTest." });
     }
 
     let body: any = {};
