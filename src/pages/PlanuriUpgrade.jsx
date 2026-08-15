@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import NumberFlow from "@number-flow/react";
-import { Briefcase, Database, Server, CheckCheck } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Briefcase, Database, Server, CheckCheck, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/lib/AuthContext";
+import { base44 } from "@/api/base44Client";
 
 // ---------------------------------------------------------------------------
 // Clonă 1:1 a componentei de referință (21st.dev — @uilayout.contact/pricing-section):
@@ -24,30 +27,6 @@ function Reveal({ as = "div", index = 0, className, children }) {
     >
       {children}
     </MotionTag>
-  );
-}
-
-// Badge roșu pulsant — funcția de plată nu e încă live (adăugat peste designul
-// clonat, așa cum am discutat separat de referința 21st.dev).
-function ComingSoonBadge() {
-  return (
-    <motion.span
-      animate={{
-        boxShadow: [
-          "0 0 0px rgba(225,29,72,0.0)",
-          "0 0 16px rgba(225,29,72,0.55)",
-          "0 0 0px rgba(225,29,72,0.0)",
-        ],
-      }}
-      transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-      className="inline-flex items-center gap-1.5 rounded-full border border-rose-400/60 bg-rose-500/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-rose-500"
-    >
-      <span className="relative flex h-1.5 w-1.5">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-500 opacity-75" />
-        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-rose-500" />
-      </span>
-      Coming Soon
-    </motion.span>
   );
 }
 
@@ -157,14 +136,41 @@ const PLANS = [
 
 function PlanCard({ plan, annual }) {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [checkingOut, setCheckingOut] = useState(false);
 
-  const handleSelectPlan = () => {
-    // TODO (Stripe): la conectarea plăților, înlocuiește toast-ul de mai jos cu
-    // un redirect spre checkout, folosind plan.id + intervalul (lunar/anual).
-    toast({
-      title: "Disponibil în curând",
-      description: "Planurile de plată sunt în pregătire — revenim cu toate detaliile în curând.",
-    });
+  const handleSelectPlan = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    setCheckingOut(true);
+    try {
+      const res = await base44.functions.invoke("CreateCheckoutSession", {
+        plan_id: plan.id,
+        interval: annual ? "yearly" : "monthly",
+      });
+      const url = res?.data?.url || res?.url;
+      const errorMsg = res?.data?.error || res?.error;
+      if (url) {
+        window.location.href = url;
+        return;
+      }
+      toast({
+        title: "Nu am putut porni plata",
+        description: errorMsg || "Încearcă din nou în câteva minute.",
+        variant: "destructive",
+      });
+    } catch (e) {
+      toast({
+        title: "Nu am putut porni plata",
+        description: "Încearcă din nou în câteva minute.",
+        variant: "destructive",
+      });
+    } finally {
+      setCheckingOut(false);
+    }
   };
 
   return (
@@ -219,17 +225,21 @@ function PlanCard({ plan, annual }) {
         <button
           type="button"
           onClick={handleSelectPlan}
-          className={`mb-4 w-full rounded-xl p-4 text-lg font-semibold transition active:scale-[0.98] ${
+          disabled={checkingOut}
+          className={`mb-4 flex w-full items-center justify-center gap-2 rounded-xl p-4 text-lg font-semibold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 ${
             plan.popular
               ? "border border-blue-400 bg-gradient-to-t from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500"
               : "border border-neutral-700 bg-gradient-to-t from-neutral-900 to-neutral-600 text-white shadow-lg shadow-neutral-900"
           }`}
         >
-          Alege planul
+          {checkingOut ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" /> Se deschide plata...
+            </>
+          ) : (
+            "Alege planul"
+          )}
         </button>
-        <div className="mb-2 flex justify-center">
-          <ComingSoonBadge />
-        </div>
 
         <ul className="space-y-2 py-5 font-semibold">
           {plan.features.map((feature, i) => (
@@ -266,6 +276,21 @@ function PlanCard({ plan, annual }) {
 
 export default function PlanuriUpgrade() {
   const [annual, setAnnual] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const checkout = params.get("checkout");
+    if (!checkout) return;
+    if (checkout === "success") {
+      toast({ title: "Plată reușită!", description: "Abonamentul tău a fost activat. Îți mulțumim!" });
+    } else if (checkout === "cancelled") {
+      toast({ title: "Plată anulată", description: "Nicio sumă nu a fost taxată." });
+    }
+    params.delete("checkout");
+    const qs = params.toString();
+    window.history.replaceState({}, "", qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
+  }, []);
 
   return (
     <div className="relative mx-auto min-h-screen overflow-hidden bg-neutral-100 px-4 pb-24 pt-16 dark:bg-neutral-950 sm:pt-20">
