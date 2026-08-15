@@ -586,16 +586,6 @@ export default function PropertyDetail() {
         </div>
       </div>
 
-      {/* Mobile sticky CTA — sits above the BottomNav on phones, flush on md+ */}
-      <div className="fixed inset-x-0 z-40 flex items-center gap-2 border-t border-border bg-white/95 px-3 py-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] backdrop-blur-md bottom-[calc(3.75rem+env(safe-area-inset-bottom))] md:bottom-0 lg:hidden dark:bg-card/95">
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-heading text-base font-bold text-navy dark:text-foreground">{formatPrice(p.price_monthly, p.currency)}</p>
-          <p className="truncate text-[11px] text-muted-foreground">{p.zone}, {p.city}</p>
-        </div>
-        <Button onClick={handleMessage} className="gap-1.5 bg-emerald text-white shadow-soft hover:bg-emerald/90">
-          <MessageCircle className="h-4 w-4" /> {t("pd_msg_btn")}
-        </Button>
-      </div>
     </div>
   );
 }
