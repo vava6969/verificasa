@@ -178,7 +178,7 @@ function PlanCard({ plan, annual }) {
           src={plan.badgeImg}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -right-3 -top-3 z-20 h-16 w-16 object-contain drop-shadow-lg sm:-right-4 sm:-top-4 sm:h-20 sm:w-20"
+          className="pointer-events-none absolute -right-3 -top-8 z-20 h-[4.5rem] w-[4.5rem] object-contain drop-shadow-lg sm:-right-4 sm:-top-9 sm:h-[5.5rem] sm:w-[5.5rem]"
         />
       )}
       <CardHeader className="text-left">
@@ -189,7 +189,7 @@ function PlanCard({ plan, annual }) {
                 src={plan.iconImg}
                 alt=""
                 aria-hidden="true"
-                className="h-11 w-11 shrink-0 object-contain drop-shadow sm:h-12 sm:w-12"
+                className="h-12 w-12 shrink-0 object-contain drop-shadow sm:h-14 sm:w-14"
               />
             )}
             <h3 className="text-2xl font-semibold text-gray-900 dark:text-white sm:text-3xl">{plan.name}</h3>
