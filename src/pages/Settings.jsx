@@ -181,8 +181,16 @@ export default function Settings() {
                   {form.cover_image_url ? (
                     <UIImage src={form.cover_image_url} fittingType="fill" className="h-full w-full" />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center gradient-emerald">
-                      <span className="text-sm font-medium text-white/80">{lang === "en" ? "No cover image" : "Fără imagine background"}</span>
+                    <div className="relative h-full w-full">
+                      <img
+                        src="/images/generated/settings-promo-v1.png"
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-navy/75 via-navy/10 to-transparent" />
+                      <span className="absolute bottom-2 left-3 rounded-full bg-black/45 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+                        {lang === "en" ? "Default cover — upload your own anytime" : "Imagine implicită — poți încărca propria imagine oricând"}
+                      </span>
                     </div>
                   )}
                 </div>
