@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 
-CELL = 180
+CELL = 130
 PAD = 10
 LABEL_H = 26
 COLS = 3
@@ -53,5 +53,5 @@ for idx, (fname, label) in enumerate(items):
     tw = d.textlength(label, font=font)
     d.text((x + (CELL - tw) / 2, y + CELL + 4), label, fill=(20, 20, 20), font=font)
 
-sheet.save("/tmp/badges_final/winners_sheet.jpg", quality=68)
+sheet.save("/tmp/badges_final/winners_sheet.jpg", quality=55)
 print("saved", sheet.size)
