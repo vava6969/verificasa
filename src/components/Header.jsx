@@ -183,6 +183,7 @@ export default function Header() {
             <Link to="/" className={navItemCls("/")}>{t("hdr_home")}</Link>
             <Link to="/search" className={navItemCls("/search")}>{t("sb_btn")}</Link>
             <Link to="/about" className={navItemCls("/about")}>{t("hdr_about")}</Link>
+            <Link to="/upgrade" className={navItemCls("/upgrade")}>{t("hdr_upgrade")}</Link>
           </nav>
 
           {/* Top-right actions — shared by desktop and mobile. */}
