@@ -127,15 +127,27 @@ export function buildEmail(content) {
             </td>
           </tr>
           <tr>
-            <td align="center" style="padding-bottom:16px;">
-              <p style="margin:0;font-size:12px;color:#7a8289;">Urmărește-ne în social media:</p>
-              <p style="margin:8px 0 0;font-size:13px;">
-                <a href="${APP_URL}" style="color:#2A73CC;text-decoration:none;font-weight:600;">Facebook</a>
-                <span style="color:#cbd5e1;margin:0 8px;">·</span>
-                <a href="${APP_URL}" style="color:#2A73CC;text-decoration:none;font-weight:600;">Instagram</a>
-                <span style="color:#cbd5e1;margin:0 8px;">·</span>
-                <a href="${APP_URL}" style="color:#2A73CC;text-decoration:none;font-weight:600;">YouTube</a>
-              </p>
+            <td align="center" style="padding-bottom:18px;">
+              <p style="margin:0 0 12px;font-size:12px;color:#7a8289;">Suntem aici pentru tine:</p>
+              <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                <tr>
+                  <td style="padding:0 7px;">
+                    <a href="mailto:${CONTACT_EMAIL}" style="text-decoration:none;">
+                      <img src="${APP_URL}/images/generated/icon-contact-v1.png" width="38" height="38" alt="Contact" style="display:block;">
+                    </a>
+                  </td>
+                  <td style="padding:0 7px;">
+                    <a href="https://instagram.com/verificasaro" style="text-decoration:none;">
+                      <img src="${APP_URL}/images/generated/icon-instagram-v1.png" width="38" height="38" alt="Instagram" style="display:block;">
+                    </a>
+                  </td>
+                  <td style="padding:0 7px;">
+                    <a href="https://tiktok.com/@verificasaro" style="text-decoration:none;">
+                      <img src="${APP_URL}/images/generated/icon-tiktok-v1.png" width="38" height="38" alt="TikTok" style="display:block;">
+                    </a>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
           <tr>
