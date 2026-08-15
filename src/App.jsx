@@ -30,6 +30,7 @@ import Privacy from '@/pages/Privacy';
 import DataDeletion from '@/pages/DataDeletion';
 import CookiePolicy from '@/pages/CookiePolicy';
 import Contact from '@/pages/Contact';
+import PlanuriUpgrade from '@/pages/PlanuriUpgrade';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { CountryProvider } from '@/components/CountryContext';
 import Account from '@/pages/Account';
@@ -79,6 +80,7 @@ const AuthenticatedApp = () => {
         <Route path="/data-deletion" element={<DataDeletion />} />
         <Route path="/cookies" element={<CookiePolicy />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/upgrade" element={<PlanuriUpgrade />} />
         <Route path="/property/:id" element={<PropertyDetail />} />
         <Route path="/profile/:id" element={<UserProfile />} />
         <Route path="/map" element={<MapSearch />} />
