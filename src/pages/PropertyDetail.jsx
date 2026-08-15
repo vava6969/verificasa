@@ -22,7 +22,7 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   MapPin, Maximize, BedDouble, Wallet, BadgeCheck, Sparkles, PawPrint, Car,
   Calendar, ShieldCheck, CheckCircle2, ChevronLeft, ChevronRight,
-  Heart, MessageCircle, UserCircle2, Clock, Pencil, Box, Maximize2, X,
+  Heart, UserCircle2, Clock, Pencil, Box, Maximize2, X,
   Wifi, VolumeX, Sun, Droplet, Expand, Film,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
