@@ -169,29 +169,30 @@ function PlanCard({ plan, annual }) {
 
   return (
     <Card
-      className={`relative border-neutral-200 dark:border-white/10 ${
+      className={`relative overflow-visible border-neutral-200 dark:border-white/10 ${
         plan.popular ? "bg-blue-50 ring-2 ring-blue-500 dark:bg-blue-950/30" : "bg-white dark:bg-neutral-900"
       }`}
     >
+      {plan.badgeImg && (
+        <img
+          src={plan.badgeImg}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-3 -top-3 z-20 h-16 w-16 object-contain drop-shadow-lg sm:-right-4 sm:-top-4 sm:h-20 sm:w-20"
+        />
+      )}
       <CardHeader className="text-left">
-        <div className="mb-3 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
+        <div className="mb-2 flex items-start justify-between gap-2">
+          <div className="flex items-center gap-3">
             {plan.iconImg && (
               <img
                 src={plan.iconImg}
                 alt=""
                 aria-hidden="true"
-                className="h-9 w-9 shrink-0 object-contain drop-shadow sm:h-10 sm:w-10"
+                className="h-11 w-11 shrink-0 object-contain drop-shadow sm:h-12 sm:w-12"
               />
             )}
-            {plan.badgeImg && (
-              <img
-                src={plan.badgeImg}
-                alt=""
-                aria-hidden="true"
-                className="h-9 w-9 shrink-0 object-contain drop-shadow sm:h-10 sm:w-10"
-              />
-            )}
+            <h3 className="text-2xl font-semibold text-gray-900 dark:text-white sm:text-3xl">{plan.name}</h3>
           </div>
           {plan.popular && (
             <span className="shrink-0 rounded-full bg-blue-500 px-3 py-1 text-sm font-medium text-white">
@@ -199,7 +200,6 @@ function PlanCard({ plan, annual }) {
             </span>
           )}
         </div>
-        <h3 className="mb-2 text-2xl font-semibold text-gray-900 dark:text-white sm:text-3xl">{plan.name}</h3>
         <p className="mb-4 text-sm text-gray-600 dark:text-neutral-400">{plan.description}</p>
         <div className="flex items-baseline">
           <span className="text-4xl font-semibold text-gray-900 dark:text-white">
