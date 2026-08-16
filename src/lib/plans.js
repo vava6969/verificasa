@@ -97,3 +97,11 @@ export function compareByPlanThenViews(planOf) {
     return (b.views_count || 0) - (a.views_count || 0);
   };
 }
+
+// Opțiuni gata de folosit pentru filtrul „Plan” din SearchFiltersDrawer —
+// Agent primul (cel mai important), apoi Pro, apoi Basic — fiecare cu
+// iconița mică de badge folosită și pe carduri, pentru recunoaștere vizuală
+// instantă în filtrele de căutare/hartă.
+export const PLAN_FILTER_OPTIONS = PLANS.slice()
+  .reverse()
+  .map((p) => ({ id: p.id, label: p.shortName || p.name, icon: p.badgeImg }));
