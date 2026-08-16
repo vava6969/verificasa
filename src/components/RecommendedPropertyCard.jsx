@@ -29,7 +29,7 @@ export default function RecommendedPropertyCard({ property, planId }) {
   return (
     <div
       onClick={() => navigate(`/property/${p.id}`)}
-      className={`group flex w-[168px] shrink-0 cursor-pointer flex-col overflow-hidden rounded-2xl border bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-glow dark:bg-card sm:w-[196px] ${meta?.accent === "gold" ? "border-gold/45" : "border-border"}`}
+      className={`group flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl border bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-glow dark:bg-card ${meta?.accent === "gold" ? "border-gold/45" : "border-border"}`}
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         {images.length ? (
