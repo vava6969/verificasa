@@ -166,7 +166,7 @@ export function CircularCarousel({
                   )}
                   <h3
                     className={cn(
-                      "break-words font-semibold leading-tight transition-colors duration-300",
+                      "line-clamp-2 break-words font-semibold leading-tight transition-colors duration-300",
                       isActive
                         ? "text-foreground text-xs sm:text-sm"
                         : "text-muted-foreground text-xs",
@@ -177,7 +177,7 @@ export function CircularCarousel({
                 </div>
                 <p
                   className={cn(
-                    "break-words text-[11px] leading-relaxed transition-colors duration-300 line-clamp-5",
+                    "line-clamp-3 break-words text-[11px] leading-relaxed transition-colors duration-300",
                     isActive ? "text-muted-foreground" : "text-muted-foreground/60",
                   )}
                 >
