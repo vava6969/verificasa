@@ -208,6 +208,28 @@ export default function PropertyDetail() {
     { icon: Calendar, label: t("stat_avail"), value: p.available_from ? new Date(p.available_from).toLocaleDateString(locale) : t("immediate") },
   ];
 
+  // Tab-urile galeriei (Galerie/Prezentare/Tur 3D) — aceleași butoane, refolosite
+  // fie ca rând normal (deasupra, pt. tab-urile 3D/Prezentare), fie ca bară
+  // flotantă glassmorphism peste poza principală (tab-ul Galerie), ca imaginea
+  // să se extindă până sus, acoperind fosta dungă albă.
+  const tabSwitcherButtons = (
+    <>
+      <button onClick={() => setTab("gallery")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "gallery" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+        {t("tab_gallery")} ({images.length})
+      </button>
+      {images.length > 0 && (
+        <button onClick={() => setTab("presentation")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "presentation" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+          <span className="flex items-center gap-1.5"><Film className="h-3.5 w-3.5" /> {lang === "en" ? "Showcase" : "Prezentare"}</span>
+        </button>
+      )}
+      {p.tour_3d_url && (
+        <button onClick={() => setTab("3d")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "3d" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+          <span className="flex items-center gap-1.5"><Box className="h-3.5 w-3.5" /> {t("tab_3d")}</span>
+        </button>
+      )}
+    </>
+  );
+
   return (
     <div className="bg-secondary/30">
       {tour3dFull && p.tour_3d_url && (
@@ -240,21 +262,11 @@ export default function PropertyDetail() {
           <div className="min-w-0 space-y-4 sm:space-y-6 lg:col-span-2">
             {/* GALLERY */}
             <div>
-          <div className="mb-3 flex items-center gap-2">
-            <button onClick={() => setTab("gallery")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "gallery" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
-              {t("tab_gallery")} ({images.length})
-            </button>
-            {images.length > 0 && (
-              <button onClick={() => setTab("presentation")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "presentation" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
-                <span className="flex items-center gap-1.5"><Film className="h-3.5 w-3.5" /> {lang === "en" ? "Showcase" : "Prezentare"}</span>
-              </button>
-            )}
-            {p.tour_3d_url && (
-              <button onClick={() => setTab("3d")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "3d" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
-                <span className="flex items-center gap-1.5"><Box className="h-3.5 w-3.5" /> {t("tab_3d")}</span>
-              </button>
-            )}
-          </div>
+          {tab !== "gallery" && (
+            <div className="mb-3 flex items-center gap-2">
+              {tabSwitcherButtons}
+            </div>
+          )}
 
           {tab === "3d" ? (
             <div className="relative overflow-hidden rounded-2xl border border-border bg-navy-deep shadow-soft">
@@ -291,6 +303,11 @@ export default function PropertyDetail() {
                   touchStartX.current = null;
                 }}
               >
+                {/* Bară flotantă glassmorphism cu tab-urile — acoperă fosta dungă
+                    albă de deasupra, poza se întinde până sus, sub butoane. */}
+                <div className="pointer-events-auto absolute inset-x-0 top-0 z-20 flex items-center gap-2 bg-gradient-to-b from-black/55 via-black/15 to-transparent p-3 backdrop-blur-md">
+                  {tabSwitcherButtons}
+                </div>
                 <AnimatePresence>
                   {images[activeImage] && (
                     <motion.button
@@ -366,7 +383,7 @@ export default function PropertyDetail() {
                   <Heart className={`h-5 w-5 transition ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
                 </button>
                 {images.length > 0 && (
-                  <span className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur-md">
+                  <span className="pointer-events-none absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur-md">
                     <Expand className="h-3 w-3" /> {lang === "en" ? "Click to zoom" : "Apasă pentru zoom"}
                   </span>
                 )}
