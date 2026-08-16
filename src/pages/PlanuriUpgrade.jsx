@@ -279,13 +279,21 @@ export default function PlanuriUpgrade() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const checkout = params.get("checkout");
+    const sessionId = params.get("session_id");
     if (!checkout) return;
     if (checkout === "success") {
       toast({ title: "Plată reușită!", description: "Abonamentul tău a fost activat. Îți mulțumim!" });
+      // Confirmă server-side sesiunea Stripe și salvează planul pe cont — fără
+      // asta, plata trece prin Stripe dar utilizatorul rămâne fără plan activ
+      // în aplicație (vezi VerifyCheckoutSession).
+      if (sessionId) {
+        base44.functions.invoke("VerifyCheckoutSession", { session_id: sessionId }).catch(() => {});
+      }
     } else if (checkout === "cancelled") {
       toast({ title: "Plată anulată", description: "Nicio sumă nu a fost taxată." });
     }
     params.delete("checkout");
+    params.delete("session_id");
     const qs = params.toString();
     window.history.replaceState({}, "", qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
   }, []);
