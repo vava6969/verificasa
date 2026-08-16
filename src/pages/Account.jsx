@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, MessageCircle, Bell, Bookmark, Search, Plus, Home,
   Settings as SettingsIcon, ShieldCheck, LogOut, Moon, Sun, Check, Cookie,
-  ChevronDown, Palette, Coins, Languages,
+  ChevronDown, Palette, Coins, Languages, Sparkles,
 } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useNotifications } from "@/hooks/useNotifications";
 import { Button } from "@/components/ui/button";
 import VerifiCasaLogo from "@/components/VerifiCasaLogo";
+import { getPlanMeta } from "@/lib/plans";
+import { fetchMyActiveSubscription } from "@/lib/subscriptions";
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 
@@ -25,6 +27,89 @@ const OPTION_COLORS = {
   slate: "border-slate-400/40 bg-slate-400/10 text-slate-600 dark:border-slate-400/30 dark:bg-slate-400/10 dark:text-slate-300",
   gold: "border-gold/50 bg-gold-soft text-gold-deep",
 };
+
+// Secțiune „Planul meu” — plan activ (icon, valabilitate, facturare, beneficii)
+// sau, dacă nu are niciunul, o invitație spre pagina de planuri. Sursa de
+// adevăr e entitatea Subscription, populată de VerifyCheckoutSession după o
+// plată Stripe reușită — niciodată editabilă direct din client.
+function MyPlanSection() {
+  const { user } = useAuth();
+  const { lang } = useCountry();
+  const en = lang === "en";
+  const [sub, setSub] = useState(undefined);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!user?.id) { setSub(null); return undefined; }
+    fetchMyActiveSubscription(user.id).then((s) => { if (!cancelled) setSub(s); });
+    return () => { cancelled = true; };
+  }, [user?.id]);
+
+  if (sub === undefined) {
+    return <div className="mb-6 h-28 animate-pulse rounded-2xl border border-border bg-card" />;
+  }
+
+  if (!sub) {
+    return (
+      <section className="mb-6 rounded-2xl border border-dashed border-border bg-card p-5 text-center shadow-soft">
+        <Sparkles className="mx-auto h-6 w-6 text-emerald" />
+        <p className="mt-2 font-heading text-base font-bold text-navy dark:text-foreground">
+          {en ? "No active plan" : "Niciun plan activ"}
+        </p>
+        <p className="mx-auto mt-1 max-w-xs text-sm text-muted-foreground">
+          {en
+            ? "Pick a plan so your listings get more visibility and a better spot in search."
+            : "Alege un plan ca anunțurile tale să fie mai vizibile și mai bine poziționate."}
+        </p>
+        <Button asChild className="mt-4 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
+          <Link to="/upgrade">{en ? "View plans" : "Vezi planuri"}</Link>
+        </Button>
+      </section>
+    );
+  }
+
+  const meta = getPlanMeta(sub.plan_id);
+  const validUntil = sub.current_period_end
+    ? new Date(sub.current_period_end).toLocaleDateString(en ? "en-GB" : "ro-RO", { day: "2-digit", month: "long", year: "numeric" })
+    : null;
+
+  return (
+    <section className="mb-6 overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
+      <div className="flex items-center gap-3 border-b border-border/70 p-4">
+        {meta?.iconImg && <img src={meta.iconImg} alt="" className="h-11 w-11 shrink-0 object-contain" />}
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">{en ? "Your plan" : "Planul tău"}</p>
+          <h2 className="truncate font-heading text-lg font-bold text-navy dark:text-foreground">{meta?.name || sub.plan_id}</h2>
+        </div>
+        <Link to="/upgrade" className="shrink-0 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-emerald transition hover:border-emerald/50">
+          {en ? "Change plan" : "Schimbă planul"}
+        </Link>
+      </div>
+      <div className="grid grid-cols-2 gap-3 p-4 text-sm">
+        <div>
+          <p className="text-[11px] text-muted-foreground">{en ? "Billing" : "Facturare"}</p>
+          <p className="font-semibold">{sub.billing_interval === "yearly" ? (en ? "Yearly" : "Anuală") : (en ? "Monthly" : "Lunară")}</p>
+        </div>
+        <div>
+          <p className="text-[11px] text-muted-foreground">{en ? "Active until" : "Activ până la"}</p>
+          <p className="font-semibold">{validUntil || "—"}</p>
+        </div>
+      </div>
+      {meta?.benefits?.length > 0 && (
+        <div className="border-t border-border/70 p-4">
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">{en ? "What's included" : "Ce include"}</p>
+          <ul className="space-y-1.5">
+            {meta.benefits.slice(0, 4).map((b) => (
+              <li key={b} className="flex items-center gap-2 text-sm">
+                <Check className="h-3.5 w-3.5 shrink-0 text-emerald" /> {b}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+  );
+}
 
 export default function Account() {
   const { t, lang, setLang, currency, setCurrency } = useCountry();
@@ -94,6 +179,8 @@ export default function Account() {
           <p className="text-xs text-muted-foreground">{t("hdr_myaccount")}</p>
         </div>
       </div>
+
+      <MyPlanSection />
 
       {/* Account options grid */}
       <section id="account-menu" className="mb-6 scroll-mt-20 rounded-2xl border border-border bg-card p-4 shadow-soft">
