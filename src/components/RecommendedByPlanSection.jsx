@@ -103,16 +103,11 @@ function PlanRow({ row, en }) {
           </span>
           <div>
             <h2 className="font-heading text-base font-bold text-navy dark:text-foreground sm:text-lg">
-              {en ? "Recommended · " : "Recomandate · "}<span className={accent.text}>{row.name}</span>
+              <span className={accent.text}>{row.shortName || row.name}</span>
             </h2>
             <p className="text-xs text-muted-foreground">{en ? tagline.en : tagline.ro} · {row.items.length}</p>
           </div>
         </div>
-        {row.items.length > 0 && (
-          <Link to="/anunturi-recomandate" className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition hover:opacity-80 ${accent.ring} ${accent.text}`}>
-            {en ? "View more" : "Vezi mai multe"}
-          </Link>
-        )}
       </div>
       <div className={`mb-4 h-[2px] rounded-full bg-gradient-to-r ${accent.rule} to-transparent sm:mb-5`} />
 
