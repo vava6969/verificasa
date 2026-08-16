@@ -22,6 +22,8 @@ import {
   Search, Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, RotateCcw,
 } from "lucide-react";
 import { ROMANIA_COUNTIES, ROMANIA_CENTER, ROMANIA_MAX_BOUNDS } from "@/lib/romaniaCounties";
+import { resolvePropertyPlan, PLAN_FILTER_OPTIONS } from "@/lib/plans";
+import { fetchActivePlanMap } from "@/lib/subscriptions";
 
 // Aceleași filtre ca pe /search — reutilizate 1:1 aici ca lista și harta
 // să răspundă la exact aceleași criterii, indiferent de unde intri.
@@ -193,6 +195,10 @@ export default function MapSearch() {
     VERIF_FILTERS.forEach((f) => { if (params.get(f.key) === "1") s.add(f.key); });
     return s;
   });
+  const [planFilters, setPlanFilters] = useState(() => {
+    const raw = params.get("plan");
+    return new Set(raw ? raw.split(",").filter(Boolean) : []);
+  });
 
   const updateLocation = ({ county, city, zone }) => setParams((prev) => {
     const next = new URLSearchParams(prev);
@@ -216,10 +222,21 @@ export default function MapSearch() {
       return n;
     });
   };
+  const togglePlan = (id) => {
+    setPlanFilters((prev) => {
+      const n = new Set(prev);
+      if (n.has(id)) n.delete(id); else n.add(id);
+      const next = new URLSearchParams(params);
+      if (n.size > 0) next.set("plan", Array.from(n).join(",")); else next.delete("plan");
+      setParams(next, { replace: true });
+      return n;
+    });
+  };
   const resetFilters = () => {
     setBudget(""); setRoomsMin(""); setSurfaceMin("");
     setFurnished(false); setSwap(false); setFairness(""); setSort("");
     setActiveFilters(new Set());
+    setPlanFilters(new Set());
     setParams(new URLSearchParams(), { replace: true });
   };
 
@@ -234,19 +251,23 @@ export default function MapSearch() {
   const [drawMode, setDrawMode] = useState(false);
   const [polygonPoints, setPolygonPoints] = useState([]);
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
+  const [planMap, setPlanMap] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const all = await base44.entities.Property.filter(
-          { approval_status: "APPROVED", status: "Activ", country: "RO" },
-          "-views_count",
-          500
-        );
-        if (!cancelled) setProperties(all);
+        const [all, map] = await Promise.all([
+          base44.entities.Property.filter(
+            { approval_status: "APPROVED", status: "Activ", country: "RO" },
+            "-views_count",
+            500
+          ),
+          fetchActivePlanMap(),
+        ]);
+        if (!cancelled) { setProperties(all); setPlanMap(map); }
       } catch (e) {
-        if (!cancelled) setProperties([]);
+        if (!cancelled) { setProperties([]); setPlanMap(new Map()); }
       }
     })();
 
@@ -292,6 +313,10 @@ export default function MapSearch() {
       for (const f of VERIF_FILTERS) {
         if (activeFilters.has(f.key) && !f.test(p)) return false;
       }
+      if (planFilters.size > 0) {
+        const plan = resolvePropertyPlan(p, planMap) || "none";
+        if (!planFilters.has(plan)) return false;
+      }
       if (budget) { const max = parseInt(budget, 10); if (!isNaN(max) && p.price_monthly > max) return false; }
       if (roomsMin) { const r = parseInt(roomsMin, 10); if (!isNaN(r) && (p.rooms == null || p.rooms < r)) return false; }
       if (surfaceMin) { const s = parseFloat(surfaceMin); if (!isNaN(s) && (p.surface_sqm == null || p.surface_sqm < s)) return false; }
@@ -300,7 +325,7 @@ export default function MapSearch() {
       if (fairness && p.price_fairness !== fairness) return false;
       return true;
     });
-  }, [geoProps, cityParam, zoneParam, countyParam, typeParam, qParam, activeFilters, budget, roomsMin, surfaceMin, furnished, swap, fairness]);
+  }, [geoProps, cityParam, zoneParam, countyParam, typeParam, qParam, activeFilters, planFilters, planMap, budget, roomsMin, surfaceMin, furnished, swap, fairness]);
 
   const clusters = useMemo(() => {
     if (!filteredGeoProps.length) return [];
@@ -375,7 +400,7 @@ export default function MapSearch() {
   // Reset pagination when filters change
   useEffect(() => {
     setDisplayCount(PAGE_SIZE);
-  }, [bounds, polygonPoints, cityParam, zoneParam, countyParam, typeParam, qParam, activeFilters, budget, roomsMin, surfaceMin, furnished, swap, fairness, sort]);
+  }, [bounds, polygonPoints, cityParam, zoneParam, countyParam, typeParam, qParam, activeFilters, planFilters, budget, roomsMin, surfaceMin, furnished, swap, fairness, sort]);
 
   const displayedProperties = visibleProperties.slice(0, displayCount);
   const hasMore = displayedProperties.length < visibleProperties.length;
@@ -670,6 +695,9 @@ export default function MapSearch() {
                 filters={VERIF_FILTERS}
                 activeFilters={activeFilters}
                 onToggle={toggleFilter}
+                planOptions={PLAN_FILTER_OPTIONS}
+                planFilters={planFilters}
+                onTogglePlan={togglePlan}
                 budget={budget} setBudget={setBudget}
                 roomsMin={roomsMin} setRoomsMin={setRoomsMin}
                 surfaceMin={surfaceMin} setSurfaceMin={setSurfaceMin}
