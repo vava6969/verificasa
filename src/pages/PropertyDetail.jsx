@@ -252,21 +252,32 @@ export default function PropertyDetail() {
           </button>
         </div>
       )}
-      <div className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
-        <Link to="/search" className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-navy">
-          <ChevronLeft className="h-4 w-4" /> {t("back_results")}
-        </Link>
-
-        <div className="mt-4 grid gap-4 sm:mt-6 sm:gap-6 lg:grid-cols-3">
+      <div className="mx-auto max-w-7xl px-3 pb-4 sm:px-6 sm:pb-6 lg:px-8">
+        {/* Grila pornește trasă -14 (înălțimea header-ului) ca galeria de mai jos
+            să ajungă chiar sub header-ul transparent, fără gol alb între ele. */}
+        <div className="-mt-14 grid gap-4 sm:gap-6 lg:grid-cols-3">
           {/* LEFT */}
           <div className="min-w-0 space-y-4 sm:space-y-6 lg:col-span-2">
             {/* GALLERY */}
-            <div>
-          {tab !== "gallery" && (
-            <div className="mb-3 flex items-center gap-2">
+            <div className="relative">
+          {/* Bară flotantă glassmorphism — back + tab-uri, chiar sub header-ul
+              site-ului (transparent pe această pagină); imaginea/conținutul de
+              dedesubt se întinde până sus, acoperind fosta dungă albă. */}
+          <div className="pointer-events-none absolute inset-x-0 top-14 z-20 flex items-center gap-2 bg-gradient-to-b from-black/40 via-black/10 to-transparent p-3">
+            <div className="pointer-events-auto flex items-center gap-2 rounded-full bg-black/35 p-1 backdrop-blur-md">
+              <button
+                type="button"
+                onClick={() => navigate("/search")}
+                aria-label={t("back_results")}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white transition hover:bg-white/15"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="pointer-events-auto flex items-center gap-2">
               {tabSwitcherButtons}
             </div>
-          )}
+          </div>
 
           {tab === "3d" ? (
             <div className="relative overflow-hidden rounded-2xl border border-border bg-navy-deep shadow-soft">
@@ -281,7 +292,7 @@ export default function PropertyDetail() {
               <button
                 type="button"
                 onClick={() => setTour3dFull(true)}
-                className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-navy-deep/80 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md lg:hidden"
+                className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-navy-deep/80 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md lg:hidden"
               >
                 <Maximize2 className="h-3.5 w-3.5" /> {lang === "en" ? "Fullscreen" : "Ecran complet"}
               </button>
@@ -303,11 +314,6 @@ export default function PropertyDetail() {
                   touchStartX.current = null;
                 }}
               >
-                {/* Bară flotantă glassmorphism cu tab-urile — acoperă fosta dungă
-                    albă de deasupra, poza se întinde până sus, sub butoane. */}
-                <div className="pointer-events-auto absolute inset-x-0 top-0 z-20 flex items-center gap-2 bg-gradient-to-b from-black/55 via-black/15 to-transparent p-3 backdrop-blur-md">
-                  {tabSwitcherButtons}
-                </div>
                 <AnimatePresence>
                   {images[activeImage] && (
                     <motion.button
@@ -378,7 +384,7 @@ export default function PropertyDetail() {
                   type="button"
                   onClick={(e) => { e.stopPropagation(); toggleSave(); }}
                   aria-label={saved ? t("pd_saved") : t("pd_save")}
-                  className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-black/30 text-white shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-110 hover:bg-black/50 active:scale-95"
+                  className="absolute right-3 top-16 flex h-11 w-11 items-center justify-center rounded-full bg-black/30 text-white shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-110 hover:bg-black/50 active:scale-95"
                 >
                   <Heart className={`h-5 w-5 transition ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
                 </button>
