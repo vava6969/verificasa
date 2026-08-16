@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import HeroSearch from "@/components/HeroSearch";
-import PropertyCard from "@/components/PropertyCard";
 import HeroPhoto from "@/components/HeroPhoto";
 import HeroCountdown from "@/components/HeroCountdown";
 import InspectieModal from "@/components/InspectieModal";
@@ -14,7 +12,7 @@ import BetaBanner from "@/components/BetaBanner";
 import AboutVerifiCasa from "@/components/AboutVerifiCasa";
 import RecommendedByPlanSection from "@/components/RecommendedByPlanSection";
 import CircularCarousel from "@/components/ui/circular-carousel";
-import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
+import { Reveal } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
 import {
   ShieldCheck, FileText, Plus,
