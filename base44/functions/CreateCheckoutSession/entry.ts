@@ -46,7 +46,7 @@ export default async function (req: Request): Promise<Response> {
     params.set("mode", "subscription");
     params.set("line_items[0][price]", priceId);
     params.set("line_items[0][quantity]", "1");
-    params.set("success_url", `${baseUrl}/upgrade?checkout=success`);
+    params.set("success_url", `${baseUrl}/upgrade?checkout=success&session_id={CHECKOUT_SESSION_ID}`);
     params.set("cancel_url", `${baseUrl}/upgrade?checkout=cancelled`);
     params.set("client_reference_id", me.id);
     if (me.email) params.set("customer_email", me.email);
