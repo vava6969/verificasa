@@ -128,7 +128,9 @@ function PlanRow({ row, en }) {
       ) : (
         <div className="-mx-4 flex gap-3.5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:gap-4 sm:px-0">
           {visible.map((p) => (
-            <RecommendedPropertyCard key={p.id} property={p} planId={row.id === "none" ? null : row.id} />
+            <div key={p.id} className="w-[168px] shrink-0 sm:w-[196px]">
+              <RecommendedPropertyCard property={p} planId={row.id === "none" ? null : row.id} />
+            </div>
           ))}
           <Link
             to="/anunturi-recomandate"
