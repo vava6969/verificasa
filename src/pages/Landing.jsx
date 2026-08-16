@@ -12,12 +12,12 @@ import MapSearchCTA from "@/components/MapSearchCTA";
 import ActionCards from "@/components/ActionCards";
 import BetaBanner from "@/components/BetaBanner";
 import AboutVerifiCasa from "@/components/AboutVerifiCasa";
+import RecommendedByPlanSection from "@/components/RecommendedByPlanSection";
 import CircularCarousel from "@/components/ui/circular-carousel";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
-  ShieldCheck, ArrowRight, FileText, Home, Plus,
+  ShieldCheck, FileText, Plus,
 } from "lucide-react";
 
 function iconImg(src) {
@@ -27,8 +27,7 @@ function iconImg(src) {
 }
 
 export default function Landing() {
-  const { country, t, lang } = useCountry();
-  const [properties, setProperties] = useState(null);
+  const { t, lang } = useCountry();
   const [showInspectie, setShowInspectie] = useState(false);
   const [showListeaza, setShowListeaza] = useState(false);
 
@@ -43,22 +42,6 @@ export default function Landing() {
     { id: "8", icon: iconImg("/images/generated/icon-percent-badge.png"), title: t("vp8_t"), description: t("vp8_d") },
     { id: "9", icon: iconImg("/images/generated/icon-chat.png"), title: t("vp9_t"), description: t("vp9_d") },
   ];
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const all = await base44.entities.Property.list("-views_count", 100);
-        if (cancelled) return;
-        setProperties(all.filter((p) => p.country === "RO"));
-      } catch (e) {
-        if (!cancelled) setProperties([]);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [country]);
-
-    const display = (properties || []).filter((p) => p.approval_status === "APPROVED").slice(0, 3);
-
   return (
     <div className="landing-dark">
       <BetaBanner />
@@ -119,46 +102,14 @@ export default function Landing() {
         </Reveal>
       </section>
 
-      {/* FEATURED PROPERTIES */}
-      <section id="featured" className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 sm:pb-16 lg:px-8">
-        <Reveal className="mb-5 flex items-end justify-between sm:mb-8">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-emerald">{t("featured_kicker")}</p>
-            <h2 className="mt-1 font-heading text-2xl font-bold text-navy sm:text-3xl">{t("featured_h")}</h2>
-          </div>
-          <Link to="/search" className="flex items-center gap-1 text-sm font-semibold text-emerald hover:underline">
-            {t("view_all")} <ArrowRight className="h-4 w-4" />
-          </Link>
+      {/* ANUNȚURI RECOMANDATE — 4 rânduri distincte, delimitate de planul postatorului */}
+      <div id="featured">
+        <Reveal className="mx-auto mb-5 max-w-7xl px-4 sm:px-6 sm:mb-8 lg:px-8">
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald">{t("featured_kicker")}</p>
+          <h2 className="mt-1 font-heading text-2xl font-bold text-navy sm:text-3xl">{t("featured_h")}</h2>
         </Reveal>
-
-        {properties === null ? (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)}
-          </div>
-        ) : display.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border py-20 text-center">
-            <Home className="mx-auto h-10 w-10 text-muted-foreground/40" />
-            <p className="mt-3 font-heading text-lg font-semibold text-navy">{t("featured_none_t")}</p>
-            <p className="text-sm text-muted-foreground">{t("featured_none_d")}</p>
-          </div>
-        ) : (
-          <RevealGroup className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
-            {display.map((p) => (
-              <RevealItem key={p.id}>
-                <PropertyCard property={p} hot />
-              </RevealItem>
-            ))}
-          </RevealGroup>
-        )}
-
-        {display.length > 0 && (
-          <div className="mt-5 flex justify-center sm:mt-8">
-            <Button asChild className="gap-2 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
-              <Link to="/search">{t("view_all")} <ArrowRight className="h-4 w-4" /></Link>
-            </Button>
-          </div>
-        )}
-      </section>
+        <RecommendedByPlanSection />
+      </div>
 
       {/* SOLICITĂ O INSPECȚIE CTA */}
       <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 sm:pb-20 lg:px-8">
