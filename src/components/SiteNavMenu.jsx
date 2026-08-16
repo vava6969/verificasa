@@ -59,7 +59,7 @@ export default function SiteNavMenu() {
         aria-label={en ? "Menu" : "Meniu"}
         aria-expanded={open}
       >
-        <img src="/images/generated/icon-nav-menu.png" alt="" className="h-5 w-5 object-contain" />
+        <img src="/images/generated/icon-nav-menu.png" alt="" className="h-6 w-6 object-contain" />
       </motion.button>
 
       <AnimatePresence>
