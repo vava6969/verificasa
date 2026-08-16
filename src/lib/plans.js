@@ -74,6 +74,15 @@ export function getPlanMeta(planId) {
   return PLAN_BY_ID[planId] || null;
 }
 
+// Planul „efectiv” al unui anunț: fie un override manual pus direct pe anunț
+// (folosit azi pentru datele demo — vezi poster_plan_override pe Property),
+// fie planul real, activ, al celui care l-a postat (din planMap, construit cu
+// fetchActivePlanMap()). Override-ul e restricționat la nivel de câmp (RLS)
+// la admin, deci nu poate fi auto-acordat de un user din client.
+export function resolvePropertyPlan(property, planMap) {
+  return property?.poster_plan_override || planMap?.get(property?.created_by_id) || null;
+}
+
 // Comparator gata de folosit cu Array.prototype.sort — plan mai important
 // întâi, apoi views_count descrescător, exact regula cerută pentru
 // „Anunțuri recomandate": planul postatorului decide rândul, vizualizările
