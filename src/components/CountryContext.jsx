@@ -11,11 +11,11 @@ const RATES = {
 
 export function CountryProvider({ children }) {
   // VerifiCasa is a Romania-first platform. country stays RO; users switch
-  // the display currency between EUR (default) and RON.
+  // the display currency between RON (default) and EUR.
   const [country, setCountry] = useState("RO");
   const [currency, setCurrency] = useState(() => {
-    if (typeof window !== "undefined") return localStorage.getItem("vc_currency") || "EUR";
-    return "EUR";
+    if (typeof window !== "undefined") return localStorage.getItem("vc_currency") || "RON";
+    return "RON";
   });
 
   useEffect(() => {
