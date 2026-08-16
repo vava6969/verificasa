@@ -9,6 +9,7 @@ import ScrollToTop from './components/ScrollToTop';
 import Layout from '@/components/Layout';
 import Landing from '@/pages/Landing';
 import MapSearch from '@/pages/MapSearch';
+import Search from '@/pages/Search';
 import PropertyDetail from '@/pages/PropertyDetail';
 import Owner from '@/pages/Owner';
 import Login from '@/pages/Login';
@@ -72,9 +73,9 @@ const AuthenticatedApp = () => {
       <Route path="/oauth/consent" element={<OAuthConsent />} />
       <Route element={<Layout />}>
         <Route path="/" element={<Landing />} />
-        {/* Căutare unificată: listă + hartă + filtre în aceeași pagină, stil Zillow.
-            /search și /map duc la aceeași experiență. */}
-        <Route path="/search" element={<MapSearch />} />
+        {/* Căutare — listă + filtre, fără hartă. Harta e o experiență separată,
+            accesibilă doar din butonul „Vezi hartă” sau meniul „Hartă” (/map). */}
+        <Route path="/search" element={<Search />} />
         <Route path="/about" element={<About />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
