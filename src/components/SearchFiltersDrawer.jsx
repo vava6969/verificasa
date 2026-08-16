@@ -7,13 +7,14 @@ import { Button } from "@/components/ui/button";
 // so the results page keeps just one compact row.
 export default function SearchFiltersDrawer({
   t, filters, activeFilters, onToggle,
+  planOptions, planFilters, onTogglePlan,
   budget, setBudget, roomsMin, setRoomsMin, surfaceMin, setSurfaceMin,
   fairness, setFairness, fairnessOptions, furnished, setFurnished,
   swap, setSwap, sort, setSort, sortOptions, onReset,
 }) {
   const [open, setOpen] = useState(false);
   const count =
-    activeFilters.size +
+    activeFilters.size + (planFilters?.size || 0) +
     (budget ? 1 : 0) + (roomsMin ? 1 : 0) + (surfaceMin ? 1 : 0) +
     (fairness ? 1 : 0) + (furnished ? 1 : 0) + (swap ? 1 : 0);
 
@@ -50,6 +51,19 @@ export default function SearchFiltersDrawer({
                 </button>
               ))}
             </div>
+
+            {planOptions?.length > 0 && (
+              <div>
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Plan</p>
+                <div className="flex flex-wrap gap-2">
+                  {planOptions.map((opt) => (
+                    <button key={opt.id} type="button" onClick={() => onTogglePlan(opt.id)} className={chip(planFilters?.has(opt.id))}>
+                      {opt.icon && <img src={opt.icon} alt="" className="h-4 w-4 object-contain" />} {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-3">
               <input type="number" value={budget} onChange={(e) => setBudget(e.target.value)} placeholder={t("ph_budget")} className={field} />
