@@ -11,6 +11,8 @@ import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, BookmarkPlus, Rota
 import { Skeleton } from "@/components/ui/skeleton";
 import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
+import { resolvePropertyPlan, PLAN_FILTER_OPTIONS } from "@/lib/plans";
+import { fetchActivePlanMap } from "@/lib/subscriptions";
 
 // VerifiCasa verification filters — each applies a real-property predicate.
 const VERIF_FILTERS = [
@@ -47,6 +49,7 @@ export default function SearchPage() {
   const { toast } = useToast();
   const [params, setParams] = useSearchParams();
   const [properties, setProperties] = useState(null);
+  const [planMap, setPlanMap] = useState(null);
   const [budget, setBudget] = useState("");
   const [roomsMin, setRoomsMin] = useState("");
   const [surfaceMin, setSurfaceMin] = useState("");
@@ -90,17 +93,25 @@ export default function SearchPage() {
     VERIF_FILTERS.forEach((f) => { if (params.get(f.key) === "1") s.add(f.key); });
     return s;
   });
+  const [planFilters, setPlanFilters] = useState(() => {
+    const raw = params.get("plan");
+    return new Set(raw ? raw.split(",").filter(Boolean) : []);
+  });
 
   // Real-time: admin approvals/deletes or new listings appear live in results.
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
       try {
-        const all = await base44.entities.Property.list("-created_date", 200);
+        const [all, map] = await Promise.all([
+          base44.entities.Property.list("-created_date", 200),
+          fetchActivePlanMap(),
+        ]);
         if (cancelled) return;
         setProperties(all);
+        setPlanMap(map);
       } catch (e) {
-        if (!cancelled) setProperties([]);
+        if (!cancelled) { setProperties([]); setPlanMap(new Map()); }
       }
     };
     run();
@@ -109,7 +120,7 @@ export default function SearchPage() {
   }, []);
 
   // Reset to first page whenever filters change
-  useEffect(() => { setPage(1); }, [cityParam, zoneParam, typeParam, qParam, budget, roomsMin, surfaceMin, furnished, swap, fairness, sort, activeFilters.size]);
+  useEffect(() => { setPage(1); }, [cityParam, zoneParam, typeParam, qParam, budget, roomsMin, surfaceMin, furnished, swap, fairness, sort, activeFilters.size, planFilters.size]);
 
   const toggle = (key) => {
     setActiveFilters((prev) => {
@@ -118,6 +129,17 @@ export default function SearchPage() {
       // sync to URL
       const next = new URLSearchParams(params);
       if (n.has(key)) next.set(key, "1"); else next.delete(key);
+      setParams(next, { replace: true });
+      return n;
+    });
+  };
+
+  const togglePlan = (id) => {
+    setPlanFilters((prev) => {
+      const n = new Set(prev);
+      if (n.has(id)) n.delete(id); else n.add(id);
+      const next = new URLSearchParams(params);
+      if (n.size > 0) next.set("plan", Array.from(n).join(",")); else next.delete("plan");
       setParams(next, { replace: true });
       return n;
     });
@@ -135,6 +157,10 @@ export default function SearchPage() {
     }
     for (const f of VERIF_FILTERS) {
       if (activeFilters.has(f.key) && !f.test(p)) return false;
+    }
+    if (planFilters.size > 0) {
+      const plan = resolvePropertyPlan(p, planMap) || "none";
+      if (!planFilters.has(plan)) return false;
     }
     if (budget) { const max = parseInt(budget, 10); if (!isNaN(max) && p.price_monthly > max) return false; }
     if (roomsMin) { const r = parseInt(roomsMin, 10); if (!isNaN(r) && (p.rooms == null || p.rooms < r)) return false; }
@@ -175,6 +201,7 @@ export default function SearchPage() {
     setBudget(""); setRoomsMin(""); setSurfaceMin("");
     setFurnished(false); setSwap(false); setFairness(""); setSort("");
     setActiveFilters(new Set());
+    setPlanFilters(new Set());
     setParams(new URLSearchParams(), { replace: true });
   };
 
@@ -240,6 +267,9 @@ export default function SearchPage() {
           filters={VERIF_FILTERS}
           activeFilters={activeFilters}
           onToggle={toggle}
+          planOptions={PLAN_FILTER_OPTIONS}
+          planFilters={planFilters}
+          onTogglePlan={togglePlan}
           budget={budget} setBudget={setBudget}
           roomsMin={roomsMin} setRoomsMin={setRoomsMin}
           surfaceMin={surfaceMin} setSurfaceMin={setSurfaceMin}
