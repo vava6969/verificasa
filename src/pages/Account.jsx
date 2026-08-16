@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, MessageCircle, Bell, Bookmark, Search, Plus, Home,
   Settings as SettingsIcon, ShieldCheck, LogOut, Moon, Sun, Check, Cookie,
-  ChevronDown, Palette, Coins, Languages, Sparkles,
+  ChevronDown, Palette, Coins, Languages, Sparkles, Flag,
 } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
@@ -26,6 +26,7 @@ const OPTION_COLORS = {
   indigo: "border-indigo-500/30 bg-indigo-500/10 text-indigo-600 dark:border-indigo-400/30 dark:bg-indigo-400/10 dark:text-indigo-400",
   slate: "border-slate-400/40 bg-slate-400/10 text-slate-600 dark:border-slate-400/30 dark:bg-slate-400/10 dark:text-slate-300",
   gold: "border-gold/50 bg-gold-soft text-gold-deep",
+  fuchsia: "border-fuchsia-500/30 bg-fuchsia-500/10 text-fuchsia-600 dark:border-fuchsia-400/30 dark:bg-fuchsia-400/10 dark:text-fuchsia-400",
 };
 
 // Secțiune „Planul meu” — plan activ (icon, valabilitate, facturare, beneficii)
@@ -79,7 +80,7 @@ function MyPlanSection() {
         {meta?.iconImg && <img src={meta.iconImg} alt="" className="h-11 w-11 shrink-0 object-contain" />}
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">{en ? "Your plan" : "Planul tău"}</p>
-          <h2 className="truncate font-heading text-lg font-bold text-navy dark:text-foreground">{meta?.name || sub.plan_id}</h2>
+          <h2 className="truncate font-heading text-lg font-bold text-navy dark:text-foreground">{meta?.shortName || meta?.name || sub.plan_id}</h2>
         </div>
         <Link to="/upgrade" className="shrink-0 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-emerald transition hover:border-emerald/50">
           {en ? "Change plan" : "Schimbă planul"}
@@ -144,6 +145,7 @@ export default function Account() {
     { icon: Search, label: en ? "Searches" : "Căutări", path: "/searches", color: "violet" },
     { icon: Plus, label: en ? "Add" : "Adaugă", path: "/owner", color: "teal" },
     { icon: Home, label: en ? "Listings" : "Anunțuri", path: "/my-properties", color: "indigo" },
+    { icon: Flag, label: en ? "My Reports" : "Rapoartele mele", path: "/my-reports", color: "fuchsia" },
     { icon: SettingsIcon, label: en ? "Settings" : "Setări", path: "/settings", color: "slate" },
     ...(canAdmin ? [{ icon: ShieldCheck, label: "Admin", path: "/admin", admin: true, color: "gold" }] : []),
   ];
