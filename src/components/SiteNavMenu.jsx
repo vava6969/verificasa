@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { User, Sparkles, Search, MapPin, Phone, Info } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
+import { useNotifications } from "@/hooks/useNotifications";
 
 const ease = [0.22, 1, 0.36, 1];
 
@@ -17,6 +18,7 @@ export default function SiteNavMenu() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { lang } = useCountry();
+  const { unreadCount } = useNotifications();
   const en = lang === "en";
 
   useEffect(() => {
@@ -60,6 +62,11 @@ export default function SiteNavMenu() {
         aria-expanded={open}
       >
         <img src="/images/generated/icon-nav-menu.png" alt="" className="h-6 w-6 object-contain" />
+        {isAuthenticated && unreadCount > 0 && (
+          <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white ring-2 ring-white dark:ring-navy-deep">
+            {unreadCount > 9 ? "9+" : unreadCount}
+          </span>
+        )}
       </motion.button>
 
       <AnimatePresence>
