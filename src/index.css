@@ -1,76 +1,86 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&family=Fragment+Mono&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ─────────────────────────────────────────────────────────────────────────
+   VerifiCasa "Registry" design language.
+   The product is an institution of proof: verified dossiers, stamped
+   approvals, measured facts. The visual system follows: warm paper
+   surfaces, ink-navy text, ruled hairlines, mono serials, verification
+   green used as a stamp colour, gold as punctuation only.
+   No glass, no gradients, no glow. Legacy utility class names below are
+   kept as flat compat shims so unswept components keep compiling.
+   ───────────────────────────────────────────────────────────────────────── */
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 217 24% 14%;
+    --background: 40 25% 97%;
+    --foreground: 220 30% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 217 24% 14%;
+    --card-foreground: 220 30% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 217 24% 14%;
-    --primary: 152 100% 33%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 20% 96%;
-    --secondary-foreground: 217 24% 14%;
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 37 51% 56%;
-    --accent-foreground: 217 24% 14%;
-    --destructive: 0 72% 46%;
+    --popover-foreground: 220 30% 12%;
+    --primary: 155 52% 28%;
+    --primary-foreground: 40 25% 98%;
+    --secondary: 40 15% 94%;
+    --secondary-foreground: 220 30% 12%;
+    --muted: 40 12% 94%;
+    --muted-foreground: 220 12% 42%;
+    --accent: 38 45% 52%;
+    --accent-foreground: 220 30% 12%;
+    --destructive: 0 62% 42%;
     --destructive-foreground: 0 0% 98%;
-    --border: 214 20% 90%;
-    --input: 214 20% 90%;
-    --ring: 152 100% 33%;
-    --radius: 0.9rem;
-    --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-    --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    --navy: 217 24% 14%;
-    --navy-deep: 217 32% 9%;
-    --gold: 37 51% 56%;
-    --gold-soft: 40 60% 95%;
-    --gold-deep: 36 45% 38%;
-    --emerald: 152 100% 33%;
-    --emerald-soft: 152 80% 94%;
+    --border: 40 12% 87%;
+    --input: 40 12% 84%;
+    --ring: 155 52% 28%;
+    --radius: 0.5rem;
+    --font-heading: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-mono: 'Fragment Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --navy: 220 30% 14%;
+    --navy-deep: 221 32% 9%;
+    --gold: 38 45% 52%;
+    --gold-soft: 40 45% 93%;
+    --gold-deep: 36 50% 34%;
+    --emerald: 155 52% 28%;
+    --emerald-soft: 150 30% 92%;
     /* legacy aliases kept so existing components still compile */
-    --mint: 152 100% 33%;
-    --mint-soft: 152 80% 94%;
+    --mint: 155 52% 28%;
+    --mint-soft: 150 30% 92%;
   }
 
   .dark {
-    --background: 217 32% 9%;
-    --foreground: 0 0% 98%;
-    --card: 217 28% 12%;
-    --card-foreground: 0 0% 98%;
-    --popover: 217 28% 12%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 152 100% 40%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 217 24% 18%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 217 24% 18%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 37 51% 60%;
-    --accent-foreground: 217 32% 9%;
-    --destructive: 0 62% 40%;
+    --background: 220 20% 9%;
+    --foreground: 40 15% 92%;
+    --card: 220 18% 12%;
+    --card-foreground: 40 15% 92%;
+    --popover: 220 18% 12%;
+    --popover-foreground: 40 15% 92%;
+    --primary: 155 40% 46%;
+    --primary-foreground: 220 20% 9%;
+    --secondary: 220 14% 16%;
+    --secondary-foreground: 40 15% 92%;
+    --muted: 220 14% 16%;
+    --muted-foreground: 220 10% 64%;
+    --accent: 38 45% 58%;
+    --accent-foreground: 220 20% 9%;
+    --destructive: 0 55% 45%;
     --destructive-foreground: 0 0% 98%;
-    --border: 217 24% 22%;
-    --input: 217 24% 22%;
-    --ring: 152 100% 40%;
-    --navy: 217 32% 9%;
-    --navy-deep: 217 38% 6%;
-    --gold: 37 51% 60%;
-    --gold-soft: 36 40% 20%;
-    --gold-deep: 36 50% 55%;
-    --emerald: 152 100% 40%;
-    --emerald-soft: 152 40% 16%;
-    --mint: 152 100% 40%;
-    --mint-soft: 152 40% 16%;
+    --border: 220 12% 21%;
+    --input: 220 12% 24%;
+    --ring: 155 40% 46%;
+    --navy: 220 20% 9%;
+    --navy-deep: 221 24% 6%;
+    --gold: 38 45% 58%;
+    --gold-soft: 36 30% 18%;
+    --gold-deep: 38 50% 62%;
+    --emerald: 155 40% 46%;
+    --emerald-soft: 155 28% 15%;
+    --mint: 155 40% 46%;
+    --mint-soft: 155 28% 15%;
   }
 }
 
@@ -85,9 +95,9 @@
   }
   h1, h2, h3, h4, h5 {
     @apply font-heading;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
   }
 }
 
@@ -109,139 +119,125 @@
   .bg-emerald { background-color: hsl(var(--emerald)); }
   .bg-emerald-soft { background-color: hsl(var(--emerald-soft)); }
   .border-emerald { border-color: hsl(var(--emerald)); }
-  .gradient-navy { background-image: linear-gradient(135deg, hsl(217 38% 6%) 0%, hsl(217 24% 14%) 60%, hsl(214 30% 20%) 100%); }
-  .gradient-gold { background-image: linear-gradient(135deg, hsl(40 60% 58%) 0%, hsl(36 45% 44%) 100%); }
-  .gradient-emerald { background-image: linear-gradient(135deg, hsl(152 100% 38%) 0%, hsl(160 90% 30%) 100%); }
-  .gradient-mint { background-image: linear-gradient(135deg, hsl(152 100% 38%) 0%, hsl(160 90% 30%) 100%); }
-  .shadow-soft { box-shadow: 0 2px 10px -3px rgb(27 34 44 / 0.10), 0 10px 30px -12px rgb(27 34 44 / 0.14); }
-  .shadow-glow { box-shadow: 0 0 0 1px hsl(152 100% 33% / 0.25), 0 14px 44px -14px hsl(152 100% 33% / 0.45); }
-  .shadow-gold { box-shadow: 0 6px 24px -10px hsl(37 51% 56% / 0.5); }
 
-  @keyframes vc-blob {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(18px, -14px) scale(1.08); }
-    66% { transform: translate(-16px, 12px) scale(0.94); }
+  /* Registry type utilities */
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
   }
-  .animate-blob { animation: vc-blob 9s ease-in-out infinite; }
+  .stamp-line {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .rule-t { border-top: 1px solid hsl(var(--border)); }
+  .rule-b { border-bottom: 1px solid hsl(var(--border)); }
 
-  @keyframes vc-badge-fade {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.35; }
+  /* ── Legacy compat shims (flat redefinitions, no gradients/glow/glass) ── */
+  .gradient-navy { background-color: hsl(var(--navy-deep)); background-image: none; }
+  .gradient-gold { background-color: hsl(var(--gold-deep)); background-image: none; }
+  .gradient-emerald { background-color: hsl(var(--emerald)); background-image: none; }
+  .gradient-mint { background-color: hsl(var(--emerald)); background-image: none; }
+  .shadow-soft { box-shadow: 0 1px 2px rgb(32 28 20 / 0.06), 0 2px 8px -4px rgb(32 28 20 / 0.08); }
+  .shadow-glow { box-shadow: 0 1px 2px rgb(32 28 20 / 0.06), 0 2px 8px -4px rgb(32 28 20 / 0.08); }
+  .shadow-gold { box-shadow: 0 1px 2px rgb(32 28 20 / 0.06), 0 2px 8px -4px rgb(32 28 20 / 0.08); }
+  .glow-emerald { box-shadow: 0 0 0 1px hsl(var(--emerald) / 0.35); }
+  .animate-blob { display: none; }
+  .animate-badge-fade { animation: none; }
+
+  /* Frosted panels become solid document panels */
+  .glass-panel {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 2px rgb(32 28 20 / 0.06), 0 2px 8px -4px rgb(32 28 20 / 0.08);
   }
-  .animate-badge-fade {
-    animation: vc-badge-fade 1.8s ease-in-out infinite;
+  .dark .glass-panel {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+  }
+  .surface-card {
+    background-color: hsl(var(--card));
+    background-image: none;
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 2px rgb(32 28 20 / 0.06), 0 2px 8px -4px rgb(32 28 20 / 0.08);
+  }
+  .dark .surface-card {
+    background-color: hsl(var(--card));
+    background-image: none;
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.4);
   }
 
-  /* Dark-mode: flip solid white surfaces and navy text to theme tokens,
-     so text stays readable on the dark page background. Translucent
-     white badges over images keep fixed dark text via slate utilities. */
+  /* Hero photo fade into the page background (functional mask, kept) */
+  .hero-fade { background-image: linear-gradient(to bottom, transparent, hsl(var(--background))); }
+  .dark .hero-fade { background-image: linear-gradient(to bottom, transparent, hsl(var(--background))); }
+
+  /* Gold display text — was a gradient clip, now solid light gold for dark heroes */
+  .text-gold-gradient {
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    color: hsl(38 52% 64%);
+  }
+
+  /* "RECOMANDAT" badge — flat deep gold, no shine, no animation */
+  .premium-badge {
+    background: hsl(var(--gold-deep));
+    background-size: auto;
+    border: 1px solid hsl(var(--gold-deep));
+    box-shadow: none;
+    text-shadow: none;
+    animation: none;
+    color: hsl(40 45% 96%);
+  }
+  .premium-glow {
+    box-shadow: 0 0 0 1px hsl(var(--gold) / 0.45);
+    animation: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* ── Dark-mode compat patches (kept until the per-file sweep removes the
+        raw palette classes they fix; then delete) ── */
   .dark .bg-white { background-color: hsl(var(--card)); }
   .dark .text-navy { color: hsl(var(--foreground)); }
   .dark .bg-gold.text-navy { color: hsl(var(--accent-foreground)); }
-
-  /* Status badges that hardcode light Tailwind palettes become unreadable
-     on the dark page — darken their backgrounds and lighten their text. */
   .dark .bg-amber-100 { background-color: hsl(36 45% 22%); }
   .dark .bg-amber-50  { background-color: hsl(36 40% 18%); }
   .dark .text-amber-700 { color: hsl(38 85% 72%); }
   .dark .bg-blue-50   { background-color: hsl(220 40% 20%); }
   .dark .text-blue-700 { color: hsl(214 85% 74%); }
-  .dark .bg-emerald-soft, .dark .bg-mint-soft { background-color: hsl(152 40% 16%); }
+  .dark .bg-emerald-soft, .dark .bg-mint-soft { background-color: hsl(var(--emerald-soft)); }
 
-  /* Native <select> dropdown popups inherit the page's light text but render
-     on the OS's white popup in dark mode → invisible options. Tell the
-     browser to render native controls dark so the popup matches. */
+  /* Native controls render dark in dark mode so OS popups stay legible */
   .dark select { color-scheme: dark; }
   .dark select option { background-color: hsl(var(--card)); color: hsl(var(--foreground)); }
-
-  /* Native <input> popups (date, time, color) inherit the OS light theme, so in
-     dark mode the selected value/date text renders as dark-on-dark and stays
-     invisible until the picker is opened. Tell the browser to render all
-     native input controls in dark so the value text stays legible. */
   .dark input { color-scheme: dark; }
   .dark textarea { color-scheme: dark; }
 
-  /* ---- Dark Immersive landing scope ----
-     Scoped overrides so shared components (countdown, about, property cards)
-     render as frosted-glass panels on the deep navy landing background. */
-  .dark .landing-dark { background-color: #12161e; color: #E8ECF2; }
+  /* ── Landing dark-immersive scope: solid ink panels, no frosted glass ── */
+  .dark .landing-dark { background-color: hsl(var(--background)); color: hsl(var(--foreground)); }
   .dark .landing-dark .bg-white,
   .dark .landing-dark .bg-card,
   .dark .landing-dark .bg-secondary\/40 {
-    background-color: rgb(255 255 255 / 0.05);
-    backdrop-filter: blur(14px);
+    background-color: hsl(var(--card));
   }
   .dark .landing-dark .text-navy,
-  .dark .landing-dark .dark\:text-foreground { color: #F2F5F9; }
-  .dark .landing-dark .text-muted-foreground { color: rgb(226 232 240 / 0.62); }
-  .dark .landing-dark .border-border { border-color: rgb(255 255 255 / 0.10); }
-  .dark .landing-dark .bg-emerald-soft { background-color: rgb(0 168 89 / 0.16); }
-  .dark .landing-dark .shadow-soft { box-shadow: 0 10px 34px -18px rgb(0 0 0 / 0.9); }
-  .dark .landing-dark .bg-navy-deep\/80 { background-color: rgb(255 255 255 / 0.07); }
-  .dark .landing-dark .gradient-navy { background-image: linear-gradient(135deg, #10141c 0%, #161d28 60%, #1b2532 100%); }
+  .dark .landing-dark .dark\:text-foreground { color: hsl(var(--foreground)); }
+  .dark .landing-dark .text-muted-foreground { color: hsl(var(--muted-foreground)); }
+  .dark .landing-dark .border-border { border-color: hsl(var(--border)); }
+  .dark .landing-dark .bg-emerald-soft { background-color: hsl(var(--emerald-soft)); }
+  .dark .landing-dark .shadow-soft { box-shadow: 0 1px 2px rgb(0 0 0 / 0.4); }
+  .dark .landing-dark .bg-navy-deep\/80 { background-color: hsl(var(--card)); }
+  .dark .landing-dark .gradient-navy { background-color: hsl(var(--navy-deep)); background-image: none; }
 
-  /* Frosted panels: light-mode = white glass on light bg, dark = white/5 glass */
-  .glass-panel {
-    background: rgb(255 255 255 / 0.72);
-    border: 1px solid rgb(27 34 44 / 0.08);
-    backdrop-filter: blur(16px);
-    box-shadow: 0 12px 34px -20px rgb(27 34 44 / 0.45);
-  }
-  .dark .glass-panel {
-    background: rgb(255 255 255 / 0.05);
-    border: 1px solid rgb(255 255 255 / 0.10);
-    box-shadow: 0 12px 40px -22px rgb(0 0 0 / 0.9);
-  }
-
-  /* Gradient surface cards with a subtle top light edge */
-  .surface-card {
-    background-image: linear-gradient(180deg, rgb(255 255 255 / 0.92) 0%, rgb(241 245 249 / 0.72) 100%);
-    border: 1px solid rgb(27 34 44 / 0.08);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 16px 36px -26px rgb(27 34 44 / 0.6);
-  }
-  .dark .surface-card {
-    background-image: linear-gradient(180deg, rgb(255 255 255 / 0.09) 0%, rgb(255 255 255 / 0.028) 100%);
-    border: 1px solid rgb(255 255 255 / 0.08);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.13), 0 18px 40px -26px rgb(0 0 0 / 0.9);
-  }
-
-  /* Hero bottom fade blends into the page background in both themes */
-  .hero-fade { background-image: linear-gradient(to bottom, transparent, #ffffff); }
-  .dark .hero-fade { background-image: linear-gradient(to bottom, transparent, #12161e); }
-  .glow-emerald { box-shadow: 0 0 0 1px rgb(0 168 89 / 0.30), 0 10px 30px -12px rgb(0 168 89 / 0.55); }
-  .text-gold-gradient {
-    background-image: linear-gradient(100deg, #E7CB92 0%, #C5A059 55%, #9C7B38 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-  /* Gradient buttons keep dark text on the bright green in both themes. */
-  .dark .gradient-mint.text-navy, .dark .gradient-emerald.text-navy { color: hsl(217 24% 14%); }
-
-  /* Premium RECOMANDAT badge — metallic gold with shine sweep */
-  .premium-badge {
-    background: linear-gradient(135deg, #9C7B38 0%, #C5A059 25%, #F0D98A 50%, #C5A059 75%, #9C7B38 100%);
-    background-size: 200% 100%;
-    border: 1px solid rgb(240 217 138 / 0.6);
-    box-shadow: 0 2px 8px -2px rgb(197 160 89 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.5), 0 0 0 1px rgb(156 123 56 / 0.3);
-    text-shadow: 0 1px 1px rgb(92 72 30 / 0.5);
-    animation: vc-shine 4s ease-in-out infinite;
-  }
-  @keyframes vc-shine {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
-
-  /* Premium glow ring around RECOMANDAT property cards */
-  .premium-glow {
-    box-shadow: 0 0 0 1px rgb(197 160 89 / 0.35), 0 8px 30px -8px rgb(197 160 89 / 0.4), 0 0 24px -6px rgb(197 160 89 / 0.25);
-    animation: vc-glow-pulse 3s ease-in-out infinite;
-  }
-  @keyframes vc-glow-pulse {
-    0%, 100% { box-shadow: 0 0 0 1px rgb(197 160 89 / 0.35), 0 8px 30px -8px rgb(197 160 89 / 0.4), 0 0 24px -6px rgb(197 160 89 / 0.25); }
-    50% { box-shadow: 0 0 0 1px rgb(197 160 89 / 0.55), 0 14px 44px -8px rgb(197 160 89 / 0.55), 0 0 36px -6px rgb(197 160 89 / 0.4); }
-  }
+  /* Buttons that pair a dark-text utility with a green fill stay legible */
+  .dark .gradient-mint.text-navy, .dark .gradient-emerald.text-navy { color: hsl(var(--primary-foreground)); }
 }

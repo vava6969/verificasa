@@ -1,0 +1,17 @@
+{
+  "name": "VerifiCasa — Chirii verificate online",
+  "short_name": "VerifiCasa",
+  "description": "Platformă imobiliară pentru închirieri verificate online: fiecare anunț este verificat înainte de publicare și primește un scor de încredere.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f6f2",
+  "theme_color": "#171e2b",
+  "icons": [
+    {
+      "src": "https://media.base44.com/images/public/6a5ef7d63008cd71560dfe14/4317025d6_Gemini_Generated_Image_al0itkal0itkal0i.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
