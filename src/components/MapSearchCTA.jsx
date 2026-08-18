@@ -10,12 +10,12 @@ export default function MapSearchCTA() {
   const en = lang === "en";
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-border shadow-soft dark:border-white/10">
+    <div className="relative overflow-hidden rounded-lg border border-border shadow-soft dark:border-white/10">
       {/* Full-bleed illustration — generată cu Higgsfield, tema hartă/verificare */}
       <img
         src="/images/generated/map-search-cta-v3.png"
         alt="Toate proprietățile pe hartă"
-        className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+        className="absolute inset-0 h-full w-full object-cover object-center"
       />
 
       {/* Gradient scrim so the text stays readable over any photo */}
@@ -33,7 +33,7 @@ export default function MapSearchCTA() {
         </p>
         <Button
           asChild
-          className="mt-4 w-fit gap-2 rounded-full bg-mint text-navy hover:bg-mint/90"
+          className="mt-4 w-fit gap-2"
         >
           <Link to="/map">
             <MapPin className="h-4 w-4" /> {en ? "View map" : "Vezi harta"}

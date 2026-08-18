@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useCountry } from "@/components/CountryContext";
 
@@ -11,6 +10,7 @@ function diff() {
   let d = TARGET - now;
   if (d < 0) d = 0;
   return {
+    over: TARGET - now <= 0,
     days: Math.floor(d / 86400000),
     hours: Math.floor((d % 86400000) / 3600000),
     mins: Math.floor((d % 3600000) / 60000),
@@ -18,9 +18,8 @@ function diff() {
   };
 }
 
-// Cifră unică cu tranziție tip "odometru" (inspirat din NumberFlow) — cifra
-// veche alunecă în sus și dispare, cea nouă intră de jos, fără să schimbe
-// dimensiunea sau layout-ul existent al countdown-ului.
+// Cifră unică cu tranziție tip "odometru" — cifra veche alunecă în sus,
+// cea nouă intră de jos, fără să schimbe layout-ul.
 function RollingDigit({ char, reduceMotion }) {
   if (reduceMotion) {
     return <span className="tabular-nums">{char}</span>;
@@ -54,7 +53,8 @@ function RollingDigits({ value, reduceMotion }) {
   );
 }
 
-// Slim launch strip that lives inside the hero section.
+// Launch strip in the hero: a flat ink panel with mono digits, set like a
+// line in a registry. After launch it collapses into a dated stamp line.
 export default function HeroCountdown() {
   const { t } = useCountry();
   const [time, setTime] = useState(diff());
@@ -65,22 +65,28 @@ export default function HeroCountdown() {
   }, []);
 
   const unit = (v, label) => (
-    <div className="flex flex-col items-center gap-1.5">
-      <span className="flex h-11 min-w-[2.4rem] items-center justify-center rounded-xl border border-white/15 bg-gradient-to-b from-white/[0.14] to-white/[0.04] px-1.5 font-heading text-2xl font-extrabold tabular-nums text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] sm:h-14 sm:min-w-[3.1rem] sm:text-4xl">
+    <div className="flex flex-col items-center gap-1">
+      <span className="flex h-11 min-w-[2.4rem] items-center justify-center border-b border-white/25 px-1 font-mono text-2xl tabular-nums text-white sm:h-12 sm:min-w-[2.8rem] sm:text-3xl">
         <RollingDigits value={String(v).padStart(2, "0")} reduceMotion={reduceMotion} />
       </span>
-      <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/55 sm:text-[10px]">{label}</span>
+      <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-white/50 sm:text-[10px]">{label}</span>
     </div>
   );
 
+  if (time.over) {
+    return (
+      <div className="mt-6 flex w-full max-w-2xl items-center justify-between gap-4 rounded-lg border border-white/15 bg-navy-deep/90 px-5 py-3.5 sm:mt-8">
+        <p className="stamp-line text-emerald">{t("countdown_badge")}</p>
+        <p className="font-mono text-xs text-white/70">28.08.2026 · 10:00</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="mt-5 flex w-full max-w-2xl flex-col items-center gap-4 rounded-3xl border border-white/15 bg-black/30 px-5 py-4 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-md sm:mt-8 sm:flex-row sm:justify-between sm:px-7 sm:py-5">
+    <div className="mt-5 flex w-full max-w-2xl flex-col items-center gap-4 rounded-lg border border-white/15 bg-navy-deep/90 px-5 py-4 sm:mt-8 sm:flex-row sm:justify-between sm:px-7 sm:py-5">
       <div className="text-center sm:text-left">
-        <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-emerald">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald opacity-70" />
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald" />
-          </span>
+        <span className="stamp-line inline-flex items-center gap-2 text-emerald">
+          <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald" aria-hidden="true" />
           {t("countdown_badge")}
         </span>
         <p className="mt-1 text-sm font-semibold text-white sm:text-base">{t("countdown_h")}</p>
@@ -89,19 +95,19 @@ export default function HeroCountdown() {
       <div className="flex items-center gap-4 sm:gap-5">
         <div className="flex items-center gap-2 sm:gap-3">
           {unit(time.days, t("countdown_days"))}
-          <span className="pb-4 font-heading text-xl font-bold text-white/25 sm:text-2xl">:</span>
+          <span className="pb-4 font-mono text-xl text-white/25">:</span>
           {unit(time.hours, t("countdown_hours"))}
-          <span className="pb-4 font-heading text-xl font-bold text-white/25 sm:text-2xl">:</span>
+          <span className="pb-4 font-mono text-xl text-white/25">:</span>
           {unit(time.mins, t("countdown_mins"))}
-          <span className="pb-4 font-heading text-xl font-bold text-white/25 sm:text-2xl">:</span>
+          <span className="pb-4 font-mono text-xl text-white/25">:</span>
           {unit(time.secs, "SEC")}
         </div>
         <Link
           to="/about"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/25 text-white transition hover:border-emerald hover:bg-emerald/20 sm:h-10 sm:w-10"
+          className="shrink-0 pb-1 font-semibold text-white/80 transition hover:text-white"
           aria-label={t("countdown_btn")}
         >
-          <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
+          <span aria-hidden="true">→</span>
         </Link>
       </div>
     </div>

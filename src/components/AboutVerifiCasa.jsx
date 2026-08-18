@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 
 export default function AboutVerifiCasa() {
@@ -23,83 +22,77 @@ export default function AboutVerifiCasa() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-16 lg:px-8">
       {/* Despre VerifiCasa */}
-      <Reveal className="text-center">
-        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald sm:text-xs">Despre VerifiCasa</p>
-        <h2 className="mt-1.5 font-heading text-lg font-bold leading-snug text-navy dark:text-foreground sm:text-3xl">
-          Piața online pentru chirii verificate
-        </h2>
-        <p className="mx-auto mt-2 max-w-3xl text-[13px] leading-relaxed text-muted-foreground sm:mt-4 sm:text-base">
-          Proprietarii își publică singuri anunțurile, iar VerifiCasa verifică online fiecare
-          anunț — poze, acte și preț — și calculează automat un scor de încredere. Chiriașii pot
-          lăsa recenzii, iar un tur 3D al locuinței este disponibil opțional, prin Plan Pro.
-        </p>
+      <Reveal className="border-t border-border pt-6 sm:pt-8">
+        <p className="kicker text-emerald">Despre VerifiCasa</p>
+        <div className="mt-2 grid gap-3 sm:grid-cols-[1fr_1.2fr] sm:gap-10">
+          <h2 className="font-heading text-xl leading-snug text-navy dark:text-foreground sm:text-3xl">
+            Piața online pentru chirii verificate
+          </h2>
+          <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
+            Proprietarii își publică singuri anunțurile, iar VerifiCasa verifică online fiecare
+            anunț — poze, acte și preț — și calculează automat un scor de încredere. Chiriașii pot
+            lăsa recenzii, iar un tur 3D al locuinței este disponibil opțional, prin Plan Pro.
+          </p>
+        </div>
       </Reveal>
 
-      {/* Servicii — carduri cu iconițe, hover lift */}
-      <RevealGroup className="mt-5 grid grid-cols-1 gap-4 sm:mt-10 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+      {/* Servicii — coloane pe riglă, fără carduri decorate */}
+      <RevealGroup className="mt-8 grid grid-cols-1 divide-y divide-border border-y border-border sm:mt-10 sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4 lg:divide-x">
         {services.map((s, i) => (
-          <RevealItem
-            key={i}
-            className="group relative flex flex-col overflow-hidden rounded-3xl surface-card p-4 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] sm:p-5"
-          >
-            <div className="relative flex h-11 w-11 items-center justify-center sm:h-12 sm:w-12">
-              <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/15 to-gold/10 blur-[6px] transition-transform duration-300 group-hover:scale-110" />
-              <img src={s.img} alt="" className="relative h-full w-full object-contain drop-shadow-[0_4px_10px_rgba(16,24,40,0.16)] transition-transform duration-300 group-hover:scale-110" />
+          <RevealItem key={i} className="flex flex-col py-5 lg:px-5 lg:first:pl-0 lg:last:pr-0">
+            <div className="flex items-center justify-between gap-3">
+              <p className="kicker">{String(i + 1).padStart(2, "0")}</p>
+              <img src={s.img} alt="" className="h-9 w-9 object-contain" />
             </div>
-            <h3 className="mt-3 font-heading text-sm font-bold text-navy dark:text-foreground sm:text-base">{s.title}</h3>
+            <h3 className="mt-2.5 font-heading text-base text-navy dark:text-foreground">{s.title}</h3>
             <p className="mt-1.5 flex-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">{s.desc}</p>
             <Link
               to="/about"
-              className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-emerald transition-all duration-200 group-hover:gap-2 sm:text-sm"
+              className="mt-3 inline-flex items-baseline gap-1 text-xs font-semibold text-emerald transition hover:text-emerald/80 sm:text-sm"
             >
-              Află mai multe <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+              Află mai multe <span aria-hidden="true">→</span>
             </Link>
           </RevealItem>
         ))}
       </RevealGroup>
 
-      {/* Cui se adresează — panou glassmorphism interactiv */}
-      <Reveal className="relative mt-5 overflow-hidden rounded-3xl bg-gradient-to-br from-navy via-navy-deep to-navy p-5 sm:mt-12 sm:p-10">
-        <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-emerald/30 blur-3xl animate-blob" />
-        <div className="pointer-events-none absolute -left-8 bottom-0 h-36 w-36 rounded-full bg-gold/25 blur-3xl animate-blob" style={{ animationDelay: "2s" }} />
-        <div className="pointer-events-none absolute right-1/3 top-1/2 h-28 w-28 rounded-full bg-mint/20 blur-3xl animate-blob" style={{ animationDelay: "4s" }} />
-
-        <h3 className="relative text-center font-heading text-base font-bold text-white sm:text-2xl">
+      {/* Cui se adresează — panou ink, plat */}
+      <Reveal className="mt-8 rounded-lg bg-navy-deep p-5 sm:mt-12 sm:p-10">
+        <h3 className="font-heading text-lg text-white sm:text-2xl">
           Cui se adresează
         </h3>
 
-        <div className="relative mt-5 grid grid-cols-2 gap-3 sm:mt-8 sm:grid-cols-5 sm:gap-4">
+        <div className="mt-5 grid grid-cols-2 gap-2.5 sm:mt-7 sm:grid-cols-5 sm:gap-3">
           {audience.map((a, i) => (
             <button
               key={i}
               type="button"
               onClick={() => setActiveAudience(i)}
-              className={`group flex flex-col items-center gap-2 rounded-2xl border p-3 text-center backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 sm:p-4 ${
+              aria-pressed={activeAudience === i}
+              className={`flex flex-col items-center gap-2 rounded-md border p-3 text-center transition-colors sm:p-4 ${
                 activeAudience === i
-                  ? "border-white/40 bg-white/20"
-                  : "border-white/10 bg-white/5 hover:border-white/25 hover:bg-white/10"
+                  ? "border-emerald bg-white/10"
+                  : "border-white/10 bg-transparent hover:border-white/30"
               }`}
             >
-              <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-white p-1.5 shadow-soft transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
-                <img src={a.img} alt="" className="h-full w-full object-contain" />
-              </span>
+              <img src={a.img} alt="" className="h-10 w-10 object-contain sm:h-12 sm:w-12" />
               <span className="text-[11px] font-semibold text-white sm:text-sm">{a.label}</span>
             </button>
           ))}
         </div>
 
-        <div className="relative mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-center text-xs text-white/80 backdrop-blur-xl transition-all duration-300 sm:mt-6 sm:text-sm">
+        <p className="mt-4 border-t border-white/10 pt-4 text-center text-xs text-white/75 sm:mt-6 sm:text-sm">
           {audience[activeAudience].desc}
-        </div>
+        </p>
       </Reveal>
 
       {/* Contact rapid */}
-      <div className="mt-4 flex justify-center sm:mt-8">
+      <div className="mt-6 flex justify-center sm:mt-8">
         <Link
           to="/contact"
-          className="inline-flex items-center gap-1.5 rounded-full bg-emerald px-4 py-2 text-xs font-semibold text-white shadow-soft transition hover:bg-emerald/90 sm:text-sm"
+          className="inline-flex items-baseline gap-1.5 text-sm font-semibold text-emerald transition hover:text-emerald/80"
         >
-          Contactează-ne <ArrowRight className="h-3.5 w-3.5" />
+          Contactează-ne <span aria-hidden="true">→</span>
         </Link>
       </div>
     </section>
