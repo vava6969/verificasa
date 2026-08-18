@@ -50,9 +50,9 @@ const makeSort = (t) => [
 ];
 const norm = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 
-const PIN_RENT = "#3b82f6";
-const PIN_SALE = "#00A859";
-const PIN_GOLD = "#C5A059";
+const PIN_RENT = "#1e2b45";
+const PIN_SALE = "#226b4b";
+const PIN_GOLD = "#836427";
 const PAGE_SIZE = 5;
 
 function formatCount(n) {
@@ -66,7 +66,7 @@ function formatCount(n) {
 function clusterIcon(count, isActive) {
   const baseSize = count >= 1000 ? 52 : count >= 100 ? 46 : count >= 10 ? 40 : 36;
   const size = isActive ? baseSize + 6 : baseSize;
-  const bg = isActive ? "#00A859" : "#3a6c76";
+  const bg = isActive ? "#226b4b" : "#44506a";
   const shadow = isActive
     ? `box-shadow:0 0 0 10px ${bg}22,0 4px 16px rgba(0,0,0,0.35);`
     : `box-shadow:0 2px 8px rgba(0,0,0,0.3),0 0 0 4px ${bg}33;`;
@@ -75,7 +75,7 @@ function clusterIcon(count, isActive) {
     html: `<div style="
       width:${size}px;height:${size}px;border-radius:50%;
       background:${bg};color:#fff;display:flex;align-items:center;justify-content:center;
-      font-weight:700;font-size:12px;font-family:Inter,system-ui,sans-serif;
+      font-weight:700;font-size:12px;font-family:'Fragment Mono',ui-monospace,monospace;
       ${shadow}
       border:2.5px solid #fff;transition:all .15s ease;
     ">${formatCount(count)}</div>`,
@@ -92,7 +92,7 @@ function propertyIcon(property) {
     property.created_date &&
     (Date.now() - new Date(property.created_date).getTime()) / 86400000 <= 7;
   const newBadge = isNew
-    ? `<div style="position:absolute;top:-9px;right:-12px;background:#00A859;color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:6px;border:1.5px solid #fff;white-space:nowrap;letter-spacing:.5px;font-family:Inter,system-ui,sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.4);z-index:2;">NOU!</div>`
+    ? `<div style="position:absolute;top:-9px;right:-12px;background:#226b4b;color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:3px;border:1.5px solid #fff;white-space:nowrap;letter-spacing:.5px;font-family:'Fragment Mono',ui-monospace,monospace;box-shadow:0 1px 4px rgba(0,0,0,.4);z-index:2;">NOU!</div>`
     : "";
   return L.divIcon({
     className: "vc-property-pin",
