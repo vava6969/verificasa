@@ -29,6 +29,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
 import { createNotification } from "@/lib/notifications";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
+import { DataLedger } from "@/components/system/registry";
 
 // Inelul scorului de încredere — elementul "semnătură" al paginii: singurul
 // număr care contează cu adevărat aici se desenează la scroll, nu stă static.
@@ -38,7 +39,7 @@ function TrustScoreRing({ score = 0, size = 64 }) {
   const started = useRef(false);
   const radius = (size - 8) / 2;
   const circumference = 2 * Math.PI * radius;
-  const color = clamped >= 75 ? "#00A85A" : clamped >= 40 ? "#C9A15C" : "#94A3B8";
+  const color = clamped >= 75 ? "#226b4b" : clamped >= 40 ? "#836427" : "#94A3B8";
 
   return (
     <motion.div
@@ -107,6 +108,11 @@ export default function PropertyDetail() {
   }, [user, property]);
 
   useEffect(() => {
+    if (property?.title) document.title = property.title + " — VerifiCasa";
+    return () => { document.title = "VerifiCasa — Chirii verificate online"; };
+  }, [property?.title]);
+
+  useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
@@ -135,10 +141,10 @@ export default function PropertyDetail() {
     return (
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Skeleton className="h-8 w-32" />
-        <Skeleton className="mt-4 h-[420px] rounded-2xl" />
+        <Skeleton className="mt-4 h-[420px] rounded-lg" />
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
-          <Skeleton className="h-96 rounded-2xl lg:col-span-2" />
-          <Skeleton className="h-96 rounded-2xl" />
+          <Skeleton className="h-96 rounded-lg lg:col-span-2" />
+          <Skeleton className="h-96 rounded-lg" />
         </div>
       </div>
     );
@@ -214,16 +220,16 @@ export default function PropertyDetail() {
   // să se extindă până sus, acoperind fosta dungă albă.
   const tabSwitcherButtons = (
     <>
-      <button onClick={() => setTab("gallery")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "gallery" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+      <button onClick={() => setTab("gallery")} className={`rounded-md px-4 py-1.5 text-sm font-semibold transition ${tab === "gallery" ? "bg-navy text-white" : "bg-white text-foreground/60 border border-border"}`}>
         {t("tab_gallery")} ({images.length})
       </button>
       {images.length > 0 && (
-        <button onClick={() => setTab("presentation")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "presentation" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+        <button onClick={() => setTab("presentation")} className={`rounded-md px-4 py-1.5 text-sm font-semibold transition ${tab === "presentation" ? "bg-navy text-white" : "bg-white text-foreground/60 border border-border"}`}>
           <span className="flex items-center gap-1.5"><Film className="h-3.5 w-3.5" /> {lang === "en" ? "Showcase" : "Prezentare"}</span>
         </button>
       )}
       {p.tour_3d_url && (
-        <button onClick={() => setTab("3d")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "3d" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+        <button onClick={() => setTab("3d")} className={`rounded-md px-4 py-1.5 text-sm font-semibold transition ${tab === "3d" ? "bg-navy text-white" : "bg-white text-foreground/60 border border-border"}`}>
           <span className="flex items-center gap-1.5"><Box className="h-3.5 w-3.5" /> {t("tab_3d")}</span>
         </button>
       )}
@@ -246,7 +252,7 @@ export default function PropertyDetail() {
             type="button"
             onClick={() => setTour3dFull(false)}
             aria-label={lang === "en" ? "Close" : "Închide"}
-            className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md active:bg-white/30"
+            className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white active:bg-white/30"
           >
             <X className="h-6 w-6" />
           </button>
@@ -264,7 +270,7 @@ export default function PropertyDetail() {
               site-ului (transparent pe această pagină); imaginea/conținutul de
               dedesubt se întinde până sus, acoperind fosta dungă albă. */}
           <div className="pointer-events-none absolute inset-x-0 top-14 z-20 flex items-center gap-2 bg-gradient-to-b from-black/40 via-black/10 to-transparent p-3">
-            <div className="pointer-events-auto flex items-center gap-2 rounded-full bg-black/35 p-1 backdrop-blur-md">
+            <div className="pointer-events-auto flex items-center gap-2 rounded-full bg-black/35 p-1">
               <button
                 type="button"
                 onClick={() => navigate("/search")}
@@ -280,7 +286,7 @@ export default function PropertyDetail() {
           </div>
 
           {tab === "3d" ? (
-            <div className="relative overflow-hidden rounded-2xl border border-border bg-navy-deep shadow-soft">
+            <div className="relative overflow-hidden rounded-lg border border-border bg-navy-deep shadow-soft">
               <iframe
                 src={p.tour_3d_url}
                 title="Tur 3D"
@@ -292,7 +298,7 @@ export default function PropertyDetail() {
               <button
                 type="button"
                 onClick={() => setTour3dFull(true)}
-                className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-navy-deep/80 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md lg:hidden"
+                className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-navy-deep/80 px-3 py-1.5 text-xs font-semibold text-white lg:hidden"
               >
                 <Maximize2 className="h-3.5 w-3.5" /> {lang === "en" ? "Fullscreen" : "Ecran complet"}
               </button>
@@ -302,7 +308,7 @@ export default function PropertyDetail() {
           ) : (
             <div className="select-none">
               <div
-                className="relative flex items-center justify-center overflow-hidden rounded-3xl border border-border/60 bg-secondary shadow-[0_30px_80px_-30px_rgba(16,24,40,0.4)] select-none"
+                className="relative flex items-center justify-center overflow-hidden rounded-lg border border-border bg-secondary select-none"
                 style={{ aspectRatio: "16 / 10" }}
                 onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
                 onTouchEnd={(e) => {
@@ -338,7 +344,7 @@ export default function PropertyDetail() {
                   )}
                 </AnimatePresence>
                 {!images[activeImage] && (
-                  <div className="flex aspect-video w-full max-w-3xl items-center justify-center bg-gradient-to-br from-navy/10 to-mint/20 text-muted-foreground">
+                  <div className="flex aspect-video w-full max-w-3xl items-center justify-center bg-secondary text-muted-foreground">
                     <span className="text-sm">Fără poze</span>
                   </div>
                 )}
@@ -361,7 +367,7 @@ export default function PropertyDetail() {
                       type="button"
                       onClick={() => setActiveImage((i) => (i - 1 + images.length) % images.length)}
                       aria-label="Imaginea anterioară"
-                      className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-110 hover:bg-white/35 active:scale-95 sm:h-12 sm:w-12"
+                      className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white shadow-lg transition hover:bg-white/35 sm:h-12 sm:w-12"
                     >
                       <ChevronLeft className="h-5 w-5" />
                     </button>
@@ -369,11 +375,11 @@ export default function PropertyDetail() {
                       type="button"
                       onClick={() => setActiveImage((i) => (i + 1) % images.length)}
                       aria-label="Imaginea următoare"
-                      className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-110 hover:bg-white/35 active:scale-95 sm:h-12 sm:w-12"
+                      className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white shadow-lg transition hover:bg-white/35 sm:h-12 sm:w-12"
                     >
                       <ChevronRight className="h-5 w-5" />
                     </button>
-                    <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-black/45 px-3 py-1.5 text-xs font-semibold tabular-nums text-white backdrop-blur-md">
+                    <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-black/45 px-3 py-1.5 text-xs font-semibold tabular-nums text-white">
                       {activeImage + 1} / {images.length}
                     </span>
                   </>
@@ -384,12 +390,12 @@ export default function PropertyDetail() {
                   type="button"
                   onClick={(e) => { e.stopPropagation(); toggleSave(); }}
                   aria-label={saved ? t("pd_saved") : t("pd_save")}
-                  className="absolute right-3 top-16 flex h-11 w-11 items-center justify-center rounded-full bg-black/30 text-white shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-110 hover:bg-black/50 active:scale-95"
+                  className="absolute right-3 top-16 flex h-11 w-11 items-center justify-center rounded-full bg-black/30 text-white shadow-lg transition hover:bg-black/50"
                 >
                   <Heart className={`h-5 w-5 transition ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
                 </button>
                 {images.length > 0 && (
-                  <span className="pointer-events-none absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur-md">
+                  <span className="pointer-events-none absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-1.5 text-[11px] font-semibold text-white">
                     <Expand className="h-3 w-3" /> {lang === "en" ? "Click to zoom" : "Apasă pentru zoom"}
                   </span>
                 )}
@@ -401,7 +407,7 @@ export default function PropertyDetail() {
                     <button
                       key={i}
                       onClick={() => setActiveImage(i)}
-                      className={`h-16 w-24 shrink-0 overflow-hidden rounded-xl border-2 bg-navy-deep shadow-sm transition-all duration-200 sm:h-20 sm:w-28 ${activeImage === i ? "scale-[1.03] border-emerald ring-2 ring-emerald/30" : "border-transparent opacity-70 hover:scale-[1.02] hover:opacity-100"}`}
+                      className={`h-16 w-24 shrink-0 overflow-hidden rounded-md border-2 bg-navy-deep shadow-sm transition-all duration-200 sm:h-20 sm:w-28 ${activeImage === i ? "border-emerald" : "border-transparent opacity-70 hover:opacity-100"}`}
                     >
                       <Image src={img} alt={`thumb ${i}`} fittingType="fill" className="h-full w-full" />
                     </button>
@@ -415,13 +421,13 @@ export default function PropertyDetail() {
         {/* KEY STATS BAR */}
         <RevealGroup className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3" stagger={0.06}>
           {stats.map((s, i) => (
-            <RevealItem key={i} y={14} className="flex items-center gap-2 rounded-xl border border-border bg-white px-2.5 py-2 shadow-soft dark:bg-card">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-soft">
-                <s.icon className="h-3.5 w-3.5 text-emerald" />
+            <RevealItem key={i} y={14} className="flex items-center gap-2 rounded-md border border-border bg-white px-2.5 py-2 shadow-soft dark:bg-card">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-secondary">
+                <s.icon className="h-3.5 w-3.5 text-muted-foreground" />
               </span>
               <div className="min-w-0">
                 <p className="truncate font-heading text-sm font-bold leading-tight text-navy dark:text-foreground">{s.value}</p>
-                <p className="truncate text-[10px] uppercase tracking-wide text-muted-foreground">{s.label}</p>
+                <p className="truncate font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground">{s.label}</p>
               </div>
             </RevealItem>
           ))}
@@ -437,8 +443,8 @@ export default function PropertyDetail() {
                 }}
               />
             )}
-            <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-white p-4 shadow-soft sm:p-6">
-              <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-emerald via-gold to-emerald" />
+            <div className="relative overflow-hidden rounded-lg border border-border bg-white p-4 shadow-soft sm:p-6">
+              <div className="absolute inset-x-0 top-0 h-[2px] bg-emerald" />
               <div className="flex flex-wrap items-start justify-between gap-2 sm:gap-3">
                 <div className="min-w-0 flex-1">
                   <h1 className="font-heading text-xl font-bold text-navy sm:text-3xl">{p.title}</h1>
@@ -467,11 +473,11 @@ export default function PropertyDetail() {
                   </p>
                   {p.approved_by_name && (
                     <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-emerald">
-                      <BadgeCheck className="h-3.5 w-3.5" /> {t("pd_approved_by")} {p.approved_by_name}{p.approved_date ? ` · ${new Date(p.approved_date).toLocaleString(locale, { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}` : ""}
+                      {t("pd_approved_by")} {p.approved_by_name}{p.approved_date ? ` · ${new Date(p.approved_date).toLocaleString(locale, { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" })}` : ""}
                     </p>
                   )}
                   <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <Button size="sm" onClick={toggleSave} className="gap-1.5 bg-emerald text-white shadow-soft hover:bg-emerald/90">
+                    <Button size="sm" onClick={toggleSave} className="gap-1.5">
                       <Heart className={`h-4 w-4 ${saved ? "fill-white" : ""}`} /> {saved ? t("pd_saved") : t("pd_save")}
                     </Button>
                     {canEdit && (
@@ -494,54 +500,59 @@ export default function PropertyDetail() {
                 {typeof p.trust_score === "number" && <TrustScoreRing score={p.trust_score} />}
                 <div className="flex flex-1 flex-wrap gap-2">
                 {p.trust_score >= 75 ? (
-                  <span className="flex items-center gap-1.5 rounded-full bg-navy px-3 py-1.5 text-xs font-semibold text-mint ring-1 ring-mint/40">
-                    <BadgeCheck className="h-3.5 w-3.5" /> {t("pc_trust_high")}
+                  <span className="stamp-line rounded-sm bg-navy/90 px-2.5 py-1.5 text-white">
+                    {t("pc_trust_high")}
                   </span>
                 ) : p.trust_score >= 40 ? (
-                  <span className="flex items-center gap-1.5 rounded-full bg-navy px-3 py-1.5 text-xs font-semibold text-mint ring-1 ring-mint/40">
-                    <BadgeCheck className="h-3.5 w-3.5" /> {t("pc_verified")}
+                  <span className="stamp-line rounded-sm bg-navy/90 px-2.5 py-1.5 text-white">
+                    {t("pc_verified")}
                   </span>
                 ) : null}
                 {p.ai_tour_verified && (
-                  <span className="flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground/70 dark:bg-white/10">
-                    <Sparkles className="h-3.5 w-3.5 text-emerald" /> {t("badge_aitour_v")}
+                  <span className="flex items-center gap-1.5 rounded-sm border border-border bg-secondary px-2.5 py-1 text-xs font-medium text-foreground/70 dark:bg-white/10">
+                    {t("badge_aitour_v")}
                   </span>
                 )}
                 {p.tour_3d_url && (
-                  <span className="flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground/70 dark:bg-white/10">
-                    <Box className="h-3.5 w-3.5 text-emerald" /> {t("tab_3d")}
+                  <span className="flex items-center gap-1.5 rounded-sm border border-border bg-secondary px-2.5 py-1 text-xs font-medium text-foreground/70 dark:bg-white/10">
+                    {t("tab_3d")}
                   </span>
                 )}
                 {p.pet_friendly && (
-                  <span className="flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground/70 dark:bg-white/10">
-                    <PawPrint className="h-3.5 w-3.5 text-emerald" /> {t("badge_pet_v")}
+                  <span className="flex items-center gap-1.5 rounded-sm border border-border bg-secondary px-2.5 py-1 text-xs font-medium text-foreground/70 dark:bg-white/10">
+                    {t("badge_pet_v")}
                   </span>
                 )}
                 {p.parking && (
-                  <span className="flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground/70 dark:bg-white/10">
-                    <Car className="h-3.5 w-3.5 text-emerald" /> {t("badge_parking")}
+                  <span className="flex items-center gap-1.5 rounded-sm border border-border bg-secondary px-2.5 py-1 text-xs font-medium text-foreground/70 dark:bg-white/10">
+                    {t("badge_parking")}
                   </span>
                 )}
                 {p.furnished && (
-                  <span className="flex items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-semibold text-foreground/70 dark:bg-white/10">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald" /> {t("badge_furnished")}
+                  <span className="flex items-center gap-1.5 rounded-sm border border-border bg-secondary px-2.5 py-1 text-xs font-medium text-foreground/70 dark:bg-white/10">
+                    {t("badge_furnished")}
                   </span>
                 )}
                 </div>
               </div>
 
-              <div className="mt-4 space-y-2.5 rounded-2xl border border-border bg-secondary/40 p-4">
-                <p className="flex items-center gap-2 text-xs font-semibold text-navy dark:text-foreground">
-                  <ShieldCheck className="h-4 w-4 text-emerald" /> {legalInfo.tenantFee}
-                </p>
+              <div className="mt-5">
                 {(p.internet_speed_mbps || p.noise_db != null || p.light_orientation || p.water_pressure_ok) && (
-                  <div className="flex flex-wrap gap-x-4 gap-y-1.5 border-t border-border/60 pt-2.5 text-xs font-medium text-muted-foreground">
-                    {p.internet_speed_mbps && <span className="flex items-center gap-1.5"><Wifi className="h-3.5 w-3.5 text-emerald" /> {t("pd_fac_internet")} {p.internet_speed_mbps} Mbps</span>}
-                    {p.noise_db != null && <span className="flex items-center gap-1.5"><VolumeX className="h-3.5 w-3.5 text-emerald" /> {t("pd_fac_noise")} {p.noise_db} dB</span>}
-                    {p.light_orientation && <span className="flex items-center gap-1.5"><Sun className="h-3.5 w-3.5 text-emerald" /> {t("pd_fac_orientation")} {p.light_orientation}</span>}
-                    {p.water_pressure_ok && <span className="flex items-center gap-1.5"><Droplet className="h-3.5 w-3.5 text-emerald" /> {t("pd_fac_water")}</span>}
-                  </div>
+                  <>
+                    <p className="kicker">{lang === "en" ? "Technical record" : "Fișa tehnică"}</p>
+                    <DataLedger
+                      className="mt-2"
+                      dense
+                      rows={[
+                        p.internet_speed_mbps ? { label: t("pd_fac_internet"), value: p.internet_speed_mbps + " Mbps" } : null,
+                        p.noise_db != null ? { label: t("pd_fac_noise"), value: p.noise_db + " dB" } : null,
+                        p.light_orientation ? { label: t("pd_fac_orientation"), value: p.light_orientation } : null,
+                        p.water_pressure_ok ? { label: t("pd_fac_water"), value: "OK" } : null,
+                      ].filter(Boolean)}
+                    />
+                  </>
                 )}
+                <p className="mt-3 text-xs text-muted-foreground">{legalInfo.tenantFee}</p>
               </div>
 
               <h2 className="mt-6 font-heading text-lg font-bold text-navy">{t("desc_h")}</h2>
@@ -555,16 +566,14 @@ export default function PropertyDetail() {
 
             {/* MAP */}
             <Reveal>
-              <div className="overflow-hidden rounded-3xl border border-border/70 bg-white shadow-soft transition-shadow duration-300 hover:shadow-[0_20px_50px_-20px_rgba(16,24,40,0.3)] dark:bg-card">
+              <div className="overflow-hidden rounded-lg border border-border bg-white shadow-soft dark:bg-card">
                 <div className="flex items-center gap-3 border-b border-border p-4">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald/15 text-emerald">
-                    <MapPin className="h-4 w-4" />
-                  </span>
+                  <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
                   <div>
                     <h3 className="font-heading font-bold text-navy dark:text-foreground">{t("map_h")}</h3>
                     <p className="text-xs text-muted-foreground">{t("map_sub")}</p>
                   </div>
-                  <span className="ml-auto flex items-center gap-1 rounded-full bg-emerald-soft px-2.5 py-1 text-[11px] font-medium text-emerald">
+                  <span className="stamp-line ml-auto rounded-sm bg-emerald-soft px-2 py-1 text-emerald">
                     {p.latitude && p.longitude ? t("map_exact") : t("map_approx")}
                   </span>
                 </div>
