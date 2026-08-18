@@ -10,10 +10,10 @@ import CookieBanner from "@/components/CookieBanner";
 
 export default function Layout() {
   const { pathname } = useLocation();
-  // Footerul e o secțiune de marketing/legal — îl arătăm doar pe paginile unde
-  // are sens (homepage, contact și paginile legale), nu în restul aplicației.
-  const FOOTER_PATHS = ["/", "/contact", "/terms", "/privacy", "/data-deletion", "/cookies"];
-  const showFooter = FOOTER_PATHS.includes(pathname);
+  // Footerul (cu linkurile legale obligatorii) apare peste tot, mai puțin pe
+  // suprafețele imersive unde ar rupe layoutul full-height.
+  const NO_FOOTER_PATHS = ["/map", "/messages"];
+  const showFooter = !NO_FOOTER_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
   const hideBottomNav = false;
 
   return (

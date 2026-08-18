@@ -16,12 +16,12 @@ export default function VerifiCasaLogo({ size = 44, withWordmark = true, tagline
       />
       {withWordmark && (
         <div className="min-w-0 leading-none">
-          <span className={`block truncate font-heading text-base font-extrabold tracking-tight ${tone === "light" ? "text-white" : "text-navy"} sm:text-lg`}>VerifiCasa</span>
-          <span className="mt-0.5 hidden text-[8.5px] font-semibold uppercase tracking-[0.2em] text-gold sm:block">
+          <span className={`block truncate font-heading text-base font-semibold tracking-tight ${tone === "light" ? "text-white" : "text-navy"} sm:text-lg`}>VerifiCasa</span>
+          <span className={`mt-0.5 hidden font-mono text-[8.5px] uppercase tracking-[0.14em] sm:block ${tone === "light" ? "text-white/60" : "text-muted-foreground"}`}>
             Inspecții & Verificări Imobiliare
           </span>
           {tagline && (
-            <span className="mt-1 inline-flex rounded-full bg-emerald-soft px-1.5 py-0.5 text-[8.5px] font-bold uppercase tracking-wide text-emerald">
+            <span className="stamp-line mt-1 inline-flex text-emerald">
               Platformă Verificată de Închirieri
             </span>
           )}

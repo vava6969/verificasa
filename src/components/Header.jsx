@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { User, Plus, Globe, Check } from "lucide-react";
 import {
@@ -18,53 +18,59 @@ export default function Header() {
   const isActive = (to) => location.pathname === to || (to !== "/" && location.pathname.startsWith(to));
   const isLanding = location.pathname === "/";
   // Pagina de anunț își întinde galeria de poze până sub header — header-ul
-  // devine transparent/glassmorphic acolo la fel ca pe homepage, ca imaginea
-  // să se vadă prin el în loc de o dungă albă solidă.
+  // rămâne transparent peste imagine acolo și pe homepage.
   const isHeroHeader = isLanding || location.pathname.startsWith("/property/");
   const navItemCls = (to) =>
     `text-sm font-semibold transition hover:text-emerald ${isActive(to) ? "text-emerald" : isHeroHeader ? "text-white/90" : "text-foreground/80"}`;
-  const navItemClsMobile = (to) =>
-    `text-xs font-bold transition ${isActive(to) ? "text-emerald" : isHeroHeader ? "text-white/80" : "text-foreground/70"}`;
 
-  // Top menu only appears at the very top of the page — hidden anywhere else
-  // (no reveal on scroll-up), so users must scroll all the way up to reach it.
+  // Hide on scroll down, reveal on scroll up — the nav is always one flick away.
   const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      if (y < 8) setHidden(false);
-      else setHidden(true);
+      if (y < 16) {
+        setHidden(false);
+      } else if (y > lastY.current + 4) {
+        setHidden(true);
+      } else if (y < lastY.current - 4) {
+        setHidden(false);
+      }
+      lastY.current = y;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Shared currency / language switcher (compact on mobile, full on desktop).
-  const CurrencySwitch = ({ compact = false }) => (
+  // Shared currency / language switcher. Mono codes, no emoji.
+  const CurrencySwitch = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex h-9 w-9 items-center justify-center rounded-full border border-border/50 bg-white/60 text-foreground shadow-soft backdrop-blur-md transition hover:border-emerald/50 dark:bg-card/60" aria-label={`${t("hdr_currency")} / ${t("hdr_language")}`}>
-          <Globe className="h-4 w-4 text-emerald" />
+        <button
+          className={`flex h-9 w-9 items-center justify-center rounded-md border transition ${isHeroHeader ? "border-white/25 text-white hover:border-white/50" : "border-border bg-card text-foreground hover:border-emerald/50"}`}
+          aria-label={`${t("hdr_currency")} / ${t("hdr_language")}`}
+        >
+          <Globe className="h-4 w-4" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-52">
-        <DropdownMenuLabel className="text-xs text-muted-foreground">💰 {t("hdr_currency")}</DropdownMenuLabel>
+        <DropdownMenuLabel className="kicker">{t("hdr_currency")}</DropdownMenuLabel>
         <DropdownMenuItem onClick={() => setCurrency("EUR")} className="cursor-pointer font-semibold">
-          <span className="mr-2">🇪🇺 💶</span> EUR
+          <span className="mr-2 font-mono text-xs text-muted-foreground">EUR</span> Euro
           {currency === "EUR" && <Check className="ml-auto h-4 w-4 text-emerald" />}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setCurrency("RON")} className="cursor-pointer font-semibold">
-          <span className="mr-2">🇷🇴 💵</span> RON
+          <span className="mr-2 font-mono text-xs text-muted-foreground">RON</span> Leu românesc
           {currency === "RON" && <Check className="ml-auto h-4 w-4 text-emerald" />}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuLabel className="text-xs text-muted-foreground">🗣️ {t("hdr_language")}</DropdownMenuLabel>
+        <DropdownMenuLabel className="kicker">{t("hdr_language")}</DropdownMenuLabel>
         <DropdownMenuItem onClick={() => setLang("ro")} className="cursor-pointer font-semibold">
-          <span className="mr-2">🇷🇴</span> Română
+          <span className="mr-2 font-mono text-xs text-muted-foreground">RO</span> Română
           {lang === "ro" && <Check className="ml-auto h-4 w-4 text-emerald" />}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setLang("en")} className="cursor-pointer font-semibold">
-          <span className="mr-2">🇬🇧</span> English
+          <span className="mr-2 font-mono text-xs text-muted-foreground">EN</span> English
           {lang === "en" && <Check className="ml-auto h-4 w-4 text-emerald" />}
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -72,7 +78,7 @@ export default function Header() {
   );
 
   return (
-    <header className={`sticky top-0 z-50 w-full transition-all duration-300 ease-out ${isHeroHeader ? "bg-gradient-to-b from-black/30 to-transparent" : "border-b border-border/30 bg-white/55 backdrop-blur-2xl dark:bg-navy-deep/40"} ${hidden ? "-translate-y-[calc(100%+4px)] opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
+    <header className={`sticky top-0 z-50 w-full transition-transform duration-300 ease-out ${isHeroHeader ? "bg-gradient-to-b from-black/40 to-transparent" : "border-b border-border bg-background"} ${hidden ? "-translate-y-[calc(100%+4px)]" : "translate-y-0"}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between gap-2">
           <Link to="/" className="flex min-w-0 items-center gap-2">
@@ -96,7 +102,7 @@ export default function Header() {
                 <Link
                   to="/post-property"
                   aria-label={t("hdr_add")}
-                  className="flex h-9 items-center justify-center gap-1 rounded-full bg-emerald px-3 text-white shadow-soft transition hover:bg-emerald/90 md:px-4"
+                  className="flex h-9 items-center justify-center gap-1 rounded-md bg-emerald px-3 text-sm font-semibold text-white transition hover:bg-emerald/90 md:px-4"
                 >
                   <Plus className="h-4 w-4" />
                   <span className="hidden md:inline">{t("hdr_add")}</span>
@@ -107,7 +113,7 @@ export default function Header() {
               <>
                 <Link
                   to="/login"
-                  className="flex h-9 items-center gap-1.5 rounded-full bg-emerald px-4 text-sm font-semibold text-white shadow-soft transition hover:bg-emerald/90"
+                  className="flex h-9 items-center gap-1.5 rounded-md bg-emerald px-4 text-sm font-semibold text-white transition hover:bg-emerald/90"
                 >
                   <User className="h-4 w-4" />
                   <span>{t("hdr_login")}</span>
