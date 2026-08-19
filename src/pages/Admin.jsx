@@ -274,7 +274,7 @@ export default function Admin() {
       <div className="border-b border-border bg-white dark:bg-card shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 sm:px-6 sm:py-4">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-navy sm:h-9 sm:w-9 sm:rounded-md">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-navy sm:h-9 sm:w-9 sm:rounded-xl">
               <ShieldAlert className="h-4 w-4 text-emerald sm:h-5 sm:w-5" />
             </div>
             <div className="min-w-0">
@@ -287,7 +287,7 @@ export default function Admin() {
               </p>
             </div>
           </div>
-          <Button variant="outline" size="icon" onClick={load} aria-label="Reincarca" className="h-8 w-8 shrink-0 sm:h-9 sm:w-auto sm:gap-1.5 sm:px-4 sm:text-sm">
+          <Button variant="outline" size="icon" onClick={load} aria-label="Reincarca" className="h-8 w-8 shrink-0 rounded-full sm:h-9 sm:w-auto sm:gap-1.5 sm:px-4 sm:text-sm">
             <RefreshCw className="h-4 w-4" /> <span className="hidden sm:inline">Reincarca</span>
           </Button>
         </div>
@@ -307,9 +307,9 @@ export default function Admin() {
         </div>
 
         {/* Tab nav */}
-        <div className="mb-5 rounded-lg border border-border bg-white dark:bg-card shadow-sm overflow-hidden">
+        <div className="mb-5 rounded-2xl border border-border bg-white dark:bg-card shadow-sm overflow-hidden">
           <div className="px-4 pt-4 pb-2">
-            <p className="kicker mb-2">Prioritare</p>
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Prioritare</p>
             <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 no-scrollbar">
               {PTABS.map((t) => {
                 const Ico = t.icon;
@@ -318,16 +318,16 @@ export default function Admin() {
                   <button
                     key={t.k}
                     onClick={() => setTab(t.k)}
-                    className={"flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md px-3.5 py-2 text-sm font-semibold transition " +
+                    className={"flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3.5 py-2 text-sm font-semibold transition " +
                       (isActive ? "bg-navy text-white shadow-sm" : "text-foreground/70 hover:bg-secondary/60")}
                   >
-                    <Ico className={"h-4 w-4 " + (isActive ? "text-emerald" : t.tone === "rose" ? "text-destructive" : t.tone === "amber" ? "text-gold-deep" : t.tone === "gold" ? "text-gold-deep" : "text-emerald")} />
+                    <Ico className={"h-4 w-4 " + (isActive ? "text-emerald" : t.tone === "rose" ? "text-rose-500" : t.tone === "amber" ? "text-amber-500" : t.tone === "gold" ? "text-gold-deep" : "text-emerald")} />
                     {t.label}
                     {t.count > 0 && (
-                      <span className={"rounded-sm px-1.5 py-0.5 text-[10px] font-bold " +
+                      <span className={"rounded-full px-1.5 py-0.5 text-[10px] font-bold " +
                         (isActive ? "bg-white/20 text-white" :
-                         t.tone === "rose" ? "bg-destructive text-destructive-foreground" :
-                         t.tone === "amber" ? "bg-gold-soft text-gold-deep" :
+                         t.tone === "rose" ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400" :
+                         t.tone === "amber" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" :
                          t.tone === "gold" ? "bg-gold-soft text-gold-deep" :
                          "bg-emerald-soft text-emerald")}>
                         {t.count}
@@ -340,7 +340,7 @@ export default function Admin() {
           </div>
           <div className="mx-4 border-t border-border" />
           <div className="px-4 pt-3 pb-4">
-            <p className="kicker mb-2">Gestionare</p>
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Gestionare</p>
             <div className="flex flex-wrap gap-1.5">
               {GTABS.map((t) => {
                 const Ico = t.icon;
@@ -349,7 +349,7 @@ export default function Admin() {
                   <button
                     key={t.k}
                     onClick={() => setTab(t.k)}
-                    className={"flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition " +
+                    className={"flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-medium transition " +
                       (isActive ? "bg-secondary text-foreground font-semibold" : "text-foreground/60 hover:bg-secondary/50")}
                   >
                     <Ico className="h-3.5 w-3.5" /> {t.label}
@@ -371,7 +371,7 @@ export default function Admin() {
                 return (
                   <>
                     {visible.map((r) => (
-                <div key={r.id} className="rounded-md border border-border bg-white p-4 dark:bg-card">
+                <div key={r.id} className="rounded-xl border border-border bg-white p-4 dark:bg-card">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <p className="font-heading font-bold text-navy dark:text-foreground">
@@ -379,7 +379,7 @@ export default function Admin() {
                       </p>
                       <p className="text-xs text-muted-foreground">{r.email} · {r.phone || "fara tel"}</p>
                     </div>
-                    <span className="rounded-sm bg-navy/10 px-2.5 py-0.5 text-[11px] font-semibold text-navy dark:bg-white/10 dark:text-foreground">
+                    <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
                       {r.status}
                     </span>
                   </div>
@@ -414,7 +414,7 @@ export default function Admin() {
                   value={auditSearch}
                   onChange={(e) => setAuditSearch(e.target.value)}
                   placeholder="Cauta dupa ID, autor sau actiune..."
-                  className="w-full rounded-md border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card"
+                  className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card"
                 />
               </div>
               {(() => {
@@ -428,7 +428,7 @@ export default function Admin() {
                 return (
                   <>
                     {visible.map((a) => (
-                  <div key={a.id} className="flex items-center justify-between rounded-md border border-border bg-white p-3 text-sm dark:bg-card">
+                  <div key={a.id} className="flex items-center justify-between rounded-xl border border-border bg-white p-3 text-sm dark:bg-card">
                     <span>
                       <b className="text-navy dark:text-foreground">{a.actor_name}</b>
                       <span className="text-muted-foreground">
@@ -466,7 +466,7 @@ export default function Admin() {
                       </p>
                       <div className="space-y-2">
                         {insp.slice(0, inspDoneCount).map((r) => (
-                          <div key={r.id} className="rounded-md border border-border bg-white p-4 dark:bg-card">
+                          <div key={r.id} className="rounded-xl border border-border bg-white p-4 dark:bg-card">
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               <div>
                                 <p className="font-heading font-bold text-navy dark:text-foreground">
@@ -474,7 +474,7 @@ export default function Admin() {
                                 </p>
                                 <p className="text-xs text-muted-foreground">{r.email} · {r.phone || "fara tel"}</p>
                               </div>
-                              <span className={"rounded-sm px-2.5 py-0.5 text-[11px] font-semibold " +
+                              <span className={"rounded-full px-2.5 py-0.5 text-[11px] font-semibold " +
                                 (r.status === "Contactat" ? "bg-emerald-soft text-emerald" : "bg-secondary text-muted-foreground")}>
                                 {r.status}
                               </span>
@@ -503,15 +503,15 @@ export default function Admin() {
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
                   placeholder="Cauta dupa nume sau email..."
-                  className="w-full rounded-md border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card"
+                  className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card"
                 />
               </div>
               {users === null
-                ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-lg" />)
+                ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-2xl" />)
                 : filteredUsers.length === 0
                 ? <p className="text-sm text-muted-foreground">Niciun utilizator gasit.</p>
                 : filteredUsers.slice(0, userCount).map((u) => (
-                  <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-white p-4 shadow-soft dark:bg-card">
+                  <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card">
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-soft text-emerald">
                       <Users className="h-5 w-5" />
                     </span>
@@ -523,7 +523,7 @@ export default function Admin() {
                       value={u.role || "user"}
                       onChange={(e) => changeRole(u, e.target.value)}
                       disabled={u.id === user.id || !isSuper}
-                      className="rounded-md border border-border bg-white px-3 py-1.5 text-xs font-semibold outline-none focus:border-emerald disabled:opacity-60 dark:bg-card"
+                      className="rounded-full border border-border bg-white px-3 py-1.5 text-xs font-semibold outline-none focus:border-emerald disabled:opacity-60 dark:bg-card"
                     >
                       {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
                     </select>
@@ -548,7 +548,7 @@ export default function Admin() {
                   value={commentSearch}
                   onChange={(e) => setCommentSearch(e.target.value)}
                   placeholder="Cauta dupa autor, continut sau proprietate..."
-                  className="w-full rounded-md border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card"
+                  className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card"
                 />
               </div>
               {(() => {
@@ -561,7 +561,7 @@ export default function Admin() {
                 return (
                   <>
                     {visible.map((c) => (
-                  <div key={c.id} className="rounded-md border border-border bg-white p-3 dark:bg-card">
+                  <div key={c.id} className="rounded-xl border border-border bg-white p-3 dark:bg-card">
                     <div className="flex items-center justify-between">
                       <span className="text-sm">
                         <b className="text-navy dark:text-foreground">{c.user_name}</b>
@@ -584,7 +584,7 @@ export default function Admin() {
 
           ) : tab === "recomandate" ? (
             <div className="space-y-4">
-              <div className="rounded-lg border border-gold/30 bg-gold-soft/30 p-4 dark:bg-card">
+              <div className="rounded-2xl border border-gold/30 bg-gold-soft/30 p-4 dark:bg-card">
                 <div className="mb-1 flex items-center gap-2">
                   <Crown className="h-5 w-5 text-gold-deep" />
                   <h3 className="font-heading font-bold text-navy dark:text-foreground">Acordare badge Recomandat</h3>
@@ -612,7 +612,7 @@ export default function Admin() {
                 ) : (
                   <div className="space-y-2">
                     {all.filter((p) => p.featured).slice(0, featCount).map((p) => (
-                      <div key={p.id} className="flex items-center gap-3 rounded-md border border-gold/30 bg-white p-3 dark:bg-card">
+                      <div key={p.id} className="flex items-center gap-3 rounded-xl border border-gold/30 bg-white p-3 dark:bg-card">
                         <div className="h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-secondary">
                           {p.images?.[0] && <UIImage src={p.images[0]} fittingType="fill" className="h-full w-full" />}
                         </div>
@@ -642,7 +642,7 @@ export default function Admin() {
                   value={propSearch}
                   onChange={(e) => setPropSearch(e.target.value)}
                   placeholder="Cauta dupa titlu sau ID..."
-                  className="w-full rounded-md border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card"
+                  className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card"
                 />
               </div>
               {(() => {
@@ -652,7 +652,7 @@ export default function Admin() {
                 );
                 if (src.length === 0) {
                   return properties === null
-                    ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-lg" />)
+                    ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-2xl" />)
                     : <p className="text-sm text-muted-foreground">{tab === "pending" ? "Niciun anunt in asteptare." : "Niciun anunt gasit."}</p>;
                 }
                 const visible = src.slice(0, propCount);
@@ -663,8 +663,8 @@ export default function Admin() {
                     return <PropertyEditForm key={p.id} property={p} isAdmin onDone={() => { setEditingId(null); load(); }} />;
                   }
                   return (
-                    <div key={p.id} className="flex flex-wrap items-center gap-4 rounded-lg border border-border bg-white p-4 shadow-soft dark:bg-card">
-                      <div className="h-16 w-24 shrink-0 overflow-hidden rounded-md bg-secondary">
+                    <div key={p.id} className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card">
+                      <div className="h-16 w-24 shrink-0 overflow-hidden rounded-xl bg-secondary">
                         {p.images?.[0] && <UIImage src={p.images[0]} fittingType="fill" className="h-full w-full" />}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -672,7 +672,7 @@ export default function Admin() {
                         <p className="text-xs text-muted-foreground">
                           {p.zone}, {p.city} · {p.property_type} · {p.price_monthly}
                           {" · "}
-                          <span className={p.approval_status === "APPROVED" ? "font-semibold text-emerald" : "font-semibold text-gold-deep"}>
+                          <span className={p.approval_status === "APPROVED" ? "font-semibold text-emerald" : "font-semibold text-amber-600"}>
                             {p.approval_status || "PENDING"}
                           </span>
                         </p>
@@ -690,7 +690,7 @@ export default function Admin() {
                           </Button>
                         )}
                         {p.approval_status === "APPROVED" && (
-                          <Button size="sm" variant="outline" onClick={() => setApproval(p, "REJECTED")} className="gap-1 border-gold/40 text-gold-deep">
+                          <Button size="sm" variant="outline" onClick={() => setApproval(p, "REJECTED")} className="gap-1 border-amber-400 text-amber-700">
                             <X className="h-3.5 w-3.5" /> Retrage
                           </Button>
                         )}

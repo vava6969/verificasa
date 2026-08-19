@@ -52,7 +52,7 @@ export default function MyProperties() {
     return (
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         <Skeleton className="h-9 w-56" />
-        <div className="mt-6 space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-lg" />)}</div>
+        <div className="mt-6 space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-2xl" />)}</div>
       </div>
     );
   }
@@ -70,7 +70,7 @@ export default function MyProperties() {
       </div>
 
       {properties.length === 0 ? (
-        <div className="mt-8 rounded-lg border-2 border-dashed border-border bg-white py-20 text-center shadow-soft">
+        <div className="mt-8 rounded-3xl border-2 border-dashed border-border bg-white py-20 text-center shadow-soft">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-soft">
             <Home className="h-8 w-8 text-emerald" />
           </div>
@@ -83,9 +83,9 @@ export default function MyProperties() {
       ) : (
         <div className="mt-8 space-y-4">
           {properties.map((p) => (
-            <div key={p.id} className="rounded-lg border border-border bg-white p-4 shadow-soft">
+            <div key={p.id} className="rounded-2xl border border-border bg-white p-4 shadow-soft">
               <div className="flex flex-wrap items-center gap-4">
-                <div className="h-20 w-28 shrink-0 overflow-hidden rounded-md bg-secondary">
+                <div className="h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-secondary">
                   {p.images?.[0] ? <UIImage src={p.images[0]} fittingType="fill" className="h-full w-full" /> : null}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -95,8 +95,8 @@ export default function MyProperties() {
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" /> {p.views_count || 0}</span>
-                  <span className={`rounded-sm px-2 py-0.5 text-[11px] font-semibold ${p.approval_status === "APPROVED" ? "bg-emerald-soft text-emerald" : "bg-gold-soft text-gold-deep"}`}>{p.approval_status === "APPROVED" ? "Aprobat" : "În așteptare"}</span>
-                  <span className={`rounded-sm px-2 py-0.5 text-[11px] font-semibold ${p.status === "Activ" ? "bg-emerald-soft text-emerald" : "bg-secondary text-muted-foreground"}`}>{p.status}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${p.approval_status === "APPROVED" ? "bg-emerald-soft text-emerald" : "bg-amber-100 text-amber-700"}`}>{p.approval_status === "APPROVED" ? "Aprobat" : "În așteptare"}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${p.status === "Activ" ? "bg-emerald-soft text-emerald" : "bg-secondary text-muted-foreground"}`}>{p.status}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button variant="outline" size="sm" onClick={() => setEditing(editing === p.id ? null : p.id)} className="gap-1">

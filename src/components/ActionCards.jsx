@@ -1,13 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { RevealGroup, RevealItem } from "@/components/ui/reveal";
 
-// Cele trei căi principale (caută / listează / verifică), numerotate ca într-un
-// registru. Cardurile stau pe aceeași linie de bază: conținutul variază,
-// butonul rămâne ancorat jos.
+// Bloc principal de navigare pe homepage, în genul "Buy a home / Rent a home /
+// Sell a home" de la Zillow: trei căi clare, fiecare cu ilustrație de brand,
+// titlu bold și un singur CTA. Înlocuiește navigarea prin text cu navigare
+// vizuală, imediat sub hero.
 export default function ActionCards({ onRequestInspection }) {
-  const { lang } = useCountry();
+  const { t, lang } = useCountry();
   const en = lang === "en";
 
   const cards = [
@@ -40,32 +42,33 @@ export default function ActionCards({ onRequestInspection }) {
     },
   ];
 
-  const ctaCls =
-    "mt-auto inline-flex items-baseline gap-1.5 pt-5 text-sm font-semibold text-emerald transition hover:text-emerald/80";
-
   return (
     <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
       <RevealGroup className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
         {cards.map((c, i) => (
           <RevealItem
             key={i}
-            className="flex flex-col rounded-lg border border-border bg-card p-6 shadow-soft sm:p-7"
+            className="flex flex-col items-center rounded-3xl surface-card p-6 text-center transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] sm:p-7"
           >
-            <div className="flex items-start justify-between gap-4">
-              <p className="kicker">{String(i + 1).padStart(2, "0")}</p>
-              <img src={c.img} alt="" className="h-20 w-20 shrink-0 object-contain sm:h-24 sm:w-24" />
-            </div>
-            <h3 className="mt-3 font-heading text-lg text-navy dark:text-foreground sm:text-xl">
+            <img src={c.img} alt="" className="h-28 w-28 object-contain sm:h-32 sm:w-32" />
+            <h3 className="mt-4 font-heading text-lg font-bold text-navy dark:text-foreground sm:text-xl">
               {c.title}
             </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{c.desc}</p>
             {c.to ? (
-              <Link to={c.to} className={ctaCls}>
-                {c.cta} <span aria-hidden="true">→</span>
+              <Link
+                to={c.to}
+                className="mt-5 inline-flex items-center gap-1.5 rounded-full border-2 border-navy/15 bg-white px-5 py-2 text-sm font-semibold text-navy transition hover:border-emerald hover:text-emerald dark:border-white/15 dark:bg-white/5 dark:text-foreground"
+              >
+                {c.cta} <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             ) : (
-              <button type="button" onClick={onRequestInspection} className={`${ctaCls} text-left`}>
-                {c.cta} <span aria-hidden="true">→</span>
+              <button
+                type="button"
+                onClick={onRequestInspection}
+                className="mt-5 inline-flex items-center gap-1.5 rounded-full border-2 border-navy/15 bg-white px-5 py-2 text-sm font-semibold text-navy transition hover:border-emerald hover:text-emerald dark:border-white/15 dark:bg-white/5 dark:text-foreground"
+              >
+                {c.cta} <ArrowRight className="h-3.5 w-3.5" />
               </button>
             )}
           </RevealItem>

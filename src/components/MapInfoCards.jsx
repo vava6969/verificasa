@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { MapPin } from "lucide-react";
+import { BarChart3, MapPin, Clock, TrendingUp } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 
 // Compact info cards shown below the map on mobile to fill empty space.
@@ -35,22 +35,23 @@ export default function MapInfoCards({ properties, lang }) {
   return (
     <>
       {/* Quick stats */}
-      <div className="rounded-lg border border-border bg-card p-4 shadow-soft dark:border-white/10">
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-soft dark:border-white/10">
         <div className="flex items-center gap-2">
-          <p className="kicker text-emerald">
+          <BarChart3 className="h-4 w-4 text-emerald" />
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald">
             {en ? "Quick stats" : "Statistici rapide"}
           </p>
         </div>
         <div className="mt-3 grid grid-cols-3 gap-2">
-          <div className="rounded-md bg-emerald-soft p-2.5 text-center dark:bg-emerald/10">
+          <div className="rounded-xl bg-emerald-soft p-2.5 text-center dark:bg-emerald/10">
             <p className="text-xl font-bold text-navy dark:text-foreground">{stats.total}</p>
             <p className="text-[10px] text-muted-foreground">{en ? "properties" : "proprietăți"}</p>
           </div>
-          <div className="rounded-md bg-gold-soft p-2.5 text-center dark:bg-gold/10">
+          <div className="rounded-xl bg-gold-soft p-2.5 text-center dark:bg-gold/10">
             <p className="text-xl font-bold text-navy dark:text-foreground">{stats.countyCount}</p>
             <p className="text-[10px] text-muted-foreground">{en ? "counties" : "județe"}</p>
           </div>
-          <div className="rounded-md bg-secondary p-2.5 text-center dark:bg-white/5">
+          <div className="rounded-xl bg-secondary p-2.5 text-center dark:bg-white/5">
             <p className="text-xl font-bold text-navy dark:text-foreground">{stats.cityCount}</p>
             <p className="text-[10px] text-muted-foreground">{en ? "cities" : "orașe"}</p>
           </div>
@@ -58,9 +59,10 @@ export default function MapInfoCards({ properties, lang }) {
       </div>
 
       {/* Top counties */}
-      <div className="rounded-lg border border-border bg-card p-4 shadow-soft dark:border-white/10">
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-soft dark:border-white/10">
         <div className="flex items-center gap-2">
-          <p className="kicker text-emerald">
+          <TrendingUp className="h-4 w-4 text-emerald" />
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald">
             {en ? "Top counties" : "Cele mai căutate județe"}
           </p>
         </div>
@@ -73,7 +75,7 @@ export default function MapInfoCards({ properties, lang }) {
                 </span>
                 {county}
               </span>
-              <span className="rounded-sm bg-emerald-soft px-2 py-0.5 text-xs font-bold text-emerald dark:bg-emerald/10">
+              <span className="rounded-full bg-emerald-soft px-2 py-0.5 text-xs font-bold text-emerald dark:bg-emerald/10">
                 {count}
               </span>
             </div>
@@ -82,9 +84,10 @@ export default function MapInfoCards({ properties, lang }) {
       </div>
 
       {/* Recently added */}
-      <div className="rounded-lg border border-border bg-card p-4 shadow-soft dark:border-white/10">
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-soft dark:border-white/10">
         <div className="flex items-center gap-2">
-          <p className="kicker text-emerald">
+          <Clock className="h-4 w-4 text-emerald" />
+          <p className="text-xs font-bold uppercase tracking-wider text-emerald">
             {en ? "Recently added" : "Adăugate recent"}
           </p>
         </div>
@@ -102,7 +105,7 @@ export default function MapInfoCards({ properties, lang }) {
                 <div className="min-w-0 flex-1">
                   <p className="flex items-center gap-1.5 truncate text-sm font-medium text-foreground">
                     {isPromoted && (
-                      <span className="inline-flex shrink-0 rounded-sm bg-gold px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                      <span className="inline-flex shrink-0 rounded-full bg-gold px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
                         Promovat
                       </span>
                     )}

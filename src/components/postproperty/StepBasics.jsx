@@ -11,7 +11,7 @@ export default function StepBasics({ form, set }) {
   return (
     <div className="space-y-5">
       <div>
-        <p className="kicker mb-2">Ce vrei să faci?</p>
+        <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">Ce vrei să faci?</p>
         <div className="grid grid-cols-2 gap-3">
           <ChoiceCard iconSrc="/images/generated/icon-key.png" title="Închiriere" sub="Chirie lunară" active={form.transaction_type === "RENT"} onClick={() => set({ transaction_type: "RENT" })} />
           <ChoiceCard iconSrc="/images/generated/icon-coins.png" title="Vânzare" sub="Preț total" active={form.transaction_type === "SALE"} onClick={() => set({ transaction_type: "SALE" })} />
@@ -19,7 +19,7 @@ export default function StepBasics({ form, set }) {
       </div>
 
       <div>
-        <p className="kicker mb-2">Tip proprietate</p>
+        <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">Tip proprietate</p>
         <div className="grid grid-cols-3 gap-2">
           {TYPES.map((tp) => (
             <ChoiceCard key={tp.v} icon={tp.icon} title={tp.v} active={form.property_type === tp.v} onClick={() => set({ property_type: tp.v })} />

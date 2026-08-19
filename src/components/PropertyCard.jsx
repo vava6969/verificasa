@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
-  MapPin, Maximize, BedDouble, PawPrint, BadgePercent,
-  Eye, Building2, Phone, MessageCircle, PhoneOff,
-  Box, Car, Sofa, Heart, Camera,
+  MapPin, Maximize, BedDouble, ShieldCheck, PawPrint, BadgePercent,
+  Eye, Building2, Phone, MessageCircle,
+  Calendar, PhoneOff,
+  Box, Crown, Car, Sofa, Heart, Camera,
 } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
@@ -120,7 +121,7 @@ export default function PropertyCard({ property, hot = false }) {
   const extraChips = chips.slice(3);
 
   return (
-    <div className={`group relative flex flex-col overflow-hidden rounded-lg border bg-white shadow-soft transition-colors dark:bg-card ${hot ? "border-gold/60" : "border-border hover:border-foreground/25"}`}>
+    <div className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-glow dark:bg-card ${hot ? "premium-glow border-gold/50" : "border-border"}`}>
       {/* Cover */}
       <div
         className="relative aspect-[4/3] overflow-hidden touch-pan-y"
@@ -137,9 +138,9 @@ export default function PropertyCard({ property, hot = false }) {
         onClick={toDetail}
       >
         {images.length ? (
-          <Image src={images[idx]} alt={p.title} fittingType="fill" className="h-full w-full cursor-pointer" />
+          <Image src={images[idx]} alt={p.title} fittingType="fill" className="h-full w-full cursor-pointer transition-transform duration-500 group-hover:scale-[1.04]" />
         ) : (
-          <div className="h-full w-full bg-secondary" />
+          <div className="h-full w-full bg-gradient-to-br from-navy/10 to-emerald/20" />
         )}
 
         {/* Dots indicator */}
@@ -154,17 +155,17 @@ export default function PropertyCard({ property, hot = false }) {
         {/* Badge-uri grupate stânga-sus: Verificat + Recomandat */}
         <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
           {isHighTrust ? (
-            <span className="stamp-line rounded-sm bg-navy/90 px-2 py-1 text-white">
-              {t("pc_trust_high")}
+            <span className="flex items-center gap-1 rounded-full bg-navy px-2.5 py-1 text-[11px] font-bold text-mint shadow-soft ring-1 ring-mint/40">
+              <ShieldCheck className="h-3.5 w-3.5" /> {t("pc_trust_high")}
             </span>
           ) : isVerified ? (
-            <span className="stamp-line rounded-sm bg-emerald px-2 py-1 text-white">
-              {t("pc_verified")}
+            <span className="flex items-center gap-1 rounded-full bg-emerald px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
+              <ShieldCheck className="h-3.5 w-3.5" /> {t("pc_verified")}
             </span>
           ) : null}
           {hot && (
-            <span className="premium-badge stamp-line rounded-sm px-2 py-1">
-              {t("pc_hot")}
+            <span className="premium-badge flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white">
+              <Crown className="h-3 w-3" /> {t("pc_hot")}
             </span>
           )}
         </div>
@@ -175,21 +176,21 @@ export default function PropertyCard({ property, hot = false }) {
           onClick={toggleSave}
           aria-label={saved ? t("pd_unsaved") : t("pd_saved_toast")}
           disabled={savePending}
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-navy-deep/60 text-white transition hover:bg-navy-deep/80 disabled:opacity-60"
+          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-navy-deep/45 text-white backdrop-blur-md transition hover:bg-navy-deep/65 disabled:opacity-60"
         >
           <Heart className={`h-4 w-4 transition ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
         </button>
 
         {/* Data postării — stânga-jos */}
         {p.created_date && (
-          <span className="absolute bottom-3 left-3 rounded-sm bg-navy-deep/70 px-2 py-0.5 font-mono text-[10px] text-white/90">
-            {new Date(p.created_date).toLocaleDateString(dateLocale, { day: "2-digit", month: "2-digit" })}
+          <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full bg-navy-deep/60 px-2 py-0.5 text-[10px] font-medium text-white/90 backdrop-blur">
+            <Calendar className="h-2.5 w-2.5" /> {new Date(p.created_date).toLocaleDateString(dateLocale, { day: "2-digit", month: "2-digit" })}
           </span>
         )}
 
         {/* Număr poze — dreapta-jos, ca la Zillow */}
         {images.length > 0 && (
-          <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-sm bg-navy-deep/70 px-2 py-0.5 font-mono text-[10px] text-white/90">
+          <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-navy-deep/60 px-2 py-0.5 text-[10px] font-semibold text-white/90 backdrop-blur">
             <Camera className="h-2.5 w-2.5" /> {images.length}
           </span>
         )}
@@ -207,9 +208,9 @@ export default function PropertyCard({ property, hot = false }) {
 
         {/* Specs — rând unic compact */}
         <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-foreground/70">
-          {p.rooms != null && <span className="flex items-center gap-1"><BedDouble className="h-3.5 w-3.5 text-muted-foreground" /> {p.rooms} {t("sep_rooms")}</span>}
-          {p.surface_sqm != null && <span className="flex items-center gap-1"><Maximize className="h-3.5 w-3.5 text-muted-foreground" /> {p.surface_sqm} mp</span>}
-          {p.floor && <span className="flex items-center gap-1"><Building2 className="h-3.5 w-3.5 text-muted-foreground" /> {t("pc_floor")} {p.floor}</span>}
+          {p.rooms != null && <span className="flex items-center gap-1"><BedDouble className="h-3.5 w-3.5 text-emerald" /> {p.rooms} {t("sep_rooms")}</span>}
+          {p.surface_sqm != null && <span className="flex items-center gap-1"><Maximize className="h-3.5 w-3.5 text-emerald" /> {p.surface_sqm} mp</span>}
+          {p.floor && <span className="flex items-center gap-1"><Building2 className="h-3.5 w-3.5 text-emerald" /> {t("pc_floor")} {p.floor}</span>}
         </div>
 
         {/* Chips secundare — icon-only, max 3 + popover */}
@@ -232,7 +233,7 @@ export default function PropertyCard({ property, hot = false }) {
               </button>
             )}
             {showExtra && extraChips.length > 0 && (
-              <div className="absolute left-0 top-7 z-10 flex flex-wrap gap-1.5 rounded-md border border-border bg-white p-2 shadow-soft dark:bg-card">
+              <div className="absolute left-0 top-7 z-10 flex flex-wrap gap-1.5 rounded-xl border border-border bg-white p-2 shadow-glow dark:bg-card">
                 {extraChips.map((c, i) => {
                   const Ico = c.icon;
                   return (
@@ -252,7 +253,7 @@ export default function PropertyCard({ property, hot = false }) {
             <p className="font-heading text-xl font-bold text-navy dark:text-foreground">{primary}<span className="text-xs font-medium text-muted-foreground">{p.transaction_type === "SALE" ? "" : t("pc_permonth")}</span></p>
             <p className="text-[11px] text-muted-foreground">≈ {secondary}</p>
           </div>
-          <span className="flex items-center gap-1 font-mono text-[11px] text-muted-foreground"><Eye className="h-3 w-3" /> {p.views_count || 0}</span>
+          <span className="flex items-center gap-1 text-[11px] text-muted-foreground"><Eye className="h-3 w-3" /> {p.views_count || 0}</span>
         </div>
       </div>
 
@@ -263,7 +264,7 @@ export default function PropertyCard({ property, hot = false }) {
           onClick={(e) => e.stopPropagation()}
           className="flex shrink-0 items-center"
         >
-          <span className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold text-white ${isProprietar ? "bg-emerald" : "bg-navy"}`}>
+          <span className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold text-white ${isProprietar ? "bg-emerald" : "bg-blue-600"}`}>
             {(p.posted_by_name || p.owner_name || "V").charAt(0).toUpperCase()}
           </span>
         </Link>

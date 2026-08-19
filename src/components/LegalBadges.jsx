@@ -1,8 +1,9 @@
 import React from "react";
+import { ExternalLink } from "lucide-react";
 
 /**
- * Legal compliance links for the footer (ANPC SAL + EU ODR).
- * Ruled rows in the registry register — mono tag, plain line, text arrow.
+ * Legal compliance badges for the footer (ANPC SAL + EU ODR).
+ * Small, transparent, clickable cards that blend with the dark navy footer.
  */
 export default function LegalBadges() {
   const badges = [
@@ -19,20 +20,26 @@ export default function LegalBadges() {
   ];
 
   return (
-    <div className="mt-5 divide-y divide-white/10 border-y border-white/10">
+    <div className="mt-5 space-y-2.5">
       {badges.map((b) => (
         <a
           key={b.href}
           href={b.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="group flex items-baseline justify-between gap-3 py-2.5 text-left"
+          className="group flex items-center justify-between gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-left transition hover:border-emerald/60 hover:bg-white/10"
         >
-          <span className="flex min-w-0 flex-col leading-tight">
-            <span className="stamp-line text-white/45">{b.tag}</span>
-            <span className="mt-0.5 text-[11px] text-white/70 transition-colors group-hover:text-white">{b.line}</span>
+          <span className="flex flex-col leading-tight">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gold">
+              {b.tag}
+            </span>
+            <span className="text-[11px] font-semibold text-white/75">
+              {b.line}
+            </span>
           </span>
-          <span aria-hidden="true" className="shrink-0 text-xs text-white/40 transition-colors group-hover:text-white">↗</span>
+          <span className="flex shrink-0 items-center gap-1 rounded-full bg-emerald/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white transition group-hover:bg-emerald">
+            Detalii <ExternalLink className="h-3 w-3" />
+          </span>
         </a>
       ))}
     </div>

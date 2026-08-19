@@ -73,7 +73,7 @@ export default function Saved() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-6 flex items-center gap-3">
-        <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-emerald text-white shadow-soft"><Bookmark className="h-5 w-5" /></span>
+        <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald to-emerald/80 text-white shadow-soft"><Bookmark className="h-5 w-5" /></span>
         <div>
           <h1 className="font-heading text-2xl font-bold text-navy dark:text-foreground">Salvate</h1>
           <p className="text-sm text-muted-foreground">Proprietățile și profilurile pe care le-ai păstrat.</p>
@@ -104,12 +104,13 @@ export default function Saved() {
       {tab === "properties" && (
         properties === null ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-lg" />)}
+            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)}
           </div>
         ) : properties.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border bg-secondary py-20 text-center">
+          <div className="rounded-3xl border border-dashed border-border bg-gradient-to-b from-secondary/40 to-transparent py-20 text-center">
             <span className="relative mx-auto flex h-16 w-16 items-center justify-center">
-              <Home className="h-8 w-8 text-emerald/70" />
+              <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/20 to-gold/10 blur-md" />
+              <Home className="relative h-8 w-8 text-emerald/70" />
             </span>
             <p className="mt-3 font-heading text-lg font-semibold text-navy dark:text-foreground">Niciun anunț salvat</p>
             <p className="text-sm text-muted-foreground">Apasă inima pe un anunț sau „Salvează" pe pagina de detaliu.</p>
@@ -120,7 +121,7 @@ export default function Saved() {
             {properties.map((p) => (
               <div key={p.id} className="relative">
                 <PropertyCard property={p} />
-                <button onClick={() => remove(p.id)} className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-destructive shadow-soft transition hover:bg-destructive hover:text-destructive-foreground" title="Elimină din salvate">
+                <button onClick={() => remove(p.id)} className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-rose-500 shadow-soft transition hover:bg-rose-500 hover:text-white" title="Elimină din salvate">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
@@ -133,12 +134,13 @@ export default function Saved() {
       {tab === "profiles" && (
         profileUsers === null ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-lg" />)}
+            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-2xl" />)}
           </div>
         ) : profileUsers.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border bg-secondary py-20 text-center">
+          <div className="rounded-3xl border border-dashed border-border bg-gradient-to-b from-secondary/40 to-transparent py-20 text-center">
             <span className="relative mx-auto flex h-16 w-16 items-center justify-center">
-              <UserCircle className="h-8 w-8 text-emerald/70" />
+              <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/20 to-gold/10 blur-md" />
+              <UserCircle className="relative h-8 w-8 text-emerald/70" />
             </span>
             <p className="mt-3 font-heading text-lg font-semibold text-navy dark:text-foreground">Niciun profil salvat</p>
             <p className="text-sm text-muted-foreground">Salvează profiluri de proprietari sau agenți pentru a le găsi rapid.</p>
@@ -147,10 +149,10 @@ export default function Saved() {
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {profileUsers.map((u) => (
-              <div key={u.id} className="relative overflow-hidden rounded-lg border border-border bg-white p-4 shadow-soft dark:bg-card">
+              <div key={u.id} className="relative overflow-hidden rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card">
                 <button
                   onClick={() => removeProfile(u.id)}
-                  className="absolute right-3 top-3 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-secondary/80 text-destructive transition hover:bg-destructive hover:text-destructive-foreground"
+                  className="absolute right-3 top-3 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-secondary/80 text-rose-500 transition hover:bg-rose-500 hover:text-white"
                   title="Elimină profilul"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -166,7 +168,7 @@ export default function Saved() {
                   <div className="min-w-0">
                     <p className="truncate font-heading text-sm font-bold text-navy hover:text-emerald dark:text-foreground">{u.full_name || u.email}</p>
                     <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <span className={`inline-block h-1.5 w-1.5 rounded-full ${u.seller_type === "Agent" ? "bg-navy" : "bg-emerald"}`} />
+                      <span className={`inline-block h-1.5 w-1.5 rounded-full ${u.seller_type === "Agent" ? "bg-blue-500" : "bg-emerald"}`} />
                       {u.seller_type === "Agent" ? "Agent Imobiliar" : "Proprietar"}
                     </p>
                     {u.agency_name && <p className="truncate text-xs text-muted-foreground">{u.agency_name}</p>}

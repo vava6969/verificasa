@@ -84,7 +84,7 @@ export default function Owner() {
 
         <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-4">
           {STAT_CARDS.map((s, i) => (
-            <div key={i} className="surface-card rounded-md p-2.5 sm:p-4">
+            <div key={i} className="surface-card rounded-xl p-2.5 sm:p-4">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-soft sm:h-10 sm:w-10">
                   <s.icon className="h-4 w-4 text-emerald sm:h-5 sm:w-5" />
@@ -110,16 +110,16 @@ export default function Owner() {
         <div className="mt-8">
           <h2 className="font-heading text-xl font-bold text-navy">{t("my_props")}</h2>
           {properties === null ? (
-            <div className="mt-4 space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-lg" />)}</div>
+            <div className="mt-4 space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-2xl" />)}</div>
           ) : properties.length === 0 ? (
-            <div className="mt-4 rounded-lg border border-dashed border-border py-16 text-center">
+            <div className="mt-4 rounded-2xl border border-dashed border-border py-16 text-center">
               <Camera className="mx-auto h-8 w-8 text-muted-foreground/40" />
               <p className="mt-3 text-sm text-muted-foreground">{t("no_props")}</p>
             </div>
           ) : (
             <div className="mt-4 space-y-3">
               {properties.map((p) => (
-                <div key={p.id} className="flex flex-wrap items-center gap-4 rounded-lg border border-border bg-white p-4 shadow-soft">
+                <div key={p.id} className="flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-white p-4 shadow-soft">
                   <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-secondary">
                     {p.images?.[0] ? <UIImage src={p.images[0]} fittingType="fill" className="h-full w-full" /> : null}
                   </div>
@@ -130,8 +130,8 @@ export default function Owner() {
                   <div className="flex items-center gap-4 text-xs">
                     <span className="flex items-center gap-1 text-muted-foreground"><Eye className="h-3.5 w-3.5" /> {p.views_count || 0}</span>
                     <span className={`flex items-center gap-1 ${p.ai_video_url ? "text-mint" : "text-muted-foreground"}`}>AI {p.ai_video_url ? t("ai_active") : t("ai_none")}</span>
-                    <span className={`rounded-sm px-2 py-0.5 text-[11px] font-semibold ${p.approval_status === "APPROVED" ? "bg-mint-soft text-navy" : "bg-gold-soft text-gold-deep"}`}>{p.approval_status === "APPROVED" ? "Aprobat" : "În așteptare"}</span>
-                    <span className={`rounded-sm px-2 py-0.5 text-[11px] font-semibold ${p.status === "Activ" ? "bg-mint-soft text-navy" : "bg-secondary text-muted-foreground"}`}>{p.status}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${p.approval_status === "APPROVED" ? "bg-mint-soft text-navy" : "bg-amber-100 text-amber-700"}`}>{p.approval_status === "APPROVED" ? "Aprobat" : "În așteptare"}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${p.status === "Activ" ? "bg-mint-soft text-navy" : "bg-secondary text-muted-foreground"}`}>{p.status}</span>
                   </div>
                   <Button variant="outline" size="sm" className="gap-1"><Download className="h-3.5 w-3.5" /> {t("contract_pdf")}</Button>
                 </div>
@@ -146,19 +146,19 @@ export default function Owner() {
             <h2 className="font-heading text-xl font-bold text-navy">{t("inq_title")}</h2>
             <div className="mt-4 space-y-3">
               {inquiries.map((inq) => (
-                <div key={inq.id} className="rounded-lg border border-border bg-white p-4 shadow-soft">
+                <div key={inq.id} className="rounded-2xl border border-border bg-white p-4 shadow-soft">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <p className="font-heading font-bold text-navy">{inq.name} <span className="text-xs font-normal text-muted-foreground">— {inq.property_title}</span></p>
                       <p className="text-xs text-muted-foreground">{inq.email} · {inq.phone || t("inq_no_phone")}</p>
                     </div>
-                    <span className={`rounded-sm px-2.5 py-0.5 text-[11px] font-semibold ${inq.status === "Nou" ? "bg-navy/10 text-navy" : inq.status === "Calificat" ? "bg-mint-soft text-navy" : inq.status === "Vizionare programată" ? "bg-gold-soft text-gold-deep" : "bg-secondary text-muted-foreground"}`}>{inq.status}</span>
+                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${inq.status === "Nou" ? "bg-blue-50 text-blue-700" : inq.status === "Calificat" ? "bg-mint-soft text-navy" : inq.status === "Vizionare programată" ? "bg-amber-50 text-amber-700" : "bg-secondary text-muted-foreground"}`}>{inq.status}</span>
                   </div>
                   {(inq.occupation || inq.estimated_income) && (
                     <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
                       {inq.occupation && <span>{t("inq_occupation")} {inq.occupation}</span>}
-                      {inq.estimated_income && <span>{t("inq_income")} {inq.estimated_income}</span>}
-                      {inq.move_date && <span>{t("inq_move")} {new Date(inq.move_date).toLocaleDateString("ro-RO")}</span>}
+                      {inq.estimated_income && <span>💰 {t("inq_income")} {inq.estimated_income}</span>}
+                      {inq.move_date && <span>📅 {t("inq_move")} {new Date(inq.move_date).toLocaleDateString("ro-RO")}</span>}
                     </div>
                   )}
                 </div>

@@ -42,7 +42,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-7xl items-stretch justify-around border-t border-border bg-background px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-7xl items-stretch justify-around border-t border-border/30 bg-white/55 px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1.5 shadow-[0_-6px_24px_-10px_rgb(27_34_44/0.22)] backdrop-blur-2xl md:hidden dark:bg-navy-deep/50"
       aria-label="Navigare rapidă"
     >
       {items.map((it) => {
@@ -51,7 +51,7 @@ export default function BottomNav() {
         if (it.primary) {
           return (
             <button key={it.path} onClick={it.onClick} className="flex flex-1 flex-col items-center justify-center gap-0.5 py-0.5" aria-label={it.label}>
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald text-white">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald text-white shadow-soft">
                 <Icon className="h-5 w-5" strokeWidth={2.5} />
               </span>
               <span className="text-[10px] font-bold text-emerald">{it.label}</span>
@@ -63,7 +63,7 @@ export default function BottomNav() {
             <span className={`relative flex h-7 w-7 items-center justify-center ${active ? "text-emerald" : "text-foreground/60"}`}>
               <Icon className="h-5 w-5" strokeWidth={active ? 2.5 : 2} fill={active && it.icon === Home ? "currentColor" : "none"} />
               {it.badge && (
-                <span className="absolute -right-2 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground">
+                <span className="absolute -right-2 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white">
                   {it.badge}
                 </span>
               )}

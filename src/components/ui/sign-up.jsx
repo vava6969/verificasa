@@ -192,7 +192,7 @@ export function AuthComponent({ logo, brandName = "VerifiCasa" }) {
     return (
       <Shell logo={logo} brandName={brandName} L={L}>
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-lg bg-emerald mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald mb-4 shadow-glow">
             <Mail className="w-7 h-7 text-white" />
           </div>
           <h2 className="text-xl font-bold text-foreground">{L.verifyTitle}</h2>
@@ -207,7 +207,7 @@ export function AuthComponent({ logo, brandName = "VerifiCasa" }) {
           </InputOTP>
         </div>
         <button onClick={verifyOtp} disabled={loading || otp.length < 6}
-          className="w-full h-12 rounded-md font-semibold gradient-emerald text-navy flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50">
+          className="w-full h-12 rounded-xl font-semibold gradient-emerald text-navy flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50">
           {loading ? <><Loader2 className="w-4 h-4 animate-spin" />{L.verifying}</> : <>{L.verify}<ArrowRight className="w-4 h-4" /></>}
         </button>
         <p className="text-center text-sm text-muted-foreground mt-4">
@@ -224,7 +224,7 @@ export function AuthComponent({ logo, brandName = "VerifiCasa" }) {
       <Shell logo={logo} brandName={brandName} L={L}>
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-6">
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
-            className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald mb-5">
+            className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald mb-5 shadow-glow">
             <Check className="w-10 h-10 text-white" strokeWidth={3} />
           </motion.div>
           <h2 className="text-2xl font-bold text-foreground">{L.success}</h2>
@@ -300,12 +300,12 @@ export function AuthComponent({ logo, brandName = "VerifiCasa" }) {
           <div className="flex gap-2">
             {step > 0 && (
               <button type="button" onClick={() => setStep((s) => s - 1)}
-                className="h-12 px-5 rounded-md border border-border text-foreground font-medium flex items-center gap-1.5 hover:bg-secondary transition">
+                className="h-12 px-5 rounded-xl border border-border text-foreground font-medium flex items-center gap-1.5 hover:bg-secondary transition">
                 <ArrowLeft className="w-4 h-4" />{L.back}
               </button>
             )}
             <button type="submit" disabled={loading}
-              className="flex-1 h-12 rounded-md font-semibold gradient-emerald text-navy flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50">
+              className="flex-1 h-12 rounded-xl font-semibold gradient-emerald text-navy flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50">
               {loading ? <><Loader2 className="w-4 h-4 animate-spin" />{L.creating}</> : (step < totalSteps - 1 ? <>{L.next}<ArrowRight className="w-4 h-4" /></> : <>{L.create}<ArrowRight className="w-4 h-4" /></>)}
             </button>
           </div>
@@ -318,7 +318,7 @@ export function AuthComponent({ logo, brandName = "VerifiCasa" }) {
             <Link to="/forgot-password" className="text-xs text-emerald hover:underline">{L.forgot}</Link>
           </div>
           <button type="submit" disabled={loading}
-            className="w-full h-12 rounded-md font-semibold gradient-emerald text-navy flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50">
+            className="w-full h-12 rounded-xl font-semibold gradient-emerald text-navy flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50">
             {loading ? <><Loader2 className="w-4 h-4 animate-spin" />{L.loggingIn}</> : <>{L.login}<ArrowRight className="w-4 h-4" /></>}
           </button>
         </form>
@@ -339,6 +339,17 @@ export function AuthComponent({ logo, brandName = "VerifiCasa" }) {
 function Shell({ logo, brandName, L, children }) {
   return (
     <div className="relative min-h-screen flex items-center justify-center px-4 py-10 overflow-hidden bg-background">
+      {/* animated gradient background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-soft/50 via-background to-gold-soft/40" />
+        <motion.div className="absolute -top-40 -left-40 w-[34rem] h-[34rem] rounded-full bg-emerald/20 blur-3xl"
+          animate={{ x: [0, 60, 0], y: [0, 40, 0], scale: [1, 1.1, 1] }} transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.div className="absolute -bottom-40 -right-40 w-[34rem] h-[34rem] rounded-full bg-gold/20 blur-3xl"
+          animate={{ x: [0, -50, 0], y: [0, -30, 0], scale: [1, 1.15, 1] }} transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.div className="absolute top-1/3 right-1/4 w-80 h-80 rounded-full bg-emerald/10 blur-3xl"
+          animate={{ x: [0, -40, 0], y: [0, 50, 0] }} transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }} />
+      </div>
+
       <div className="relative z-10 w-full max-w-md">
         {/* brand */}
         <div className="flex flex-col items-center mb-6">
@@ -349,7 +360,7 @@ function Shell({ logo, brandName, L, children }) {
         </div>
         {/* glass card */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-          className="glass-panel rounded-lg p-7 sm:p-8">
+          className="glass-panel rounded-3xl p-7 sm:p-8">
           {children}
         </motion.div>
         <Link to="/" className="mt-6 flex items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-emerald transition">
@@ -378,7 +389,7 @@ function ErrorBox({ children }) {
 function SocialBtn({ children, onClick }) {
   return (
     <button type="button" onClick={onClick}
-      className="flex items-center justify-center gap-2 h-11 rounded-md border border-border bg-card hover:border-emerald/50 hover:bg-secondary/40 transition">
+      className="flex items-center justify-center gap-2 h-11 rounded-xl border border-border bg-card hover:border-emerald/50 hover:bg-secondary/40 transition">
       {children}
     </button>
   );

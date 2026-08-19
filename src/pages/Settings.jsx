@@ -169,7 +169,7 @@ export default function Settings() {
         {tab === "profile" && (
           <div className="space-y-6">
             {/* Cover image */}
-            <section className="rounded-lg border border-border bg-white p-5 shadow-soft dark:bg-card">
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
               <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground">
                 <ImageIcon className="h-4 w-4 text-emerald" /> {lang === "en" ? "Cover image" : "Imagine background"}
               </h2>
@@ -177,7 +177,7 @@ export default function Settings() {
                 {lang === "en" ? "Appears at the top of your public profile." : "Apare în partea de sus a profilului tău public."}
               </p>
               <div className="mt-4">
-                <div className="relative h-32 overflow-hidden rounded-md border border-border sm:h-40">
+                <div className="relative h-32 overflow-hidden rounded-xl border border-border sm:h-40">
                   {form.cover_image_url ? (
                     <UIImage src={form.cover_image_url} fittingType="fill" className="h-full w-full" />
                   ) : (
@@ -188,7 +188,7 @@ export default function Settings() {
                         className="h-full w-full object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-navy/75 via-navy/10 to-transparent" />
-                      <span className="absolute bottom-2 left-3 rounded-sm bg-black/45 px-2.5 py-1 text-[11px] font-semibold text-white">
+                      <span className="absolute bottom-2 left-3 rounded-full bg-black/45 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
                         {lang === "en" ? "Default cover — upload your own anytime" : "Imagine implicită — poți încărca propria imagine oricând"}
                       </span>
                     </div>
@@ -204,7 +204,7 @@ export default function Settings() {
                   {form.cover_image_url && (
                     <button
                       onClick={removeCoverImage}
-                      className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-semibold text-destructive hover:bg-destructive/10"
+                      className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20"
                     >
                       {lang === "en" ? "Remove" : "Elimină"}
                     </button>
@@ -223,23 +223,23 @@ export default function Settings() {
             )}
 
             {/* Avatar */}
-            <section className="rounded-lg border border-border bg-white p-5 shadow-soft dark:bg-card">
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
               <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground"><Camera className="h-4 w-4 text-emerald" /> {t("st_avatar")}</h2>
               <p className="text-sm text-muted-foreground">Va apărea în comentarii, chat și pe profilul tău public.</p>
               <div className="mt-4"><AvatarUpload /></div>
             </section>
 
             {/* Name + role */}
-            <section className="rounded-lg border border-border bg-white p-5 shadow-soft dark:bg-card">
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
               <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground"><User className="h-4 w-4 text-emerald" /> {t("st_full_name")}</h2>
               <input
                 value={form.full_name}
                 onChange={(e) => set("full_name", e.target.value)}
                 disabled={!canChangeName}
-                className="mt-3 w-full rounded-md border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40 disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-3 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40 disabled:cursor-not-allowed disabled:opacity-60"
               />
               {!canChangeName && (
-                <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-gold-soft px-3 py-2 text-xs text-gold-deep">
+                <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:bg-amber-900/20 dark:text-amber-400">
                   <Clock className="h-3.5 w-3.5 shrink-0" />
                   {lang === "en"
                     ? `You can change your name again in ${daysUntilNameChange} day(s).`
@@ -253,7 +253,7 @@ export default function Settings() {
                     <button
                       key={r}
                       onClick={() => set("seller_type", r)}
-                      className={`flex items-center justify-center gap-2 rounded-md border px-3 py-2.5 text-sm font-semibold transition ${form.seller_type === r ? "border-emerald bg-emerald-soft text-emerald" : "border-border bg-background text-muted-foreground hover:border-emerald/50"}`}
+                      className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-semibold transition ${form.seller_type === r ? "border-emerald bg-emerald-soft text-emerald" : "border-border bg-background text-muted-foreground hover:border-emerald/50"}`}
                     >
                       {r}
                     </button>
@@ -264,7 +264,7 @@ export default function Settings() {
 
             {/* Agency fields (only if Agent) */}
             {form.seller_type === "Agent" && (
-              <section className="rounded-lg border border-border bg-white p-5 shadow-soft dark:bg-card">
+              <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
                 <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground">
                   <Building2 className="h-4 w-4 text-emerald" /> {t("st_agency_name")}
                 </h2>
@@ -272,7 +272,7 @@ export default function Settings() {
                   value={form.agency_name}
                   onChange={(e) => set("agency_name", e.target.value)}
                   placeholder="Ex: Coldwell Banker Iași"
-                  className="mt-3 w-full rounded-md border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                  className="mt-3 w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
                 />
                 <p className="mt-4 mb-2 text-sm font-semibold text-navy dark:text-foreground">{t("st_agency_logo")}</p>
                 <div className="flex items-center gap-3">
@@ -294,13 +294,13 @@ export default function Settings() {
                 <input
                   value={form.license_number}
                   onChange={(e) => set("license_number", e.target.value)}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                  className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
                 />
               </section>
             )}
 
             {/* Contact — phone & WhatsApp */}
-            <section className="rounded-lg border border-border bg-white p-5 shadow-soft dark:bg-card">
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
               <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground">
                 <Phone className="h-4 w-4 text-emerald" /> {lang === "en" ? "Contact details" : "Date de contact"}
               </h2>
@@ -316,7 +316,7 @@ export default function Settings() {
                     value={form.phone}
                     onChange={(e) => set("phone", e.target.value)}
                     placeholder="07xx xxx xxx"
-                    className="w-full rounded-md border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                    className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
                   />
                 </div>
                 <div>
@@ -327,7 +327,7 @@ export default function Settings() {
                     value={form.whatsapp_phone}
                     onChange={(e) => set("whatsapp_phone", e.target.value)}
                     placeholder="407xxxxxxxx (format internațional)"
-                    className="w-full rounded-md border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                    className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
                   />
                   <p className="mt-1 text-xs text-muted-foreground">
                     {lang === "en" ? "Include country code, e.g. 40 for Romania." : "Include codul de țară, ex. 40 pentru România."}
@@ -337,7 +337,7 @@ export default function Settings() {
             </section>
 
             {/* Bio */}
-            <section className="rounded-lg border border-border bg-white p-5 shadow-soft dark:bg-card">
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
               <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground"><FileText className="h-4 w-4 text-emerald" /> {t("st_bio")}</h2>
               <textarea
                 value={form.bio}
@@ -345,7 +345,7 @@ export default function Settings() {
                 rows={3}
                 maxLength={500}
                 placeholder={t("st_bio_ph")}
-                className="mt-3 w-full resize-none rounded-md border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                className="mt-3 w-full resize-none rounded-xl border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
               />
               <p className="mt-1 text-right text-xs text-muted-foreground">{form.bio.length}/500</p>
             </section>
@@ -359,7 +359,7 @@ export default function Settings() {
         {/* PRIVACY TAB */}
         {tab === "privacy" && (
           <div className="space-y-4">
-            <section className="rounded-lg border border-border bg-white p-5 shadow-soft dark:bg-card">
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
               <ToggleRow
                 label={t("st_phone_public")}
                 value={form.phone_public}
@@ -377,7 +377,7 @@ export default function Settings() {
               />
             </section>
 
-            <section className="rounded-lg border border-border bg-white p-5 shadow-soft dark:bg-card">
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
               <p className="mb-3 text-sm font-semibold text-navy dark:text-foreground">{t("st_profile_vis")}</p>
               <div className="grid grid-cols-2 gap-2">
                 {[
@@ -387,7 +387,7 @@ export default function Settings() {
                   <button
                     key={opt.v}
                     onClick={() => set("profile_visibility", opt.v)}
-                    className={`rounded-md border px-3 py-2.5 text-sm font-semibold transition ${form.profile_visibility === opt.v ? "border-emerald bg-emerald-soft text-emerald" : "border-border bg-background text-muted-foreground hover:border-emerald/50"}`}
+                    className={`rounded-xl border px-3 py-2.5 text-sm font-semibold transition ${form.profile_visibility === opt.v ? "border-emerald bg-emerald-soft text-emerald" : "border-border bg-background text-muted-foreground hover:border-emerald/50"}`}
                   >
                     {opt.label}
                   </button>
@@ -405,7 +405,7 @@ export default function Settings() {
         {tab === "notifications" && (
           <div className="space-y-4">
             <NotificationsPanel />
-            <section className="rounded-lg border border-border bg-white p-5 shadow-soft dark:bg-card">
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
               <ToggleRow
                 label={t("st_email_messages")}
                 value={form.email_notify_messages}
@@ -426,7 +426,7 @@ export default function Settings() {
         {/* SECURITY TAB */}
         {tab === "security" && (
           <div className="space-y-4">
-            <section className="rounded-lg border border-border bg-white p-5 shadow-soft dark:bg-card">
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
               <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground">
                 <Lock className="h-4 w-4 text-emerald" /> {t("st_change_password")}
               </h2>
@@ -435,7 +435,7 @@ export default function Settings() {
                   ? "We'll send a password reset link to your email address."
                   : "Vom trimite un link de resetare a parolei pe adresa ta de email."}
               </p>
-              <div className="mt-3 flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-2.5">
+              <div className="mt-3 flex items-center gap-2 rounded-xl bg-secondary/50 px-3 py-2.5">
                 <span className="text-sm font-medium text-foreground/80">{user?.email || "—"}</span>
               </div>
               <Button onClick={changePassword} disabled={passLoading} className="mt-3 w-full gap-2 bg-emerald text-white hover:bg-emerald/90">
@@ -443,7 +443,7 @@ export default function Settings() {
               </Button>
             </section>
 
-            <section className="rounded-lg border border-border bg-white p-5 shadow-soft dark:bg-card">
+            <section className="rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
               <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground"><Moon className="h-4 w-4 text-emerald" /> Aspect</h2>
               <p className="text-sm text-muted-foreground">{lang === "en" ? "Toggle between light and dark theme." : "Comută între temă deschisă și întunecată."}</p>
               <div className="mt-3"><ThemeToggle withLabel /></div>
@@ -456,7 +456,7 @@ export default function Settings() {
           <div>
             <Link
               to="/my-properties"
-              className="flex items-center justify-between rounded-lg border border-border bg-white p-5 shadow-soft transition hover:border-emerald/40 dark:bg-card"
+              className="flex items-center justify-between rounded-2xl border border-border bg-white p-5 shadow-soft transition hover:border-emerald/40 dark:bg-card"
             >
               <div className="flex items-center gap-3">
                 <span className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-soft text-emerald">
@@ -474,7 +474,7 @@ export default function Settings() {
       </div>
 
       {/* Account data */}
-      <section className="mt-6 rounded-lg border border-border bg-white p-5 shadow-soft dark:bg-card">
+      <section className="mt-6 rounded-2xl border border-border bg-white p-5 shadow-soft dark:bg-card">
         <h2 className="flex items-center gap-2 font-heading text-base font-bold text-navy dark:text-foreground"><Mail className="h-4 w-4 text-emerald" /> Date cont</h2>
         <dl className="mt-3 text-sm">
           <div className="flex justify-between border-b border-border/50 py-2"><dt className="text-muted-foreground">Email</dt><dd className="font-semibold text-navy dark:text-foreground">{user?.email || "—"}</dd></div>

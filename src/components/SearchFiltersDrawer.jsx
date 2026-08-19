@@ -20,7 +20,7 @@ export default function SearchFiltersDrawer({
 
   const field = "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card";
   const chip = (active) =>
-    `flex items-center gap-1.5 rounded-md border px-3.5 py-2 text-sm font-semibold transition ${
+    `flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-semibold transition ${
       active ? "border-emerald bg-emerald text-white shadow-soft" : "border-border bg-background text-foreground/70 hover:border-emerald/50 dark:bg-card"
     }`;
 
@@ -33,7 +33,7 @@ export default function SearchFiltersDrawer({
       >
         <SlidersHorizontal className="h-4 w-4" /> {t("sr_advanced")}
         {count > 0 && (
-          <span className="ml-1 rounded-sm bg-white/25 px-1.5 font-mono text-xs">{count}</span>
+          <span className="ml-1 rounded-full bg-white/25 px-1.5 text-xs">{count}</span>
         )}
       </button>
 
@@ -54,7 +54,7 @@ export default function SearchFiltersDrawer({
 
             {planOptions?.length > 0 && (
               <div>
-                <p className="kicker mb-2">Plan</p>
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Plan</p>
                 <div className="flex flex-wrap gap-2">
                   {planOptions.map((opt) => (
                     <button key={opt.id} type="button" onClick={() => onTogglePlan(opt.id)} className={chip(planFilters?.has(opt.id))}>
@@ -86,8 +86,8 @@ export default function SearchFiltersDrawer({
             </div>
 
             <div className="flex gap-2 pt-1">
-              <Button variant="outline" className="flex-1" onClick={onReset}>{t("sr_reset_filters")}</Button>
-              <Button className="flex-1 gap-1.5" onClick={() => setOpen(false)}>
+              <Button variant="outline" className="flex-1 rounded-full" onClick={onReset}>{t("sr_reset_filters")}</Button>
+              <Button className="flex-1 gap-1.5 rounded-full bg-emerald text-white hover:bg-emerald/90" onClick={() => setOpen(false)}>
                 <Check className="h-4 w-4" /> {t("sb_btn")}
               </Button>
             </div>

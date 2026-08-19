@@ -224,7 +224,7 @@ export default function SearchPage() {
           <Button onClick={resetFilters} variant="outline" className="gap-1.5 border-emerald/40 text-emerald hover:bg-emerald-soft">
             <RotateCcw className="h-4 w-4" /> {t("sr_reset_filters")}
           </Button>
-          <Button onClick={saveSearch} variant="outline" className="gap-1.5">
+          <Button onClick={saveSearch} variant="outline" className="gap-1.5 border-gold/40 text-gold-deep hover:bg-gold-soft">
             <BookmarkPlus className="h-4 w-4" /> {t("sr_save_search")}
           </Button>
         </div>
@@ -285,10 +285,10 @@ export default function SearchPage() {
 
       {properties === null ? (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-lg" />)}
+          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)}
         </div>
       ) : found === 0 ? (
-        <div className="rounded-lg border border-dashed border-border py-20 text-center">
+        <div className="rounded-2xl border border-dashed border-border py-20 text-center">
           <Home className="mx-auto h-10 w-10 text-muted-foreground/40" />
           <p className="mt-3 font-heading text-lg font-semibold text-navy">{t("sr_empty_title")}</p>
           <p className="text-sm text-muted-foreground">{t("sr_empty_sub")}</p>

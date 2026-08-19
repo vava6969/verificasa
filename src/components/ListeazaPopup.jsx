@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { X, Camera, ClipboardCheck, Sparkles } from "lucide-react";
+import { X, CheckCircle2, Camera, ClipboardCheck, Sparkles } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 
 export default function ListeazaPopup({ open, onClose }) {
@@ -27,9 +27,9 @@ export default function ListeazaPopup({ open, onClose }) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-navy-deep/70" onClick={onClose} />
-      <div className="relative z-10 w-full max-w-xl overflow-hidden rounded-lg border border-border bg-white shadow-2xl dark:bg-card">
-        <div className="relative bg-emerald p-6 text-white">
+      <div className="absolute inset-0 bg-navy-deep/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative z-10 w-full max-w-xl overflow-hidden rounded-3xl border border-border bg-white shadow-2xl dark:bg-card">
+        <div className="relative gradient-emerald p-6 text-white">
           <button onClick={onClose} aria-label={t("li_close")} className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white transition hover:bg-white/40">
             <X className="h-5 w-5" />
           </button>
@@ -40,8 +40,8 @@ export default function ListeazaPopup({ open, onClose }) {
         <div className="p-6">
           <div className="grid gap-3 sm:grid-cols-2">
             {steps.map((s, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-lg border border-border bg-secondary/30 p-4">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-emerald-soft text-emerald"><s.icon className="h-5 w-5" /></span>
+              <div key={i} className="flex items-start gap-3 rounded-2xl border border-border bg-secondary/30 p-4">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-soft text-emerald"><s.icon className="h-5 w-5" /></span>
                 <div>
                   <p className="font-heading text-sm font-bold text-navy dark:text-foreground">{s.title}</p>
                   <p className="text-xs text-muted-foreground">{s.desc}</p>
@@ -50,9 +50,9 @@ export default function ListeazaPopup({ open, onClose }) {
             ))}
           </div>
           <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="font-mono text-emerald">✓</span> {t("li_note")}
+            <CheckCircle2 className="h-4 w-4 text-emerald" /> {t("li_note")}
           </p>
-          <button onClick={onClose} className="mt-4 w-full rounded-md bg-emerald py-2.5 text-sm font-bold text-white transition hover:opacity-90">{t("li_btn")}</button>
+          <button onClick={onClose} className="mt-4 w-full rounded-xl bg-emerald py-2.5 text-sm font-bold text-white transition hover:opacity-90">{t("li_btn")}</button>
         </div>
       </div>
     </div>

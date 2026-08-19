@@ -42,9 +42,9 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
 
   const { average, count } = useMemo(() => {
     const c = ratings.length;
-    if (c === 0) return { average: 0, count: 0 };
+    if (c === 0) return { average: 1, count: 0 };
     const sum = ratings.reduce((a, r) => a + (r.rating || 0), 0);
-    return { average: sum / c, count: c };
+    return { average: (sum + 1) / (c + 1), count: c };
   }, [ratings]);
 
   const trustMarkers = [
@@ -54,8 +54,8 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
   ].filter(Boolean);
 
   return (
-    <div className="relative overflow-hidden rounded-lg border border-border bg-white shadow-soft dark:bg-card">
-      <div className="h-[2px] bg-emerald" />
+    <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-white shadow-[0_25px_60px_-25px_rgba(16,24,40,0.35)] dark:bg-card">
+      <div className="h-[3px] bg-gradient-to-r from-emerald via-gold to-emerald" />
       <div className="p-5 sm:p-6">
       <h3 className="font-heading text-base font-bold text-navy dark:text-foreground">{t("contact_h")}</h3>
       <p className="mt-0.5 text-xs text-muted-foreground">{t("contact_sub")}</p>
@@ -66,7 +66,7 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
           {avatarUrl ? (
             <img src={avatarUrl} alt={sellerName} className="h-14 w-14 rounded-full object-cover ring-2 ring-emerald/20" />
           ) : (
-            <span className={`flex h-14 w-14 items-center justify-center rounded-full text-base font-bold text-white ring-2 ring-emerald/20 ${isProprietar ? "bg-emerald" : "bg-navy"}`}>
+            <span className={`flex h-14 w-14 items-center justify-center rounded-full text-base font-bold text-white ring-2 ring-emerald/20 ${isProprietar ? "bg-emerald" : "bg-blue-600"}`}>
               {initials(sellerName)}
             </span>
           )}
@@ -79,7 +79,7 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
         <div className="min-w-0">
           <p className="truncate font-heading text-sm font-bold text-navy hover:text-emerald dark:text-foreground">{sellerName}</p>
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span className={`inline-block h-2 w-2 rounded-full ${isProprietar ? "bg-emerald" : "bg-navy"}`} />
+            <span className={`inline-block h-2 w-2 rounded-full ${isProprietar ? "bg-emerald" : "bg-blue-500"}`} />
             {isProprietar ? t("pc_seller_landlord") : t("pc_seller_agent")}
           </p>
           {count > 0 && (
@@ -89,20 +89,23 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
             </div>
           )}
           {count === 0 && (
-            <p className="mt-0.5 text-xs text-muted-foreground">{t("up_no_reviews")}</p>
+            <div className="mt-0.5 flex items-center gap-1">
+              <RatingStars rating={1} size="sm" />
+              <span className="text-xs text-muted-foreground">{t("up_no_reviews")}</span>
+            </div>
           )}
         </div>
       </Link>
 
       {/* Primary CTA */}
-      <Button onClick={onMessage} className="mt-4 w-full gap-2" size="lg">
+      <Button onClick={onMessage} className="mt-4 w-full gap-2 bg-emerald text-white shadow-soft transition-transform duration-200 hover:scale-[1.015] hover:bg-emerald/90 active:scale-[0.98]" size="lg">
         <MessageCircle className="h-5 w-5" /> {t("pd_msg_btn")}
       </Button>
 
       {/* Secondary actions */}
       <div className="mt-2 grid grid-cols-2 gap-2">
         {hasPhone ? (
-          <Button asChild variant="outline" className="gap-1.5 border-emerald/30 text-emerald hover:bg-emerald-soft">
+          <Button asChild variant="outline" className="gap-1.5 border-emerald/30 text-emerald transition-transform duration-200 hover:scale-[1.015] hover:bg-emerald-soft active:scale-[0.98]">
             <a href={`tel:${callPhone}`}><Phone className="h-4 w-4" /> {t("pc_call")}</a>
           </Button>
         ) : (
@@ -111,7 +114,7 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
           </Button>
         )}
         {hasWhatsApp ? (
-          <Button asChild variant="outline" className="gap-1.5 border-emerald/30 text-emerald hover:bg-emerald-soft">
+          <Button asChild variant="outline" className="gap-1.5 border-emerald/30 text-emerald transition-transform duration-200 hover:scale-[1.015] hover:bg-emerald-soft active:scale-[0.98]">
             <a href={`https://wa.me/${waPhone}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>
           </Button>
         ) : (
@@ -121,19 +124,27 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
         )}
       </div>
 
-      <div className="mt-4" />
+      {/* Separator */}
+      <div className="my-4 h-px bg-border" />
 
-      {/* Trust markers — ruled rows */}
-      <div className="divide-y divide-border border-y border-border">
-        {trustMarkers.map((m, i) => (
-          <div key={i} className="flex items-baseline gap-2 py-2 text-xs font-medium text-foreground/75">
-            <span aria-hidden="true" className="font-mono text-emerald">✓</span>
-            {m.text}
-          </div>
-        ))}
+      {/* Trust markers */}
+      <div className="space-y-1.5">
+        {trustMarkers.map((m, i) => {
+          const Ico = m.icon;
+          return (
+            <div key={i} className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 text-xs font-medium text-foreground/75 transition-colors duration-200 hover:bg-secondary/50">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald/12 text-emerald">
+                <Ico className="h-3.5 w-3.5" />
+              </span>
+              {m.text}
+            </div>
+          );
+        })}
       </div>
 
-      <p className="stamp-line mt-4 text-center text-muted-foreground">{t("pd_trust_footer")}</p>
+      <div className="mt-4 flex items-center justify-center gap-1.5 rounded-full bg-secondary/50 py-2 text-[11px] font-medium text-muted-foreground">
+        <ShieldCheck className="h-3.5 w-3.5 text-emerald" /> {t("pd_trust_footer")}
+      </div>
 
       {/* Leave review button — visible only for authenticated non-owner users */}
       {user && targetUserId && user.id !== targetUserId && ownerUser && (

@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, BedDouble, Maximize, Eye } from "lucide-react";
+import { MapPin, BedDouble, Maximize, ShieldCheck, Box, Eye } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { Image } from "@/components/ui/image";
 
@@ -24,42 +24,42 @@ export default function SimilarPropertyCard({ property, hot = false }) {
   return (
     <div
       onClick={() => navigate(`/property/${p.id}`)}
-      className={`group flex h-full cursor-pointer flex-col overflow-hidden rounded-lg border bg-white shadow-soft transition-colors dark:bg-card ${hot ? "border-gold/60" : "border-border hover:border-foreground/25"}`}
+      className={`group flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-glow dark:bg-card ${hot ? "premium-glow border-gold/50" : "border-border"}`}
     >
       {/* Cover */}
       <div className="relative aspect-[4/3] overflow-hidden">
         {images.length ? (
-          <Image src={images[0]} alt={p.title} fittingType="fill" className="h-full w-full" />
+          <Image src={images[0]} alt={p.title} fittingType="fill" className="h-full w-full transition-transform duration-500 group-hover:scale-105" />
         ) : (
-          <div className="h-full w-full bg-secondary" />
+          <div className="h-full w-full bg-gradient-to-br from-navy/10 to-emerald/20" />
         )}
 
         {/* Badges */}
-        <div className="absolute left-2 top-2 flex flex-col items-start gap-1">
+        <div className="absolute left-2 top-2 flex flex-col gap-1">
           {isHighTrust ? (
-            <span className="stamp-line rounded-sm bg-navy/90 px-1.5 py-0.5 text-[9px] text-white">
-              {t("pc_trust_high")}
+            <span className="flex items-center gap-0.5 rounded-full bg-navy px-2 py-0.5 text-[10px] font-bold text-mint shadow-soft ring-1 ring-mint/40">
+              <ShieldCheck className="h-3 w-3" /> {t("pc_trust_high")}
             </span>
           ) : isVerified ? (
-            <span className="stamp-line rounded-sm bg-emerald px-1.5 py-0.5 text-[9px] text-white">
-              {t("pc_verified")}
+            <span className="flex items-center gap-0.5 rounded-full bg-emerald px-2 py-0.5 text-[10px] font-bold text-white shadow-soft">
+              <ShieldCheck className="h-3 w-3" /> {t("pc_verified")}
             </span>
           ) : null}
           {p.tour_3d_url && (
-            <span className="stamp-line rounded-sm bg-navy/90 px-1.5 py-0.5 text-[9px] text-white">
-              {t("tab_3d")}
+            <span className="flex items-center gap-0.5 rounded-full bg-navy px-2 py-0.5 text-[10px] font-bold text-mint shadow-soft ring-1 ring-mint/40">
+              <Box className="h-3 w-3" /> {t("tab_3d")}
             </span>
           )}
         </div>
 
         {hot && (
-          <span className="premium-badge stamp-line absolute right-2 top-2 rounded-sm px-1.5 py-0.5 text-[9px]">
+          <span className="premium-badge absolute right-2 top-2 rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-white">
             {t("pc_hot")}
           </span>
         )}
 
         {/* Views */}
-        <span className="absolute bottom-2 right-2 flex items-center gap-0.5 rounded-sm bg-navy-deep/70 px-1.5 py-0.5 font-mono text-[9px] text-white">
+        <span className="absolute bottom-2 right-2 flex items-center gap-0.5 rounded-full bg-navy/75 px-1.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur">
           <Eye className="h-2.5 w-2.5" /> {p.views_count || 0}
         </span>
       </div>
@@ -80,12 +80,12 @@ export default function SimilarPropertyCard({ property, hot = false }) {
         <div className="mt-1.5 flex items-center gap-2.5 text-[11px] text-foreground/70">
           {p.rooms != null && (
             <span className="flex items-center gap-0.5">
-              <BedDouble className="h-3 w-3 text-muted-foreground" /> {p.rooms}
+              <BedDouble className="h-3 w-3 text-emerald" /> {p.rooms}
             </span>
           )}
           {p.surface_sqm != null && (
             <span className="flex items-center gap-0.5">
-              <Maximize className="h-3 w-3 text-muted-foreground" /> {p.surface_sqm} mp
+              <Maximize className="h-3 w-3 text-emerald" /> {p.surface_sqm} mp
             </span>
           )}
         </div>

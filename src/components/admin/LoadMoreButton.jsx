@@ -6,7 +6,7 @@ export default function LoadMoreButton({ onClick, remaining = 0, label = "Încar
   return (
     <button
       onClick={onClick}
-      className="mx-auto mt-1 flex items-center gap-2 rounded-md border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground/80 shadow-soft transition hover:border-emerald hover:text-emerald dark:bg-card"
+      className="mx-auto mt-1 flex items-center gap-2 rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground/80 shadow-soft transition hover:border-emerald hover:text-emerald dark:bg-card"
     >
       <ChevronDown className="h-4 w-4" />
       {label}{remaining > 0 ? ` (încă ${remaining})` : ""}

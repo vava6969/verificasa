@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Check } from "lucide-react";
+import { Cookie, X, Check, ShieldCheck } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { Button } from "@/components/ui/button";
 import { getConsent, setConsent } from "@/lib/cookieConsent";
@@ -55,11 +55,14 @@ export default function CookieBanner() {
             initial={{ y: 80, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 80, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ type: "spring", stiffness: 260, damping: 24 }}
             className="fixed inset-x-0 bottom-0 z-50 px-4 pb-4 sm:pb-6"
           >
-            <div className="mx-auto max-w-3xl rounded-lg border border-white/15 bg-navy-deep px-4 py-3.5 text-white sm:px-5">
+            <div className="mx-auto max-w-3xl rounded-2xl border border-emerald/30 bg-navy-deep/95 px-4 py-3.5 text-white shadow-glow backdrop-blur-md sm:px-5">
               <div className="flex flex-wrap items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald/20 text-emerald">
+                  <Cookie className="h-5 w-5" />
+                </div>
                 <p className="flex-1 text-xs leading-relaxed text-white/80 sm:text-sm">
                   {t("cookie_msg")}{" "}
                   <Link to="/cookies" className="font-semibold text-emerald hover:underline">
@@ -77,10 +80,10 @@ export default function CookieBanner() {
                   <Button onClick={() => setShowPrefs(true)} size="sm" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
                     {t("cookie_prefs")}
                   </Button>
-                  <Button onClick={acceptAll} size="sm" className="bg-emerald text-white hover:bg-emerald/90">
+                  <Button onClick={acceptAll} size="sm" className="gradient-mint text-navy hover:opacity-90">
                     {t("cookie_accept")}
                   </Button>
-                  <button onClick={rejectAll} className="rounded-md p-1 text-white/50 hover:text-white" aria-label="Close">
+                  <button onClick={rejectAll} className="rounded-full p-1 text-white/50 hover:text-white" aria-label="Close">
                     <X className="h-4 w-4" />
                   </button>
                 </div>
@@ -146,7 +149,7 @@ export default function CookieBanner() {
                 <Button onClick={rejectAll} size="sm" variant="ghost">
                   {t("cookie_reject_all")}
                 </Button>
-                <Button onClick={savePrefs} size="sm" className="bg-emerald text-white hover:bg-emerald/90">
+                <Button onClick={savePrefs} size="sm" className="gradient-mint text-navy hover:opacity-90">
                   {t("cookie_save_prefs")}
                 </Button>
                 <Button onClick={acceptAll} size="sm" variant="outline">
@@ -169,8 +172,8 @@ function CookieRow({ title, desc, checked, disabled, onChange, t }) {
         <div className="flex items-center gap-2">
           <p className="text-sm font-semibold text-navy dark:text-foreground">{title}</p>
           {disabled && (
-            <span className="stamp-line rounded-sm bg-emerald-soft px-2 py-0.5 text-emerald">
-              {t("cookie_always_on")}
+            <span className="flex items-center gap-1 rounded-full bg-emerald/10 px-2 py-0.5 text-[10px] font-semibold text-emerald">
+              <ShieldCheck className="h-3 w-3" /> {t("cookie_always_on")}
             </span>
           )}
         </div>
