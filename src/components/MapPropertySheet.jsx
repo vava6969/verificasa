@@ -28,7 +28,7 @@ export default function MapPropertySheet({ property, onClose, lang }) {
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 32, stiffness: 320 }}
-            className="relative w-full rounded-t-3xl bg-background shadow-2xl"
+            className="relative w-full rounded-t-lg bg-background shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-center pt-2.5">
@@ -42,7 +42,7 @@ export default function MapPropertySheet({ property, onClose, lang }) {
             </button>
 
             <div className="flex gap-3 p-4 pt-3">
-              <Link to={`/property/${property.id}`} className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl">
+              <Link to={`/property/${property.id}`} className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md">
                 {property.images?.[0] ? (
                   <Image src={property.images[0]} fittingType="fill" className="h-full w-full" />
                 ) : (
@@ -51,7 +51,7 @@ export default function MapPropertySheet({ property, onClose, lang }) {
                   </div>
                 )}
                 {isVerified && (
-                  <span className="absolute left-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-emerald px-1.5 py-0.5 text-[9px] font-bold text-white shadow-soft">
+                  <span className="absolute left-1.5 top-1.5 flex items-center gap-0.5 rounded-sm bg-emerald px-1.5 py-0.5 text-[9px] font-bold text-white shadow-soft">
                     <ShieldCheck className="h-2.5 w-2.5" /> {en ? "Verified" : "Verif."}
                   </span>
                 )}

@@ -8,12 +8,12 @@ import { Image as UIImage } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { createNotification } from "@/lib/notifications";
 import ReportModal from "@/components/ReportModal";
-import { MessageSquare, ShieldCheck, BadgeCheck, Lock, Heart, Reply, Send, Trash2 } from "lucide-react";
+import { ShieldCheck, BadgeCheck, Lock, Heart, Reply, Send, Trash2 } from "lucide-react";
 
 const ROLE_BADGE = {
   SUPER_ADMIN: { label: "Super Admin", cls: "bg-gold text-navy" },
   ADMIN: { label: "Admin", cls: "bg-navy text-emerald" },
-  AGENT: { label: "Agent", cls: "bg-blue-600 text-white" },
+  AGENT: { label: "Agent", cls: "bg-navy text-white" },
   PROPRIETAR: { label: "Proprietar", cls: "bg-emerald text-white" },
   USER: { label: "Utilizator", cls: "bg-secondary text-foreground" },
   SUPPORT: { label: "Support", cls: "bg-secondary text-foreground" },
@@ -190,7 +190,7 @@ export default function PropertyComments({ property }) {
     const badge = ROLE_BADGE[r] || ROLE_BADGE.USER;
     const Icon = r === "PROPRIETAR" ? BadgeCheck : ["SUPER_ADMIN", "ADMIN", "AGENT", "SUPPORT"].includes(r) ? ShieldCheck : null;
     return (
-      <span className={cn("flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold", badge.cls)}>
+      <span className={cn("flex items-center gap-1 rounded-sm px-2 py-0.5 text-[10px] font-bold", badge.cls)}>
         {Icon && <Icon className="h-3 w-3" />} {badge.label}
       </span>
     );
@@ -212,8 +212,8 @@ export default function PropertyComments({ property }) {
             </div>
             <p className="mt-1 text-sm text-foreground/80">{c.content}</p>
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-              <button onClick={() => toggleLike(c)} className={cn("flex items-center gap-1 text-xs font-semibold transition", liked ? "text-rose-500" : "text-muted-foreground hover:text-rose-500")}>
-                <Heart className={cn("h-3.5 w-3.5", liked && "fill-rose-500")} /> {likeCount > 0 ? likeCount : ""} Apreciază
+              <button onClick={() => toggleLike(c)} className={cn("flex items-center gap-1 text-xs font-semibold transition", liked ? "text-destructive" : "text-muted-foreground hover:text-destructive")}>
+                <Heart className={cn("h-3.5 w-3.5", liked && "fill-destructive")} /> {likeCount > 0 ? likeCount : ""} Apreciază
               </button>
               {canPost && !isReply && (
                 <button onClick={() => { setReplyTo(replyTo === c.id ? null : c.id); setReplyContent(""); }} className="flex items-center gap-1 text-xs font-semibold text-muted-foreground transition hover:text-emerald">
@@ -245,9 +245,8 @@ export default function PropertyComments({ property }) {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card sm:p-6">
+    <div className="rounded-lg border border-border bg-white p-4 shadow-soft dark:bg-card sm:p-6">
       <div className="flex items-center gap-2">
-        <MessageSquare className="h-5 w-5 text-emerald" />
         <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">Comentarii</h3>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
@@ -268,12 +267,12 @@ export default function PropertyComments({ property }) {
             </div>
           </form>
         ) : (
-          <div className="mt-4 flex items-center gap-2 rounded-xl border border-dashed border-border bg-secondary/30 px-4 py-3 text-xs text-muted-foreground">
+          <div className="mt-4 flex items-center gap-2 rounded-md border border-dashed border-border bg-secondary/30 px-4 py-3 text-xs text-muted-foreground">
             <Lock className="h-4 w-4" /> Contul tău nu este verificat. Solicită verificarea pentru a putea comenta.
           </div>
         )
       ) : (
-        <div className="mt-4 rounded-xl border border-dashed border-border bg-secondary/30 px-4 py-3 text-center text-xs text-muted-foreground">
+        <div className="mt-4 rounded-md border border-dashed border-border bg-secondary/30 px-4 py-3 text-center text-xs text-muted-foreground">
           <a href="/login" className="font-bold text-emerald">Conectează-te</a> pentru a lăsa un comentariu.
         </div>
       )}

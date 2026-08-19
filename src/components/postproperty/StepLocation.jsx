@@ -20,9 +20,9 @@ export default function StepLocation({ form, set, country }) {
         </div>
       </Field>
 
-      <div className="rounded-2xl border border-emerald/30 bg-emerald-soft/40 p-4 dark:bg-emerald-soft/10">
+      <div className="rounded-lg border border-emerald/30 bg-emerald-soft/40 p-4 dark:bg-emerald-soft/10">
         <p className="flex items-center gap-2 font-heading text-sm font-bold text-navy dark:text-foreground">
-          <MapPin className="h-4 w-4 text-emerald" /> Locație exactă pe hartă
+          Locație exactă pe hartă
         </p>
         <GooglePlacesAutocomplete
           value={form.landmark}
@@ -33,7 +33,7 @@ export default function StepLocation({ form, set, country }) {
             longitude: place.lng != null ? place.lng : form.longitude,
           })}
           placeholder="Caută adresa (ex: Strada Nicolae Iorga, Iași)…"
-          className="mt-2 w-full rounded-xl border border-emerald/50 bg-white px-3.5 py-3 text-base text-foreground outline-none focus:border-emerald dark:bg-card"
+          className="mt-2 w-full rounded-md border border-emerald/50 bg-white px-3.5 py-3 text-base text-foreground outline-none focus:border-emerald dark:bg-card"
         />
         <p className="mt-1.5 text-[11px] text-muted-foreground">
           Selectează adresa din sugestii — coordonatele GPS se salvează automat.

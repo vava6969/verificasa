@@ -93,9 +93,9 @@ export default function ReviewModal({ targetUser, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-end justify-center bg-navy-deep/60 backdrop-blur-sm sm:items-center" onClick={onClose}>
+    <div className="fixed inset-0 z-[200] flex items-end justify-center bg-navy-deep/60 sm:items-center" onClick={onClose}>
       <div
-        className="w-full max-w-md rounded-t-3xl border border-border bg-card p-5 shadow-glow sm:rounded-3xl"
+        className="w-full max-w-md rounded-t-lg border border-border bg-card p-5 sm:rounded-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
@@ -108,7 +108,7 @@ export default function ReviewModal({ targetUser, onClose }) {
         </div>
 
         {/* Target user */}
-        <div className="mb-4 flex items-center gap-3 rounded-xl bg-secondary/50 p-3">
+        <div className="mb-4 flex items-center gap-3 rounded-md bg-secondary/50 p-3">
           {targetUser?.avatar_url ? (
             <img src={targetUser.avatar_url} alt="" className="h-12 w-12 rounded-full object-cover" />
           ) : (
@@ -128,7 +128,7 @@ export default function ReviewModal({ targetUser, onClose }) {
           <form onSubmit={handleSubmit}>
             {/* Conversation requirement notice */}
             {!hasConversation && (
-              <div className="mb-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:border-amber-800/50 dark:bg-amber-900/20 dark:text-amber-400">
+              <div className="mb-4 flex items-start gap-2 rounded-lg border border-gold/30 bg-gold-soft px-3 py-2 text-xs text-gold-deep">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                 <span>
                   {en
@@ -153,7 +153,7 @@ export default function ReviewModal({ targetUser, onClose }) {
                 rows={3}
                 maxLength={1000}
                 placeholder={t("rv_comment_ph")}
-                className="w-full resize-none rounded-xl border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
               />
             </div>
 
@@ -175,7 +175,7 @@ export default function ReviewModal({ targetUser, onClose }) {
             <button
               type="submit"
               disabled={submitting || rating === 0}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald py-3 text-sm font-bold text-white shadow-soft transition hover:bg-emerald/90 disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-md bg-emerald py-3 text-sm font-bold text-white shadow-soft transition hover:bg-emerald/90 disabled:opacity-50"
             >
               {submitting
                 ? <><Loader2 className="h-4 w-4 animate-spin" /> {t("rv_submitting")}</>

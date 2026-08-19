@@ -229,10 +229,10 @@ export default function UserProfile() {
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-        <Skeleton className="h-40 w-full rounded-2xl" />
-        <Skeleton className="mt-4 h-12 w-64 rounded-xl" />
+        <Skeleton className="h-40 w-full rounded-lg" />
+        <Skeleton className="mt-4 h-12 w-64 rounded-md" />
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 rounded-2xl" />)}
+          {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 rounded-lg" />)}
         </div>
       </div>
     );
@@ -255,7 +255,7 @@ export default function UserProfile() {
       </Link>
 
       {/* Profile header with cover image */}
-      <div className="mt-4 overflow-hidden rounded-3xl border border-border bg-white shadow-soft dark:bg-card">
+      <div className="mt-4 overflow-hidden rounded-lg border border-border bg-white shadow-soft dark:bg-card">
         <div className="relative h-32 sm:h-40">
           {profile.cover_image_url ? (
             <UIImage src={profile.cover_image_url} fittingType="fill" className="h-full w-full" />
@@ -270,7 +270,7 @@ export default function UserProfile() {
               {profile.avatar_url ? (
                 <img src={profile.avatar_url} alt="" className="-mt-12 h-20 w-20 shrink-0 rounded-full border-4 border-white object-cover dark:border-card sm:-mt-14 sm:h-24 sm:w-24" />
               ) : (
-                <span className={`-mt-12 flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-white text-2xl font-bold text-white dark:border-card sm:-mt-14 sm:h-24 sm:w-24 ${isAgent ? "bg-blue-600" : "bg-emerald"}`}>
+                <span className={`-mt-12 flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-white text-2xl font-bold text-white dark:border-card sm:-mt-14 sm:h-24 sm:w-24 ${isAgent ? "bg-navy" : "bg-emerald"}`}>
                   {initials(profile.full_name || profile.email)}
                 </span>
               )}
@@ -278,14 +278,14 @@ export default function UserProfile() {
                 <div className="flex items-center gap-2">
                   <h1 className="font-heading text-xl font-bold text-navy dark:text-foreground sm:text-2xl">{profile.full_name || profile.email}</h1>
                   {profile.is_verified && (
-                    <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-0.5 text-[11px] font-bold text-emerald">
+                    <span className="flex items-center gap-1 rounded-sm bg-emerald-soft px-2 py-0.5 text-[11px] font-bold text-emerald">
                       <BadgeCheck className="h-3.5 w-3.5" /> {t("up_verified_landlord")}
                     </span>
                   )}
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <span className={`inline-block h-2 w-2 rounded-full ${isAgent ? "bg-blue-500" : "bg-emerald"}`} />
+                    <span className={`inline-block h-2 w-2 rounded-full ${isAgent ? "bg-navy" : "bg-emerald"}`} />
                     {isAgent ? t("up_agent") : t("up_landlord")}
                   </span>
                   {isAgent && profile.agency_name && (
@@ -419,7 +419,7 @@ export default function UserProfile() {
             <div className="grid gap-6 lg:grid-cols-3">
               {/* Breakdown */}
               <div className="lg:col-span-1">
-                <div className="sticky top-20 rounded-2xl border border-border bg-white p-5 dark:bg-card">
+                <div className="sticky top-20 rounded-lg border border-border bg-white p-5 dark:bg-card">
                   <div className="flex items-center gap-3">
                     <span className="font-heading text-4xl font-bold text-navy dark:text-foreground">{average.toFixed(1)}</span>
                     <div>
@@ -430,7 +430,7 @@ export default function UserProfile() {
                     </div>
                   </div>
                   <div className="mt-4">
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("up_rating_breakdown")}</p>
+                    <p className="kicker mb-2">{t("up_rating_breakdown")}</p>
                     <RatingBreakdown distribution={distribution} total={count} />
                   </div>
                 </div>

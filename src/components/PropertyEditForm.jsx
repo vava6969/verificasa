@@ -76,7 +76,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
   const [uploading, setUploading] = useState(false);
 
   const inputCls = "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card";
-  const lab = "text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70";
+  const lab = "kicker";
 
   const upd = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const numOrNull = (v) => (v === "" || v == null ? null : Number(v));
@@ -178,14 +178,14 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
   );
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-emerald/30 bg-emerald-soft/40 p-5">
+    <form onSubmit={handleSubmit} className="rounded-lg border border-emerald/30 bg-emerald-soft/40 p-5">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">Editează anunțul</h3>
-        {isAdmin && <span className="rounded-full bg-navy px-2.5 py-0.5 text-[10px] font-bold uppercase text-emerald">Mod admin</span>}
+        {isAdmin && <span className="rounded-sm bg-navy px-2.5 py-0.5 text-[10px] font-bold uppercase text-emerald">Mod admin</span>}
       </div>
 
       {/* Date de bază */}
-      <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-emerald">Date de bază</p>
+      <p className="kicker mb-2 text-emerald">Date de bază</p>
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Titlu"><input value={form.title} onChange={(e) => upd("title", e.target.value)} className={inputCls} /></Field>
         <Field label="Tip tranzacție">
@@ -210,12 +210,12 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       <textarea value={form.description} onChange={(e) => upd("description", e.target.value)} placeholder="Descriere" rows={3} className={`mt-3 ${inputCls}`} />
 
       {/* Poze */}
-      <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Poze ({form.images.length}/{MAX_PHOTOS})</p>
+      <p className="kicker mb-2 mt-4 text-emerald">Poze ({form.images.length}/{MAX_PHOTOS})</p>
       <div className="flex flex-wrap gap-2">
         {form.images.map((img, i) => (
           <div key={i} className="group relative h-20 w-28 overflow-hidden rounded-lg border border-border bg-secondary">
             <UIImage src={img} fittingType="fill" className="h-full w-full" />
-            <button type="button" onClick={() => removeImage(i)} aria-label="Șterge poza" className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-navy-deep/70 text-white opacity-0 transition group-hover:opacity-100 hover:bg-rose-600">
+            <button type="button" onClick={() => removeImage(i)} aria-label="Șterge poza" className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-navy-deep/70 text-white opacity-0 transition group-hover:opacity-100 hover:bg-destructive">
               <Trash2 className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -229,7 +229,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       </div>
 
       {/* Locație */}
-      <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Locație</p>
+      <p className="kicker mb-2 mt-4 text-emerald">Locație</p>
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Oraș și zonă">
           <div className={inputCls}>
@@ -254,7 +254,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       </div>
 
       {/* Specificații */}
-      <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Specificații</p>
+      <p className="kicker mb-2 mt-4 text-emerald">Specificații</p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Field label="Camere"><input type="number" value={form.rooms} onChange={(e) => upd("rooms", e.target.value)} className={inputCls} /></Field>
         <Field label="Suprafață (mp)"><input type="number" value={form.surface_sqm} onChange={(e) => upd("surface_sqm", e.target.value)} className={inputCls} /></Field>
@@ -283,7 +283,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       </div>
 
       {/* Contact */}
-      <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Contact & proprietar</p>
+      <p className="kicker mb-2 mt-4 text-emerald">Contact & proprietar</p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Field label="Telefon"><input inputMode="numeric" value={form.phone} onChange={(e) => upd("phone", onlyPhoneDigits(e.target.value))} placeholder="07xx..." className={inputCls} /></Field>
         <Field label="WhatsApp (internațional)"><input inputMode="tel" value={form.whatsapp_phone} onChange={(e) => upd("whatsapp_phone", onlyPhoneDigits(e.target.value))} placeholder="407xx..." className={inputCls} /></Field>
@@ -297,7 +297,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       </div>
 
       {/* Costuri & tur AI */}
-      <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Costuri & Tur 3D</p>
+      <p className="kicker mb-2 mt-4 text-emerald">Costuri & Tur 3D</p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Field label="Estimare utilități/lună"><input type="number" value={form.monthly_utilities_estimate} onChange={(e) => upd("monthly_utilities_estimate", e.target.value)} className={inputCls} /></Field>
         <Field label="Întreținere/lună"><input type="number" value={form.maintenance_fee} onChange={(e) => upd("maintenance_fee", e.target.value)} className={inputCls} /></Field>
@@ -313,8 +313,8 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
           efectiv se setează momentan manual, de admin, mai jos. */}
       {!isAdmin && (
         form.tour_3d_url ? (
-          <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald/30 bg-emerald-soft/40 p-3.5">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-soft text-emerald">
+          <div className="mt-3 flex items-center gap-3 rounded-md border border-emerald/30 bg-emerald-soft/40 p-3.5">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-emerald-soft text-emerald">
               <Video className="h-4 w-4" />
             </span>
             <span>
@@ -323,9 +323,9 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
             </span>
           </div>
         ) : (
-          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-dashed border-border bg-secondary/30 p-3.5">
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-md border border-dashed border-border bg-secondary/30 p-3.5">
             <div className="flex items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-secondary text-muted-foreground">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-secondary text-muted-foreground">
                 <Video className="h-4 w-4" />
               </span>
               <span>
@@ -333,7 +333,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
                 <span className="block text-xs text-muted-foreground">Adaugă link-ul tău către tur — disponibil cu Plan Pro</span>
               </span>
             </div>
-            <span className="flex shrink-0 items-center gap-1 rounded-full bg-gold-soft px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-gold-deep">
+            <span className="flex shrink-0 items-center gap-1 rounded-sm bg-gold-soft px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-gold-deep">
               <Lock className="h-3 w-3" /> Plan Pro
             </span>
           </div>
@@ -343,7 +343,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       {/* Badge-uri & verificări — admin only */}
       {isAdmin && (
         <>
-          <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Badge-uri & verificări (admin)</p>
+          <p className="kicker mb-2 mt-4 text-emerald">Badge-uri & verificări (admin)</p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <Field label="Nivel verificare">
               <select value={form.verification_level} onChange={(e) => upd("verification_level", e.target.value)} className={inputCls}>

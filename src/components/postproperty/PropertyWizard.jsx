@@ -147,28 +147,13 @@ export default function PropertyWizard({ onDone, onCancel }) {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <div className="surface-card overflow-hidden rounded-3xl">
+    <div className="surface-card overflow-hidden rounded-lg">
       {/* Progress header */}
       <div className="border-b border-border/60 px-4 pb-4 pt-5 sm:px-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-navy-deep shadow-soft">
-              <span className="absolute inset-0 bg-gradient-to-br from-emerald/25 to-transparent" />
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={step}
-                  initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  exit={{ opacity: 0, scale: 0.6, rotate: 8 }}
-                  transition={{ duration: 0.25, ease: "easeOut" }}
-                  className="relative flex items-center justify-center text-emerald"
-                >
-                  <Current.icon className="h-5 w-5" />
-                </motion.span>
-              </AnimatePresence>
-            </span>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-emerald">
+              <p className="kicker text-emerald">
                 Pasul {step + 1} din {STEPS.length}
               </p>
               <h2 className="font-heading text-lg font-bold text-navy dark:text-foreground">{Current.title}</h2>
@@ -179,39 +164,17 @@ export default function PropertyWizard({ onDone, onCancel }) {
 
         <div className="relative mt-4 h-2 w-full overflow-hidden rounded-full bg-secondary">
           <motion.div
-            className="relative h-full overflow-hidden rounded-full gradient-emerald"
-            animate={{
-              width: `${progress}%`,
-              boxShadow: [
-                "0 0 6px 0 rgba(0,168,89,0.45)",
-                "0 0 14px 3px rgba(0,168,89,0.75)",
-                "0 0 6px 0 rgba(0,168,89,0.45)",
-              ],
-            }}
-            transition={{
-              width: { duration: 0.5, ease: "easeOut" },
-              boxShadow: { duration: 1.6, repeat: Infinity, ease: "easeInOut" },
-            }}
-          >
-            <motion.span
-              className="absolute inset-y-0 w-10 bg-white/50"
-              style={{ filter: "blur(3px)" }}
-              animate={{ x: ["-2.5rem", "calc(100% + 2.5rem)"] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            />
-          </motion.div>
+            className="relative h-full rounded-full bg-emerald"
+            animate={{ width: `${progress}%` }}
+            transition={{ width: { duration: 0.5, ease: "easeOut" } }}
+          />
         </div>
 
         {/* Pași parcurși */}
         <div className="mt-4 flex items-center">
           {STEPS.map((s, i) => (
             <React.Fragment key={s.id}>
-              <motion.span
-                animate={{
-                  scale: i === step ? 1.08 : 1,
-                  boxShadow: i === step ? "0 0 0 4px rgba(0,168,89,0.16)" : "0 0 0 0 rgba(0,168,89,0)",
-                }}
-                transition={{ duration: 0.3 }}
+              <span
                 className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 text-[10px] font-bold ${
                   i < step
                     ? "border-emerald bg-emerald text-white"
@@ -221,7 +184,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
                 }`}
               >
                 {i < step ? <Check className="h-3 w-3" /> : i + 1}
-              </motion.span>
+              </span>
               {i < STEPS.length - 1 && (
                 <span className={`mx-1 h-0.5 flex-1 rounded-full transition-colors duration-500 ${i < step ? "bg-emerald" : "bg-border"}`} />
               )}
@@ -229,8 +192,8 @@ export default function PropertyWizard({ onDone, onCancel }) {
           ))}
         </div>
 
-        <div className="mt-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
-          <span className="rounded-full bg-navy px-2.5 py-1 text-white">{Current.title}</span>
+        <div className="mt-3 flex items-center gap-2 kicker">
+          <span className="rounded-sm bg-navy px-2.5 py-1 text-white">{Current.title}</span>
           {STEPS[step + 1] && (
             <span className="flex items-center gap-1 text-muted-foreground/70">
               <ArrowRight className="h-3 w-3" /> Urmează: {STEPS[step + 1].title}
@@ -259,12 +222,12 @@ export default function PropertyWizard({ onDone, onCancel }) {
       </div>
 
       {/* Nav */}
-      <div className="sticky bottom-0 flex items-center gap-3 border-t border-border/60 bg-background/90 px-4 py-3 backdrop-blur-xl sm:px-6">
-        <Button type="button" variant="outline" onClick={back} className="gap-1.5 rounded-full">
+      <div className="sticky bottom-0 flex items-center gap-3 border-t border-border/60 bg-background px-4 py-3 sm:px-6">
+        <Button type="button" variant="outline" onClick={back} className="gap-1.5">
           <ArrowLeft className="h-4 w-4" /> {step === 0 ? "Renunță" : "Înapoi"}
         </Button>
         {step < STEPS.length - 1 ? (
-          <Button type="button" onClick={next} className="flex-1 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
+          <Button type="button" onClick={next} className="flex-1 gap-1.5 bg-emerald text-white shadow-soft hover:bg-emerald/90">
             Continuă <ArrowRight className="h-4 w-4" />
           </Button>
         ) : (

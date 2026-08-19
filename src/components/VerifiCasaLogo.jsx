@@ -17,7 +17,7 @@ export default function VerifiCasaLogo({ size = 44, withWordmark = true, tagline
       {withWordmark && (
         <div className="min-w-0 leading-none">
           <span className={`block truncate font-heading text-base font-semibold tracking-tight ${tone === "light" ? "text-white" : "text-navy"} sm:text-lg`}>VerifiCasa</span>
-          <span className={`mt-0.5 hidden font-mono text-[8.5px] uppercase tracking-[0.14em] sm:block ${tone === "light" ? "text-white/60" : "text-muted-foreground"}`}>
+          <span className={`mt-0.5 hidden whitespace-nowrap font-mono text-[8.5px] uppercase tracking-[0.12em] lg:block ${tone === "light" ? "text-white/60" : "text-muted-foreground"}`}>
             Inspecții & Verificări Imobiliare
           </span>
           {tagline && (

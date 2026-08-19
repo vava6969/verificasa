@@ -72,7 +72,7 @@ export default function ReportModal({
         variant={variant}
         size={size}
         onClick={() => setOpen(true)}
-        className={cn("gap-1 text-muted-foreground hover:text-rose-500", className)}
+        className={cn("gap-1 text-muted-foreground hover:text-destructive", className)}
         title={isComment ? "Raportează comentariu" : "Raportează anunț"}
       >
         <Flag className="h-3.5 w-3.5" />
@@ -83,7 +83,7 @@ export default function ReportModal({
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Flag className="h-5 w-5 text-rose-500" /> Raportează {isComment ? "comentariu" : "anunț"}
+              Raportează {isComment ? "comentariu" : "anunț"}
             </DialogTitle>
             <DialogDescription>
               Sesizările sunt confidențiale. Echipa VerifiCasa le analizează cât mai repede.
@@ -96,7 +96,7 @@ export default function ReportModal({
               <select
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint"
+                className="mt-1 w-full rounded-md border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint"
               >
                 <option value="">Selectează motivul…</option>
                 {REASONS.map((r) => <option key={r} value={r}>{r}</option>)}
@@ -120,20 +120,20 @@ export default function ReportModal({
                   value={rName}
                   onChange={(e) => setRName(e.target.value)}
                   placeholder="Nume (opțional)"
-                  className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint"
+                  className="w-full rounded-md border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint"
                 />
                 <input
                   type="email"
                   value={rEmail}
                   onChange={(e) => setREmail(e.target.value)}
                   placeholder="Email (opțional)"
-                  className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint"
+                  className="w-full rounded-md border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint"
                 />
               </div>
             )}
 
             <DialogFooter>
-              <Button type="submit" disabled={sending} className="bg-rose-500 text-white hover:bg-rose-600">
+              <Button type="submit" disabled={sending} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                 {sending ? "Se trimite…" : "Trimite raportul"}
               </Button>
             </DialogFooter>

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, MessageCircle, Bell, Bookmark, Search, Plus, Home,
   Settings as SettingsIcon, ShieldCheck, LogOut, Moon, Sun, Check, Cookie,
-  ChevronDown, Palette, Coins, Languages, Sparkles, Flag,
+  ChevronDown, Palette, Coins, Languages, Flag,
 } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
@@ -17,16 +17,16 @@ import { fetchMyActiveSubscription } from "@/lib/subscriptions";
 const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 
 const OPTION_COLORS = {
-  sky: "border-sky-500/30 bg-sky-500/10 text-sky-600 dark:border-sky-400/30 dark:bg-sky-400/10 dark:text-sky-400",
+  sky: "border-navy/30 bg-navy/10 text-navy dark:border-border dark:bg-secondary dark:text-foreground",
   emerald: "border-emerald/40 bg-emerald-soft text-emerald",
-  amber: "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-400",
-  rose: "border-rose-500/30 bg-rose-500/10 text-rose-600 dark:border-rose-400/30 dark:bg-rose-400/10 dark:text-rose-400",
-  violet: "border-violet-500/30 bg-violet-500/10 text-violet-600 dark:border-violet-400/30 dark:bg-violet-400/10 dark:text-violet-400",
-  teal: "border-teal-500/30 bg-teal-500/10 text-teal-600 dark:border-teal-400/30 dark:bg-teal-400/10 dark:text-teal-400",
-  indigo: "border-indigo-500/30 bg-indigo-500/10 text-indigo-600 dark:border-indigo-400/30 dark:bg-indigo-400/10 dark:text-indigo-400",
-  slate: "border-slate-400/40 bg-slate-400/10 text-slate-600 dark:border-slate-400/30 dark:bg-slate-400/10 dark:text-slate-300",
+  amber: "border-gold/40 bg-gold-soft text-gold-deep",
+  rose: "border-destructive/30 bg-destructive/10 text-destructive",
+  violet: "border-border bg-secondary text-muted-foreground",
+  teal: "border-border bg-secondary text-muted-foreground",
+  indigo: "border-navy/30 bg-navy/10 text-navy dark:border-border dark:bg-secondary dark:text-foreground",
+  slate: "border-border bg-secondary text-muted-foreground",
   gold: "border-gold/50 bg-gold-soft text-gold-deep",
-  fuchsia: "border-fuchsia-500/30 bg-fuchsia-500/10 text-fuchsia-600 dark:border-fuchsia-400/30 dark:bg-fuchsia-400/10 dark:text-fuchsia-400",
+  fuchsia: "border-border bg-secondary text-muted-foreground",
 };
 
 // Secțiune „Planul meu” — plan activ (icon, valabilitate, facturare, beneficii)
@@ -47,13 +47,12 @@ function MyPlanSection() {
   }, [user?.id]);
 
   if (sub === undefined) {
-    return <div className="mb-6 h-28 animate-pulse rounded-2xl border border-border bg-card" />;
+    return <div className="mb-6 h-28 animate-pulse rounded-lg border border-border bg-card" />;
   }
 
   if (!sub) {
     return (
-      <section className="mb-6 rounded-2xl border border-dashed border-border bg-card p-5 text-center shadow-soft">
-        <Sparkles className="mx-auto h-6 w-6 text-emerald" />
+      <section className="mb-6 rounded-lg border border-dashed border-border bg-card p-5 text-center shadow-soft">
         <p className="mt-2 font-heading text-base font-bold text-navy dark:text-foreground">
           {en ? "No active plan" : "Niciun plan activ"}
         </p>
@@ -62,7 +61,7 @@ function MyPlanSection() {
             ? "Pick a plan so your listings get more visibility and a better spot in search."
             : "Alege un plan ca anunțurile tale să fie mai vizibile și mai bine poziționate."}
         </p>
-        <Button asChild className="mt-4 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
+        <Button asChild className="mt-4 bg-emerald text-white shadow-soft hover:bg-emerald/90">
           <Link to="/upgrade">{en ? "View plans" : "Vezi planuri"}</Link>
         </Button>
       </section>
@@ -75,14 +74,14 @@ function MyPlanSection() {
     : null;
 
   return (
-    <section className="mb-6 overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
+    <section className="mb-6 overflow-hidden rounded-lg border border-border bg-card shadow-soft">
       <div className="flex items-center gap-3 border-b border-border/70 p-4">
         {meta?.iconImg && <img src={meta.iconImg} alt="" className="h-11 w-11 shrink-0 object-contain" />}
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">{en ? "Your plan" : "Planul tău"}</p>
+          <p className="kicker">{en ? "Your plan" : "Planul tău"}</p>
           <h2 className="truncate font-heading text-lg font-bold text-navy dark:text-foreground">{meta?.shortName || meta?.name || sub.plan_id}</h2>
         </div>
-        <Link to="/upgrade" className="shrink-0 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-emerald transition hover:border-emerald/50">
+        <Link to="/upgrade" className="shrink-0 rounded-sm border border-border px-3 py-1.5 text-xs font-semibold text-emerald transition hover:border-emerald/50">
           {en ? "Change plan" : "Schimbă planul"}
         </Link>
       </div>
@@ -98,7 +97,7 @@ function MyPlanSection() {
       </div>
       {meta?.benefits?.length > 0 && (
         <div className="border-t border-border/70 p-4">
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">{en ? "What's included" : "Ce include"}</p>
+          <p className="kicker mb-2">{en ? "What's included" : "Ce include"}</p>
           <ul className="space-y-1.5">
             {meta.benefits.slice(0, 4).map((b) => (
               <li key={b} className="flex items-center gap-2 text-sm">
@@ -157,11 +156,11 @@ export default function Account() {
     return (
       <Link key={opt.label} to={opt.path} className="group flex flex-col items-center gap-1.5 text-center">
         <span className="relative">
-          <span className={`flex h-12 w-12 items-center justify-center rounded-full border transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:scale-105 ${OPTION_COLORS[opt.color] || OPTION_COLORS.emerald}`}>
+          <span className={`flex h-12 w-12 items-center justify-center rounded-full border ${OPTION_COLORS[opt.color] || OPTION_COLORS.emerald}`}>
             <Icon className="h-5 w-5" />
           </span>
           {opt.badge && (
-            <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white">
+            <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground">
               {opt.badge}
             </span>
           )}
@@ -174,7 +173,7 @@ export default function Account() {
   return (
     <div className="mx-auto max-w-4xl px-3 py-5 sm:px-6 sm:py-8 lg:px-8">
       {/* Profile header */}
-      <div className="mb-4 flex items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-soft sm:p-4">
+      <div className="mb-4 flex items-center gap-3 rounded-lg border border-border bg-card p-3 shadow-soft sm:p-4">
         <VerifiCasaLogo size={40} tagline={false} wordmark={false} />
         <div className="min-w-0">
           <h1 className="truncate text-base font-bold sm:text-lg">{greeting}</h1>
@@ -185,8 +184,8 @@ export default function Account() {
       <MyPlanSection />
 
       {/* Account options grid */}
-      <section id="account-menu" className="mb-6 scroll-mt-20 rounded-2xl border border-border bg-card p-4 shadow-soft">
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">{t("hdr_myaccount")}</h2>
+      <section id="account-menu" className="mb-6 scroll-mt-20 rounded-lg border border-border bg-card p-4 shadow-soft">
+        <h2 className="kicker mb-3">{t("hdr_myaccount")}</h2>
 
         <div className="grid grid-cols-4 gap-x-2 gap-y-4 sm:grid-cols-6">
           {primaryOptions.map(renderOption)}
@@ -213,7 +212,7 @@ export default function Account() {
             <button
               type="button"
               onClick={() => setMenuExpanded((v) => !v)}
-              className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70 transition hover:text-emerald active:scale-[0.98]"
+              className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg py-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70 transition hover:text-emerald"
             >
               {menuExpanded ? (en ? "Show less" : "Restrânge meniul") : (en ? "More options" : "Mai multe opțiuni")}
               <motion.span animate={{ rotate: menuExpanded ? 180 : 0 }} transition={{ duration: 0.25 }} className="flex">
@@ -234,8 +233,8 @@ export default function Account() {
 
       {/* Preferințe section */}
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">Preferințe</h2>
-        <div className="space-y-4 rounded-2xl border border-border bg-card p-5 shadow-soft">
+        <h2 className="kicker mb-3">Preferințe</h2>
+        <div className="space-y-4 rounded-lg border border-border bg-card p-5 shadow-soft">
           {/* Tema */}
           <div>
             <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold"><Palette className="h-4 w-4 text-emerald" /> Tema</p>
@@ -259,13 +258,13 @@ export default function Account() {
           <div>
             <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold"><Coins className="h-4 w-4 text-emerald" /> {t("hdr_currency")}</p>
             <div className="grid grid-cols-2 gap-2">
-              {[{ v: "EUR", el: "🇪🇺 💶" }, { v: "RON", el: "🇷🇴 💵" }].map((c) => (
+              {[{ v: "EUR" }, { v: "RON" }].map((c) => (
                 <button
                   key={c.v}
                   onClick={() => setCurrency(c.v)}
                   className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition ${currency === c.v ? "border-emerald bg-emerald-soft text-emerald" : "border-border bg-background text-muted-foreground hover:border-emerald/50"}`}
                 >
-                  <span>{c.el}</span> {c.v} {currency === c.v && <Check className="h-4 w-4" />}
+                  <span className="font-mono text-xs">{c.v}</span> {currency === c.v && <Check className="h-4 w-4" />}
                 </button>
               ))}
             </div>
@@ -275,13 +274,13 @@ export default function Account() {
           <div>
             <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold"><Languages className="h-4 w-4 text-emerald" /> {t("hdr_language")}</p>
             <div className="grid grid-cols-2 gap-2">
-              {[{ v: "ro", el: "🇷🇴", label: "Română" }, { v: "en", el: "🇬🇧", label: "English" }].map((l) => (
+              {[{ v: "ro", el: "RO", label: "Română" }, { v: "en", el: "EN", label: "English" }].map((l) => (
                 <button
                   key={l.v}
                   onClick={() => setLang(l.v)}
                   className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition ${lang === l.v ? "border-emerald bg-emerald-soft text-emerald" : "border-border bg-background text-muted-foreground hover:border-emerald/50"}`}
                 >
-                  <span>{l.el}</span> {l.label} {lang === l.v && <Check className="h-4 w-4" />}
+                  <span className="font-mono text-xs text-muted-foreground">{l.el}</span> {l.label} {lang === l.v && <Check className="h-4 w-4" />}
                 </button>
               ))}
             </div>

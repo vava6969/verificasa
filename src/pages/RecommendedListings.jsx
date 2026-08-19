@@ -77,10 +77,10 @@ export default function RecommendedListings() {
 
       {loading ? (
         <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} className="h-56 rounded-2xl" />)}
+          {Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} className="h-56 rounded-lg" />)}
         </div>
       ) : sorted.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
+        <div className="mt-8 rounded-lg border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
           {en ? "No listings yet." : "Niciun anunț momentan."}
         </div>
       ) : (
@@ -93,7 +93,7 @@ export default function RecommendedListings() {
                 <React.Fragment key={p.id}>
                   {showDivider && (
                     <div className="col-span-full mt-2 flex items-center gap-3 first:mt-0">
-                      <span className="whitespace-nowrap text-xs font-bold uppercase tracking-widest text-muted-foreground">{tierLabel(p._plan)}</span>
+                      <span className="kicker whitespace-nowrap">{tierLabel(p._plan)}</span>
                       <span className="h-px flex-1 bg-border" />
                     </div>
                   )}
@@ -107,7 +107,7 @@ export default function RecommendedListings() {
             <div className="mt-8 flex justify-center">
               <Button
                 variant="outline"
-                className="gap-1.5 rounded-full"
+                className="gap-1.5"
                 onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
               >
                 {en ? "Load more" : "Încarcă mai multe"} <ChevronDown className="h-4 w-4" />

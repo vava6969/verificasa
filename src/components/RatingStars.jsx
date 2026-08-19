@@ -16,7 +16,7 @@ export default function RatingStars({ rating = 0, count = null, size = "sm", sho
         {[1, 2, 3, 4, 5].map((n) => (
           <Star
             key={n}
-            className={`${cls} ${n <= Math.round(rating) ? "fill-amber-400 text-amber-400" : "fill-muted-foreground/20 text-muted-foreground/30"}`}
+            className={`${cls} ${n <= Math.round(rating) ? "fill-gold text-gold" : "fill-muted-foreground/20 text-muted-foreground/30"}`}
           />
         ))}
       </span>
@@ -45,11 +45,11 @@ export function StarPicker({ value = 0, onChange, size = "lg" }) {
           onClick={() => onChange(n)}
           onMouseEnter={() => setHover(n)}
           onMouseLeave={() => setHover(0)}
-          className="rounded-full p-1 transition hover:scale-110"
+          className="rounded-full p-1"
           aria-label={`${n} stele`}
         >
           <Star
-            className={`${cls} ${(hover || value) >= n ? "fill-amber-400 text-amber-400" : "fill-muted-foreground/15 text-muted-foreground/40"}`}
+            className={`${cls} ${(hover || value) >= n ? "fill-gold text-gold" : "fill-muted-foreground/15 text-muted-foreground/40"}`}
           />
         </button>
       ))}
@@ -68,10 +68,10 @@ export function RatingBreakdown({ distribution = {}, total = 0 }) {
         return (
           <div key={star} className="flex items-center gap-2 text-xs">
             <span className="flex w-8 items-center gap-0.5 font-medium text-muted-foreground">
-              {star} <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+              {star} <Star className="h-3 w-3 fill-gold text-gold" />
             </span>
             <div className="h-2 flex-1 overflow-hidden rounded-full bg-secondary">
-              <div className="h-full rounded-full bg-amber-400" style={{ width: `${pct}%` }} />
+              <div className="h-full rounded-full bg-gold" style={{ width: `${pct}%` }} />
             </div>
             <span className="w-8 text-right text-muted-foreground">{count}</span>
           </div>

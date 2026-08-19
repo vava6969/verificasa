@@ -4,7 +4,7 @@ import { CHIP_OPTS, FACILITY_OPTS, OPTION_OPTS } from "@/lib/propertyPayload";
 
 const Group = ({ title, note, children }) => (
   <div>
-    <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{title}</p>
+    <p className="kicker mb-2">{title}</p>
     <div className="flex flex-wrap gap-2">{children}</div>
     {note && <p className="mt-1.5 text-[11px] text-muted-foreground/80">{note}</p>}
   </div>

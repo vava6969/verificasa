@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { X, ShieldCheck, Send, ArrowLeft, ArrowRight, User, Home, MessageSquare, CheckCircle2, LogIn, Lock, KeyRound, Handshake, FileText, Trophy } from "lucide-react";
+import { X, ShieldCheck, Send, ArrowLeft, ArrowRight, User, Home, MessageSquare, CheckCircle2, LogIn, KeyRound, Handshake, FileText, Trophy } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useToast } from "@/components/ui/use-toast";
 import { useCountry } from "@/components/CountryContext";
@@ -115,17 +115,16 @@ export default function InspectieModal({ open, onClose }) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-navy-deep/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-10 flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-border bg-white shadow-2xl dark:bg-card">
+      <div className="absolute inset-0 bg-navy-deep/70" onClick={onClose} />
+      <div className="relative z-10 flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-lg border border-border bg-white shadow-2xl dark:bg-card">
         {/* Header — poză de fundal generată cu Higgsfield + scrim, text jos-stânga */}
         <div className="relative shrink-0 overflow-hidden">
           <img src="/images/generated/inspectie-header-v1.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/92 via-navy-deep/55 to-navy-deep/15" />
-          <button onClick={onClose} aria-label={t("ins_close")} className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition hover:bg-white/30">
+          <button onClick={onClose} aria-label={t("ins_close")} className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/30">
             <X className="h-5 w-5" />
           </button>
           <div className="relative flex min-h-[136px] flex-col justify-end p-6 text-white">
-            <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald/25 text-emerald backdrop-blur-sm"><ShieldCheck className="h-5 w-5" /></span>
             <h3 className="font-heading text-xl font-bold">{t("ins_title")}</h3>
             <p className="text-sm text-white/80">{t("ins_sub")}</p>
           </div>
@@ -133,7 +132,6 @@ export default function InspectieModal({ open, onClose }) {
 
         {needsAuth ? (
           <div className="flex flex-col items-center justify-center gap-4 px-6 py-12 text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-soft text-emerald"><Lock className="h-7 w-7" /></span>
             <div>
               <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">Autentificare necesară</h3>
               <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
@@ -141,10 +139,10 @@ export default function InspectieModal({ open, onClose }) {
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-2.5">
-              <Button asChild className="gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
+              <Button asChild className="gap-1.5 bg-emerald text-white shadow-soft hover:bg-emerald/90">
                 <Link to="/login"><LogIn className="h-4 w-4" /> Intră în cont</Link>
               </Button>
-              <Button asChild variant="outline" className="gap-1.5 rounded-full">
+              <Button asChild variant="outline" className="gap-1.5">
                 <Link to="/register">Creează cont</Link>
               </Button>
             </div>
@@ -156,11 +154,8 @@ export default function InspectieModal({ open, onClose }) {
         <div className="shrink-0 border-b border-border/60 px-5 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-navy text-emerald">
-                <Current.icon className="h-4 w-4" />
-              </span>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-emerald">
+                <p className="kicker text-emerald">
                   Pasul {step + 1} din {STEPS.length}
                 </p>
                 <h2 className="font-heading text-base font-bold text-navy dark:text-foreground">{Current.title}</h2>
@@ -170,11 +165,11 @@ export default function InspectieModal({ open, onClose }) {
           </div>
 
           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-            <div className="h-full rounded-full gradient-emerald transition-all duration-500" style={{ width: `${progress}%` }} />
+            <div className="h-full rounded-full bg-emerald transition-all duration-500" style={{ width: `${progress}%` }} />
           </div>
 
-          <div className="mt-2.5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
-            <span className="rounded-full bg-navy px-2.5 py-1 text-white">{Current.title}</span>
+          <div className="mt-2.5 flex items-center gap-2 kicker">
+            <span className="rounded-sm bg-navy px-2.5 py-1 text-white">{Current.title}</span>
             {STEPS[step + 1] && (
               <span className="flex items-center gap-1 text-muted-foreground/70">
                 <ArrowRight className="h-3 w-3" /> Urmează: {STEPS[step + 1].title}
@@ -216,12 +211,12 @@ export default function InspectieModal({ open, onClose }) {
                 </Field>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Field label="Nume" required>
-                    <input value={form.name} readOnly={isAuthenticated} onChange={(e) => { set({ name: e.target.value }); clearError("name"); }} placeholder={t("ins_ph_name")} className={inputCls + (isAuthenticated ? " cursor-not-allowed bg-secondary/50" : "") + (errors.name ? " border-rose-400 focus:border-rose-400 focus:ring-rose-200" : "")} required />
-                    {errors.name && <p className="mt-1 text-[11px] font-semibold text-rose-500">{errors.name}</p>}
+                    <input value={form.name} readOnly={isAuthenticated} onChange={(e) => { set({ name: e.target.value }); clearError("name"); }} placeholder={t("ins_ph_name")} className={inputCls + (isAuthenticated ? " cursor-not-allowed bg-secondary/50" : "") + (errors.name ? " border-destructive focus:border-destructive focus:ring-destructive/20" : "")} required />
+                    {errors.name && <p className="mt-1 text-[11px] font-semibold text-destructive">{errors.name}</p>}
                   </Field>
                   <Field label="Email" required>
-                    <input type="email" value={form.email} readOnly={isAuthenticated} onChange={(e) => { set({ email: e.target.value }); clearError("email"); }} placeholder={t("ins_ph_email")} className={inputCls + (isAuthenticated ? " cursor-not-allowed bg-secondary/50" : "") + (errors.email ? " border-rose-400 focus:border-rose-400 focus:ring-rose-200" : "")} required />
-                    {errors.email && <p className="mt-1 text-[11px] font-semibold text-rose-500">{errors.email}</p>}
+                    <input type="email" value={form.email} readOnly={isAuthenticated} onChange={(e) => { set({ email: e.target.value }); clearError("email"); }} placeholder={t("ins_ph_email")} className={inputCls + (isAuthenticated ? " cursor-not-allowed bg-secondary/50" : "") + (errors.email ? " border-destructive focus:border-destructive focus:ring-destructive/20" : "")} required />
+                    {errors.email && <p className="mt-1 text-[11px] font-semibold text-destructive">{errors.email}</p>}
                   </Field>
                 </div>
                 {isAuthenticated && (
@@ -237,8 +232,8 @@ export default function InspectieModal({ open, onClose }) {
             {step === 1 && (
               <div className="space-y-4">
                 <Field label="Adresă / Link anunț" required hint="Adresa fizică a proprietății sau link-ul anunțului VerifiCasa">
-                  <input value={form.address_or_url} onChange={(e) => { set({ address_or_url: e.target.value }); clearError("address_or_url"); }} placeholder={t("ins_ph_addr")} className={inputCls + (errors.address_or_url ? " border-rose-400 focus:border-rose-400 focus:ring-rose-200" : "")} required />
-                  {errors.address_or_url && <p className="mt-1 text-[11px] font-semibold text-rose-500">{errors.address_or_url}</p>}
+                  <input value={form.address_or_url} onChange={(e) => { set({ address_or_url: e.target.value }); clearError("address_or_url"); }} placeholder={t("ins_ph_addr")} className={inputCls + (errors.address_or_url ? " border-destructive focus:border-destructive focus:ring-destructive/20" : "")} required />
+                  {errors.address_or_url && <p className="mt-1 text-[11px] font-semibold text-destructive">{errors.address_or_url}</p>}
                 </Field>
                 <Field label="Pachet de interes" hint="Alege serviciul dorit">
                   <div className="grid grid-cols-2 gap-2.5">
@@ -250,7 +245,7 @@ export default function InspectieModal({ open, onClose }) {
                           type="button"
                           onClick={() => set({ package_interest: p.value })}
                           className={
-                            "flex items-center gap-2 rounded-2xl border px-3.5 py-3 text-left text-sm font-semibold transition " +
+                            "flex items-center gap-2 rounded-lg border px-3.5 py-3 text-left text-sm font-semibold transition " +
                             (active
                               ? "border-emerald bg-emerald-soft text-emerald shadow-soft ring-1 ring-emerald/30"
                               : "border-border bg-white text-foreground/70 hover:border-emerald/40 dark:bg-card")
@@ -272,13 +267,13 @@ export default function InspectieModal({ open, onClose }) {
                   <textarea value={form.message} onChange={(e) => set({ message: e.target.value })} rows={5} placeholder={t("ins_ph_msg")} className={inputCls} />
                 </Field>
                 {/* Summary */}
-                <div className="rounded-2xl border border-border/60 bg-secondary/30 p-4">
-                  <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Rezumat cerere</p>
+                <div className="rounded-lg border border-border/60 bg-secondary/30 p-4">
+                  <p className="kicker mb-2">Rezumat cerere</p>
                   <ul className="space-y-1.5 text-sm text-foreground/80">
-                    <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald" /> {form.role}</li>
-                    <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald" /> {form.name || "—"}</li>
-                    <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald" /> {form.email || "—"}</li>
-                    {form.package_interest && <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald" /> {form.package_interest}</li>}
+                    <li className="flex items-center gap-2"><span className="font-mono text-emerald">✓</span> {form.role}</li>
+                    <li className="flex items-center gap-2"><span className="font-mono text-emerald">✓</span> {form.name || "—"}</li>
+                    <li className="flex items-center gap-2"><span className="font-mono text-emerald">✓</span> {form.email || "—"}</li>
+                    {form.package_interest && <li className="flex items-center gap-2"><span className="font-mono text-emerald">✓</span> {form.package_interest}</li>}
                   </ul>
                 </div>
                 <p className="text-center text-[11px] text-muted-foreground">{t("ins_footer")}</p>
@@ -287,16 +282,16 @@ export default function InspectieModal({ open, onClose }) {
           </div>
 
           {/* Nav */}
-          <div className="flex shrink-0 items-center gap-3 border-t border-border/60 bg-background/90 px-5 py-3 backdrop-blur-xl">
-            <Button type="button" variant="outline" onClick={back} className="gap-1.5 rounded-full">
+          <div className="flex shrink-0 items-center gap-3 border-t border-border/60 bg-background px-5 py-3">
+            <Button type="button" variant="outline" onClick={back} className="gap-1.5">
               <ArrowLeft className="h-4 w-4" /> {step === 0 ? t("ins_close") : "Înapoi"}
             </Button>
             {step < STEPS.length - 1 ? (
-              <Button type="button" onClick={next} className="flex-1 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
+              <Button type="button" onClick={next} className="flex-1 gap-1.5 bg-emerald text-white shadow-soft hover:bg-emerald/90">
                 Continuă <ArrowRight className="h-4 w-4" />
               </Button>
             ) : (
-              <Button type="submit" disabled={sending} className="flex-1 gap-2 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 disabled:opacity-60">
+              <Button type="submit" disabled={sending} className="flex-1 gap-2 bg-emerald text-white shadow-soft hover:bg-emerald/90 disabled:opacity-60">
                 <Send className="h-4 w-4" /> {sending ? t("ins_sending") : t("ins_btn")}
               </Button>
             )}
