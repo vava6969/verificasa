@@ -77,13 +77,22 @@ export function getPlanMeta(planId) {
   return PLAN_BY_ID[planId] || null;
 }
 
-// Planul „efectiv” al unui anunț: fie un override manual pus direct pe anunț
-// (folosit azi pentru datele demo — vezi poster_plan_override pe Property),
-// fie planul real, activ, al celui care l-a postat (din planMap, construit cu
-// fetchActivePlanMap()). Override-ul e restricționat la nivel de câmp (RLS)
-// la admin, deci nu poate fi auto-acordat de un user din client.
+// Planul „efectiv” al unui anunț. Ordinea:
+//   1. poster_plan_override — override manual de admin (date demo);
+//   2. poster_plan — câmp denormalizat pe anunț, scris DOAR server-side
+//      (VerifyCheckoutSession la plată, SyncPosterPlans la backfill). Sursa
+//      principală de acum: Subscription.read e blocat la owner/admin, deci
+//      browserul nu mai poate citi abonamentele altora.
+//   3. planMap — fallback istoric (fetchActivePlanMap), care după blocarea
+//      RLS mai întoarce cel mult abonamentul propriu; inofensiv, dar util
+//      înainte de rularea SyncPosterPlans.
 export function resolvePropertyPlan(property, planMap) {
-  return property?.poster_plan_override || planMap?.get(property?.created_by_id) || null;
+  return (
+    property?.poster_plan_override ||
+    property?.poster_plan ||
+    planMap?.get(property?.created_by_id) ||
+    null
+  );
 }
 
 // Comparator gata de folosit cu Array.prototype.sort — plan mai important

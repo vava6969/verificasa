@@ -57,7 +57,25 @@
         }
       ]
     },
-    "create": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "ADMIN"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "SUPER_ADMIN"
+          }
+        }
+      ]
+    },
     "update": {
       "$or": [
         {
