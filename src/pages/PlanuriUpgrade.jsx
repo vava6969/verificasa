@@ -83,7 +83,6 @@ export default function PlanuriUpgrade() {
   const navigate = useNavigate();
   const en = lang === "en";
 
-  useEffect(() => { document.title = "Planuri și boost-uri – VerifiCasa"; }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

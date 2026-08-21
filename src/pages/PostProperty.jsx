@@ -9,8 +9,6 @@ export default function PostProperty() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    document.title = "Postează anunț · VerifiCasa";
-    return () => { document.title = "VerifiCasa"; };
   }, []);
 
   return (

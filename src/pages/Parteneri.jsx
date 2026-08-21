@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Reveal } from "@/components/ui/reveal";
 import { Stamp, Ledger, LedgerRow, Hairline } from "@/components/fisa";
 import { PARTNERS } from "@/lib/partners";
@@ -7,7 +7,6 @@ import { PARTNERS } from "@/lib/partners";
 // riglată (logo într-o ramă neutră, ce face concret, ce primești cu codul
 // VerifiCasa, link extern). Construit pentru n parteneri de la început.
 export default function Parteneri() {
-  useEffect(() => { document.title = "Parteneri – VerifiCasa"; }, []);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">

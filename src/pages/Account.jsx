@@ -106,7 +106,6 @@ export default function Account() {
   const canAdmin = ADMIN_ROLES.includes(role);
   const greeting = user?.full_name || user?.email || (en ? "user" : "utilizator");
 
-  useEffect(() => { document.title = `${t("hdr_myaccount")} – VerifiCasa`; }, [t]);
 
   // Confirmarea plății de boost-uri, la revenirea din Stripe.
   useEffect(() => {

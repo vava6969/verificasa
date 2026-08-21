@@ -52,7 +52,6 @@ export default function MyProperties() {
      
   }, [user?.id]);
 
-  useEffect(() => { document.title = `${en ? "My listings" : "Anunțurile mele"} – VerifiCasa`; }, [en]);
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
