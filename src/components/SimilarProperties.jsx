@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import SimilarPropertyCard from "@/components/SimilarPropertyCard";
+import { buildCoverMap } from "@/lib/covers";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Reveal } from "@/components/ui/reveal";
 
@@ -12,6 +13,7 @@ import { Reveal } from "@/components/ui/reveal";
 export default function SimilarProperties({ property }) {
   const { t } = useCountry();
   const [items, setItems] = useState(null);
+  const coverMap = useMemo(() => buildCoverMap(items || []), [items]);
   const scrollerRef = useRef(null);
 
   useEffect(() => {
@@ -82,7 +84,7 @@ export default function SimilarProperties({ property }) {
       >
         {items.map((p) => (
           <div key={p.id} className="w-[220px] shrink-0 sm:w-64 lg:w-72" style={{ scrollSnapAlign: "start" }}>
-            <SimilarPropertyCard property={p} hot={p.featured} />
+            <SimilarPropertyCard property={p} hot={p.featured} coverMap={coverMap} />
           </div>
         ))}
 

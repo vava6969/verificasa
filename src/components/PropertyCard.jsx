@@ -1,34 +1,37 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Phone, MessageCircle, PhoneOff, Heart } from "lucide-react";
+import { Phone, MessageCircle, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { startConversation } from "@/lib/conversations";
 import { Image } from "@/components/ui/image";
 import { base44 } from "@/api/base44Client";
-import { Stamp, Frank, PhotoMark, Viewfinder } from "@/components/fisa";
-import { formatDistanceToNowStrict } from "date-fns";
-import { ro, enGB } from "date-fns/locale";
+import { PropertyBadgeRow } from "@/components/PropertyBadges";
+import { coverOf } from "@/lib/covers";
 
-// Fișa scurtă a unui anunț. Coperta poartă stratul de inspecție (colțare,
-// marcaje mono, codul proprietății), verdictul e o ștampilă cu bordură, iar
-// faptele stau pe un rând de registru cu cifre tabulare. Fără pastile, fără
-// sticlă, fără ridicare la hover — doar conturul care se închide la verde.
-export default function PropertyCard({ property, hot = false }) {
+// Cardul de anunț. Fotografia conduce, prețul e primul lucru citit, iar sub el
+// stă o singură linie de caracteristici. Codul anunțului, contorul de
+// vizualizări și scorul numeric au ieșit de pe card: sunt informație de pagină
+// de anunț, nu de listă. Insignele stau pe fotografie, ca la orice portal.
+export default function PropertyCard({ property, hot = false, coverMap }) {
   const { currency, formatPrice, t, lang } = useCountry();
   const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const p = property;
-  const images = p.images?.length ? p.images : [];
-  const [idx, setIdx] = useState(0);
-  const touchStartX = useRef(null);
   const en = lang === "en";
 
-  const trustScore = typeof p.trust_score === "number" ? p.trust_score : 0;
-  const isHighTrust = trustScore >= 75;
-  const isVerified = trustScore >= 40;
+  // Galeria pornește de la coperta calculată, ca prima imagine să fie cea care
+  // apare și în restul listei.
+  const cover = coverOf(p, coverMap);
+  const images = p.images?.length
+    ? (cover && !p.images.includes(cover) ? [cover, ...p.images.slice(1)] : p.images)
+    : (cover ? [cover] : []);
+
+  const [idx, setIdx] = useState(0);
+  const touchStartX = useRef(null);
+
   const boosted = p.boost_active || p.featured || hot;
   const seller = p.seller_role || (p.owner_verified ? "Proprietar" : "Agent");
   const isProprietar = seller === "Proprietar";
@@ -74,7 +77,6 @@ export default function PropertyCard({ property, hot = false }) {
   const eur = formatPrice(p.price_monthly, p.currency, "EUR");
   const ron = formatPrice(p.price_monthly, p.currency, "RON");
   const primary = currency === "EUR" ? eur : ron;
-  const secondary = currency === "EUR" ? ron : eur;
 
   const toDetail = () => navigate(`/property/${p.id}`);
 
@@ -91,26 +93,22 @@ export default function PropertyCard({ property, hot = false }) {
 
   const callPhone = (p.phone || "").replace(/\D/g, "");
   const hasPhone = !!callPhone && callPhone.length >= 6;
-  const postedAgo = p.created_date
-    ? formatDistanceToNowStrict(new Date(p.created_date), { addSuffix: true, locale: en ? enGB : ro })
-    : "";
 
-  // Facilitățile ca text, nu ca pastile cu iconițe — se citesc dintr-o privire.
-  const features = [
-    p.tour_3d_url && t("tab_3d"),
-    p.commission_free && t("pc_com0"),
-    p.pet_friendly && t("pc_pet_btn"),
-    p.furnished && t("badge_furnished"),
-    p.parking && t("badge_parking"),
-  ].filter(Boolean);
+  // O singură linie de specificații, în ordinea în care oamenii chiar caută.
+  const specs = [
+    p.rooms != null && `${p.rooms} ${en ? (p.rooms === 1 ? "room" : "rooms") : "cam."}`,
+    p.surface_sqm != null && `${p.surface_sqm} mp`,
+    p.floor,
+  ].filter(Boolean).join(" · ");
 
-  const boostUntil = p.boost_ends_date
-    ? new Date(p.boost_ends_date).toLocaleDateString(en ? "en-GB" : "ro-RO", { day: "2-digit", month: "short" })
-    : null;
+  const step = (dir) => (e) => {
+    e.preventDefault(); e.stopPropagation();
+    if (images.length < 2) return;
+    setIdx((i) => (i + dir + images.length) % images.length);
+  };
 
   return (
-    <article className="group relative flex flex-col overflow-hidden border border-border bg-card transition-colors hover:border-emerald">
-      {/* Copertă — stratul de inspecție e desenat PE fotografie */}
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl">
       <div
         className="relative aspect-[4/3] cursor-pointer overflow-hidden touch-pan-y"
         onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
@@ -126,123 +124,91 @@ export default function PropertyCard({ property, hot = false }) {
         onClick={toDetail}
       >
         {images.length ? (
-          <Image src={images[idx]} alt={p.title} fittingType="fill" className="h-full w-full" />
+          <Image
+            src={images[idx]}
+            alt={p.title}
+            fittingType="fill"
+            className="h-full w-full transition-transform duration-500 group-hover:scale-[1.04]"
+          />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-secondary">
             <span className="text-xs text-muted-foreground">{t("info_missing")}</span>
           </div>
         )}
 
-        <Viewfinder inset="0.5rem" stroke="rgba(255,255,255,0.7)" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/50 to-transparent" />
-
-        {/* marcaje de instrument */}
-        {p.property_code && <PhotoMark className="bottom-2 left-2.5">{p.property_code}</PhotoMark>}
-        {p.surface_sqm != null && <PhotoMark className="bottom-2 right-2.5">{p.surface_sqm} MP</PhotoMark>}
-        {images.length > 1 && (
-          <PhotoMark className="top-2 left-2.5">
-            {String(idx + 1).padStart(2, "0")}/{String(images.length).padStart(2, "0")}
-          </PhotoMark>
-        )}
+        <PropertyBadgeRow
+          property={{ ...p, boost_active: boosted }}
+          size="md"
+          lang={lang}
+          className="absolute left-2.5 top-2.5 max-w-[calc(100%-4rem)]"
+        />
 
         <button
           type="button"
           onClick={toggleSave}
           aria-label={saved ? t("pd_unsaved") : t("pd_saved_toast")}
           disabled={savePending}
-          className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-sm border border-white/40 bg-black/35 text-white transition-colors hover:bg-black/55 disabled:opacity-60"
+          className="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/92 text-neutral-700 shadow-[0_1px_3px_rgba(0,0,0,0.25)] transition-transform hover:scale-105 disabled:opacity-60 dark:bg-neutral-900/90 dark:text-neutral-200"
         >
-          <Heart className={`h-4 w-4 ${saved ? "fill-white" : ""}`} />
+          <Heart className={`h-[18px] w-[18px] ${saved ? "fill-rose-500 text-rose-500" : ""}`} />
         </button>
 
         {images.length > 1 && (
-          <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1">
-            {images.slice(0, 6).map((_, i) => (
-              <span key={i} className={`h-1 ${i === idx ? "w-4 bg-white" : "w-1 bg-white/55"}`} />
-            ))}
-          </div>
+          <>
+            <button
+              type="button"
+              onClick={step(-1)}
+              aria-label={en ? "Previous photo" : "Fotografia anterioară"}
+              className="absolute left-2 top-1/2 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-neutral-800 opacity-0 shadow transition-opacity group-hover:opacity-100 sm:flex"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={step(1)}
+              aria-label={en ? "Next photo" : "Fotografia următoare"}
+              className="absolute right-2 top-1/2 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-neutral-800 opacity-0 shadow transition-opacity group-hover:opacity-100 sm:flex"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+            <div className="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 gap-1.5">
+              {images.slice(0, 6).map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all ${i === idx ? "w-4 bg-white" : "w-1.5 bg-white/60"}`}
+                />
+              ))}
+            </div>
+          </>
         )}
       </div>
 
-      {/* Verdicte — ștampile, nu pastile */}
-      {(isVerified || boosted) && (
-        <div className="flex flex-wrap items-center gap-1.5 border-b border-border px-3.5 py-2">
-          {isHighTrust ? (
-            <Stamp tone="verde">{t("pc_trust_high")}</Stamp>
-          ) : isVerified ? (
-            <Stamp tone="verde">{t("pc_verified")}</Stamp>
-          ) : null}
-          {boosted && <Frank until={boostUntil} />}
-        </div>
-      )}
+      <div onClick={toDetail} className="flex min-w-0 flex-1 cursor-pointer flex-col p-3.5 sm:p-4">
+        <p className="text-[1.35rem] font-bold leading-none text-foreground tnum sm:text-2xl">
+          {primary}
+          <span className="ml-1 text-sm font-semibold text-muted-foreground">
+            {p.transaction_type === "SALE" ? "" : t("pc_permonth")}
+          </span>
+        </p>
 
-      {/* Corp */}
-      <div onClick={toDetail} className="flex min-w-0 flex-1 cursor-pointer flex-col p-3.5">
-        <h3 className="line-clamp-1 font-heading text-lg font-semibold leading-snug text-foreground">
-          {p.title || <span className="italic text-muted-foreground">{t("info_missing")}</span>}
-        </h3>
-        <p className="mt-0.5 truncate text-sm text-muted-foreground">
+        {specs && <p className="mt-1.5 truncate text-sm font-semibold text-foreground/80">{specs}</p>}
+
+        <p className="mt-1 truncate text-sm text-muted-foreground">
           {p.zone || p.city ? `${p.zone ? p.zone + ", " : ""}${p.city || ""}` : t("info_missing")}
         </p>
 
-        {/* Rând de registru: fapte cu cifre tabulare */}
-        <dl className="mt-2.5 flex flex-wrap items-baseline gap-x-4 gap-y-1 border-t border-border pt-2.5 text-sm">
-          {p.rooms != null && (
-            <div className="flex items-baseline gap-1">
-              <dt className="text-muted-foreground">{t("sep_rooms")}</dt>
-              <dd className="font-semibold tnum">{p.rooms}</dd>
-            </div>
-          )}
-          {p.surface_sqm != null && (
-            <div className="flex items-baseline gap-1">
-              <dt className="text-muted-foreground">mp</dt>
-              <dd className="font-semibold tnum">{p.surface_sqm}</dd>
-            </div>
-          )}
-          {p.floor && (
-            <div className="flex items-baseline gap-1">
-              <dt className="text-muted-foreground">{t("pc_floor")}</dt>
-              <dd className="font-semibold tnum">{p.floor}</dd>
-            </div>
-          )}
-          <div className="ml-auto flex items-baseline gap-1">
-            <dt className="text-muted-foreground">{en ? "views" : "vizite"}</dt>
-            <dd className="font-semibold tnum">{p.views_count || 0}</dd>
-          </div>
-        </dl>
-
-        {features.length > 0 && (
-          <p className="mt-2 line-clamp-1 text-xs text-muted-foreground">{features.join(" · ")}</p>
-        )}
-
-        <div className="mt-3 flex items-end justify-between border-t border-border pt-2.5">
-          <div>
-            <p className="font-heading text-2xl font-semibold text-foreground tnum">
-              {primary}
-              <span className="ml-0.5 font-body text-xs font-medium text-muted-foreground">
-                {p.transaction_type === "SALE" ? "" : t("pc_permonth")}
-              </span>
-            </p>
-            <p className="text-xs text-muted-foreground tnum">≈ {secondary}</p>
-          </div>
-          {trustScore > 0 && (
-            <span className="text-right text-xs text-muted-foreground">
-              {en ? "trust" : "încredere"}<br />
-              <span className="font-heading text-base font-semibold text-foreground tnum">{trustScore}</span>
-              <span className="text-[10px]">/100</span>
-            </span>
-          )}
-        </div>
+        <h3 className="mt-1.5 line-clamp-1 text-sm text-muted-foreground">
+          {p.title || ""}
+        </h3>
       </div>
 
-      {/* Subsol — cine a publicat + contact */}
-      <div className="flex items-center gap-2.5 border-t border-border px-3.5 py-2.5">
+      <div className="flex items-center gap-2.5 border-t border-border px-3.5 py-2.5 sm:px-4">
         <Link
           to={p.created_by_id ? `/profile/${p.created_by_id}` : "#"}
           onClick={(e) => e.stopPropagation()}
           className="flex shrink-0 items-center"
         >
-          <span className="flex h-7 w-7 items-center justify-center rounded-sm border border-border bg-secondary text-[10px] font-bold text-foreground">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-[11px] font-bold text-foreground">
             {(p.posted_by_name || p.owner_name || "V").charAt(0).toUpperCase()}
           </span>
         </Link>
@@ -254,31 +220,27 @@ export default function PropertyCard({ property, hot = false }) {
           <p className="truncate text-xs font-semibold text-foreground hover:text-emerald">
             {p.posted_by_name || p.owner_name || "VerifiCasa"}
           </p>
-          <p className="truncate text-[11px] text-muted-foreground">
-            {sellerLabel}{postedAgo ? ` · ${postedAgo}` : ""}
-          </p>
+          <p className="truncate text-[11px] text-muted-foreground">{sellerLabel}</p>
         </Link>
-        <div className="flex shrink-0 items-center gap-1.5">
-          {hasPhone ? (
+        <div className="flex shrink-0 items-center gap-2">
+          {hasPhone && (
             <a
               href={`tel:${callPhone}`}
               onClick={(e) => e.stopPropagation()}
               title={t("pc_call")}
-              className="flex h-9 w-9 items-center justify-center rounded-sm border border-border text-foreground transition-colors hover:border-emerald hover:text-emerald"
+              aria-label={t("pc_call")}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-emerald hover:text-emerald"
             >
-              <Phone className="h-4 w-4" />
+              <Phone className="h-[18px] w-[18px]" />
             </a>
-          ) : (
-            <span title={t("pc_no_phone")} className="flex h-9 w-9 items-center justify-center rounded-sm border border-border text-muted-foreground/40">
-              <PhoneOff className="h-4 w-4" />
-            </span>
           )}
           <button
             onClick={handleMessage}
             title={t("pc_message")}
-            className="flex h-9 w-9 items-center justify-center rounded-sm bg-emerald text-primary-foreground transition-colors hover:bg-emerald/90"
+            aria-label={t("pc_message")}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald text-primary-foreground transition-transform hover:scale-105"
           >
-            <MessageCircle className="h-4 w-4" />
+            <MessageCircle className="h-[18px] w-[18px]" />
           </button>
         </div>
       </div>

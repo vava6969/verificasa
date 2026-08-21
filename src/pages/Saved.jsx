@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import PropertyCard from "@/components/PropertyCard";
+import { buildCoverMap } from "@/lib/covers";
 import { Bookmark, Trash2, Home, UserCircle } from "lucide-react";
 import { initials, avatarColor } from "@/lib/chatUtils";
 import RatingStars from "@/components/RatingStars";
@@ -18,6 +19,7 @@ export default function Saved() {
   const [properties, setProperties] = useState(null);
   const [savedProfiles, setSavedProfiles] = useState(null);
   const [profileUsers, setProfileUsers] = useState(null);
+  const coverMap = useMemo(() => buildCoverMap(properties || []), [properties]);
 
   const loadProperties = async () => {
     try {
@@ -119,7 +121,7 @@ export default function Saved() {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {properties.map((p) => (
               <div key={p.id} className="relative">
-                <PropertyCard property={p} />
+                <PropertyCard property={p} coverMap={coverMap} />
                 <button onClick={() => remove(p.id)} className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded bg-white/90 text-rose-500 shadow-soft transition hover:bg-rose-500 hover:text-white" title="Elimină din salvate">
                   <Trash2 className="h-4 w-4" />
                 </button>

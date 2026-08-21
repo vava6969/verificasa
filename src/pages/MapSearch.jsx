@@ -11,6 +11,7 @@ import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import PropertyCard from "@/components/PropertyCard";
+import { buildCoverMap } from "@/lib/covers";
 import MapPropertySheet from "@/components/MapPropertySheet";
 import MapInfoCards from "@/components/MapInfoCards";
 import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
@@ -438,6 +439,7 @@ export default function MapSearch() {
   }, [bounds, polygonPoints, cityParam, zoneParam, countyParam, typeParam, qParam, activeFilters, planFilters, budget, roomsMin, surfaceMin, furnished, swap, fairness, sort]);
 
   const displayedProperties = visibleProperties.slice(0, displayCount);
+  const coverMap = useMemo(() => buildCoverMap(properties || []), [properties]);
   const hasMore = displayedProperties.length < visibleProperties.length;
 
   // 99+ format for badge
@@ -843,7 +845,7 @@ export default function MapSearch() {
                   onClick={() => markVisited(p.id)}
                   className={hoveredKey === p.id ? "ring-1 ring-emerald" : undefined}
                 >
-                  <PropertyCard property={p} />
+                  <PropertyCard property={p} coverMap={coverMap} />
                 </div>
               ))}
               {hasMore && (

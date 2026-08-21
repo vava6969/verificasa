@@ -5,6 +5,7 @@ import { useCountry } from "@/components/CountryContext";
 import { PLANS, resolvePropertyPlan, compareByBoostThenViews } from "@/lib/plans";
 import { fetchActivePlanMap } from "@/lib/subscriptions";
 import RecommendedPropertyCard from "@/components/RecommendedPropertyCard";
+import { buildCoverMap } from "@/lib/covers";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Homepage — „Anunțuri recomandate", pe 4 rânduri distincte, delimitate strict
@@ -56,6 +57,10 @@ export default function RecommendedByPlanSection() {
 
   if (properties.length === 0) return null;
 
+  // Harta de coperți se calculează pe TOATE anunțurile, nu pe rând, ca
+  // acelasi duplicat sa nu reapara in doua randuri diferite.
+  const coverMap = buildCoverMap(properties);
+
   const grouped = { agent: [], pro: [], basic: [], none: [] };
   for (const p of properties) {
     const plan = resolvePropertyPlan(p, planMap) || "none";
@@ -73,13 +78,13 @@ export default function RecommendedByPlanSection() {
   return (
     <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 sm:pb-16 lg:px-8">
       {rows.map((row) => (
-        <PlanRow key={row.id} row={row} en={en} />
+        <PlanRow key={row.id} row={row} en={en} coverMap={coverMap} />
       ))}
     </section>
   );
 }
 
-function PlanRow({ row, en }) {
+function PlanRow({ row, en, coverMap }) {
   const isPaidTier = row.id !== "none";
   if (row.items.length === 0 && !isPaidTier) return null;
 
@@ -113,7 +118,7 @@ function PlanRow({ row, en }) {
         <div className="-mx-4 flex gap-3.5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:gap-4 sm:px-0">
           {visible.map((p) => (
             <div key={p.id} className="w-[168px] shrink-0 sm:w-[196px]">
-              <RecommendedPropertyCard property={p} planId={row.id === "none" ? null : row.id} />
+              <RecommendedPropertyCard property={p} planId={row.id === "none" ? null : row.id} coverMap={coverMap} />
             </div>
           ))}
           <Link

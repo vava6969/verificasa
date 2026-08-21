@@ -92,11 +92,18 @@ export function getEntitlements(planId) {
 // ---------------------------------------------------------------------------
 export const BOOST_DURATION_DAYS = 7;
 
+// b1 e pachetul „cumperi unul și gata": clientul a cerut explicit ca un
+// proprietar să poată promova un anunț fără să fie obligat să ia un pachet.
+// Se poate cumpăra direct de pe anunț (vezi CreateBoostCheckout cu property_id),
+// caz în care boost-ul se aplică singur la întoarcerea din plată.
 export const BOOST_PACKS = [
+  { id: "b1",  boosts: 1,  priceRon: 14.99, single: true },
   { id: "b3",  boosts: 3,  priceRon: 31.99 },
   { id: "b6",  boosts: 6,  priceRon: 58.99, popular: true },
   { id: "b12", boosts: 12, priceRon: 80.99 },
 ];
+
+export const SINGLE_BOOST_PACK = BOOST_PACKS.find((p) => p.single);
 
 export const BOOST_PACK_BY_ID = Object.fromEntries(BOOST_PACKS.map((b) => [b.id, b]));
 

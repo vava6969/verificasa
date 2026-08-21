@@ -1,6 +1,6 @@
 import { secrets } from "base44:runtime";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { addCredits } from "../../shared/boosts.js";
+import { addCredits, BOOST_DURATION_DAYS } from "../../shared/boosts.js";
 
 // Confirmă server-side o plată de boost-uri și scrie creditele în registru.
 // Idempotent pe session_id: o reîncărcare a paginii de succes nu dublează.
@@ -42,12 +42,50 @@ export default async function (req: Request): Promise<Response> {
     const boosts = parseInt(session.metadata?.boosts || "0", 10);
     if (!boosts || boosts < 1) return Response.json({ error: "Pachet necunoscut în sesiunea de plată." });
 
-    const balance = await addCredits(svc, {
+    let balance = await addCredits(svc, {
       userId: me.id, delta: boosts, reason: "purchase", sourceId: sessionId,
       note: `Pachet ${session.metadata?.pack_id || ""}`,
     });
 
-    return Response.json({ ok: true, boosts, balance });
+    // Boost cumpărat direct de pe un anunț: îl aplicăm imediat, ca omul să nu
+    // plătească și apoi să mai fie nevoit să apese încă un buton. Dacă aplicarea
+    // eșuează, creditul rămâne în cont — nu se pierde nimic.
+    const propertyId = session.metadata?.property_id || "";
+    let appliedTo: string | null = null;
+    let boostEndsDate: string | null = null;
+
+    if (propertyId) {
+      try {
+        const p: any = await svc.entities.Property.get(propertyId);
+        if (p && p.created_by_id === me.id && p.approval_status === "APPROVED") {
+          const now = Date.now();
+          const currentEnd = p.boost_ends_date ? new Date(p.boost_ends_date).getTime() : 0;
+          const from = currentEnd > now ? currentEnd : now;
+          boostEndsDate = new Date(from + BOOST_DURATION_DAYS * 86400000).toISOString();
+
+          await svc.entities.Boost.create({
+            property_id: propertyId,
+            user_id: me.id,
+            starts_date: new Date(now).toISOString(),
+            ends_date: boostEndsDate,
+            status: "active",
+            credits_spent: 1,
+          });
+          await svc.entities.Property.update(propertyId, {
+            boost_active: true,
+            boost_ends_date: boostEndsDate,
+          });
+          balance = await addCredits(svc, {
+            userId: me.id, delta: -1, reason: "spend", sourceId: propertyId, note: p.title || "",
+          });
+          appliedTo = propertyId;
+        }
+      } catch (_) {
+        // creditul rămâne în sold; utilizatorul îl poate aplica manual
+      }
+    }
+
+    return Response.json({ ok: true, boosts, balance, applied_to: appliedTo, boost_ends_date: boostEndsDate });
   } catch (e: any) {
     return Response.json({ error: e?.message || String(e) });
   }
