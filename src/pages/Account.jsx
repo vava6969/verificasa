@@ -140,7 +140,7 @@ export default function Account() {
   const options = [
     { icon: LayoutDashboard, label: en ? "Home" : "Acasă", path: "/", color: "sky" },
     { icon: MessageCircle, label: en ? "Chat" : "Mesaje", path: "/messages", color: "emerald" },
-    { icon: Bell, label: en ? "Alerts" : "Alerte", path: "/settings", badge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null, color: "amber" },
+    { icon: Bell, label: en ? "Alerts" : "Alerte", path: "/notificari", badge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null, color: "amber" },
     { icon: Bookmark, label: en ? "Saved" : "Salvate", path: "/saved", color: "rose" },
     { icon: Search, label: en ? "Searches" : "Căutări", path: "/searches", color: "violet" },
     { icon: Plus, label: en ? "Add" : "Adaugă", path: "/owner", color: "teal" },
