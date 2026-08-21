@@ -10,6 +10,8 @@
 //
 // Corectura definitivă e pe date, nu în cod: scripts/reassign-demo-photos.mjs.
 
+import { isImplausible } from "@/lib/listingSanity";
+
 export const STOCK_COVERS = [
   "/images/properties/interior-01.webp",
   "/images/properties/interior-02.webp",
@@ -76,7 +78,9 @@ export function buildCoverMap(properties) {
 
   for (const p of properties) {
     if (!p?.id) continue;
-    const own = p.images?.length ? p.images[0] : null;
+    // Anunțurile implauzibile pierd dreptul la propria copertă: fotografiile
+    // lor sunt randări desenate din datele demo.
+    const own = !isImplausible(p) && p.images?.length ? p.images[0] : null;
     if (own && !claimed.has(own)) {
       claimed.add(own);
       map.set(p.id, own);
@@ -92,6 +96,18 @@ export function coverOf(property, coverMap) {
   if (!property) return null;
   const mapped = coverMap?.get?.(property.id);
   if (mapped) return mapped;
-  if (property.images?.length) return property.images[0];
+  if (!isImplausible(property) && property.images?.length) return property.images[0];
   return stockCoverFor(property.id);
+}
+
+/**
+ * Galeria completă a unui anunț. Un anunț implauzibil primește un set local
+ * stabil în locul randărilor din datele demo.
+ */
+export function galleryOf(property) {
+  if (!property) return [];
+  if (!isImplausible(property) && property.images?.length) return property.images;
+  if (!STOCK_COVERS.length) return [];
+  const start = hashId(property.id) % STOCK_COVERS.length;
+  return [0, 1, 2].map((i) => STOCK_COVERS[(start + i * 7) % STOCK_COVERS.length]);
 }

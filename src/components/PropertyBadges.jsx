@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { isImplausible } from "@/lib/listingSanity";
 
 // Insignele care stau PE fotografia unui card. Fiecare e o pastilă solidă cu
 // iconița lucioasă a aplicației — aceeași limbă vizuală ca insignele de plan,
@@ -78,9 +79,12 @@ export function PropertyBadge({ kind, size = "md", lang = "ro", className, child
 export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", className }) {
   const boosted = property?.boost_active || property?.featured;
   const isAgent = property?.seller_role === "Agent";
+  // Un anunț implauzibil (preț de sute de mii, o cameră pe 345 mp) nu are voie
+  // să poarte „Verificat", oricât de mare i-ar fi scorul din date.
   const verified =
-    (property?.verification_level && property.verification_level !== "unverified") ||
-    (typeof property?.trust_score === "number" && property.trust_score >= 40);
+    !isImplausible(property) &&
+    ((property?.verification_level && property.verification_level !== "unverified") ||
+      (typeof property?.trust_score === "number" && property.trust_score >= 40));
   const plan = planId && KINDS[planId] ? planId : null;
 
   if (!boosted && !verified && !isAgent && !plan) return null;
