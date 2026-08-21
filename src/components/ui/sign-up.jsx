@@ -207,7 +207,7 @@ export function AuthComponent({ logo, brandName = "VerifiCasa" }) {
           </InputOTP>
         </div>
         <button onClick={verifyOtp} disabled={loading || otp.length < 6}
-          className="w-full h-12 rounded font-semibold gradient-emerald text-navy flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50">
+          className="w-full h-12 rounded font-semibold bg-emerald text-primary-foreground flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50">
           {loading ? <><Loader2 className="w-4 h-4 animate-spin" />{L.verifying}</> : <>{L.verify}<ArrowRight className="w-4 h-4" /></>}
         </button>
         <p className="text-center text-sm text-muted-foreground mt-4">
@@ -305,7 +305,7 @@ export function AuthComponent({ logo, brandName = "VerifiCasa" }) {
               </button>
             )}
             <button type="submit" disabled={loading}
-              className="flex-1 h-12 rounded font-semibold gradient-emerald text-navy flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50">
+              className="flex-1 h-12 rounded font-semibold bg-emerald text-primary-foreground flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50">
               {loading ? <><Loader2 className="w-4 h-4 animate-spin" />{L.creating}</> : (step < totalSteps - 1 ? <>{L.next}<ArrowRight className="w-4 h-4" /></> : <>{L.create}<ArrowRight className="w-4 h-4" /></>)}
             </button>
           </div>
@@ -318,7 +318,7 @@ export function AuthComponent({ logo, brandName = "VerifiCasa" }) {
             <Link to="/forgot-password" className="text-xs text-emerald hover:underline">{L.forgot}</Link>
           </div>
           <button type="submit" disabled={loading}
-            className="w-full h-12 rounded font-semibold gradient-emerald text-navy flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50">
+            className="w-full h-12 rounded font-semibold bg-emerald text-primary-foreground flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50">
             {loading ? <><Loader2 className="w-4 h-4 animate-spin" />{L.loggingIn}</> : <>{L.login}<ArrowRight className="w-4 h-4" /></>}
           </button>
         </form>

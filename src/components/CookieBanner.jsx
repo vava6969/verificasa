@@ -80,7 +80,7 @@ export default function CookieBanner() {
                   <Button onClick={() => setShowPrefs(true)} size="sm" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
                     {t("cookie_prefs")}
                   </Button>
-                  <Button onClick={acceptAll} size="sm" className="gradient-mint text-navy hover:opacity-90">
+                  <Button onClick={acceptAll} size="sm" className="bg-emerald text-primary-foreground hover:opacity-90">
                     {t("cookie_accept")}
                   </Button>
                   <button onClick={rejectAll} className="rounded p-1 text-white/50 hover:text-white" aria-label="Close">
@@ -149,7 +149,7 @@ export default function CookieBanner() {
                 <Button onClick={rejectAll} size="sm" variant="ghost">
                   {t("cookie_reject_all")}
                 </Button>
-                <Button onClick={savePrefs} size="sm" className="gradient-mint text-navy hover:opacity-90">
+                <Button onClick={savePrefs} size="sm" className="bg-emerald text-primary-foreground hover:opacity-90">
                   {t("cookie_save_prefs")}
                 </Button>
                 <Button onClick={acceptAll} size="sm" variant="outline">

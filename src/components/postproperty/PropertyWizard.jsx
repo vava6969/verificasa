@@ -200,7 +200,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
 
         <div className="relative mt-4 h-2 w-full overflow-hidden rounded-full bg-secondary">
           <motion.div
-            className="relative h-full overflow-hidden rounded-full gradient-emerald"
+            className="relative h-full overflow-hidden rounded-full bg-emerald"
             animate={{
               width: `${progress}%`,
               boxShadow: [

@@ -170,7 +170,7 @@ export default function InspectieModal({ open, onClose }) {
           </div>
 
           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-            <div className="h-full rounded-full gradient-emerald transition-all duration-500" style={{ width: `${progress}%` }} />
+            <div className="h-full rounded-full bg-emerald transition-all duration-500" style={{ width: `${progress}%` }} />
           </div>
 
           <div className="mt-2.5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">

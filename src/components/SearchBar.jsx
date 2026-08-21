@@ -68,7 +68,7 @@ export default function SearchBar({ compact = false, onSubmitted }) {
           </select>
         </div>
 
-        <Button type="submit" className="gradient-emerald text-white shadow-soft hover:opacity-90 md:px-7">
+        <Button type="submit" className="bg-emerald text-white shadow-soft hover:opacity-90 md:px-7">
           <Search className="h-4 w-4" /> {t("sb_btn")}
         </Button>
       </div>

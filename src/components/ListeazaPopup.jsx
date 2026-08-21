@@ -29,7 +29,7 @@ export default function ListeazaPopup({ open, onClose }) {
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-navy-deep/70" onClick={onClose} />
       <div className="relative z-10 w-full max-w-xl overflow-hidden rounded border border-border bg-white shadow-2xl dark:bg-card">
-        <div className="relative gradient-emerald p-6 text-white">
+        <div className="relative bg-emerald p-6 text-white">
           <button onClick={onClose} aria-label={t("li_close")} className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded bg-white/20 text-white transition hover:bg-white/40">
             <X className="h-5 w-5" />
           </button>

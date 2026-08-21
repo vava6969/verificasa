@@ -242,7 +242,7 @@ export default function UserProfile() {
     return (
       <div className="mx-auto max-w-5xl px-4 py-24 text-center sm:px-6 lg:px-8">
         <p className="font-heading text-2xl font-bold text-navy dark:text-foreground">{t("not_found")}</p>
-        <Button asChild className="mt-4 gradient-mint text-navy"><Link to="/">{t("back_home")}</Link></Button>
+        <Button asChild className="mt-4 bg-emerald text-primary-foreground"><Link to="/">{t("back_home")}</Link></Button>
       </div>
     );
   }
@@ -260,7 +260,7 @@ export default function UserProfile() {
           {profile.cover_image_url ? (
             <UIImage src={profile.cover_image_url} fittingType="fill" className="h-full w-full" />
           ) : (
-            <div className="h-full w-full gradient-emerald" />
+            <div className="h-full w-full bg-emerald" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
         </div>

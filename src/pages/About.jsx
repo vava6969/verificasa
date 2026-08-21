@@ -155,7 +155,7 @@ export default function About() {
             {c.hero_p1} {c.hero_p2}
           </motion.p>
           <motion.div initial="hidden" animate="show" variants={fadeUp} className="mt-8 flex flex-wrap justify-center gap-3">
-            <Button asChild className="rounded gradient-mint text-navy shadow-soft hover:opacity-90">
+            <Button asChild className="rounded bg-emerald text-primary-foreground shadow-soft hover:opacity-90">
               <Link to="/search">{c.cta_search} <ArrowRight className="h-4 w-4" /></Link>
             </Button>
             <Button asChild variant="outline" className="rounded border-white/30 bg-white/5 text-white hover:bg-white/10">
