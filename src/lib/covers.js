@@ -22,7 +22,6 @@ export const STOCK_COVERS = [
   "/images/properties/interior-09.webp",
   "/images/properties/interior-10.webp",
   "/images/properties/interior-11.webp",
-  "/images/properties/interior-12.webp",
   "/images/properties/exterior-01.webp",
   "/images/properties/exterior-02.webp",
   "/images/properties/exterior-03.webp",
