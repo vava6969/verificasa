@@ -41,7 +41,7 @@
     --ring: 150 57% 28%;
 
     /* registry corners: squared, not pill */
-    --radius: 0.25rem;
+    --radius: 0.75rem;
 
     /* exactly two faces + mono for on-photo instrument marks */
     --font-heading: 'Spectral', 'Iowan Old Style', Georgia, serif;
