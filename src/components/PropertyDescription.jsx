@@ -29,7 +29,7 @@ export default function PropertyDescription({ text, emptyLabel, moreLabel, lessL
       });
     }, TICK_MS);
     return () => clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [started, text]);
 
   if (!text) {

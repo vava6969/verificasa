@@ -64,7 +64,7 @@ export default function Messages() {
     const unsubM = base44.entities.Message.subscribe(() => loadConversations());
     const unsubC = base44.entities.Conversation.subscribe(() => loadConversations());
     return () => { try { unsubM?.(); } catch {} try { unsubC?.(); } catch {} };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isAuthenticated, user?.id]);
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;

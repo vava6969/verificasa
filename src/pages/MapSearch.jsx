@@ -146,7 +146,7 @@ function MapController({ onBoundsChange, onZoomChange, flyTarget, onFlyDone, onR
     const c = map.getCenter();
     onBoundsChange({ north: b.getNorth(), south: b.getSouth(), east: b.getEast(), west: b.getWest(), lat: c.lat, lng: c.lng });
     onZoomChange(map.getZoom());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [map]);
 
   useEffect(() => {
@@ -154,7 +154,7 @@ function MapController({ onBoundsChange, onZoomChange, flyTarget, onFlyDone, onR
       map.flyTo([flyTarget.lat, flyTarget.lng], flyTarget.zoom || 10, { duration: 0.8 });
       onFlyDone();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [flyTarget, map]);
 
   useMapEvents({

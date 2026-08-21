@@ -45,7 +45,7 @@ export default function InstagramPopup() {
 
     holdTimer.current = setTimeout(() => close(), HOLD_MS);
     return () => clearHold();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [open]);
 
   // Start the first cycle + reschedule after each close.
@@ -55,7 +55,7 @@ export default function InstagramPopup() {
       if (showTimer.current) clearTimeout(showTimer.current);
       clearHold();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const close = () => {

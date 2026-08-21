@@ -104,6 +104,71 @@ export function Meter({ label, used = 0, limit, unlimited = false, reset, classN
   );
 }
 
+/**
+ * The score, shown with its working. Bands come from the ComputeTrustScore
+ * breakdown; a listing that scores badly shows WHY, deductions included.
+ * Falls back to the bare figure while a listing has no stored breakdown yet.
+ */
+export function ScoreLedger({ score, breakdown, className, labels = {} }) {
+  const s = Math.max(0, Math.min(100, Math.round(score ?? 0)));
+  const verdict = s >= 75 ? (labels.high || "Încredere ridicată") : s >= 40 ? (labels.mid || "Verificat") : (labels.low || "Neverificat");
+  const tone = s >= 40 ? "verde" : "ink";
+  const bands = Array.isArray(breakdown?.bands) ? breakdown.bands : [];
+  const deductions = Array.isArray(breakdown?.deductions) ? breakdown.deductions : [];
+
+  return (
+    <section className={cn("border border-border bg-card", className)}>
+      <div className="flex items-center justify-between gap-4 border-b border-border px-4 py-3">
+        <div className="min-w-0">
+          <h3 className="font-heading text-lg font-semibold text-foreground">
+            {labels.title || "Scor de încredere"}
+          </h3>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {labels.sub || "Calculat din dovezi, nu din câte poze ai încărcat."}
+          </p>
+        </div>
+        <div className="shrink-0 text-right">
+          <p className="font-heading text-3xl font-semibold leading-none text-foreground tnum">
+            {s}<span className="font-body text-sm font-medium text-muted-foreground">/100</span>
+          </p>
+          <Stamp tone={tone} className="mt-1.5">{verdict}</Stamp>
+        </div>
+      </div>
+
+      {bands.length > 0 ? (
+        <div className="px-4 py-1">
+          <Ledger className="border-y-0">
+            {bands.map((b) => (
+              <div key={b.key || b.label} className="py-2.5">
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="text-sm font-semibold text-foreground">{b.label}</p>
+                  <p className="text-sm font-semibold tnum">
+                    {b.points}<span className="font-normal text-muted-foreground">/{b.max}</span>
+                  </p>
+                </div>
+                {b.reason && <p className="mt-0.5 max-w-[62ch] text-xs text-muted-foreground">{b.reason}</p>}
+              </div>
+            ))}
+            {deductions.map((d) => (
+              <div key={d.key || d.label} className="py-2.5">
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="text-sm font-semibold text-marcaj">{d.label}</p>
+                  <p className="text-sm font-semibold text-marcaj tnum">−{Math.abs(d.points)}</p>
+                </div>
+                {d.reason && <p className="mt-0.5 max-w-[62ch] text-xs text-muted-foreground">{d.reason}</p>}
+              </div>
+            ))}
+          </Ledger>
+        </div>
+      ) : (
+        <p className="px-4 py-3 text-xs text-muted-foreground">
+          {labels.pending || "Detalierea scorului se publică la următoarea recalculare a anunțului."}
+        </p>
+      )}
+    </section>
+  );
+}
+
 /* ---- instrument marks ON photographs (the only home of mono type) ---- */
 
 /** Mono annotation positioned on an image. Parent must be relative. */

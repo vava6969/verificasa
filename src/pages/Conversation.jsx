@@ -96,7 +96,7 @@ export default function Conversation() {
       if (event?.data?.conversation_id === id) loadMessages();
     });
     return () => { cancelled = true; try { unsub?.(); } catch {} };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [id, isAuthenticated, user?.id]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
