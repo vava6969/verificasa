@@ -8,155 +8,106 @@ import InspectieModal from "@/components/InspectieModal";
 import ListeazaPopup from "@/components/ListeazaPopup";
 import MapSearchCTA from "@/components/MapSearchCTA";
 import ActionCards from "@/components/ActionCards";
+import ValueProps from "@/components/ValueProps";
 import BetaBanner from "@/components/BetaBanner";
 import AboutVerifiCasa from "@/components/AboutVerifiCasa";
 import RecommendedByPlanSection from "@/components/RecommendedByPlanSection";
-import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
-import { Stamp, Kicker } from "@/components/fisa";
+import { Reveal } from "@/components/ui/reveal";
 
-// Homepage as the registry's front sheet. The hero is asymmetric: the claim
-// and the search on the left, the evidence on the right — a real photograph
-// carrying the inspection layer, and the live 3D scan underneath it.
+// Prima pagină, în forma cerută de client: fotografia ocupă ecranul, titlul e
+// scurt, căutarea stă imediat sub deget. Fără dateline, fără paragraf de
+// introducere, fără ștampile — nimeni nu citește prima pagină, o parcurge.
 export default function Landing() {
   const { t, lang } = useCountry();
   const en = lang === "en";
   const [showInspectie, setShowInspectie] = useState(false);
   const [showListeaza, setShowListeaza] = useState(false);
 
-  const valueProps = [
-    ["vp1_t", "vp1_d"], ["vp2_t", "vp2_d"], ["vp3_t", "vp3_d"],
-    ["vp4_t", "vp4_d"], ["vp5_t", "vp5_d"], ["vp6_t", "vp6_d"],
-    ["vp7_t", "vp7_d"], ["vp8_t", "vp8_d"], ["vp9_t", "vp9_d"],
-  ];
-
   return (
     <div>
       <BetaBanner />
 
-      {/* ——— PRIMA PAGINĂ A REGISTRULUI ———
-          Două compoziții distincte, nu una strivită:
-          · Desktop: pagină de gazetă — dateline riglat, titlu mare pe stânga,
-            fotografia-fișă sângerează până la marginea ferestrei pe dreapta,
-            iar banda de scanare 3D taie pagina pe toată lățimea, ca un
-            seismograf. Fără eyebrow-pastilă, fără accent italic în titlu:
-            ambele erau amprente de generator.
-          · Telefon: unealtă, nu afiș — titlu la scară mică, căutarea imediat
-            sub deget, fotografia și scanarea după. */}
-      <section className="mx-auto max-w-7xl px-4 pb-6 pt-6 sm:px-6 sm:pt-8 lg:px-8">
-        {/* dateline — informație, nu decor */}
-        <div className="flex items-baseline justify-between gap-4 border-y border-border py-2">
-          <p className="text-xs font-semibold text-foreground sm:text-sm">
-            {en ? "The register of verified rentals" : "Registrul chiriilor verificate"}
-          </p>
-          <p className="text-xs text-muted-foreground sm:text-sm">
-            {"România · " + new Date().toLocaleDateString(en ? "en-GB" : "ro-RO", { day: "2-digit", month: "long", year: "numeric" })}
-          </p>
-        </div>
+      {/* HERO — fotografie pe toată lățimea, text peste ea */}
+      <section className="relative">
+        <div className="relative h-[78vh] min-h-[440px] w-full overflow-hidden sm:h-[70vh] sm:min-h-[520px] lg:h-[76vh]">
+          <HeroPhoto rounded={false} className="absolute inset-0 h-full w-full" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/30 to-black/70" />
 
-        <div className="mt-6 grid items-start gap-8 lg:mt-10 lg:grid-cols-12 lg:gap-10">
-          <div className="min-w-0 lg:col-span-6">
-            <h1 className="font-heading text-[2rem] font-medium leading-[calc(1.12em_+_3px)] tracking-[-0.02em] text-foreground sm:text-[2.6rem] lg:text-[3rem] xl:text-[3.4rem]">
-              {t("hero_h1_a")}
-              <br />
-              {t("hero_h1_b")}
-            </h1>
-            <p className="mt-5 hidden max-w-[52ch] text-lg leading-relaxed text-muted-foreground lg:block">
-              {en
-                ? "Every listing is checked before it goes live: photos, paperwork, price. What you see is what you rent."
-                : "Fiecare anunț e verificat înainte de publicare: poze, acte, preț. Ce vezi e ce închiriezi."}
-            </p>
+          <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-8 sm:px-6 sm:pb-12 lg:px-8 lg:pb-16">
+            <Reveal>
+              <h1 className="max-w-[15ch] text-[2.4rem] font-bold leading-[1.03] tracking-tight text-white sm:text-6xl lg:text-7xl">
+                {t("hero_h1_a")}
+              </h1>
+              <p className="mt-2 max-w-[22ch] text-lg font-semibold text-white/85 sm:text-2xl">
+                {t("hero_h1_b")}
+              </p>
+            </Reveal>
 
-            <div className="mt-5 lg:mt-7">
+            <Reveal delay={0.12} className="mt-6 w-full sm:mt-8 lg:max-w-4xl">
               <HeroSearch />
-            </div>
+            </Reveal>
 
-            {/* Acțiuni: bloc plin pe telefon, rând pe desktop */}
-            <div className="mt-5 grid gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-4">
+            <Reveal delay={0.2} className="mt-4 flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={() => setShowListeaza(true)}
-                className="min-h-[48px] rounded bg-emerald px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90 sm:min-h-[44px]"
+                className="min-h-[48px] rounded-full bg-emerald px-6 text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:scale-[1.03]"
               >
                 {t("hdr_add")}
               </button>
               <button
                 type="button"
                 onClick={() => setShowInspectie(true)}
-                className="inline-flex min-h-[44px] items-center justify-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:justify-start"
+                className="inline-flex min-h-[48px] items-center rounded-full border border-white/50 px-6 text-sm font-bold text-white transition-colors hover:bg-white/15"
               >
-                {en ? "Request a verification" : "Solicită o verificare"} <span className="ml-1" aria-hidden="true">→</span>
+                {en ? "Request a check" : "Cere o verificare"}
               </button>
-            </div>
+            </Reveal>
           </div>
-
-          {/* fotografia-fișă — pe desktop iese din container până la marginea
-              ferestrei: fotografia e dovada, are voie să rupă rama */}
-          <Reveal className="min-w-0 lg:col-span-6 lg:mr-[calc(-2rem_-_max(0px,(100vw_-_80rem)/2))]">
-            <HeroPhoto className="aspect-[4/3] w-full lg:aspect-[16/9]" />
-          </Reveal>
         </div>
-
-        {/* banda de parcurgere — turul taie pagina dintr-o parte în alta */}
-        <Reveal className="mt-3 overflow-hidden bg-navy-deep lg:mx-[calc(50%-50vw)] lg:mt-8">
-          <div className="h-28 w-full sm:h-32 lg:h-36">
-            {/* v2 holds one speed end to end (tail/head 1.03) and carries no
-                mid-clip cuts; its ends do not quite meet, so the join is
-                dissolved rather than cut. */}
-            <LoopVideo
-              src="/videos/hero-walkthrough-v2.mp4"
-              poster="/images/hero/villa-living-1.webp"
-              objectPosition="center 55%"
-              crossfade={0.4}
-            />
-          </div>
-        </Reveal>
-
-        <HeroCountdown className="mt-6 lg:mt-8" />
       </section>
 
       {/* THE THREE WAYS IN */}
       <ActionCards onRequestInspection={() => setShowInspectie(true)} />
 
-      {/* WHY — ruled ledger, two columns, type does the work */}
-      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
-        <Reveal className="mb-5">
-          <Kicker>{en ? "Why VerifiCasa" : "De ce VerifiCasa"}</Kicker>
-          <h2 className="mt-1 font-heading text-2xl font-semibold text-foreground sm:text-3xl">
-            {en ? "Transparency, step by step" : "Transparență, pas cu pas"}
-          </h2>
+      {/* ANUNȚURI RECOMANDATE — sus, e ce vine lumea să vadă */}
+      <div id="featured" className="pt-2">
+        <Reveal className="mx-auto mb-4 max-w-7xl px-4 sm:mb-6 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-foreground sm:text-3xl">{t("featured_h")}</h2>
         </Reveal>
-        <RevealGroup className="grid grid-cols-1 border-t border-border md:grid-cols-2 md:gap-x-12">
-          {valueProps.map(([tt, dd]) => (
-            <RevealItem key={tt} className="border-b border-border py-4">
-              <h3 className="font-body text-[15px] font-bold text-foreground">{t(tt)}</h3>
-              <p className="mt-1 max-w-[62ch] text-sm leading-relaxed text-muted-foreground">{t(dd)}</p>
-            </RevealItem>
-          ))}
-        </RevealGroup>
-      </section>
+        <RecommendedByPlanSection />
+      </div>
 
-      {/* DESPRE */}
-      <AboutVerifiCasa />
+      {/* BANDA VIDEO — turul taie pagina dintr-o parte în alta */}
+      <Reveal className="overflow-hidden bg-navy-deep">
+        <div className="h-36 w-full sm:h-44 lg:h-56">
+          <LoopVideo
+            src="/videos/hero-walkthrough-v2.mp4"
+            poster="/images/hero/villa-living-1.webp"
+            objectPosition="center 55%"
+            crossfade={0.4}
+          />
+        </div>
+      </Reveal>
 
-      {/* MAP */}
+      {/* DE CE — iconițe, nu paragrafe */}
+      <ValueProps />
+
+      {/* HARTA */}
       <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
         <Reveal>
           <MapSearchCTA />
         </Reveal>
       </section>
 
-      {/* ANUNȚURI RECOMANDATE */}
-      <div id="featured">
-        <Reveal className="mx-auto mb-5 max-w-7xl px-4 sm:mb-8 sm:px-6 lg:px-8">
-          <Kicker>{t("featured_kicker")}</Kicker>
-          <h2 className="mt-1 font-heading text-2xl font-semibold text-foreground sm:text-3xl">{t("featured_h")}</h2>
-        </Reveal>
-        <RecommendedByPlanSection />
-      </div>
+      <HeroCountdown className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8" />
 
-      {/* OWNER CTA — photograph + ruled claims */}
+      {/* DESPRE */}
+      <AboutVerifiCasa />
+
+      {/* OWNER CTA */}
       <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 sm:pb-20 lg:px-8">
-        <Reveal className="relative overflow-hidden border border-border">
+        <Reveal className="relative overflow-hidden rounded-2xl">
           <img
             src="/images/generated/owner-cta-bg-mobile-v1.png"
             alt=""
@@ -172,30 +123,26 @@ export default function Landing() {
           <div className="absolute inset-0 bg-gradient-to-r from-navy-deep/95 via-navy-deep/80 to-navy-deep/30" />
 
           <div className="relative max-w-2xl p-6 sm:p-12">
-            <Stamp tone="verde">{t("owner_badge")}</Stamp>
-            <h2 className="mt-3 font-heading text-2xl font-semibold leading-tight text-white sm:mt-4 sm:text-3xl">{t("owner_h")}</h2>
-            <p className="mt-2 text-sm text-white/80 sm:mt-3 sm:text-base">{t("owner_d")}</p>
+            <h2 className="text-2xl font-bold leading-tight text-white sm:text-4xl">{t("owner_h")}</h2>
 
-            <div className="mt-5 flex flex-wrap gap-3 sm:mt-6">
+            <div className="mt-5 flex flex-wrap gap-3 sm:mt-7">
               <button
                 type="button"
                 onClick={() => setShowInspectie(true)}
-                className="rounded bg-emerald px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90"
+                className="min-h-[48px] rounded-full bg-emerald px-6 text-sm font-bold text-primary-foreground transition-transform hover:scale-[1.03]"
               >
                 {t("owner_btn_inspectie")}
               </button>
               <button
                 type="button"
                 onClick={() => setShowListeaza(true)}
-                className="rounded border border-white/40 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:border-white hover:bg-white/10"
+                className="min-h-[48px] rounded-full border border-white/50 px-6 text-sm font-bold text-white transition-colors hover:bg-white/15"
               >
                 {t("owner_btn_listeaza")}
               </button>
             </div>
 
-            <p className="mt-4 text-xs text-white/55 sm:mt-5">{t("owner_note")}</p>
-
-            <ul className="mt-5 grid grid-cols-2 gap-x-6 border-t border-white/20 pt-4 sm:mt-8 sm:grid-cols-4">
+            <ul className="mt-6 grid grid-cols-2 gap-x-6 border-t border-white/20 pt-4 sm:mt-8 sm:grid-cols-4">
               {[t("b_verified"), t("b_measure"), t("b_report"), t("b_docs")].map((b) => (
                 <li key={b} className="py-1.5 text-xs font-semibold text-white/85">
                   <span className="mr-1.5 text-emerald" aria-hidden="true">✓</span>{b}

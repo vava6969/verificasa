@@ -230,77 +230,81 @@
     text-shadow: 0 1px 2px rgb(0 0 0 / 0.55);
   }
 
-  /* ---- map: price-stamp pins + survey-sheet furniture ----
-     divIcon markup lives outside React, so the pins are classed here and
-     read the same tokens as the rest of the app (both themes for free). */
+  /* ---- map: price bubbles ----
+     divIcon markup lives outside React, so the pins are classed here and read
+     the same tokens as the rest of the app (both themes for free). Bule
+     rotunjite, nu stampile patrate: harta e partea in care oamenii se joaca,
+     iar rama de fisa tehnica o facea sa para un formular. */
   .vc-pin {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     background: hsl(var(--card));
     color: hsl(var(--foreground));
-    border: 1.5px solid hsl(var(--foreground));
-    border-radius: 2px;
-    padding: 3px 7px 2px;
+    border: 1.5px solid hsl(var(--card));
+    border-radius: 999px;
+    padding: 4px 10px;
     font-family: var(--font-body);
     font-weight: 700;
-    font-size: 12px;
+    font-size: 12.5px;
     line-height: 1.2;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     position: relative;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.28);
+    transition: transform 0.18s ease, background-color 0.18s ease;
   }
   .vc-pin::after {
     content: "";
     position: absolute;
     left: 50%;
-    bottom: -6px;
-    width: 1.5px;
-    height: 6px;
-    background: hsl(var(--foreground));
-    transform: translateX(-50%);
+    bottom: -3px;
+    width: 8px;
+    height: 8px;
+    background: inherit;
+    transform: translateX(-50%) rotate(45deg);
   }
-  .vc-pin .vc-pin-tick { color: hsl(var(--primary)); font-weight: 700; }
+  .vc-pin:hover { transform: scale(1.08); z-index: 40; }
+  .vc-pin .vc-pin-tick { color: hsl(var(--primary)); font-weight: 900; }
   .vc-pin--active {
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
     border-color: hsl(var(--primary));
+    transform: scale(1.1);
     z-index: 30;
   }
-  .vc-pin--active::after { background: hsl(var(--primary)); }
   .vc-pin--active .vc-pin-tick { color: hsl(var(--primary-foreground)); }
-  .vc-pin--visited { color: hsl(var(--muted-foreground)); border-color: hsl(var(--muted-foreground)); }
-  .vc-pin--visited::after { background: hsl(var(--muted-foreground)); }
-  .vc-pin--boosted::before {
-    content: "";
-    position: absolute;
-    top: -1.5px;
-    right: -1.5px;
-    width: 0;
-    height: 0;
-    border-top: 9px solid hsl(var(--marcaj));
-    border-left: 9px solid transparent;
+  .vc-pin--visited {
+    background: hsl(var(--secondary));
+    color: hsl(var(--muted-foreground));
+    border-color: hsl(var(--secondary));
   }
+  /* promovat: bula inchisa cu cifre aurii, aceeasi pereche ca insigna de pe card */
+  .vc-pin--boosted {
+    background: #1e1608;
+    color: #f5ce7c;
+    border-color: #1e1608;
+  }
+  .vc-pin--boosted .vc-pin-tick { color: #f5ce7c; }
   .vc-bundle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: hsl(var(--card) / 0.94);
-    color: hsl(var(--foreground));
-    border: 1.5px solid hsl(var(--foreground));
-    outline: 1px solid hsl(var(--foreground) / 0.35);
-    outline-offset: 2.5px;
-    border-radius: 2px;
-    padding: 5px 9px 4px;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border: 2.5px solid hsl(var(--primary-foreground) / 0.85);
+    border-radius: 999px;
+    padding: 6px 11px;
     font-family: var(--font-body);
-    font-weight: 700;
-    font-size: 12px;
+    font-weight: 800;
+    font-size: 12.5px;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.22);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.3);
+    transition: transform 0.18s ease;
   }
-  .vc-bundle--active { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: hsl(var(--primary)); }
+  .vc-bundle:hover { transform: scale(1.08); }
+  .vc-bundle--active { background: hsl(var(--foreground)); color: hsl(var(--background)); }
   .vc-maplabel {
     font-family: var(--f-body, var(--font-body));
     font-size: 10px;
@@ -321,8 +325,8 @@
     padding: 2px 6px;
   }
   /* paper-toned tiles until the client's MapTiler key lands (CSS-filtered) */
-  .vc-tiles-plan { filter: saturate(0.5) sepia(0.14) brightness(1.02) contrast(0.98); }
-  .dark .vc-tiles-plan { filter: invert(1) hue-rotate(180deg) brightness(0.85) saturate(0.25) contrast(0.95); }
+  .vc-tiles-plan { filter: saturate(1.05); }
+  .dark .vc-tiles-plan { filter: invert(1) hue-rotate(180deg) brightness(0.9) saturate(0.6); }
   .vc-tiles-none { filter: none; }
 
   /* generated paper grain (SVG turbulence, no stock textures) */

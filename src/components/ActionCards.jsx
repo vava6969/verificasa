@@ -3,62 +3,69 @@ import { Link } from "react-router-dom";
 import { useCountry } from "@/components/CountryContext";
 import { RevealGroup, RevealItem } from "@/components/ui/reveal";
 
-// The three ways in — as one ruled block, not three floating cards. Each entry
-// is typed: title, plain sentence, contextual action. Divided by hairlines,
-// columns on desktop, rows on mobile.
+// Cele trei drumuri în aplicație. Fiecare e o fotografie cu un singur rând de
+// text peste ea — se aleg din privire, nu din citit. Paragrafele explicative
+// au ieșit; dacă un card are nevoie de trei rânduri ca să se explice, atunci
+// cardul e greșit, nu textul prea scurt.
 export default function ActionCards({ onRequestInspection }) {
   const { lang } = useCountry();
   const en = lang === "en";
 
   const cards = [
     {
-      title: en ? "Find a verified rental" : "Caută o chirie verificată",
-      desc: en
-        ? "Browse listings that have been verified online, with real photos and honest pricing."
-        : "Răsfoiește anunțuri verificate online, cu poze reale și prețuri corecte.",
-      cta: en ? "Search properties" : "Caută proprietăți",
+      title: en ? "Find a rental" : "Caută o chirie",
+      img: "/images/properties/interior-01.webp",
       to: "/search",
     },
     {
-      title: en ? "List your property" : "Listează-ți proprietatea",
-      desc: en
-        ? "Post your listing for free and reach tenants looking for verified homes."
-        : "Publică anunțul gratuit și ajungi la chiriași care caută locuințe verificate.",
-      cta: en ? "List for free" : "Listează gratuit",
+      title: en ? "List your place" : "Listează gratuit",
+      img: "/images/properties/exterior-03.webp",
       to: "/post-property",
     },
     {
-      title: en ? "Request a verification" : "Solicită o verificare",
-      desc: en
-        ? "We verify the listing online: photos, paperwork and price, so you rent with no surprises."
-        : "Verificăm anunțul online: poze, acte și preț, ca să închiriezi fără surprize.",
-      cta: en ? "Request verification" : "Solicită verificare",
+      title: en ? "Get it verified" : "Cere o verificare",
+      img: "/images/properties/interior-05.webp",
       to: null,
     },
   ];
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
-      <RevealGroup className="grid grid-cols-1 divide-y divide-border border border-border bg-card sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-        {cards.map((c, i) => (
-          <RevealItem key={i} className="flex flex-col p-6 sm:p-7">
-            <h3 className="font-heading text-xl font-semibold text-foreground">{c.title}</h3>
-            <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{c.desc}</p>
-            {c.to ? (
-              <Link to={c.to} className="mt-5 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0">
-                {c.cta} <span aria-hidden="true">→</span>
-              </Link>
-            ) : (
-              <button
-                type="button"
-                onClick={onRequestInspection}
-                className="mt-5 text-left inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0"
-              >
-                {c.cta} <span aria-hidden="true">→</span>
-              </button>
-            )}
-          </RevealItem>
-        ))}
+    <section className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 lg:px-8">
+      <RevealGroup className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+        {cards.map((c) => {
+          const inner = (
+            <span className="group relative flex h-32 items-end overflow-hidden rounded-2xl sm:h-44">
+              <img
+                src={c.img}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+              <span className="relative flex w-full items-center justify-between gap-2 p-4 sm:p-5">
+                <span className="text-lg font-bold text-white sm:text-xl">{c.title}</span>
+                <span
+                  aria-hidden="true"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald text-lg leading-none text-primary-foreground transition-transform duration-300 group-hover:translate-x-1"
+                >
+                  →
+                </span>
+              </span>
+            </span>
+          );
+          return (
+            <RevealItem key={c.title}>
+              {c.to ? (
+                <Link to={c.to} className="block">{inner}</Link>
+              ) : (
+                <button type="button" onClick={onRequestInspection} className="block w-full text-left">
+                  {inner}
+                </button>
+              )}
+            </RevealItem>
+          );
+        })}
       </RevealGroup>
     </section>
   );

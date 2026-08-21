@@ -602,33 +602,17 @@ export default function MapSearch() {
           <DrawController drawMode={drawMode} onAddPoint={(pt) => setPolygonPoints((prev) => [...prev, pt])} />
         </MapContainer>
 
-        {/* ——— RAMA FIȘEI DE TEREN ———
-            Colțurile tipăresc coordonatele vii (se schimbă la fiecare pan),
-            marginea poartă scara și nordul. E interfață reală, nu decor: asta
-            transformă „pagina cu hartă" în fișa de teren a registrului. */}
-        <div className="pointer-events-none absolute inset-0 z-[900] border-[6px] border-background/85">
-          <span className="vc-sheet-coord absolute left-2 top-2">
-            {bounds ? `${bounds.north.toFixed(4)} N · ${bounds.west.toFixed(4)} E` : "—"}
-          </span>
-          <span className="vc-sheet-coord absolute right-2 top-2">N ↑</span>
-          <span className="vc-sheet-coord absolute bottom-2 left-2">
-            {bounds ? `${bounds.south.toFixed(4)} N · ${bounds.east.toFixed(4)} E` : "—"}
-          </span>
-          <span className="vc-sheet-coord absolute bottom-2 right-2">
-            ZOOM {String(zoom).padStart(2, "0")} · {visibleProperties.length} ÎNREG.
-          </span>
-        </div>
 
         {/* Înapoi */}
         <button
           onClick={() => navigate("/")}
-          className="absolute left-3 top-8 z-[1000] flex items-center gap-1.5 rounded border border-border bg-background px-3 py-1.5 text-sm font-semibold text-foreground transition-colors hover:border-emerald"
+          className="absolute left-3 top-4 z-[1000] flex min-h-[40px] items-center gap-1.5 rounded-full border border-border bg-background px-4 text-sm font-semibold text-foreground shadow-md transition-colors hover:border-emerald"
         >
           <ArrowLeft className="h-4 w-4" /> {en ? "Back" : "Înapoi"}
         </button>
 
         {/* Zoom */}
-        <div className="absolute left-3 top-20 z-[1000] flex flex-col divide-y divide-border overflow-hidden rounded border border-border bg-background">
+        <div className="absolute left-3 top-16 z-[1000] hidden flex-col divide-y divide-border overflow-hidden rounded-full border border-border bg-background shadow-md sm:flex">
           <button
             onClick={() => mapInstance?.zoomIn()}
             className="flex h-9 w-9 items-center justify-center text-foreground transition-colors hover:bg-secondary"
@@ -646,7 +630,7 @@ export default function MapSearch() {
         </div>
 
         {/* PLAN / SATELIT — file ștampilate */}
-        <div className="absolute right-3 top-8 z-[1000] flex divide-x divide-border overflow-hidden rounded border border-border bg-background">
+        <div className="absolute right-3 top-4 z-[1000] flex divide-x divide-border overflow-hidden rounded-full border border-border bg-background shadow-md">
           {[
             { id: "plan", label: "PLAN" },
             { id: "satelit", label: "SATELIT" },
@@ -655,7 +639,7 @@ export default function MapSearch() {
               key={b.id}
               onClick={() => setBasemap(b.id)}
               aria-pressed={basemap === b.id}
-              className={`px-3 py-1.5 text-xs font-bold transition-colors ${
+              className={`min-h-[40px] px-4 text-xs font-bold transition-colors ${
                 basemap === b.id ? "bg-emerald text-primary-foreground" : "text-foreground hover:bg-secondary"
               }`}
             >
@@ -665,10 +649,10 @@ export default function MapSearch() {
         </div>
 
         {/* Salvează căutarea + desenare zonă */}
-        <div className="absolute right-3 top-20 z-[1000] flex flex-col items-end gap-1.5">
+        <div className="absolute right-3 top-16 z-[1000] flex flex-col items-end gap-1.5">
           <button
             onClick={saveSearch}
-            className="flex items-center gap-1.5 rounded border border-border bg-background px-3 py-1.5 text-sm font-semibold text-foreground transition-colors hover:border-emerald"
+            className="flex min-h-[40px] items-center gap-1.5 rounded-full border border-border bg-background px-4 text-sm font-semibold text-foreground shadow-md transition-colors hover:border-emerald"
           >
             <Heart className="h-4 w-4" /> <span className="hidden sm:inline">{en ? "Save" : "Salvează"}</span>
           </button>
@@ -677,13 +661,13 @@ export default function MapSearch() {
             <>
               <button
                 onClick={finishDraw}
-                className="flex items-center gap-1.5 rounded bg-emerald px-3 py-1.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90"
+                className="flex min-h-[40px] items-center gap-1.5 rounded-full bg-emerald px-4 text-sm font-semibold text-primary-foreground shadow-md transition-colors hover:bg-emerald/90"
               >
                 <Check className="h-4 w-4" /> {en ? "Finish" : "Finalizează"}
               </button>
               <button
                 onClick={cancelDraw}
-                className="flex items-center gap-1.5 rounded border border-border bg-background px-3 py-1.5 text-sm font-semibold text-foreground transition-colors hover:border-emerald"
+                className="flex min-h-[40px] items-center gap-1.5 rounded-full border border-border bg-background px-4 text-sm font-semibold text-foreground shadow-md transition-colors hover:border-emerald"
               >
                 <X className="h-4 w-4" /> {en ? "Cancel" : "Anulează"}
               </button>
@@ -691,15 +675,15 @@ export default function MapSearch() {
           ) : (
             <button
               onClick={() => setDrawMode(true)}
-              className="flex items-center gap-1.5 rounded border border-border bg-background px-3 py-1.5 text-sm font-semibold text-foreground transition-colors hover:border-emerald"
+              className="flex min-h-[40px] items-center gap-1.5 rounded-full border border-border bg-background px-4 text-sm font-semibold text-foreground shadow-md transition-colors hover:border-emerald"
             >
-              <PenLine className="h-4 w-4" /> {en ? "Mark a parcel" : "Marchează o parcelă"}
+              <PenLine className="h-4 w-4" /> {en ? "Draw an area" : "Desenează o zonă"}
             </button>
           )}
           {polygonPoints.length >= 3 && !drawMode && (
             <button
               onClick={clearPolygon}
-              className="flex items-center gap-1.5 rounded border border-border bg-background px-3 py-1.5 text-sm font-semibold text-destructive transition-colors hover:border-destructive"
+              className="flex min-h-[40px] items-center gap-1.5 rounded-full border border-border bg-background px-4 text-sm font-semibold text-destructive shadow-md transition-colors hover:border-destructive"
             >
               <Trash2 className="h-4 w-4" /> {en ? "Clear parcel" : "Șterge parcela"}
             </button>
@@ -708,7 +692,7 @@ export default function MapSearch() {
 
         {/* Instrucțiune desenare */}
         {drawMode && (
-          <div className="absolute left-1/2 top-32 z-[1000] -translate-x-1/2 border border-border bg-background px-4 py-1.5 text-xs font-semibold text-foreground">
+          <div className="absolute left-1/2 top-28 z-[1000] -translate-x-1/2 rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold text-foreground shadow-md">
             {en ? "Tap the map to add points" : "Apasă pe hartă pentru a adăuga puncte"}
           </div>
         )}
@@ -716,7 +700,7 @@ export default function MapSearch() {
         {/* Mobil: numărul de înregistrări → deschide lista */}
         <button
           onClick={() => setShowListMobile(true)}
-          className="absolute bottom-6 left-1/2 z-[1000] flex min-h-[44px] -translate-x-1/2 items-center gap-2 rounded bg-foreground px-4 py-2 text-sm font-semibold text-background md:hidden"
+          className="absolute bottom-6 left-1/2 z-[1000] flex min-h-[48px] -translate-x-1/2 items-center gap-2 rounded-full bg-foreground px-6 text-sm font-bold text-background shadow-xl md:hidden"
         >
           <MapPin className="h-4 w-4" /> {badgeCount} {en ? "properties" : "proprietăți"}
         </button>
