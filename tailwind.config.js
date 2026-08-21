@@ -56,6 +56,14 @@ module.exports = {
   				DEFAULT: 'hsl(var(--emerald))',
   				soft: 'hsl(var(--emerald-soft))'
   			},
+  			verde: {
+  				DEFAULT: 'hsl(var(--primary))',
+  				soft: 'hsl(var(--accent))'
+  			},
+  			marcaj: {
+  				DEFAULT: 'hsl(var(--marcaj))',
+  				foreground: 'hsl(var(--marcaj-foreground))'
+  			},
   			chart: {
   				'1': 'hsl(var(--chart-1))',
   				'2': 'hsl(var(--chart-2))',

@@ -1,21 +1,21 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
-// Primitive de "scroll reveal" reutilizabile în tot site-ul, pe framer-motion
-// (deja o dependență a proiectului — vezi circular-carousel.jsx). Scop: fiecare
-// secțiune/card apare cu un fade-up discret când intră în viewport, în loc să
-// fie pur și simplu prezent din start — dă senzația de site "viu", nu static.
+// Scroll-reveal primitives on the single house curve. One weighted ease,
+// slow and deliberate (0.9s), no per-index stagger spray — pacing is craft.
+// Respects prefers-reduced-motion: content simply appears.
 
-const EASE = [0.22, 1, 0.36, 1];
+const EASE = [0.16, 1, 0.3, 1];
 
-// Element unic (header de secțiune, panou, imagine) — fade + translate pe scroll.
-export function Reveal({ children, className, delay = 0, y = 28, once = true, ...props }) {
+export function Reveal({ children, className, delay = 0, y = 18, once = true, ...props }) {
+  const reduced = useReducedMotion();
+  if (reduced) return <div className={className}>{children}</div>;
   return (
     <motion.div
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once, margin: "-60px" }}
-      transition={{ duration: 0.65, ease: EASE, delay }}
+      transition={{ duration: 0.9, ease: EASE, delay }}
       className={className}
       {...props}
     >
@@ -24,17 +24,15 @@ export function Reveal({ children, className, delay = 0, y = 28, once = true, ..
   );
 }
 
-// Container pentru grile/liste — copiii RevealItem apar în cascadă (stagger).
-export function RevealGroup({ children, className, stagger = 0.08, once = true, ...props }) {
+export function RevealGroup({ children, className, stagger = 0.1, once = true, ...props }) {
+  const reduced = useReducedMotion();
+  if (reduced) return <div className={className}>{children}</div>;
   return (
     <motion.div
       initial="hidden"
       whileInView="show"
       viewport={{ once, margin: "-60px" }}
-      variants={{
-        hidden: {},
-        show: { transition: { staggerChildren: stagger } },
-      }}
+      variants={{ hidden: {}, show: { transition: { staggerChildren: stagger } } }}
       className={className}
       {...props}
     >
@@ -43,12 +41,12 @@ export function RevealGroup({ children, className, stagger = 0.08, once = true, 
   );
 }
 
-export function RevealItem({ children, className, y = 24, ...props }) {
+export function RevealItem({ children, className, y = 14, ...props }) {
   return (
     <motion.div
       variants={{
         hidden: { opacity: 0, y },
-        show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
+        show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } },
       }}
       className={className}
       {...props}
