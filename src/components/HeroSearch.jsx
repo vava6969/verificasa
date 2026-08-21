@@ -14,11 +14,11 @@ export default function HeroSearch() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="glass-panel flex w-full items-center gap-3 rounded-full px-4 py-3 text-left md:hidden"
+        className="flex w-full items-center gap-3 border border-border bg-card px-4 py-3 text-left md:hidden"
       >
         <Search className="h-4 w-4 shrink-0 text-emerald" />
         <span className="flex-1 truncate text-sm font-medium text-foreground/70">{t("sb_city")} · {t("sb_zone")}</span>
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald text-white">
+        <span className="flex h-8 w-8 items-center justify-center rounded bg-emerald text-primary-foreground">
           <ArrowRight className="h-4 w-4" />
         </span>
       </button>

@@ -1,20 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { RevealGroup, RevealItem } from "@/components/ui/reveal";
 
-// Bloc principal de navigare pe homepage, în genul "Buy a home / Rent a home /
-// Sell a home" de la Zillow: trei căi clare, fiecare cu ilustrație de brand,
-// titlu bold și un singur CTA. Înlocuiește navigarea prin text cu navigare
-// vizuală, imediat sub hero.
+// The three ways in — as one ruled block, not three floating cards. Each entry
+// is typed: title, plain sentence, contextual action. Divided by hairlines,
+// columns on desktop, rows on mobile.
 export default function ActionCards({ onRequestInspection }) {
-  const { t, lang } = useCountry();
+  const { lang } = useCountry();
   const en = lang === "en";
 
   const cards = [
     {
-      img: "/images/illustrations/action-search.svg",
       title: en ? "Find a verified rental" : "Caută o chirie verificată",
       desc: en
         ? "Browse listings that have been verified online, with real photos and honest pricing."
@@ -23,7 +20,6 @@ export default function ActionCards({ onRequestInspection }) {
       to: "/search",
     },
     {
-      img: "/images/illustrations/action-list.svg",
       title: en ? "List your property" : "Listează-ți proprietatea",
       desc: en
         ? "Post your listing for free and reach tenants looking for verified homes."
@@ -32,11 +28,10 @@ export default function ActionCards({ onRequestInspection }) {
       to: "/post-property",
     },
     {
-      img: "/images/illustrations/action-inspect.svg",
       title: en ? "Request a verification" : "Solicită o verificare",
       desc: en
-        ? "Our team verifies the listing online — photos, paperwork and price — so you rent with no surprises."
-        : "Echipa noastră verifică anunțul online — poze, acte și preț — fără surprize la mutare.",
+        ? "We verify the listing online: photos, paperwork and price, so you rent with no surprises."
+        : "Verificăm anunțul online: poze, acte și preț, ca să închiriezi fără surprize.",
       cta: en ? "Request verification" : "Solicită verificare",
       to: null,
     },
@@ -44,31 +39,22 @@ export default function ActionCards({ onRequestInspection }) {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
-      <RevealGroup className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-5">
+      <RevealGroup className="grid grid-cols-1 divide-y divide-border border border-border bg-card sm:grid-cols-3 sm:divide-x sm:divide-y-0">
         {cards.map((c, i) => (
-          <RevealItem
-            key={i}
-            className="flex flex-col items-center rounded-3xl surface-card p-6 text-center transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] sm:p-7"
-          >
-            <img src={c.img} alt="" className="h-28 w-28 object-contain sm:h-32 sm:w-32" />
-            <h3 className="mt-4 font-heading text-lg font-bold text-navy dark:text-foreground sm:text-xl">
-              {c.title}
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{c.desc}</p>
+          <RevealItem key={i} className="flex flex-col p-6 sm:p-7">
+            <h3 className="font-heading text-xl font-semibold text-foreground">{c.title}</h3>
+            <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{c.desc}</p>
             {c.to ? (
-              <Link
-                to={c.to}
-                className="mt-5 inline-flex items-center gap-1.5 rounded-full border-2 border-navy/15 bg-white px-5 py-2 text-sm font-semibold text-navy transition hover:border-emerald hover:text-emerald dark:border-white/15 dark:bg-white/5 dark:text-foreground"
-              >
-                {c.cta} <ArrowRight className="h-3.5 w-3.5" />
+              <Link to={c.to} className="mt-5 text-sm font-bold text-emerald transition-colors hover:text-foreground">
+                {c.cta} <span aria-hidden="true">→</span>
               </Link>
             ) : (
               <button
                 type="button"
                 onClick={onRequestInspection}
-                className="mt-5 inline-flex items-center gap-1.5 rounded-full border-2 border-navy/15 bg-white px-5 py-2 text-sm font-semibold text-navy transition hover:border-emerald hover:text-emerald dark:border-white/15 dark:bg-white/5 dark:text-foreground"
+                className="mt-5 text-left text-sm font-bold text-emerald transition-colors hover:text-foreground"
               >
-                {c.cta} <ArrowRight className="h-3.5 w-3.5" />
+                {c.cta} <span aria-hidden="true">→</span>
               </button>
             )}
           </RevealItem>

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useCountry } from "@/components/CountryContext";
 
@@ -11,6 +10,7 @@ function diff() {
   let d = TARGET - now;
   if (d < 0) d = 0;
   return {
+    over: TARGET - now <= 0,
     days: Math.floor(d / 86400000),
     hours: Math.floor((d % 86400000) / 3600000),
     mins: Math.floor((d % 3600000) / 60000),
@@ -18,13 +18,9 @@ function diff() {
   };
 }
 
-// Cifră unică cu tranziție tip "odometru" (inspirat din NumberFlow) — cifra
-// veche alunecă în sus și dispare, cea nouă intră de jos, fără să schimbe
-// dimensiunea sau layout-ul existent al countdown-ului.
+// Odometer digit — the old digit slides up and out, the new one in from below.
 function RollingDigit({ char, reduceMotion }) {
-  if (reduceMotion) {
-    return <span className="tabular-nums">{char}</span>;
-  }
+  if (reduceMotion) return <span className="tabular-nums">{char}</span>;
   return (
     <span className="relative inline-grid w-[0.62em] overflow-hidden text-center align-top">
       <AnimatePresence mode="popLayout" initial={false}>
@@ -33,7 +29,7 @@ function RollingDigit({ char, reduceMotion }) {
           initial={{ y: "70%", opacity: 0 }}
           animate={{ y: "0%", opacity: 1 }}
           exit={{ y: "-70%", opacity: 0 }}
-          transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
           className="tabular-nums"
           style={{ gridArea: "1 / 1" }}
         >
@@ -54,54 +50,47 @@ function RollingDigits({ value, reduceMotion }) {
   );
 }
 
-// Slim launch strip that lives inside the hero section.
-export default function HeroCountdown() {
+// Launch counter as a ruled ledger strip: solid card, hairline-divided digit
+// cells, dated caption. No glass, no glow, no pulsing dot.
+export default function HeroCountdown({ className = "" }) {
   const { t } = useCountry();
   const [time, setTime] = useState(diff());
   const reduceMotion = useReducedMotion();
+
   useEffect(() => {
     const id = setInterval(() => setTime(diff()), 1000);
     return () => clearInterval(id);
   }, []);
 
+  if (time.over) return null;
+
   const unit = (v, label) => (
-    <div className="flex flex-col items-center gap-1.5">
-      <span className="flex h-11 min-w-[2.4rem] items-center justify-center rounded-xl border border-white/15 bg-gradient-to-b from-white/[0.14] to-white/[0.04] px-1.5 font-heading text-2xl font-extrabold tabular-nums text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] sm:h-14 sm:min-w-[3.1rem] sm:text-4xl">
+    <div className="flex flex-1 flex-col items-center gap-1 px-3 py-2 sm:px-5">
+      <span className="font-heading text-2xl font-semibold text-foreground tnum sm:text-3xl">
         <RollingDigits value={String(v).padStart(2, "0")} reduceMotion={reduceMotion} />
       </span>
-      <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/55 sm:text-[10px]">{label}</span>
+      <span className="text-[11px] font-semibold text-muted-foreground">{label}</span>
     </div>
   );
 
   return (
-    <div className="mt-5 flex w-full max-w-2xl flex-col items-center gap-4 rounded-3xl border border-white/15 bg-black/30 px-5 py-4 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-md sm:mt-8 sm:flex-row sm:justify-between sm:px-7 sm:py-5">
-      <div className="text-center sm:text-left">
-        <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-emerald">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald opacity-70" />
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald" />
-          </span>
-          {t("countdown_badge")}
-        </span>
-        <p className="mt-1 text-sm font-semibold text-white sm:text-base">{t("countdown_h")}</p>
-      </div>
-
-      <div className="flex items-center gap-4 sm:gap-5">
-        <div className="flex items-center gap-2 sm:gap-3">
+    <div className={`border border-border bg-card ${className}`}>
+      <div className="flex flex-col items-stretch sm:flex-row">
+        <div className="flex flex-1 flex-col justify-center border-b border-border px-5 py-3 sm:border-b-0 sm:border-r">
+          <p className="text-xs font-bold text-emerald">{t("countdown_badge")}</p>
+          <p className="mt-0.5 text-sm font-semibold text-foreground">{t("countdown_h")}</p>
+        </div>
+        <div className="flex items-stretch divide-x divide-border">
           {unit(time.days, t("countdown_days"))}
-          <span className="pb-4 font-heading text-xl font-bold text-white/25 sm:text-2xl">:</span>
           {unit(time.hours, t("countdown_hours"))}
-          <span className="pb-4 font-heading text-xl font-bold text-white/25 sm:text-2xl">:</span>
           {unit(time.mins, t("countdown_mins"))}
-          <span className="pb-4 font-heading text-xl font-bold text-white/25 sm:text-2xl">:</span>
-          {unit(time.secs, "SEC")}
+          {unit(time.secs, "sec")}
         </div>
         <Link
           to="/about"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/25 text-white transition hover:border-emerald hover:bg-emerald/20 sm:h-10 sm:w-10"
-          aria-label={t("countdown_btn")}
+          className="flex items-center justify-center border-t border-border px-5 py-3 text-sm font-semibold text-emerald transition-colors hover:bg-secondary sm:border-l sm:border-t-0"
         >
-          <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
+          {t("countdown_btn")} <span className="ml-1.5" aria-hidden="true">→</span>
         </Link>
       </div>
     </div>
