@@ -99,7 +99,15 @@ export default function Landing() {
         {/* banda de parcurgere — turul taie pagina dintr-o parte în alta */}
         <Reveal className="mt-3 overflow-hidden bg-navy-deep lg:mx-[calc(50%-50vw)] lg:mt-8">
           <div className="h-28 w-full sm:h-32 lg:h-36">
-            <LoopVideo src="/videos/hero-walkthrough-v1.mp4" objectPosition="center 55%" />
+            {/* v2 holds one speed end to end (tail/head 1.03) and carries no
+                mid-clip cuts; its ends do not quite meet, so the join is
+                dissolved rather than cut. */}
+            <LoopVideo
+              src="/videos/hero-walkthrough-v2.mp4"
+              poster="/images/hero/villa-living-1.webp"
+              objectPosition="center 55%"
+              crossfade={0.4}
+            />
           </div>
         </Reveal>
 
