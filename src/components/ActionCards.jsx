@@ -30,7 +30,7 @@ export default function ActionCards({ onRequestInspection }) {
   ];
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-8 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:pt-6 sm:pb-8 lg:px-8">
       <RevealGroup className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
         {cards.map((c) => {
           const inner = (

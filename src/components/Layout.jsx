@@ -3,8 +3,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
-import { CountryProvider } from "@/components/CountryContext";
-import ScrollToTop from "@/components/ScrollToTop";
 import InstagramPopup from "@/components/InstagramPopup";
 import CookieBanner from "@/components/CookieBanner";
 import { titleForPath } from "@/lib/pageTitle";
@@ -26,9 +24,12 @@ export default function Layout() {
   const showFooter = FOOTER_PATHS.includes(pathname);
   const hideBottomNav = false;
 
+  // No CountryProvider and no ScrollToTop here: App.jsx already mounts both
+  // above the router. A second provider gave the pages inside this layout a
+  // different currency/language state from the pages outside it (/post-property,
+  // a conversation), so switching the flag in the header only moved half the app.
   return (
-    <CountryProvider>
-      <ScrollToTop />
+    <>
       <div className="flex min-h-screen flex-col overflow-x-clip bg-background">
         <Header />
         <main className="flex-1 overflow-x-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
@@ -42,6 +43,6 @@ export default function Layout() {
       {!hideBottomNav && <BottomNav />}
       <InstagramPopup />
       <CookieBanner />
-    </CountryProvider>
+    </>
   );
 }

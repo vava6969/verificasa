@@ -49,14 +49,19 @@ function PartnerCard({ partner, en }) {
     <article className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
       {/* Logo, pe o tentă verde moale */}
       <div className="flex items-center justify-center bg-emerald/10 px-5 py-8 dark:bg-emerald/15">
-        <div className="flex h-20 w-full max-w-[260px] items-center justify-center rounded-xl bg-white p-4 shadow-sm">
-          <img
-            src={partner.logo}
-            alt={partner.name}
-            className="max-h-full max-w-full object-contain"
-            loading="lazy"
-          />
-        </div>
+        {/* PNG transparent, tuș verde-închis — nu are nevoie de casetă albă. */}
+        <img
+          src={partner.logo}
+          alt={partner.name}
+          className="h-16 w-auto max-w-[240px] object-contain dark:hidden"
+          loading="lazy"
+        />
+        <img
+          src={partner.logoLight || partner.logo}
+          alt={partner.name}
+          className="hidden h-16 w-auto max-w-[240px] object-contain dark:block"
+          loading="lazy"
+        />
       </div>
 
       <div className="p-5 sm:p-6">

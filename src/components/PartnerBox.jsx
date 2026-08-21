@@ -18,13 +18,6 @@ export default function PartnerBox({ partnerId = "residence-vertical", className
   const pct = /(\d+)\s*%/.exec(partner.discount || "");
   const offer = pct ? (en ? `${pct[1]}% off` : `${pct[1]}% reducere`) : partner.discount || "";
 
-  let host = "";
-  try {
-    host = new URL(partner.url).hostname.replace(/^www\./, "");
-  } catch {
-    host = "";
-  }
-
   const copyCode = async () => {
     try {
       await navigator.clipboard.writeText(partner.code);
@@ -38,15 +31,22 @@ export default function PartnerBox({ partnerId = "residence-vertical", className
   return (
     <Reveal className={className}>
       <aside className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-        <div className="flex items-center gap-3 bg-emerald/10 px-4 py-4 dark:bg-emerald/15">
-          <div className="flex h-12 w-24 shrink-0 items-center justify-center rounded-xl bg-white p-2 shadow-sm">
-            <img
-              src={partner.logo}
-              alt={partner.name}
-              className="max-h-full max-w-full object-contain"
-              loading="lazy"
-            />
-          </div>
+        <div className="flex items-center gap-3.5 bg-emerald/10 px-4 py-4 dark:bg-emerald/15">
+          {/* Logo-ul e PNG cu fundal transparent și tuș verde-închis, deci stă
+              direct pe tentă. Caseta albă din spate era o cutie în plus, care
+              rupea banda verde în două. */}
+          <img
+            src={partner.logo}
+            alt={partner.name}
+            className="h-10 w-auto max-w-[104px] shrink-0 object-contain dark:hidden"
+            loading="lazy"
+          />
+          <img
+            src={partner.logoLight || partner.logo}
+            alt={partner.name}
+            className="hidden h-10 w-auto max-w-[104px] shrink-0 object-contain dark:block"
+            loading="lazy"
+          />
           <div className="min-w-0">
             <h3 className="font-heading text-base font-semibold text-foreground">
               {en ? "Don't take our word for it" : "Nu ne crezi pe cuvânt?"}
@@ -97,9 +97,15 @@ export default function PartnerBox({ partnerId = "residence-vertical", className
             href={partner.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full border border-emerald/70 bg-gradient-to-t from-emerald to-emerald/85 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald/40 transition active:scale-[0.99]"
+            className="mt-4 flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-full border border-emerald/70 bg-gradient-to-t from-emerald to-emerald/85 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald/40 transition active:scale-[0.99]"
           >
-            {en ? `Check on ${host}` : `Verifică pe ${host}`}
+            <span className="text-white/80">{en ? "Check on" : "Verifică pe"}</span>
+            {/* Varianta albă a logo-ului, direct pe verde — fără casetă. */}
+            <img
+              src={partner.logoLight || partner.logo}
+              alt={partner.name}
+              className="h-7 w-auto max-w-[110px] object-contain"
+            />
             <span aria-hidden="true">↗</span>
           </a>
 

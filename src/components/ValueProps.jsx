@@ -1,14 +1,16 @@
 import React, { useEffect, useRef } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 import { useCountry } from "@/components/CountryContext";
 
-// „De ce VerifiCasa" — nouă cipuri: iconița lucioasă, titlul și O singură
-// linie de explicație. Iconițele sunt normalizate la aceeași umplere optică,
-// deci cutia pătrată le randează egale.
+// „De ce VerifiCasa" — nouă motive. Erau nouă cutii într-o grilă 3×3: tot
+// blocul se citea dintr-o privire, ocupa o treime de ecran și nu scotea nimic
+// în față. Acum e o singură bandă care se plimbă singură, la orice lățime, iar
+// motivul din mijlocul benzii e cel scos în evidență — pe rând, la nesfârșit.
 //
-// Pe telefon banda se plimbă singură, încet, la nesfârșit, și se oprește în
-// clipa în care omul o atinge — nu-i smulge degetul de pe ecran. Pe desktop
-// e o grilă statică, unde nu are ce să câștige din mișcare.
+// Banda se mișcă pe `setInterval`, nu pe requestAnimationFrame: temporizatoarele
+// merg și când bufferul de cadre e sugrumat (tab în fundal, iframe-ul din
+// editorul Base44), iar dacă totuși nu merge nimic, banda rămâne pur și simplu
+// pe loc — vizibilă, nu goală.
 const ITEMS = [
   { key: "vp2", img: "/images/generated/icon-shield-check.png", cap: { ro: "Poze, acte și preț, verificate", en: "Photos, papers and price, checked" } },
   { key: "vp4", img: "/images/generated/icon-document-check.png", cap: { ro: "Măsurători și acte, la dosar", en: "Measurements and papers on file" } },
@@ -21,28 +23,29 @@ const ITEMS = [
   { key: "vp9", img: "/images/generated/icon-chat.png", cap: { ro: "Experiențe reale, nefiltrate", en: "Real, unfiltered experiences" } },
 ];
 
-function Chip({ item, t, en, reduced }) {
+function Chip({ item, t, en, ariaHidden }) {
   return (
-    <motion.div
-      whileHover={reduced ? undefined : { y: -3 }}
-      className="flex w-[152px] shrink-0 items-center gap-2 rounded-2xl border border-border bg-card p-2.5 shadow-sm sm:w-auto sm:gap-3 sm:p-4"
+    <div
+      data-spot="off"
+      aria-hidden={ariaHidden || undefined}
+      className="group flex w-[214px] shrink-0 items-center gap-2.5 rounded-2xl border border-border bg-card px-3 py-2.5 shadow-sm transition-[transform,box-shadow,border-color,background-color] duration-500 ease-out data-[spot=on]:-translate-y-1 data-[spot=on]:border-emerald/50 data-[spot=on]:bg-emerald/[0.06] data-[spot=on]:shadow-[0_14px_30px_-14px_rgba(16,24,40,0.4)] sm:w-[248px]"
     >
-      <motion.img
+      <img
         src={item.img}
         alt=""
         aria-hidden="true"
-        whileHover={reduced ? undefined : { scale: 1.12, rotate: -2 }}
-        transition={{ type: "spring", stiffness: 380, damping: 16 }}
-        className="h-9 w-9 shrink-0 object-contain drop-shadow-sm sm:h-12 sm:w-12"
+        className="h-9 w-9 shrink-0 object-contain opacity-70 drop-shadow-sm transition-[opacity,transform] duration-500 ease-out group-data-[spot=on]:scale-110 group-data-[spot=on]:opacity-100 sm:h-10 sm:w-10"
         loading="lazy"
       />
       <div className="min-w-0">
-        <p className="text-[11.5px] font-bold leading-tight text-foreground sm:text-sm">{t(`${item.key}_t`)}</p>
-        <p className="mt-0.5 truncate text-[10px] leading-tight text-muted-foreground sm:text-xs sm:whitespace-normal">
+        <p className="truncate text-[12.5px] font-bold leading-tight text-foreground sm:text-[13.5px]">
+          {t(`${item.key}_t`)}
+        </p>
+        <p className="mt-0.5 truncate text-[10.5px] leading-tight text-muted-foreground sm:text-[11.5px]">
           {en ? item.cap.en : item.cap.ro}
         </p>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -55,35 +58,51 @@ export default function ValueProps() {
   // reporni efectul, iar un `mouseenter` rămas agățat ar opri banda definitiv.
   const pausedRef = useRef(false);
 
-  // Derulare continuă pe telefon. Lista e dublată, iar când prima copie s-a
-  // consumat sărim înapoi la zero — bucla nu se vede.
   useEffect(() => {
     if (reduced) return undefined;
     const rail = railRef.current;
     if (!rail) return undefined;
-    const phone = window.matchMedia("(max-width: 639px)");
-    if (!phone.matches) return undefined;
 
     const TICK = 40;   // ms
-    const SPEED = 26;  // px pe secundă — lent, nu distrage de la conținut
+    const SPEED = 30;  // px pe secundă — lent, nu distrage de la conținut
     let carry = 0;     // scrollLeft e întreg; acumulăm subunitățile
 
+    // Reflectorul: cardul al cărui centru e cel mai aproape de centrul benzii.
+    const spotlight = () => {
+      const mid = rail.scrollLeft + rail.clientWidth / 2;
+      let best = null;
+      let bestDist = Infinity;
+      for (const chip of rail.children) {
+        const dist = Math.abs(chip.offsetLeft + chip.offsetWidth / 2 - mid);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = chip;
+        }
+        if (chip.dataset.spot !== "off") chip.dataset.spot = "off";
+      }
+      if (best) best.dataset.spot = "on";
+    };
+
     const id = setInterval(() => {
-      if (pausedRef.current) return;
-      const half = rail.scrollWidth / 2;
-      if (half <= 0) return;
-      carry += (SPEED * TICK) / 1000;
-      if (carry < 1) return;
-      const whole = Math.floor(carry);
-      carry -= whole;
-      const next = rail.scrollLeft + whole;
-      rail.scrollLeft = next >= half ? next - half : next;
+      if (!pausedRef.current) {
+        const half = rail.scrollWidth / 2;
+        if (half > 0) {
+          carry += (SPEED * TICK) / 1000;
+          if (carry >= 1) {
+            const whole = Math.floor(carry);
+            carry -= whole;
+            const next = rail.scrollLeft + whole;
+            rail.scrollLeft = next >= half ? next - half : next;
+          }
+        }
+      }
+      spotlight();
     }, TICK);
+
     return () => clearInterval(id);
   }, [reduced]);
 
-  // Doar atingerea reală oprește banda. Fără pauză pe hover: pe desktop asta e
-  // oricum o grilă, iar un hover agățat ar îngheța-o pe telefon.
+  // Atingerea sau cursorul opresc banda cât timp omul se uită la un card.
   const hold = () => { pausedRef.current = true; };
   const release = () => {
     // scurt răgaz după ce ridici degetul, ca inerția de scroll să se stingă
@@ -91,30 +110,40 @@ export default function ValueProps() {
   };
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-      <h2 className="text-xl font-bold text-foreground sm:text-3xl">
+    <section className="py-7 sm:py-10">
+      <h2 className="mx-auto max-w-7xl px-4 text-xl font-bold text-foreground sm:px-6 sm:text-3xl lg:px-8">
         {en ? "Why VerifiCasa" : "De ce VerifiCasa"}
       </h2>
 
-      <motion.div
-        ref={railRef}
-        onPointerDown={hold}
-        onPointerUp={release}
-        onPointerCancel={release}
-        onTouchStart={hold}
-        onTouchEnd={release}
-        className="vc-rail -mx-4 mt-4 flex gap-2.5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:mt-7 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3"
+      {/* Banda taie pagina dintr-o margine în alta, cu capetele stinse — se
+          vede că mai e ceva dincolo de ecran, fără să apară o tăietură seacă. */}
+      <div
+        className="relative mt-4 sm:mt-6"
+        style={{
+          maskImage: "linear-gradient(to right, transparent, #000 4.5rem, #000 calc(100% - 4.5rem), transparent)",
+          WebkitMaskImage: "linear-gradient(to right, transparent, #000 4.5rem, #000 calc(100% - 4.5rem), transparent)",
+        }}
       >
-        {ITEMS.map((item) => (
-          <Chip key={item.key} item={item} t={t} en={en} reduced={reduced} />
-        ))}
-        {/* Copia care face bucla continuă. Ascunsă pe desktop, unde e o grilă. */}
-        {ITEMS.map((item) => (
-          <div key={`loop-${item.key}`} aria-hidden="true" className="contents sm:hidden">
-            <Chip item={item} t={t} en={en} reduced={reduced} />
-          </div>
-        ))}
-      </motion.div>
+        <div
+          ref={railRef}
+          onPointerDown={hold}
+          onPointerUp={release}
+          onPointerCancel={release}
+          onMouseEnter={hold}
+          onMouseLeave={release}
+          onTouchStart={hold}
+          onTouchEnd={release}
+          className="vc-rail flex gap-3 overflow-x-auto px-4 py-2 sm:px-6 lg:px-8"
+        >
+          {ITEMS.map((item) => (
+            <Chip key={item.key} item={item} t={t} en={en} />
+          ))}
+          {/* Copia care face bucla continuă. */}
+          {ITEMS.map((item) => (
+            <Chip key={`loop-${item.key}`} item={item} t={t} en={en} ariaHidden />
+          ))}
+        </div>
+      </div>
     </section>
   );
 }

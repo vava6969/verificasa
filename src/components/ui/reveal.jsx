@@ -1,57 +1,164 @@
-import React from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import React, { createContext, useContext, useLayoutEffect, useRef, useState } from "react";
+import { useReducedMotion } from "framer-motion";
 
-// Scroll-reveal primitives on the single house curve. One weighted ease,
-// slow and deliberate (0.9s), no per-index stagger spray — pacing is craft.
-// Respects prefers-reduced-motion: content simply appears.
+// Scroll-reveal primitives on the single house curve. One weighted ease, slow
+// and deliberate, no per-index stagger spray — pacing is craft.
+//
+// These used to be framer-motion `whileInView` wrappers. The problem with that
+// shape is that the *only* thing making the content visible was an animation
+// frame: a section rendered at opacity 0 and waited for the tween to lift it.
+// Whenever the frame loop stalled — a backgrounded tab, the app running inside
+// the Base44 editor's iframe, a throttled phone — whole sections stayed
+// invisible while still taking up their full height. That is what the blank
+// band between the hero and the first row was.
+//
+// So the reveal is now plain CSS: the resting state IS the visible state, the
+// hidden state is only ever applied once we have proof an IntersectionObserver
+// is alive and reporting. If anything at all goes wrong — no IO, no callback,
+// reduced motion — the content just shows. Never invisible by default.
 
-const EASE = [0.16, 1, 0.3, 1];
+const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
+const SAFETY_MS = 1800; // if IO has said nothing by now, stop hiding things
 
-export function Reveal({ children, className, delay = 0, y = 18, once = true, ...props }) {
+const StaggerContext = createContext(null);
+
+function useInView({ once = true, disabled = false } = {}) {
+  const ref = useRef(null);
+  // Armed = we are allowed to hide. Starts false so the very first paint is
+  // visible content; the effect arms it only when it can also un-arm it.
+  const [armed, setArmed] = useState(false);
+  const [shown, setShown] = useState(false);
+
+  // Layout effect, not effect: arming has to happen before the browser paints,
+  // otherwise the content flashes in at full opacity and then hides itself.
+  useLayoutEffect(() => {
+    if (disabled) return undefined;
+    const node = ref.current;
+    if (!node || typeof IntersectionObserver === "undefined") return undefined;
+
+    let heard = false;
+    const io = new IntersectionObserver(
+      (entries) => {
+        heard = true;
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setShown(true);
+            if (once) io.disconnect();
+          } else if (!once) {
+            setShown(false);
+          }
+        }
+      },
+      { rootMargin: "0px 0px -60px 0px" }
+    );
+
+    setArmed(true);
+    io.observe(node);
+
+    // Timers keep running when frames do not. If the observer never reported,
+    // the reveal is broken — show the content rather than hide it forever.
+    const safety = setTimeout(() => {
+      if (!heard) setShown(true);
+    }, SAFETY_MS);
+
+    return () => {
+      io.disconnect();
+      clearTimeout(safety);
+    };
+  }, [once, disabled]);
+
+  return [ref, !armed || shown];
+}
+
+function revealStyle(visible, y, delay) {
+  if (visible) {
+    return {
+      opacity: 1,
+      transform: "none",
+      transition: `opacity 0.9s ${EASE} ${delay}s, transform 0.9s ${EASE} ${delay}s`,
+    };
+  }
+  return {
+    opacity: 0,
+    transform: `translateY(${y}px)`,
+    transition: `opacity 0.9s ${EASE} ${delay}s, transform 0.9s ${EASE} ${delay}s`,
+  };
+}
+
+export function Reveal({ children, className, delay = 0, y = 18, once = true, style, ...props }) {
   const reduced = useReducedMotion();
-  if (reduced) return <div className={className}>{children}</div>;
+  const [ref, visible] = useInView({ once, disabled: reduced });
+
+  if (reduced) {
+    return (
+      <div className={className} style={style} {...props}>
+        {children}
+      </div>
+    );
+  }
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once, margin: "-60px" }}
-      transition={{ duration: 0.9, ease: EASE, delay }}
-      className={className}
-      {...props}
-    >
+    <div ref={ref} className={className} style={{ ...revealStyle(visible, y, delay), ...style }} {...props}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
-export function RevealGroup({ children, className, stagger = 0.1, once = true, ...props }) {
+export function RevealGroup({ children, className, stagger = 0.1, once = true, style, ...props }) {
   const reduced = useReducedMotion();
-  if (reduced) return <div className={className}>{children}</div>;
+  const [ref, visible] = useInView({ once, disabled: reduced });
+
+  if (reduced) {
+    return (
+      <div className={className} style={style} {...props}>
+        {children}
+      </div>
+    );
+  }
+
   return (
-    <motion.div
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once, margin: "-60px" }}
-      variants={{ hidden: {}, show: { transition: { staggerChildren: stagger } } }}
-      className={className}
-      {...props}
-    >
-      {children}
-    </motion.div>
+    <StaggerContext.Provider value={{ visible, stagger }}>
+      <div ref={ref} className={className} style={style} {...props}>
+        {children}
+      </div>
+    </StaggerContext.Provider>
   );
 }
 
-export function RevealItem({ children, className, y = 14, ...props }) {
+// Children of a RevealGroup ride the group's own observer and only differ by
+// their transition-delay — one observer per row instead of one per card.
+export function RevealItem({ children, className, y = 14, style, ...props }) {
+  const reduced = useReducedMotion();
+  const group = useContext(StaggerContext);
+  const ref = useRef(null);
+  const [index, setIndex] = useState(0);
+
+  // Position among siblings decides the stagger step. Read from the DOM so the
+  // caller never has to thread an index through a .map(). Layout effect, so the
+  // delay is settled before the browser paints the first frame.
+  useLayoutEffect(() => {
+    const node = ref.current;
+    if (!node || !node.parentElement) return;
+    const i = Array.prototype.indexOf.call(node.parentElement.children, node);
+    if (i > 0) setIndex(i);
+  }, []);
+
+  if (reduced || !group) {
+    return (
+      <div ref={ref} className={className} style={style} {...props}>
+        {children}
+      </div>
+    );
+  }
+
   return (
-    <motion.div
-      variants={{
-        hidden: { opacity: 0, y },
-        show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } },
-      }}
+    <div
+      ref={ref}
       className={className}
+      style={{ ...revealStyle(group.visible, y, index * group.stagger), ...style }}
       {...props}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

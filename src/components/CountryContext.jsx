@@ -71,8 +71,39 @@ export function CountryProvider({ children }) {
   return <CountryContext.Provider value={value}>{children}</CountryContext.Provider>;
 }
 
+// A missing provider used to throw, which meant one stray consumer took down
+// the whole page with "useCountry must be used within CountryProvider" and no
+// clue as to which component. Currency and language are chrome, not content —
+// they are never worth a blank page. Fall back to the app's own defaults and
+// say so in the console instead.
+const FALLBACK = {
+  country: "RO",
+  setCountry: () => {},
+  currency: "RON",
+  setCurrency: () => {},
+  lang: "ro",
+  setLang: () => {},
+  t: makeT("ro"),
+  legalInfo: {
+    legal1: "Conform ANPC · Protecția Consumatorului",
+    legal2: "Verificare online a fiecărui anunț",
+    commission: "Comision corect · 0% chiriași pe selectate",
+    tenantFee: "Fără comision chiriași · Protecție consumator",
+  },
+  convert: (amount) => Math.round(amount || 0),
+  formatPrice: (amount) => `${Math.round(amount || 0).toLocaleString("ro-RO")} lei`,
+};
+
+let warned = false;
+
 export function useCountry() {
   const ctx = useContext(CountryContext);
-  if (!ctx) throw new Error("useCountry must be used within CountryProvider");
+  if (!ctx) {
+    if (!warned) {
+      warned = true;
+      console.warn("[VerifiCasa] useCountry called outside CountryProvider — using RO/RON defaults.");
+    }
+    return FALLBACK;
+  }
   return ctx;
 }

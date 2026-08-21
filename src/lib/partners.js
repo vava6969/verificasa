@@ -8,7 +8,11 @@ export const PARTNERS = [
   {
     id: "residence-vertical",
     name: "Residence Vertical",
+    // Ambele variante au fundal transparent. `logo` e verde-închis, pentru
+    // fundaluri deschise; `logoLight` e alb, pentru butonul verde și orice
+    // suprafață întunecată — fără casetă albă în spate.
     logo: "/images/partners/residence-vertical.png",
+    logoLight: "/images/partners/residence-vertical-white.png",
     url: "https://residencevertical.ro/?ref=verificasa",
     code: "VERIFICASA",
     discount: "10% reducere",
