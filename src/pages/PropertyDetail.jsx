@@ -28,7 +28,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
 import { createNotification } from "@/lib/notifications";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
-import { Stamp, Frank, Ledger, LedgerRow, PhotoMark, ScoreLedger } from "@/components/fisa";
+import { Stamp, Frank, Ledger, LedgerRow, ScoreLedger } from "@/components/fisa";
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -317,7 +317,7 @@ export default function PropertyDetail() {
                       type="button"
                       onClick={() => setActiveImage((i) => (i - 1 + images.length) % images.length)}
                       aria-label="Imaginea anterioară"
-                      className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border border-white/40 bg-black/40 text-white transition-colors hover:bg-black/65 sm:h-12 sm:w-12"
+                      className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-neutral-800 shadow-md transition-transform hover:scale-105 sm:h-12 sm:w-12"
                     >
                       <ChevronLeft className="h-5 w-5" />
                     </button>
@@ -325,13 +325,13 @@ export default function PropertyDetail() {
                       type="button"
                       onClick={() => setActiveImage((i) => (i + 1) % images.length)}
                       aria-label="Imaginea următoare"
-                      className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border border-white/40 bg-black/40 text-white transition-colors hover:bg-black/65 sm:h-12 sm:w-12"
+                      className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-neutral-800 shadow-md transition-transform hover:scale-105 sm:h-12 sm:w-12"
                     >
                       <ChevronRight className="h-5 w-5" />
                     </button>
-                    <PhotoMark className="bottom-3 right-3">
-                      {String(activeImage + 1).padStart(2, "0")} / {String(images.length).padStart(2, "0")}
-                    </PhotoMark>
+                    <span className="absolute bottom-3 right-3 rounded-full bg-black/55 px-2.5 py-1 text-xs font-semibold text-white">
+                      {activeImage + 1} / {images.length}
+                    </span>
                   </>
                 )}
 
@@ -340,13 +340,10 @@ export default function PropertyDetail() {
                   type="button"
                   onClick={(e) => { e.stopPropagation(); toggleSave(); }}
                   aria-label={saved ? t("pd_saved") : t("pd_save")}
-                  className="absolute right-3 top-16 flex h-11 w-11 items-center justify-center rounded-sm border border-white/40 bg-black/40 text-white transition-colors hover:bg-black/65"
+                  className="absolute right-3 top-16 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-neutral-800 shadow-md transition-transform hover:scale-105"
                 >
                   <Heart className={`h-5 w-5 transition ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
                 </button>
-                {images.length > 0 && (
-                  <PhotoMark className="bottom-3 left-3">{p.property_code || ""}</PhotoMark>
-                )}
               </div>
 
               {images.length > 1 && (
@@ -414,8 +411,8 @@ export default function PropertyDetail() {
                         : ""}
                     </p>
                   )}
-                  <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground/70">
-                    {t("pd_code_label")} <span className="select-all font-mono font-semibold text-foreground">{p.property_code || p.id}</span>
+                  <p className="mt-1 text-[11px] text-muted-foreground/60">
+                    {t("pd_code_label")} <span className="select-all">{p.property_code || p.id}</span>
                   </p>
                   {p.approved_by_name && (
                     <div className="mt-2">

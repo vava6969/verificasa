@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { User, Plus, Globe, Check } from "lucide-react";
+import { User, Plus, Check } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuLabel,
@@ -35,22 +35,34 @@ export default function Header() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="flex h-11 w-11 items-center justify-center rounded border border-border bg-card text-foreground transition-colors hover:border-emerald sm:h-9 sm:w-9"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:border-emerald sm:h-9 sm:w-9"
           aria-label={`${t("hdr_currency")} / ${t("hdr_language")}`}
         >
-          <Globe className="h-4 w-4" />
+          <img
+            src="/images/generated/icon-language-globe.png"
+            alt=""
+            aria-hidden="true"
+            className="h-6 w-6 object-contain sm:h-5 sm:w-5"
+          />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-52">
-        <DropdownMenuLabel className="text-xs text-muted-foreground">{t("hdr_currency")}</DropdownMenuLabel>
+        <DropdownMenuLabel className="flex items-center gap-2 text-xs text-muted-foreground">
+          <img src="/images/generated/icon-coins.png" alt="" aria-hidden="true" className="h-5 w-5 object-contain" />
+          {t("hdr_currency")}
+        </DropdownMenuLabel>
         {["EUR", "RON"].map((c) => (
-          <DropdownMenuItem key={c} onClick={() => setCurrency(c)} className="cursor-pointer font-semibold">
+          <DropdownMenuItem key={c} onClick={() => setCurrency(c)} className="cursor-pointer gap-2 font-semibold">
+            <span className="w-4 text-center text-muted-foreground">{c === "EUR" ? "€" : "L"}</span>
             {c}
             {currency === c && <Check className="ml-auto h-4 w-4 text-emerald" />}
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
-        <DropdownMenuLabel className="text-xs text-muted-foreground">{t("hdr_language")}</DropdownMenuLabel>
+        <DropdownMenuLabel className="flex items-center gap-2 text-xs text-muted-foreground">
+          <img src="/images/generated/icon-language-globe.png" alt="" aria-hidden="true" className="h-5 w-5 object-contain" />
+          {t("hdr_language")}
+        </DropdownMenuLabel>
         <DropdownMenuItem onClick={() => setLang("ro")} className="cursor-pointer font-semibold">
           Română
           {lang === "ro" && <Check className="ml-auto h-4 w-4 text-emerald" />}
