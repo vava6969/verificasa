@@ -31,14 +31,17 @@ export default function Layout() {
       <ScrollToTop />
       <div className="flex min-h-screen flex-col overflow-x-clip bg-background">
         <Header />
-        <main className="flex-1 overflow-x-hidden pb-16 md:pb-0">
+        <main className="flex-1 overflow-x-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
           <Outlet />
         </main>
         {showFooter && <Footer />}
-        {!hideBottomNav && <BottomNav />}
-        <InstagramPopup />
-        <CookieBanner />
       </div>
+      {/* Cromul fix stă ÎN AFARA containerului cu overflow-x-clip: `clip`
+          decupează și descendenții position:fixed, motiv pentru care bara de
+          jos părea că se plimbă odată cu pagina în loc să rămână lipită. */}
+      {!hideBottomNav && <BottomNav />}
+      <InstagramPopup />
+      <CookieBanner />
     </CountryProvider>
   );
 }

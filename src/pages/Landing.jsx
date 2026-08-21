@@ -29,7 +29,7 @@ export default function Landing() {
 
       {/* HERO — fotografie pe toată lățimea, text peste ea */}
       <section className="relative">
-        <div className="relative h-[58vh] min-h-[380px] w-full overflow-hidden sm:h-[66vh] sm:min-h-[500px] lg:h-[74vh]">
+        <div className="relative h-[46vh] min-h-[326px] max-h-[420px] w-full overflow-hidden sm:h-[66vh] sm:max-h-none sm:min-h-[500px] lg:h-[74vh]">
           {/* Poziționarea vine din wrapper, nu din className-ul pasat: clasa
               `relative` proprie a HeroPhoto câștiga în cascadă peste `absolute`
               și împingea tot textul hero sub fotografie, tăiat de
@@ -39,17 +39,17 @@ export default function Landing() {
           </div>
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/80" />
 
-          <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-8 sm:px-6 sm:pb-12 lg:px-8 lg:pb-16">
+          <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-5 sm:px-6 sm:pb-12 lg:px-8 lg:pb-16">
             <Reveal>
-              <h1 className="hero-ink max-w-[15ch] text-[1.85rem] font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-7xl">
+              <h1 className="hero-ink max-w-[15ch] text-[1.6rem] font-bold leading-[1.06] tracking-tight text-white sm:text-5xl lg:text-7xl">
                 {t("hero_h1_a")}
               </h1>
-              <p className="hero-ink mt-1.5 max-w-[24ch] text-sm font-semibold text-white/90 sm:text-xl lg:text-2xl">
+              <p className="hero-ink mt-1 max-w-[24ch] text-[13px] font-semibold text-white/90 sm:mt-1.5 sm:text-xl lg:text-2xl">
                 {t("hero_h1_b")}
               </p>
             </Reveal>
 
-            <Reveal delay={0.12} className="mt-4 w-full sm:mt-7 lg:max-w-4xl">
+            <Reveal delay={0.12} className="mt-3 w-full sm:mt-7 lg:max-w-4xl">
               <HeroSearch />
             </Reveal>
 

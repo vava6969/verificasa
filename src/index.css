@@ -331,6 +331,11 @@
 
   /* Umbră de 2px sub textul din hero: fotografiile din spate variază, iar
      titlul trebuie să rămână lizibil peste oricare dintre ele. */
+  /* Banda care se plimbă singură: fără bară de derulare vizibilă, altfel
+     mișcarea continuă arată ca un widget stricat. */
+  .vc-rail { scrollbar-width: none; -ms-overflow-style: none; }
+  .vc-rail::-webkit-scrollbar { display: none; }
+
   .hero-ink {
     text-shadow: 0 2px 4px rgb(0 0 0 / 0.55), 0 1px 2px rgb(0 0 0 / 0.4);
   }

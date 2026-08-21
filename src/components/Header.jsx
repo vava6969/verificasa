@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { motion, useReducedMotion } from "framer-motion";
 import { User, Plus, Check } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
@@ -11,79 +12,109 @@ import VerifiCasaLogo from "@/components/VerifiCasaLogo";
 import ThemeToggle from "@/components/ThemeToggle";
 import SiteNavMenu from "@/components/SiteNavMenu";
 import NotificationBell from "@/components/NotificationBell";
+import { FlagRO, FlagGB, FlagFor } from "@/components/FlagCircle";
 
-// Portal chrome: a solid bar (bg-background in both themes, no glass, no
-// gradient scrim) carrying round controls. Every control is a 44px circle on
-// phones, 36px on desktop.
+// Bara de sus. Trei decizii, nu trei accidente:
+//
+// 1. Pastila verde care marchează pagina curentă nu apare și dispare — ALUNECĂ
+//    dintr-un element în altul (layoutId), deci navigarea are continuitate.
+// 2. Bara nu mai dispare la primul pixel de derulare. Se ascunde doar când
+//    cobori hotărât și revine imediat ce urci — comportamentul unei aplicații,
+//    nu al unei pagini care fuge.
+// 3. Limba se arată ca steag, nu ca un glob generic. Emoji-urile de steag nu
+//    se randează pe Windows, deci steagurile sunt desenate ca SVG.
 export default function Header() {
   const { currency, setCurrency, lang, setLang, t } = useCountry();
   const { isAuthenticated } = useAuth();
   const location = useLocation();
-  const isActive = (to) => location.pathname === to || (to !== "/" && location.pathname.startsWith(to));
-  const navItemCls = (to) =>
-    `flex h-9 items-center rounded-full px-3 text-sm font-semibold transition-colors hover:bg-secondary hover:text-emerald ${
-      isActive(to) ? "text-emerald" : "text-foreground/75"
-    }`;
+  const reduced = useReducedMotion();
 
-  // Header shows only at the very top of the page (existing behavior kept).
+  const NAV = [
+    { to: "/", label: t("hdr_home") },
+    { to: "/search", label: t("sb_btn") },
+    { to: "/about", label: t("hdr_about") },
+    { to: "/upgrade", label: t("hdr_upgrade") },
+  ];
+  const isActive = (to) =>
+    to === "/" ? location.pathname === "/" : location.pathname.startsWith(to);
+
+  // Ascundere doar la coborâre susținută; revenire instantanee la urcare.
   const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
   useEffect(() => {
-    const onScroll = () => setHidden(window.scrollY >= 8);
+    lastY.current = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastY.current;
+      if (y < 80) setHidden(false);
+      else if (delta > 6) setHidden(true);
+      else if (delta < -6) setHidden(false);
+      lastY.current = y;
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const CurrencySwitch = () => (
+  const LangSwitch = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:border-emerald sm:h-9 sm:w-9"
+          className="group flex h-11 items-center gap-1.5 rounded-full border border-border bg-card pl-1.5 pr-3 text-foreground transition-colors hover:border-emerald sm:h-9"
           aria-label={`${t("hdr_currency")} / ${t("hdr_language")}`}
         >
-          <img
-            src="/images/generated/icon-language-globe.png"
-            alt=""
-            aria-hidden="true"
-            className="h-6 w-6 object-contain sm:h-5 sm:w-5"
-          />
+          <FlagFor lang={lang} className="h-7 w-7 shrink-0 sm:h-6 sm:w-6" />
+          <span className="text-xs font-bold tracking-wide">{currency}</span>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2">
-        <DropdownMenuLabel className="flex items-center gap-2 px-2 text-xs text-muted-foreground">
-          <img src="/images/generated/icon-coins.png" alt="" aria-hidden="true" className="h-5 w-5 object-contain" />
+        <DropdownMenuLabel className="px-2 text-xs font-semibold text-muted-foreground">
           {t("hdr_currency")}
         </DropdownMenuLabel>
-        {["EUR", "RON"].map((c) => (
+        {[
+          { code: "EUR", mark: "€" },
+          { code: "RON", mark: "lei" },
+        ].map((c) => (
           <DropdownMenuItem
-            key={c}
-            onClick={() => setCurrency(c)}
-            className="min-h-[44px] cursor-pointer gap-2 rounded-xl px-3 font-semibold"
+            key={c.code}
+            onClick={() => setCurrency(c.code)}
+            className="min-h-[44px] cursor-pointer gap-2.5 rounded-xl px-2 font-semibold"
           >
-            <span className="w-4 text-center text-muted-foreground">{c === "EUR" ? "€" : "L"}</span>
-            {c}
-            {currency === c && <Check className="ml-auto h-4 w-4 text-emerald" />}
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-[11px] font-bold text-foreground">
+              {c.mark}
+            </span>
+            {c.code}
+            {currency === c.code && <Check className="ml-auto h-4 w-4 text-emerald" />}
           </DropdownMenuItem>
         ))}
+
         <DropdownMenuSeparator />
-        <DropdownMenuLabel className="flex items-center gap-2 px-2 text-xs text-muted-foreground">
-          <img src="/images/generated/icon-language-globe.png" alt="" aria-hidden="true" className="h-5 w-5 object-contain" />
+
+        <DropdownMenuLabel className="px-2 text-xs font-semibold text-muted-foreground">
           {t("hdr_language")}
         </DropdownMenuLabel>
-        <DropdownMenuItem onClick={() => setLang("ro")} className="min-h-[44px] cursor-pointer rounded-xl px-3 font-semibold">
-          Română
-          {lang === "ro" && <Check className="ml-auto h-4 w-4 text-emerald" />}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setLang("en")} className="min-h-[44px] cursor-pointer rounded-xl px-3 font-semibold">
-          English
-          {lang === "en" && <Check className="ml-auto h-4 w-4 text-emerald" />}
-        </DropdownMenuItem>
+        {[
+          { code: "ro", label: "Română", Flag: FlagRO },
+          { code: "en", label: "English", Flag: FlagGB },
+        ].map(({ code, label, Flag }) => (
+          <DropdownMenuItem
+            key={code}
+            onClick={() => setLang(code)}
+            className="min-h-[44px] cursor-pointer gap-2.5 rounded-xl px-2 font-semibold"
+          >
+            <Flag className="h-7 w-7 shrink-0" />
+            {label}
+            {lang === code && <Check className="ml-auto h-4 w-4 text-emerald" />}
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full border-b border-border bg-background transition-transform duration-300 ${hidden ? "-translate-y-[calc(100%+4px)] opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}
+      className={`sticky top-0 z-50 w-full border-b border-border bg-background transition-transform duration-300 ease-out ${
+        hidden ? "-translate-y-full" : "translate-y-0"
+      }`}
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -92,15 +123,34 @@ export default function Header() {
             <VerifiCasaLogo size={38} tagline={false} />
           </Link>
 
-          <nav className="hidden items-center gap-1 md:flex">
-            <Link to="/" className={navItemCls("/")}>{t("hdr_home")}</Link>
-            <Link to="/search" className={navItemCls("/search")}>{t("sb_btn")}</Link>
-            <Link to="/about" className={navItemCls("/about")}>{t("hdr_about")}</Link>
-            <Link to="/upgrade" className={navItemCls("/upgrade")}>{t("hdr_upgrade")}</Link>
+          {/* Pastila activă alunecă între secțiuni în loc să clipească. */}
+          <nav className="hidden items-center gap-0.5 md:flex">
+            {NAV.map((item) => {
+              const active = isActive(item.to);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  aria-current={active ? "page" : undefined}
+                  className="relative flex h-9 items-center rounded-full px-3.5 text-sm font-semibold transition-colors"
+                >
+                  {active && (
+                    <motion.span
+                      layoutId={reduced ? undefined : "navPill"}
+                      transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                      className="absolute inset-0 rounded-full bg-emerald"
+                    />
+                  )}
+                  <span className={`relative z-10 ${active ? "text-primary-foreground" : "text-foreground/70 hover:text-emerald"}`}>
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="flex shrink-0 items-center gap-2">
-            <div className="hidden md:block"><CurrencySwitch /></div>
+            <div className="hidden md:block"><LangSwitch /></div>
             <div className="hidden md:block">
               <ThemeToggle className="w-11 justify-center rounded-full px-0 sm:w-9" />
             </div>
@@ -111,7 +161,7 @@ export default function Header() {
                 <Link
                   to="/post-property"
                   aria-label={t("hdr_add")}
-                  className="flex h-11 items-center justify-center gap-1 rounded-full bg-emerald px-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90 sm:h-9 md:px-4"
+                  className="flex h-11 items-center justify-center gap-1 rounded-full bg-emerald px-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.04] sm:h-9 md:px-4"
                 >
                   <Plus className="h-4 w-4" />
                   <span className="hidden md:inline">{t("hdr_add")}</span>
@@ -122,7 +172,7 @@ export default function Header() {
               <>
                 <Link
                   to="/login"
-                  className="flex h-11 items-center gap-1.5 rounded-full bg-emerald px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90 sm:h-9"
+                  className="flex h-11 items-center gap-1.5 rounded-full bg-emerald px-4 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.04] sm:h-9"
                 >
                   <User className="h-4 w-4" />
                   <span>{t("hdr_login")}</span>
