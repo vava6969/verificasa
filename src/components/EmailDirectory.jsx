@@ -107,21 +107,21 @@ function EmailCard({ item, index }) {
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.5, delay: (index % 2) * 0.08, ease: "easeOut" }}
       whileHover={{ y: -6, scale: 1.01 }}
-      className={`group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-white/50 bg-white/40 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_30px_-14px_rgba(27,34,44,0.18)] backdrop-blur-2xl transition-all hover:border-gold/50 hover:bg-white/55 dark:border-white/10 dark:bg-white/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_10px_36px_-16px_rgba(0,0,0,0.7)] dark:hover:bg-white/[0.08] ${isHero ? "sm:col-span-2 " + a.glow : ""} ${a.ring} hover:ring-2`}
+      className={`group relative flex flex-col gap-3 overflow-hidden rounded border border-white/50 bg-white/40 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_30px_-14px_rgba(27,34,44,0.18)] transition-all hover:border-gold/50 hover:bg-white/55 dark:border-white/10 dark:bg-white/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_10px_36px_-16px_rgba(0,0,0,0.7)] dark:hover:bg-white/[0.08] ${isHero ? "sm:col-span-2 " + a.glow : ""} ${a.ring} hover:ring-2`}
     >
       {item.bg && (
         <img
           src={item.bg}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-8 -right-6 z-0 h-36 w-36 object-contain opacity-[0.15] transition-transform duration-500 ease-out group-hover:scale-110 group-hover:opacity-[0.22] dark:opacity-[0.22] dark:group-hover:opacity-[0.3] sm:h-40 sm:w-40"
+          className="pointer-events-none absolute -bottom-8 -right-6 z-0 h-36 w-36 object-contain opacity-[0.15] transition-transform duration-500 ease-out group- group-hover:opacity-[0.22] dark:opacity-[0.22] dark:group-hover:opacity-[0.3] sm:h-40 sm:w-40"
         />
       )}
       <div className="relative z-10 flex items-start justify-between gap-3">
-        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${a.iconBg}`}>
+        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded ${a.iconBg}`}>
           <Icon className="h-5 w-5" />
         </div>
-        <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${a.badge}`}>
+        <span className={`inline-flex items-center rounded border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${a.badge}`}>
           {item.badge}
         </span>
       </div>
@@ -152,7 +152,7 @@ function EmailCard({ item, index }) {
         </div>
       </div>
       {copied && (
-        <span className="absolute -top-2 right-3 z-20 rounded-full bg-emerald px-2 py-0.5 text-[10px] font-bold text-white shadow">
+        <span className="absolute -top-2 right-3 z-20 rounded bg-emerald px-2 py-0.5 text-[10px] font-bold text-white shadow">
           Copiat!
         </span>
       )}
@@ -179,11 +179,8 @@ export default function EmailDirectory() {
   const depts = EMAILS.filter((e) => ["Recrutare", "Legal", "Admin"].includes(e.badge));
 
   return (
-    <div className="relative space-y-6 overflow-hidden rounded-3xl p-4 sm:p-6">
+    <div className="relative space-y-6 overflow-hidden rounded p-4 sm:p-6">
       {/* Decorative gradient blobs — give the glass cards something to blur on light theme */}
-      <div className="pointer-events-none absolute -left-20 -top-10 h-64 w-64 rounded-full bg-emerald/20 blur-3xl dark:bg-emerald/10" />
-      <div className="pointer-events-none absolute -right-16 top-40 h-56 w-56 rounded-full bg-gold/25 blur-3xl dark:bg-gold/15" />
-      <div className="pointer-events-none absolute bottom-20 left-1/3 h-60 w-60 rounded-full bg-blue-400/15 blur-3xl dark:bg-blue-500/10" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-soft/40 via-transparent to-gold-soft/40 dark:from-emerald/5 dark:to-gold/5" />
 
       <div className="relative space-y-6">
@@ -216,10 +213,10 @@ export default function EmailDirectory() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-40px" }}
         transition={{ duration: 0.5 }}
-        className="rounded-2xl border border-amber-300/50 bg-amber-50/70 p-5 backdrop-blur-xl dark:border-amber-500/25 dark:bg-amber-500/[0.07]"
+        className="rounded border border-amber-300/50 bg-amber-50/70 p-5 dark:border-amber-500/25 dark:bg-amber-500/[0.07]"
       >
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-300">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-300">
             <AlertTriangle className="h-5 w-5" />
           </div>
           <div className="space-y-2 text-sm">

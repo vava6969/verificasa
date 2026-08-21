@@ -102,21 +102,21 @@ export default function Lightbox({ images, index, onClose, onIndex, saved = fals
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="fixed inset-0 z-[100] flex flex-col bg-navy-deep/95 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex flex-col bg-navy-deep/95"
     >
       {/* Header controls */}
       <div className="flex items-center justify-between px-4 py-4 text-white sm:px-6">
-        <button onClick={onClose} aria-label={t("lb_close")} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/20">
+        <button onClick={onClose} aria-label={t("lb_close")} className="flex h-10 w-10 items-center justify-center rounded bg-white/10 transition hover:bg-white/20">
           <X className="h-5 w-5" />
         </button>
         <span className="text-sm font-semibold tracking-wide">
           {current + 1}/{total}
         </span>
         <div className="flex items-center gap-2">
-          <button onClick={handleShare} aria-label={t("lb_share")} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/20">
+          <button onClick={handleShare} aria-label={t("lb_share")} className="flex h-10 w-10 items-center justify-center rounded bg-white/10 transition hover:bg-white/20">
             <Share2 className="h-5 w-5" />
           </button>
-          <button onClick={onToggleSave} aria-label={t("lb_save")} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition hover:bg-white/20">
+          <button onClick={onToggleSave} aria-label={t("lb_save")} className="flex h-10 w-10 items-center justify-center rounded bg-white/10 transition hover:bg-white/20">
             <Heart className={`h-5 w-5 ${saved ? "fill-gold text-gold" : "text-white"}`} />
           </button>
         </div>
@@ -158,10 +158,10 @@ export default function Lightbox({ images, index, onClose, onIndex, saved = fals
         {/* Side arrows — PC & mobil */}
         {total > 1 && (
           <>
-            <button onClick={() => go(-1)} aria-label={t("pc_prev")} className="absolute left-2 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition hover:bg-white/30 sm:h-14 sm:w-14">
+            <button onClick={() => go(-1)} aria-label={t("pc_prev")} className="absolute left-2 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded bg-white/15 text-white transition hover:bg-white/30 sm:h-14 sm:w-14">
               <ChevronLeft className="h-6 w-6" />
             </button>
-            <button onClick={() => go(1)} aria-label={t("pc_next")} className="absolute right-2 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition hover:bg-white/30 sm:h-14 sm:w-14">
+            <button onClick={() => go(1)} aria-label={t("pc_next")} className="absolute right-2 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded bg-white/15 text-white transition hover:bg-white/30 sm:h-14 sm:w-14">
               <ChevronRight className="h-6 w-6" />
             </button>
           </>

@@ -65,7 +65,7 @@ export default function PropertyPresentation({ images, title }) {
 
   return (
     <div
-      className="relative overflow-hidden rounded-3xl border border-border/60 bg-navy-deep shadow-[0_30px_80px_-30px_rgba(16,24,40,0.4)]"
+      className="relative overflow-hidden rounded border border-border/60 bg-navy-deep shadow-[0_30px_80px_-30px_rgba(16,24,40,0.4)]"
       style={{ aspectRatio: "16 / 10" }}
       onMouseEnter={holdPause}
       onMouseLeave={scheduleResume}
@@ -108,7 +108,7 @@ export default function PropertyPresentation({ images, title }) {
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/45 to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/25 to-transparent" />
 
-      <span className="pointer-events-none absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-black/35 px-3 py-1.5 text-[11px] font-semibold text-white backdrop-blur-md">
+      <span className="pointer-events-none absolute left-4 top-4 flex items-center gap-1.5 rounded bg-black/35 px-3 py-1.5 text-[11px] font-semibold text-white">
         <span className="relative flex h-1.5 w-1.5">
           <span className={`absolute inline-flex h-full w-full rounded-full bg-emerald opacity-70 ${paused ? "" : "animate-ping"}`} />
           <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald" />
@@ -121,14 +121,14 @@ export default function PropertyPresentation({ images, title }) {
           <button
             onClick={() => { goTo(idx - 1); scheduleResume(); }}
             aria-label="Poza anterioară"
-            className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition hover:bg-white/30 sm:left-4 sm:h-12 sm:w-12"
+            className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/30 sm:left-4 sm:h-12 sm:w-12"
           >
             <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
           <button
             onClick={() => { goTo(idx + 1); scheduleResume(); }}
             aria-label="Poza următoare"
-            className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition hover:bg-white/30 sm:right-4 sm:h-12 sm:w-12"
+            className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/30 sm:right-4 sm:h-12 sm:w-12"
           >
             <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>

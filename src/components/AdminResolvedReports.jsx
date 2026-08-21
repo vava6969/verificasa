@@ -35,12 +35,12 @@ export default function AdminResolvedReports({ reports = [] }) {
         const Icon = r.status === "RESOLVED" ? CheckCircle2 : XCircle;
         const tone = r.status === "RESOLVED" ? "text-emerald" : "text-rose-500";
         return (
-          <div key={r.id} className="rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card">
+          <div key={r.id} className="rounded border border-border bg-white p-4 shadow-soft dark:bg-card">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
                 <p className="flex flex-wrap items-center gap-2 font-heading font-bold text-navy dark:text-foreground">
                   <Flag className="h-4 w-4 text-muted-foreground" /> {r.reason}
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${STATUS_TONE[r.status] || "bg-secondary text-muted-foreground"}`}>
+                  <span className={`rounded px-2 py-0.5 text-[10px] font-bold ${STATUS_TONE[r.status] || "bg-secondary text-muted-foreground"}`}>
                     {STATUS_LABEL[r.status] || r.status}
                   </span>
                 </p>

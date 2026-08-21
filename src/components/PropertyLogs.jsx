@@ -72,15 +72,15 @@ export default function PropertyLogs({ properties = [], audit = [], comments = [
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Caută proprietate..." className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card" />
         </div>
-        <div className="max-h-[60vh] space-y-1 overflow-auto rounded-2xl border border-border bg-white p-1 dark:bg-card">
+        <div className="max-h-[60vh] space-y-1 overflow-auto rounded border border-border bg-white p-1 dark:bg-card">
           {list.length === 0 ? (
             <p className="px-3 py-2 text-xs text-muted-foreground">Nicio proprietate.</p>
           ) : list.slice(0, listCount).map((p) => (
-            <button key={p.id} onClick={() => setPid(p.id)} className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition ${pid === p.id ? "bg-navy text-white" : "hover:bg-secondary"}`}>
+            <button key={p.id} onClick={() => setPid(p.id)} className={`flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm transition ${pid === p.id ? "bg-navy text-white" : "hover:bg-secondary"}`}>
               <History className="h-3.5 w-3.5 shrink-0" />
               <span className="min-w-0 flex-1 truncate">{p.title}</span>
               <span className={`shrink-0 font-mono text-[10px] ${pid === p.id ? "text-white/60" : "text-muted-foreground/60"}`}>#{p.property_code || p.id?.slice(0, 8)}</span>
-              {p.approval_status !== "APPROVED" && <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">nou</span>}
+              {p.approval_status !== "APPROVED" && <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">nou</span>}
             </button>
           ))}
           {list.length > listCount && (
@@ -89,7 +89,7 @@ export default function PropertyLogs({ properties = [], audit = [], comments = [
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border bg-white p-4 dark:bg-card">
+      <div className="rounded border border-border bg-white p-4 dark:bg-card">
         {!pid ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <History className="h-8 w-8 text-muted-foreground/50" />
@@ -102,7 +102,7 @@ export default function PropertyLogs({ properties = [], audit = [], comments = [
           <>
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <p className="font-heading font-bold text-navy dark:text-foreground">{property?.title}</p>
-              <button onClick={() => navigator.clipboard?.writeText(String(property?.property_code || ""))} title="Copiază cod" className="rounded-full border border-border bg-secondary px-2 py-0.5 font-mono text-[11px] text-muted-foreground hover:border-emerald hover:text-emerald">
+              <button onClick={() => navigator.clipboard?.writeText(String(property?.property_code || ""))} title="Copiază cod" className="rounded border border-border bg-secondary px-2 py-0.5 font-mono text-[11px] text-muted-foreground hover:border-emerald hover:text-emerald">
                 Cod Proprietate: {property?.property_code || property?.id?.slice(0, 8)}
               </button>
             </div>

@@ -40,9 +40,9 @@ export default function SavedSearches() {
       </div>
 
       {items === null ? (
-        <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-xl" />)}</div>
+        <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 rounded" />)}</div>
       ) : items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border py-16 text-center">
+        <div className="rounded border border-dashed border-border py-16 text-center">
           <SearchIcon className="mx-auto h-10 w-10 text-muted-foreground/40" />
           <p className="mt-3 font-heading text-lg font-semibold text-navy">Nicio căutare salvată</p>
           <p className="text-sm text-muted-foreground">Apasă „Salvează căutarea" pe pagina de căutare.</p>
@@ -54,7 +54,7 @@ export default function SavedSearches() {
             const qs = s.query_string || "";
             const label = s.label || qs || "Căutare";
             return (
-              <div key={s.id} className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4 shadow-soft">
+              <div key={s.id} className="flex items-center gap-3 rounded border border-border bg-white p-4 shadow-soft">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-soft text-emerald"><SearchIcon className="h-4 w-4" /></span>
                 <Link to={`/search?${qs}`} className="min-w-0 flex-1">
                   <p className="truncate font-semibold text-navy">{label}</p>
@@ -63,7 +63,7 @@ export default function SavedSearches() {
                 <Button asChild size="sm" className="bg-emerald text-white">
                   <Link to={`/search?${qs}`}>Vezi rezultate <ArrowRight className="h-4 w-4" /></Link>
                 </Button>
-                <button onClick={() => remove(s.id)} className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive" title="Șterge">
+                <button onClick={() => remove(s.id)} className="flex h-8 w-8 items-center justify-center rounded text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive" title="Șterge">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>

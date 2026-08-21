@@ -68,11 +68,11 @@ export default function InstagramPopup() {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/55 p-4"
       onClick={close}
     >
       <div
-        className="relative w-full max-w-xs overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="relative w-full max-w-xs overflow-hidden rounded bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -86,7 +86,7 @@ export default function InstagramPopup() {
         </button>
 
         <div className="bg-gradient-to-br from-[#feda75] via-[#fa7e1e] to-[#962fbf] px-5 pb-4 pt-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-soft">
+          <div className="flex h-12 w-12 items-center justify-center rounded bg-white shadow-soft">
             <Instagram className="h-6 w-6 text-foreground" />
           </div>
         </div>
@@ -101,7 +101,7 @@ export default function InstagramPopup() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={close}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald px-4 py-2.5 text-sm font-bold text-white shadow-soft transition hover:opacity-90"
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded bg-emerald px-4 py-2.5 text-sm font-bold text-white shadow-soft transition hover:opacity-90"
           >
             <Instagram className="h-4 w-4" /> Dă Follow
           </a>

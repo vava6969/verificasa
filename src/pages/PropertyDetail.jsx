@@ -91,10 +91,10 @@ export default function PropertyDetail() {
     return (
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Skeleton className="h-8 w-32" />
-        <Skeleton className="mt-4 h-[420px] rounded-2xl" />
+        <Skeleton className="mt-4 h-[420px] rounded" />
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
-          <Skeleton className="h-96 rounded-2xl lg:col-span-2" />
-          <Skeleton className="h-96 rounded-2xl" />
+          <Skeleton className="h-96 rounded lg:col-span-2" />
+          <Skeleton className="h-96 rounded" />
         </div>
       </div>
     );
@@ -170,16 +170,16 @@ export default function PropertyDetail() {
   // să se extindă până sus, acoperind fosta dungă albă.
   const tabSwitcherButtons = (
     <>
-      <button onClick={() => setTab("gallery")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "gallery" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+      <button onClick={() => setTab("gallery")} className={`rounded px-4 py-1.5 text-sm font-semibold transition ${tab === "gallery" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
         {t("tab_gallery")} ({images.length})
       </button>
       {images.length > 0 && (
-        <button onClick={() => setTab("presentation")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "presentation" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+        <button onClick={() => setTab("presentation")} className={`rounded px-4 py-1.5 text-sm font-semibold transition ${tab === "presentation" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
           <span className="flex items-center gap-1.5"><Film className="h-3.5 w-3.5" /> {lang === "en" ? "Showcase" : "Prezentare"}</span>
         </button>
       )}
       {p.tour_3d_url && (
-        <button onClick={() => setTab("3d")} className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${tab === "3d" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
+        <button onClick={() => setTab("3d")} className={`rounded px-4 py-1.5 text-sm font-semibold transition ${tab === "3d" ? "bg-navy text-mint" : "bg-white text-foreground/60 border border-border"}`}>
           <span className="flex items-center gap-1.5"><Box className="h-3.5 w-3.5" /> {t("tab_3d")}</span>
         </button>
       )}
@@ -258,7 +258,7 @@ export default function PropertyDetail() {
           ) : (
             <div className="select-none">
               <div
-                className="relative flex items-center justify-center overflow-hidden rounded-3xl border border-border/60 bg-secondary shadow-[0_30px_80px_-30px_rgba(16,24,40,0.4)] select-none"
+                className="relative flex items-center justify-center overflow-hidden rounded border border-border/60 bg-secondary shadow-[0_30px_80px_-30px_rgba(16,24,40,0.4)] select-none"
                 style={{ aspectRatio: "16 / 10" }}
                 onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
                 onTouchEnd={(e) => {
@@ -505,7 +505,7 @@ export default function PropertyDetail() {
                     <h3 className="font-heading font-bold text-navy dark:text-foreground">{t("map_h")}</h3>
                     <p className="text-xs text-muted-foreground">{t("map_sub")}</p>
                   </div>
-                  <span className="ml-auto flex items-center gap-1 rounded-full bg-emerald-soft px-2.5 py-1 text-[11px] font-medium text-emerald">
+                  <span className="ml-auto flex items-center gap-1 rounded bg-emerald-soft px-2.5 py-1 text-[11px] font-medium text-emerald">
                     {p.latitude && p.longitude ? t("map_exact") : t("map_approx")}
                   </span>
                 </div>

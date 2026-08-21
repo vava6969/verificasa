@@ -144,23 +144,21 @@ export default function About() {
           className="absolute inset-0 h-full w-full object-cover opacity-45"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/80 via-navy-deep/70 to-navy-deep/90" />
-        <div className="absolute -left-16 -top-16 h-64 w-64 rounded-full bg-emerald/20 blur-3xl" />
-        <div className="absolute -bottom-20 -right-10 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
         <div className="relative mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
-          <motion.span initial="hidden" animate="show" variants={fadeUp} className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-white/10 px-4 py-1.5 text-xs font-semibold text-gold backdrop-blur-md">
+          <motion.span initial="hidden" animate="show" variants={fadeUp} className="inline-flex items-center gap-2 rounded border border-gold/40 bg-white/10 px-4 py-1.5 text-xs font-semibold text-gold">
             <Sparkles className="h-3.5 w-3.5" /> {c.hero_badge}
           </motion.span>
           <motion.h1 initial="hidden" animate="show" variants={fadeUp} className="mt-6 font-heading text-4xl font-extrabold leading-tight sm:text-5xl">
             {c.hero_h}
           </motion.h1>
-          <motion.p initial="hidden" animate="show" variants={fadeUp} className="mx-auto mt-5 max-w-2xl rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-base text-white/85 backdrop-blur-md sm:text-lg">
+          <motion.p initial="hidden" animate="show" variants={fadeUp} className="mx-auto mt-5 max-w-2xl rounded border border-white/15 bg-white/10 px-5 py-3 text-base text-white/85 sm:text-lg">
             {c.hero_p1} {c.hero_p2}
           </motion.p>
           <motion.div initial="hidden" animate="show" variants={fadeUp} className="mt-8 flex flex-wrap justify-center gap-3">
-            <Button asChild className="rounded-full gradient-mint text-navy shadow-soft hover:opacity-90">
+            <Button asChild className="rounded gradient-mint text-navy shadow-soft hover:opacity-90">
               <Link to="/search">{c.cta_search} <ArrowRight className="h-4 w-4" /></Link>
             </Button>
-            <Button asChild variant="outline" className="rounded-full border-white/30 bg-white/5 text-white hover:bg-white/10">
+            <Button asChild variant="outline" className="rounded border-white/30 bg-white/5 text-white hover:bg-white/10">
               <Link to="/owner">{c.cta_list}</Link>
             </Button>
           </motion.div>
@@ -175,10 +173,10 @@ export default function About() {
         </div>
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} variants={{ show: { transition: { staggerChildren: 0.1 } } }} className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {c.pillars.map((p, i) => (
-            <motion.div key={i} variants={fadeUp} className="group flex flex-col rounded-2xl border border-border bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] dark:bg-card">
+            <motion.div key={i} variants={fadeUp} className="group flex flex-col rounded border border-border bg-white p-6 shadow-soft transition-colors hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] dark:bg-card">
               <div className="relative flex h-12 w-12 items-center justify-center">
-                <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/15 to-gold/10 blur-[6px] transition-transform duration-300 group-hover:scale-110" />
-                <p.icon className="relative h-full w-full drop-shadow-[0_4px_10px_rgba(16,24,40,0.16)] transition-transform duration-300 group-hover:scale-110" />
+                <span className="absolute inset-0 rounded-full transition-transform duration-300 group-" />
+                <p.icon className="relative h-full w-full drop-shadow-[0_4px_10px_rgba(16,24,40,0.16)] transition-transform duration-300 group-" />
               </div>
               <h3 className="mt-4 font-heading text-lg font-bold text-navy dark:text-foreground">{p.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.desc}</p>
@@ -191,11 +189,11 @@ export default function About() {
       <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-5 lg:items-start">
           <div className="lg:sticky lg:top-24 lg:col-span-2">
-            <div className="overflow-hidden rounded-3xl shadow-soft">
+            <div className="overflow-hidden rounded shadow-soft">
               <img src="/images/generated/about-story.png" alt="" className="h-72 w-full object-cover lg:h-[480px]" />
             </div>
           </div>
-          <div className="rounded-3xl border border-border bg-white p-7 shadow-soft dark:bg-card sm:p-9 lg:col-span-3">
+          <div className="rounded border border-border bg-white p-7 shadow-soft dark:bg-card sm:p-9 lg:col-span-3">
           <div className="text-center lg:text-left">
             <p className="text-xs font-bold uppercase tracking-wider text-emerald">{c.story_k}</p>
             <h2 className="mt-1 font-heading text-2xl font-bold text-navy dark:text-foreground sm:text-3xl">{c.story_h}</h2>
@@ -209,11 +207,11 @@ export default function About() {
 
             <h3 className="font-heading text-xl font-bold text-navy dark:text-foreground pt-2">{c.service_h}</h3>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-border bg-secondary/30 p-4 dark:bg-navy-deep/40">
+              <div className="rounded border border-border bg-secondary/30 p-4 dark:bg-navy-deep/40">
                 <p className="font-heading text-sm font-bold text-emerald">{c.service_buyers_t}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{c.service_buyers_d}</p>
               </div>
-              <div className="rounded-2xl border border-border bg-secondary/30 p-4 dark:bg-navy-deep/40">
+              <div className="rounded border border-border bg-secondary/30 p-4 dark:bg-navy-deep/40">
                 <p className="font-heading text-sm font-bold text-emerald">{c.service_owners_t}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{c.service_owners_d}</p>
               </div>
@@ -234,13 +232,13 @@ export default function About() {
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {c.steps.map((s, i) => (
-            <motion.div key={i} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={fadeUp} className="group relative overflow-hidden rounded-2xl border border-border bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] dark:bg-card">
+            <motion.div key={i} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.3 }} variants={fadeUp} className="group relative overflow-hidden rounded border border-border bg-white p-6 shadow-soft transition-colors hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] dark:bg-card">
               <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-3 select-none font-heading text-6xl font-black leading-none text-navy/[0.06] dark:text-white/[0.05]">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <span className="relative flex h-11 w-11 items-center justify-center">
-                <span className="absolute inset-0 rounded-full bg-gradient-to-br from-navy/10 to-emerald/15 blur-[6px] transition-transform duration-300 group-hover:scale-110" />
-                <s.icon className="relative h-full w-full drop-shadow-[0_4px_10px_rgba(16,24,40,0.16)] transition-transform duration-300 group-hover:scale-110" />
+                <span className="absolute inset-0 rounded-full transition-transform duration-300 group-" />
+                <s.icon className="relative h-full w-full drop-shadow-[0_4px_10px_rgba(16,24,40,0.16)] transition-transform duration-300 group-" />
               </span>
               <h3 className="relative mt-4 font-heading text-base font-bold text-navy dark:text-foreground">{s.title.replace(/^\d+\.\s*/, "")}</h3>
               <p className="relative mt-1.5 text-sm text-muted-foreground">{s.desc}</p>
@@ -256,14 +254,12 @@ export default function About() {
 
       {/* TRUST BAR */}
       <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-navy-deep p-8 shadow-[0_30px_70px_-30px_rgba(16,24,40,0.5)]">
-          <div className="pointer-events-none absolute -left-12 -top-12 h-48 w-48 rounded-full bg-emerald/20 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-12 -right-8 h-40 w-40 rounded-full bg-gold/15 blur-3xl" />
+        <div className="relative overflow-hidden rounded bg-navy-deep p-8 shadow-[0_30px_70px_-30px_rgba(16,24,40,0.5)]">
           <div className="relative grid gap-5 sm:grid-cols-3">
             {c.trust.map((b, i) => (
               <div key={i} className="flex items-start gap-3">
                 <span className="relative flex h-10 w-10 shrink-0 items-center justify-center">
-                  <span className="absolute inset-0 rounded-full bg-white/10 blur-[5px]" />
+                  <span className="absolute inset-0 rounded-full bg-white/10" />
                   <b.icon className="relative h-full w-full drop-shadow-[0_3px_8px_rgba(0,0,0,0.35)]" />
                 </span>
                 <div>
@@ -293,7 +289,7 @@ export default function About() {
             <Accordion type="single" collapsible className="space-y-2.5">
               {c.faq.map((item, i) => (
                 <motion.div key={i} variants={fadeUp}>
-                  <AccordionItem value={`faq-${i}`} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] px-4 transition-colors duration-300 hover:bg-white/[0.06] data-[state=open]:border-emerald/40 data-[state=open]:bg-white/[0.06] sm:px-5">
+                  <AccordionItem value={`faq-${i}`} className="overflow-hidden rounded border border-white/10 bg-white/[0.03] px-4 transition-colors duration-300 hover:bg-white/[0.06] data-[state=open]:border-emerald/40 data-[state=open]:bg-white/[0.06] sm:px-5">
                     <AccordionTrigger className="font-heading text-base font-semibold text-white hover:text-emerald sm:text-lg">
                       {item.q}
                     </AccordionTrigger>

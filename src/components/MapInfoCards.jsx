@@ -43,15 +43,15 @@ export default function MapInfoCards({ properties, lang }) {
           </p>
         </div>
         <div className="mt-3 grid grid-cols-3 gap-2">
-          <div className="rounded-xl bg-emerald-soft p-2.5 text-center dark:bg-emerald/10">
+          <div className="rounded bg-emerald-soft p-2.5 text-center dark:bg-emerald/10">
             <p className="text-xl font-bold text-navy dark:text-foreground">{stats.total}</p>
             <p className="text-[10px] text-muted-foreground">{en ? "properties" : "proprietăți"}</p>
           </div>
-          <div className="rounded-xl bg-gold-soft p-2.5 text-center dark:bg-gold/10">
+          <div className="rounded bg-gold-soft p-2.5 text-center dark:bg-gold/10">
             <p className="text-xl font-bold text-navy dark:text-foreground">{stats.countyCount}</p>
             <p className="text-[10px] text-muted-foreground">{en ? "counties" : "județe"}</p>
           </div>
-          <div className="rounded-xl bg-secondary p-2.5 text-center dark:bg-white/5">
+          <div className="rounded bg-secondary p-2.5 text-center dark:bg-white/5">
             <p className="text-xl font-bold text-navy dark:text-foreground">{stats.cityCount}</p>
             <p className="text-[10px] text-muted-foreground">{en ? "cities" : "orașe"}</p>
           </div>

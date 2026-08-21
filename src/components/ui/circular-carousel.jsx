@@ -151,7 +151,7 @@ export function CircularCarousel({
                 role="option"
                 tabIndex={isActive ? 0 : -1}
                 className={cn(
-                  "absolute inset-0 m-auto flex h-36 w-44 cursor-pointer flex-col items-start gap-2 overflow-hidden rounded-2xl border border-border bg-card p-3.5 shadow-soft transition-[filter] duration-300 sm:h-44 sm:w-64 sm:p-4",
+                  "absolute inset-0 m-auto flex h-36 w-44 cursor-pointer flex-col items-start gap-2 overflow-hidden rounded border border-border bg-card p-3.5 shadow-soft transition-[filter] duration-300 sm:h-44 sm:w-64 sm:p-4",
                   isActive
                     ? "pointer-events-auto ring-1 ring-emerald/50"
                     : "pointer-events-none blur-[1.5px]",
@@ -160,7 +160,7 @@ export function CircularCarousel({
                 <div className="flex w-full items-center gap-2.5 overflow-hidden">
                   {Icon && (
                     <span className="relative flex h-9 w-9 shrink-0 items-center justify-center">
-                      <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/15 to-gold/10 blur-[5px]" />
+                      <span className="absolute inset-0 rounded-full" />
                       <Icon className="relative h-7 w-7 drop-shadow-[0_3px_8px_rgba(16,24,40,0.18)]" />
                     </span>
                   )}
@@ -206,7 +206,7 @@ export function CircularCarousel({
           whileTap={{ scale: 0.95 }}
           onClick={prev}
           aria-label="Previous item"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-secondary text-muted-foreground backdrop-blur-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-secondary text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronLeft className="size-5" />
         </motion.button>
@@ -219,7 +219,7 @@ export function CircularCarousel({
               aria-selected={i === activeIndex}
               onClick={() => goTo(i)}
               className={cn(
-                "h-1.5 rounded-full transition-all duration-300",
+                "h-1.5 rounded-full transition-colors",
                 i === activeIndex
                   ? "w-6 bg-foreground/80"
                   : "w-1.5 bg-foreground/20 hover:bg-foreground/40",
@@ -234,7 +234,7 @@ export function CircularCarousel({
           whileTap={{ scale: 0.95 }}
           onClick={next}
           aria-label="Next item"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-secondary text-muted-foreground backdrop-blur-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-secondary text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronRight className="size-5" />
         </motion.button>

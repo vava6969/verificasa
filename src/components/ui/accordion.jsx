@@ -21,7 +21,7 @@ const AccordionTrigger = React.forwardRef(({ className, children, ...props }, re
       )}
       {...props}>
       {children}
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/20 text-white/70 transition-all duration-300 group-hover:border-emerald group-hover:text-emerald group-data-[state=open]:rotate-45 group-data-[state=open]:border-emerald group-data-[state=open]:bg-emerald group-data-[state=open]:text-white">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/20 text-white/70 transition-colors group-hover:border-emerald group-hover:text-emerald group-data-[state=open]:rotate-45 group-data-[state=open]:border-emerald group-data-[state=open]:bg-emerald group-data-[state=open]:text-white">
         <Plus className="h-3.5 w-3.5" />
       </span>
     </AccordionPrimitive.Trigger>

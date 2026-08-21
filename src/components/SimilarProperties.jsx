@@ -47,7 +47,7 @@ export default function SimilarProperties({ property }) {
   if (!items) {
     return (
       <div className="flex gap-3 overflow-hidden sm:gap-4">
-        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-64 w-[220px] shrink-0 rounded-2xl sm:w-64" />)}
+        {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-64 w-[220px] shrink-0 rounded sm:w-64" />)}
       </div>
     );
   }
@@ -55,7 +55,7 @@ export default function SimilarProperties({ property }) {
   if (items.length === 0) return null;
 
   return (
-    <Reveal className="overflow-hidden rounded-2xl border border-border bg-white p-3 shadow-soft sm:p-6">
+    <Reveal className="overflow-hidden rounded border border-border bg-white p-3 shadow-soft sm:p-6">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
           <Sparkles className="h-5 w-5 shrink-0 text-gold" />
@@ -90,10 +90,10 @@ export default function SimilarProperties({ property }) {
         {/* Card final — Vezi toate */}
         <Link
           to={`/search?city=${encodeURIComponent(property.city || "")}`}
-          className="group flex w-36 shrink-0 flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-emerald/40 bg-emerald-soft/40 p-6 text-center transition hover:border-emerald hover:bg-emerald-soft sm:w-48"
+          className="group flex w-36 shrink-0 flex-col items-center justify-center gap-3 rounded border-2 border-dashed border-emerald/40 bg-emerald-soft/40 p-6 text-center transition hover:border-emerald hover:bg-emerald-soft sm:w-48"
           style={{ scrollSnapAlign: "start" }}
         >
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald text-white shadow-soft transition group-hover:scale-110">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald text-white shadow-soft transition group-">
             <ArrowRight className="h-6 w-6" />
           </div>
           <p className="text-sm font-bold text-navy dark:text-foreground">{t("view_all")}</p>

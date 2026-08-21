@@ -127,7 +127,7 @@ export const LoadingButton = ({
         whileTap={disabled || pending || reduced ? undefined : { y: 1 }}
         transition={CELL}
         onClick={(event) => { if (pending) { event.preventDefault(); return; } run(); }}
-        className={`relative inline-flex h-12 select-none items-center justify-center rounded-full border border-emerald/40 bg-emerald px-6 text-sm font-semibold text-white shadow-soft outline-none transition hover:bg-emerald/90 disabled:opacity-50 ${className}`}
+        className={`relative inline-flex h-12 select-none items-center justify-center rounded border border-emerald/40 bg-emerald px-6 text-sm font-semibold text-white shadow-soft outline-none transition hover:bg-emerald/90 disabled:opacity-50 ${className}`}
         style={{ touchAction: "manipulation" }}
       >
         <span aria-hidden className="relative grid place-items-center">

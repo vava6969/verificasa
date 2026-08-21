@@ -229,10 +229,10 @@ export default function UserProfile() {
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-        <Skeleton className="h-40 w-full rounded-2xl" />
-        <Skeleton className="mt-4 h-12 w-64 rounded-xl" />
+        <Skeleton className="h-40 w-full rounded" />
+        <Skeleton className="mt-4 h-12 w-64 rounded" />
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 rounded-2xl" />)}
+          {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 rounded" />)}
         </div>
       </div>
     );
@@ -255,7 +255,7 @@ export default function UserProfile() {
       </Link>
 
       {/* Profile header with cover image */}
-      <div className="mt-4 overflow-hidden rounded-3xl border border-border bg-white shadow-soft dark:bg-card">
+      <div className="mt-4 overflow-hidden rounded border border-border bg-white shadow-soft dark:bg-card">
         <div className="relative h-32 sm:h-40">
           {profile.cover_image_url ? (
             <UIImage src={profile.cover_image_url} fittingType="fill" className="h-full w-full" />
@@ -278,7 +278,7 @@ export default function UserProfile() {
                 <div className="flex items-center gap-2">
                   <h1 className="font-heading text-xl font-bold text-navy dark:text-foreground sm:text-2xl">{profile.full_name || profile.email}</h1>
                   {profile.is_verified && (
-                    <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2 py-0.5 text-[11px] font-bold text-emerald">
+                    <span className="flex items-center gap-1 rounded bg-emerald-soft px-2 py-0.5 text-[11px] font-bold text-emerald">
                       <BadgeCheck className="h-3.5 w-3.5" /> {t("up_verified_landlord")}
                     </span>
                   )}
@@ -419,7 +419,7 @@ export default function UserProfile() {
             <div className="grid gap-6 lg:grid-cols-3">
               {/* Breakdown */}
               <div className="lg:col-span-1">
-                <div className="sticky top-20 rounded-2xl border border-border bg-white p-5 dark:bg-card">
+                <div className="sticky top-20 rounded border border-border bg-white p-5 dark:bg-card">
                   <div className="flex items-center gap-3">
                     <span className="font-heading text-4xl font-bold text-navy dark:text-foreground">{average.toFixed(1)}</span>
                     <div>

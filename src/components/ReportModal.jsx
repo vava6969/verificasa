@@ -96,7 +96,7 @@ export default function ReportModal({
               <select
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint"
+                className="mt-1 w-full rounded border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint"
               >
                 <option value="">Selectează motivul…</option>
                 {REASONS.map((r) => <option key={r} value={r}>{r}</option>)}
@@ -120,14 +120,14 @@ export default function ReportModal({
                   value={rName}
                   onChange={(e) => setRName(e.target.value)}
                   placeholder="Nume (opțional)"
-                  className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint"
+                  className="w-full rounded border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint"
                 />
                 <input
                   type="email"
                   value={rEmail}
                   onChange={(e) => setREmail(e.target.value)}
                   placeholder="Email (opțional)"
-                  className="w-full rounded-xl border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint"
+                  className="w-full rounded border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint"
                 />
               </div>
             )}

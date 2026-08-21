@@ -19,7 +19,7 @@ export default function ChatPropertyCard({ message, mine = false }) {
   return (
     <Link
       to={`/property/${id}`}
-      className={`mt-1.5 block overflow-hidden rounded-xl border transition ${mine ? "border-white/20 bg-white/15 hover:bg-white/20" : "border-black/10 bg-black/5 hover:bg-black/10"}`}
+      className={`mt-1.5 block overflow-hidden rounded border transition ${mine ? "border-white/20 bg-white/15 hover:bg-white/20" : "border-black/10 bg-black/5 hover:bg-black/10"}`}
     >
       <div className="flex gap-2.5 p-2">
         <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-black/20">

@@ -229,7 +229,7 @@ export default function Conversation() {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary/60" aria-label="Opțiuni conversație">
+            <button className="rounded p-1.5 text-muted-foreground hover:bg-secondary/60" aria-label="Opțiuni conversație">
               <MoreVertical className="h-5 w-5" />
             </button>
           </DropdownMenuTrigger>
@@ -259,7 +259,7 @@ export default function Conversation() {
             if (m.is_system && m.system_type === "review_request") {
               return (
                 <div key={m.id} className="flex justify-center px-4 py-2">
-                  <div className="flex max-w-[90%] flex-col items-center gap-2 rounded-2xl border border-gold/30 bg-gradient-to-br from-gold-soft to-amber-50 px-4 py-3 text-center shadow-sm dark:border-gold/20 dark:from-gold-soft/20 dark:to-amber-900/10 sm:max-w-[70%]">
+                  <div className="flex max-w-[90%] flex-col items-center gap-2 rounded border border-gold/30 bg-gradient-to-br from-gold-soft to-amber-50 px-4 py-3 text-center shadow-sm dark:border-gold/20 dark:from-gold-soft/20 dark:to-amber-900/10 sm:max-w-[70%]">
                     <div className="flex items-center gap-2">
                       <VerifiCasaLogo size={28} withWordmark={false} />
                       <span className="text-xs font-bold uppercase tracking-wide text-gold-deep">VerifiCasa</span>
@@ -268,7 +268,7 @@ export default function Conversation() {
                     {otherUser && (
                       <button
                         onClick={() => setShowReviewModal(true)}
-                        className="mt-1 flex items-center gap-1.5 rounded-full bg-emerald px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald/90"
+                        className="mt-1 flex items-center gap-1.5 rounded bg-emerald px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald/90"
                       >
                         <Star className="h-3.5 w-3.5 fill-white" /> Lasă o recenzie
                       </button>
@@ -294,7 +294,7 @@ export default function Conversation() {
                 )}
                 <div className={"flex max-w-[82%] flex-col gap-0.5 sm:max-w-[70%] " + (mine ? "items-end" : "items-start")}>
                   <div className={[
-                    "rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-sm sm:px-4",
+                    "rounded px-3.5 py-2.5 text-sm leading-relaxed shadow-sm sm:px-4",
                     mine ? "rounded-br-sm bg-emerald text-white" : "rounded-bl-sm bg-white text-foreground dark:bg-card",
                   ].join(" ")}>
                     {m.content}
@@ -326,7 +326,7 @@ export default function Conversation() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Scrie un mesaj..."
-          className="flex-1 rounded-full border border-border bg-background px-4 py-3 text-base outline-none focus:border-emerald dark:bg-card"
+          className="flex-1 rounded border border-border bg-background px-4 py-3 text-base outline-none focus:border-emerald dark:bg-card"
         />
         <Button
           type="submit"

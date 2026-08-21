@@ -37,7 +37,7 @@ export default function LegalBadges() {
               {b.line}
             </span>
           </span>
-          <span className="flex shrink-0 items-center gap-1 rounded-full bg-emerald/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white transition group-hover:bg-emerald">
+          <span className="flex shrink-0 items-center gap-1 rounded bg-emerald/90 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white transition group-hover:bg-emerald">
             Detalii <ExternalLink className="h-3 w-3" />
           </span>
         </a>
