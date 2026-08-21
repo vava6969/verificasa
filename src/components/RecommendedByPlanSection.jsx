@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronRight, Sparkles } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
-import { PLANS, resolvePropertyPlan } from "@/lib/plans";
+import { PLANS, resolvePropertyPlan, compareByBoostThenViews } from "@/lib/plans";
 import { fetchActivePlanMap } from "@/lib/subscriptions";
 import RecommendedPropertyCard from "@/components/RecommendedPropertyCard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -69,7 +69,7 @@ export default function RecommendedByPlanSection() {
     (grouped[plan] || grouped.none).push(p);
   }
   for (const key of Object.keys(grouped)) {
-    grouped[key].sort((a, b) => (b.views_count || 0) - (a.views_count || 0));
+    grouped[key].sort(compareByBoostThenViews);
   }
 
   const rows = [

@@ -1,0 +1,58 @@
+import { base44 } from "@/api/base44Client";
+
+// Helpers de client pentru boost-uri. Soldul se citește din registrul
+// BoostCredit (RLS: fiecare își vede doar propriile rânduri); scrierile trec
+// obligatoriu prin funcții de backend.
+
+export async function fetchBoostBalance(userId) {
+  if (!userId) return 0;
+  try {
+    const rows = await base44.entities.BoostCredit.filter({ user_id: userId }, "-created_date", 500);
+    return (rows || []).reduce((sum, r) => sum + (Number(r.delta) || 0), 0);
+  } catch (e) {
+    return 0;
+  }
+}
+
+export async function fetchBoostLedger(userId, limit = 20) {
+  if (!userId) return [];
+  try {
+    return await base44.entities.BoostCredit.filter({ user_id: userId }, "-created_date", limit);
+  } catch (e) {
+    return [];
+  }
+}
+
+// Numărul de anunțuri active ale unui utilizator — baza contorului de limite.
+export async function fetchActiveListingCount(userId) {
+  if (!userId) return 0;
+  try {
+    const rows = await base44.entities.Property.filter(
+      { created_by_id: userId, status: "Activ" }, "-created_date", 200
+    );
+    return (rows || []).filter((p) => p.approval_status !== "REJECTED").length;
+  } catch (e) {
+    return 0;
+  }
+}
+
+function unwrap(res) {
+  const data = res?.data || res || {};
+  return { ok: !!data.ok, error: data.error || null, ...data };
+}
+
+export async function redeemCoupon(code) {
+  try {
+    return unwrap(await base44.functions.invoke("RedeemCoupon", { code }));
+  } catch (e) {
+    return { ok: false, error: "Nu am putut valida codul. Încearcă din nou." };
+  }
+}
+
+export async function applyBoost(propertyId) {
+  try {
+    return unwrap(await base44.functions.invoke("ApplyBoost", { property_id: propertyId }));
+  } catch (e) {
+    return { ok: false, error: "Nu am putut promova anunțul. Încearcă din nou." };
+  }
+}

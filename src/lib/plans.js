@@ -135,15 +135,36 @@ export function resolvePropertyPlan(property, planMap) {
 }
 
 // Comparator gata de folosit cu Array.prototype.sort — plan mai important
-// întâi, apoi views_count descrescător, exact regula cerută pentru
-// „Anunțuri recomandate": planul postatorului decide rândul, vizualizările
-// decid ordinea în interiorul aceluiași rând/plan.
+// întâi, apoi boost, apoi views_count descrescător. Planul postatorului decide
+// rândul, boost-ul decide ordinea în interiorul rândului, vizualizările rup
+// egalitatea. Boost-ul NU sare peste plan: un anunț promovat nu poate ascunde
+// o potrivire mai bună dintr-o categorie superioară.
 export function compareByPlanThenViews(planOf) {
   return (a, b) => {
     const rankDiff = planRank(planOf(b)) - planRank(planOf(a));
     if (rankDiff !== 0) return rankDiff;
+    const boostDiff = (isBoosted(b) ? 1 : 0) - (isBoosted(a) ? 1 : 0);
+    if (boostDiff !== 0) return boostDiff;
     return (b.views_count || 0) - (a.views_count || 0);
   };
+}
+
+// Un anunț e promovat doar dacă boost-ul e activ ȘI nu a expirat — nu ne bazăm
+// exclusiv pe flag, ca un ExpireBoosts nerulat să nu lase anunțuri promovate
+// la nesfârșit.
+export function isBoosted(property) {
+  if (!property?.boost_active) return false;
+  if (!property.boost_ends_date) return true;
+  return new Date(property.boost_ends_date).getTime() > Date.now();
+}
+
+// Ordonare în interiorul unei liste deja filtrate: promovatele primele, apoi
+// vizualizările. Folosit acolo unde planul nu mai e criteriu (rânduri deja
+// grupate pe plan, rezultate de căutare).
+export function compareByBoostThenViews(a, b) {
+  const boostDiff = (isBoosted(b) ? 1 : 0) - (isBoosted(a) ? 1 : 0);
+  if (boostDiff !== 0) return boostDiff;
+  return (b.views_count || 0) - (a.views_count || 0);
 }
 
 // Opțiuni gata de folosit pentru filtrul „Plan” din SearchFiltersDrawer —

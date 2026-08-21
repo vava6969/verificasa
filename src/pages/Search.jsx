@@ -11,7 +11,7 @@ import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, BookmarkPlus, Rota
 import { Skeleton } from "@/components/ui/skeleton";
 import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
-import { resolvePropertyPlan, PLAN_FILTER_OPTIONS } from "@/lib/plans";
+import { resolvePropertyPlan, PLAN_FILTER_OPTIONS, compareByBoostThenViews } from "@/lib/plans";
 import { fetchActivePlanMap } from "@/lib/subscriptions";
 
 // VerifiCasa verification filters — each applies a real-property predicate.
@@ -171,9 +171,13 @@ export default function SearchPage() {
     return true;
   });
 
+  // Sortarea explicit aleasă de utilizator câștigă mereu: un boost nu are voie
+  // să răstoarne „cele mai ieftine întâi". Doar ordinea implicită dă
+  // promovatelor prioritate, iar cardurile o declară ca plasare plătită.
   if (sort === "price_asc") filtered = [...filtered].sort((a, b) => (a.price_monthly || 0) - (b.price_monthly || 0));
   else if (sort === "price_desc") filtered = [...filtered].sort((a, b) => (b.price_monthly || 0) - (a.price_monthly || 0));
   else if (sort === "newest") filtered = [...filtered].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+  else filtered = [...filtered].sort(compareByBoostThenViews);
 
   const found = filtered.length;
   const PER_PAGE = 10;

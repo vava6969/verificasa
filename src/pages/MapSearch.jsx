@@ -22,7 +22,7 @@ import {
   Search, Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, RotateCcw,
 } from "lucide-react";
 import { ROMANIA_COUNTIES, ROMANIA_CENTER, ROMANIA_MAX_BOUNDS } from "@/lib/romaniaCounties";
-import { resolvePropertyPlan, PLAN_FILTER_OPTIONS } from "@/lib/plans";
+import { resolvePropertyPlan, PLAN_FILTER_OPTIONS, compareByBoostThenViews } from "@/lib/plans";
 import { fetchActivePlanMap } from "@/lib/subscriptions";
 
 // Aceleași filtre ca pe /search — reutilizate 1:1 aici ca lista și harta
@@ -428,6 +428,7 @@ export default function MapSearch() {
     if (sort === "price_asc") result = [...result].sort((a, b) => (a.price_monthly || 0) - (b.price_monthly || 0));
     else if (sort === "price_desc") result = [...result].sort((a, b) => (b.price_monthly || 0) - (a.price_monthly || 0));
     else if (sort === "newest") result = [...result].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+    else result = [...result].sort(compareByBoostThenViews);
     return result;
   }, [filteredGeoProps, bounds, polygonPoints, sort]);
 
