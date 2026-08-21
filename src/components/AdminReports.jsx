@@ -58,16 +58,16 @@ export default function AdminReports({ reports = [], properties = [], onReload }
   return (
     <div className="space-y-3">
       {reports.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Nicio sesizare. 🎉</p>
+        <p className="text-sm text-muted-foreground">Nicio sesizare deschisă.</p>
       ) : (
         <>
         {reports.slice(0, repCount).map((r) => (
-        <div key={r.id} className="rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card">
+        <div key={r.id} className="rounded border border-border bg-white p-4 shadow-soft dark:bg-card">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
               <p className="flex flex-wrap items-center gap-2 font-heading font-bold text-navy dark:text-foreground">
                 <Flag className="h-4 w-4 text-rose-500" /> {r.reason}
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${STATUS_TONE[r.status] || "bg-secondary text-muted-foreground"}`}>
+                <span className={`rounded px-2 py-0.5 text-[10px] font-bold ${STATUS_TONE[r.status] || "bg-secondary text-muted-foreground"}`}>
                   {STATUS_LABEL[r.status] || r.status}
                 </span>
               </p>
@@ -136,7 +136,7 @@ export default function AdminReports({ reports = [], properties = [], onReload }
           })()}
 
           {resolvingId === r.id && (
-            <div className="mt-3 space-y-2 rounded-xl border border-border bg-secondary/20 p-3">
+            <div className="mt-3 space-y-2 rounded border border-border bg-secondary/20 p-3">
               <div className="flex flex-wrap items-center gap-2">
                 <select
                   value={form.status}

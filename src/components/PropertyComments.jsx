@@ -190,7 +190,7 @@ export default function PropertyComments({ property }) {
     const badge = ROLE_BADGE[r] || ROLE_BADGE.USER;
     const Icon = r === "PROPRIETAR" ? BadgeCheck : ["SUPER_ADMIN", "ADMIN", "AGENT", "SUPPORT"].includes(r) ? ShieldCheck : null;
     return (
-      <span className={cn("flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold", badge.cls)}>
+      <span className={cn("flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-bold", badge.cls)}>
         {Icon && <Icon className="h-3 w-3" />} {badge.label}
       </span>
     );
@@ -245,7 +245,7 @@ export default function PropertyComments({ property }) {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card sm:p-6">
+    <div className="rounded border border-border bg-white p-4 shadow-soft dark:bg-card sm:p-6">
       <div className="flex items-center gap-2">
         <MessageSquare className="h-5 w-5 text-emerald" />
         <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">Comentarii</h3>
@@ -268,12 +268,12 @@ export default function PropertyComments({ property }) {
             </div>
           </form>
         ) : (
-          <div className="mt-4 flex items-center gap-2 rounded-xl border border-dashed border-border bg-secondary/30 px-4 py-3 text-xs text-muted-foreground">
+          <div className="mt-4 flex items-center gap-2 rounded border border-dashed border-border bg-secondary/30 px-4 py-3 text-xs text-muted-foreground">
             <Lock className="h-4 w-4" /> Contul tău nu este verificat. Solicită verificarea pentru a putea comenta.
           </div>
         )
       ) : (
-        <div className="mt-4 rounded-xl border border-dashed border-border bg-secondary/30 px-4 py-3 text-center text-xs text-muted-foreground">
+        <div className="mt-4 rounded border border-dashed border-border bg-secondary/30 px-4 py-3 text-center text-xs text-muted-foreground">
           <a href="/login" className="font-bold text-emerald">Conectează-te</a> pentru a lăsa un comentariu.
         </div>
       )}

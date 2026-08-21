@@ -178,10 +178,10 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
   );
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-emerald/30 bg-emerald-soft/40 p-5">
+    <form onSubmit={handleSubmit} className="rounded border border-emerald/30 bg-emerald-soft/40 p-5">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">Editează anunțul</h3>
-        {isAdmin && <span className="rounded-full bg-navy px-2.5 py-0.5 text-[10px] font-bold uppercase text-emerald">Mod admin</span>}
+        {isAdmin && <span className="rounded bg-navy px-2.5 py-0.5 text-[10px] font-bold uppercase text-emerald">Mod admin</span>}
       </div>
 
       {/* Date de bază */}
@@ -215,7 +215,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         {form.images.map((img, i) => (
           <div key={i} className="group relative h-20 w-28 overflow-hidden rounded-lg border border-border bg-secondary">
             <UIImage src={img} fittingType="fill" className="h-full w-full" />
-            <button type="button" onClick={() => removeImage(i)} aria-label="Șterge poza" className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-navy-deep/70 text-white opacity-0 transition group-hover:opacity-100 hover:bg-rose-600">
+            <button type="button" onClick={() => removeImage(i)} aria-label="Șterge poza" className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded bg-navy-deep/70 text-white opacity-0 transition group-hover:opacity-100 hover:bg-rose-600">
               <Trash2 className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -313,8 +313,8 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
           efectiv se setează momentan manual, de admin, mai jos. */}
       {!isAdmin && (
         form.tour_3d_url ? (
-          <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald/30 bg-emerald-soft/40 p-3.5">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-soft text-emerald">
+          <div className="mt-3 flex items-center gap-3 rounded border border-emerald/30 bg-emerald-soft/40 p-3.5">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-emerald-soft text-emerald">
               <Video className="h-4 w-4" />
             </span>
             <span>
@@ -323,9 +323,9 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
             </span>
           </div>
         ) : (
-          <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-dashed border-border bg-secondary/30 p-3.5">
+          <div className="mt-3 flex items-center justify-between gap-3 rounded border border-dashed border-border bg-secondary/30 p-3.5">
             <div className="flex items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-secondary text-muted-foreground">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-secondary text-muted-foreground">
                 <Video className="h-4 w-4" />
               </span>
               <span>
@@ -333,7 +333,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
                 <span className="block text-xs text-muted-foreground">Adaugă link-ul tău către tur — disponibil cu Plan Pro</span>
               </span>
             </div>
-            <span className="flex shrink-0 items-center gap-1 rounded-full bg-gold-soft px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-gold-deep">
+            <span className="flex shrink-0 items-center gap-1 rounded bg-gold-soft px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-gold-deep">
               <Lock className="h-3 w-3" /> Plan Pro
             </span>
           </div>

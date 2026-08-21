@@ -39,12 +39,12 @@ export default function Contact() {
             href="https://instagram.com/verificasaro"
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2.5 rounded-xl border border-border bg-secondary/40 py-1.5 pl-1.5 pr-3.5 text-sm font-semibold text-navy transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/40 hover:bg-secondary/60 dark:text-foreground"
+            className="group inline-flex items-center gap-2.5 rounded border border-border bg-secondary/40 py-1.5 pl-1.5 pr-3.5 text-sm font-semibold text-navy transition-colors hover:border-gold/40 hover:bg-secondary/60 dark:text-foreground"
           >
             <img
               src="/images/generated/icon-instagram-v1.png"
               alt=""
-              className="h-8 w-8 shrink-0 object-contain transition-transform duration-200 group-hover:scale-110"
+              className="h-8 w-8 shrink-0 object-contain transition-transform duration-200 group-"
             />
             @verificasaro
           </a>
@@ -52,12 +52,12 @@ export default function Contact() {
             href="https://tiktok.com/@verificasaro"
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2.5 rounded-xl border border-border bg-secondary/40 py-1.5 pl-1.5 pr-3.5 text-sm font-semibold text-navy transition-all duration-200 hover:-translate-y-0.5 hover:border-navy/30 hover:bg-secondary/60 dark:text-foreground dark:hover:border-white/30"
+            className="group inline-flex items-center gap-2.5 rounded border border-border bg-secondary/40 py-1.5 pl-1.5 pr-3.5 text-sm font-semibold text-navy transition-colors hover:border-navy/30 hover:bg-secondary/60 dark:text-foreground dark:hover:border-white/30"
           >
             <img
               src="/images/generated/icon-tiktok-v1.png"
               alt=""
-              className="h-8 w-8 shrink-0 object-contain transition-transform duration-200 group-hover:scale-110"
+              className="h-8 w-8 shrink-0 object-contain transition-transform duration-200 group-"
             />
             @verificasaro
           </a>
@@ -75,8 +75,7 @@ export default function Contact() {
           <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-emerald" />
           <p>
             <span className="mr-1">🇷🇴</span>
-            Oferim servicii de verificare în toată România — peste 300 de orașe acoperite, cu
-            validare online pentru fiecare anunț publicat.
+            Oferim servicii de verificare în toată România, cu validare online pentru fiecare anunț publicat.
           </p>
         </div>
       </section>

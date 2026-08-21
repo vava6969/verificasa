@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 
 export default function AboutVerifiCasa() {
@@ -40,29 +39,26 @@ export default function AboutVerifiCasa() {
         {services.map((s, i) => (
           <RevealItem
             key={i}
-            className="group relative flex flex-col overflow-hidden rounded-3xl surface-card p-4 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] sm:p-5"
+            className="group relative flex flex-col overflow-hidden rounded surface-card p-4 transition-colors hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] sm:p-5"
           >
             <div className="relative flex h-11 w-11 items-center justify-center sm:h-12 sm:w-12">
-              <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/15 to-gold/10 blur-[6px] transition-transform duration-300 group-hover:scale-110" />
-              <img src={s.img} alt="" className="relative h-full w-full object-contain drop-shadow-[0_4px_10px_rgba(16,24,40,0.16)] transition-transform duration-300 group-hover:scale-110" />
+              <span className="absolute inset-0 rounded-full transition-transform duration-300 group-" />
+              <img src={s.img} alt="" className="relative h-full w-full object-contain drop-shadow-[0_4px_10px_rgba(16,24,40,0.16)] transition-transform duration-300 group-" />
             </div>
             <h3 className="mt-3 font-heading text-sm font-bold text-navy dark:text-foreground sm:text-base">{s.title}</h3>
             <p className="mt-1.5 flex-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">{s.desc}</p>
             <Link
               to="/about"
-              className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-emerald transition-all duration-200 group-hover:gap-2 sm:text-sm"
+              className="mt-3 inline-flex min-h-[44px] items-center text-xs font-bold text-emerald transition-colors sm:min-h-0 sm:text-sm"
             >
-              Află mai multe <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+              Află mai multe <span className="ml-1" aria-hidden="true">→</span>
             </Link>
           </RevealItem>
         ))}
       </RevealGroup>
 
       {/* Cui se adresează — panou glassmorphism interactiv */}
-      <Reveal className="relative mt-5 overflow-hidden rounded-3xl bg-gradient-to-br from-navy via-navy-deep to-navy p-5 sm:mt-12 sm:p-10">
-        <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-emerald/30 blur-3xl animate-blob" />
-        <div className="pointer-events-none absolute -left-8 bottom-0 h-36 w-36 rounded-full bg-gold/25 blur-3xl animate-blob" style={{ animationDelay: "2s" }} />
-        <div className="pointer-events-none absolute right-1/3 top-1/2 h-28 w-28 rounded-full bg-mint/20 blur-3xl animate-blob" style={{ animationDelay: "4s" }} />
+      <Reveal className="relative mt-5 overflow-hidden rounded bg-gradient-to-br from-navy via-navy-deep to-navy p-5 sm:mt-12 sm:p-10">
 
         <h3 className="relative text-center font-heading text-base font-bold text-white sm:text-2xl">
           Cui se adresează
@@ -74,13 +70,13 @@ export default function AboutVerifiCasa() {
               key={i}
               type="button"
               onClick={() => setActiveAudience(i)}
-              className={`group flex flex-col items-center gap-2 rounded-2xl border p-3 text-center backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 sm:p-4 ${
+              className={`group flex flex-col items-center gap-2 rounded border p-3 text-center transition-colors sm:p-4 ${
                 activeAudience === i
                   ? "border-white/40 bg-white/20"
                   : "border-white/10 bg-white/5 hover:border-white/25 hover:bg-white/10"
               }`}
             >
-              <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-white p-1.5 shadow-soft transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
+              <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded bg-white p-1.5 shadow-soft transition-transform duration-300 group- sm:h-14 sm:w-14">
                 <img src={a.img} alt="" className="h-full w-full object-contain" />
               </span>
               <span className="text-[11px] font-semibold text-white sm:text-sm">{a.label}</span>
@@ -88,7 +84,7 @@ export default function AboutVerifiCasa() {
           ))}
         </div>
 
-        <div className="relative mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-center text-xs text-white/80 backdrop-blur-xl transition-all duration-300 sm:mt-6 sm:text-sm">
+        <div className="relative mt-4 rounded border border-white/10 bg-white/5 px-4 py-3 text-center text-xs text-white/80 transition-colors sm:mt-6 sm:text-sm">
           {audience[activeAudience].desc}
         </div>
       </Reveal>
@@ -97,9 +93,9 @@ export default function AboutVerifiCasa() {
       <div className="mt-4 flex justify-center sm:mt-8">
         <Link
           to="/contact"
-          className="inline-flex items-center gap-1.5 rounded-full bg-emerald px-4 py-2 text-xs font-semibold text-white shadow-soft transition hover:bg-emerald/90 sm:text-sm"
+          className="inline-flex min-h-[44px] items-center rounded bg-emerald px-5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90"
         >
-          Contactează-ne <ArrowRight className="h-3.5 w-3.5" />
+          Contactează-ne <span className="ml-1.5" aria-hidden="true">→</span>
         </Link>
       </div>
     </section>

@@ -11,7 +11,7 @@ import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, BookmarkPlus, Rota
 import { Skeleton } from "@/components/ui/skeleton";
 import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
-import { resolvePropertyPlan, PLAN_FILTER_OPTIONS } from "@/lib/plans";
+import { resolvePropertyPlan, PLAN_FILTER_OPTIONS, compareByBoostThenViews } from "@/lib/plans";
 import { fetchActivePlanMap } from "@/lib/subscriptions";
 
 // VerifiCasa verification filters — each applies a real-property predicate.
@@ -171,9 +171,13 @@ export default function SearchPage() {
     return true;
   });
 
+  // Sortarea explicit aleasă de utilizator câștigă mereu: un boost nu are voie
+  // să răstoarne „cele mai ieftine întâi". Doar ordinea implicită dă
+  // promovatelor prioritate, iar cardurile o declară ca plasare plătită.
   if (sort === "price_asc") filtered = [...filtered].sort((a, b) => (a.price_monthly || 0) - (b.price_monthly || 0));
   else if (sort === "price_desc") filtered = [...filtered].sort((a, b) => (b.price_monthly || 0) - (a.price_monthly || 0));
   else if (sort === "newest") filtered = [...filtered].sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+  else filtered = [...filtered].sort(compareByBoostThenViews);
 
   const found = filtered.length;
   const PER_PAGE = 10;
@@ -209,7 +213,7 @@ export default function SearchPage() {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <Reveal className="mb-6 flex flex-wrap items-end justify-between gap-3" y={16}>
         <div>
-          <h1 className="font-heading text-2xl font-bold text-navy">
+          <h1 className="font-heading text-3xl font-semibold text-foreground">
             {cityParam || zoneParam || typeParam || qParam ? t("sr_results") : t("sr_all")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -221,10 +225,10 @@ export default function SearchPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={resetFilters} variant="outline" className="gap-1.5 border-emerald/40 text-emerald hover:bg-emerald-soft">
+          <Button onClick={resetFilters} variant="outline" className="min-h-[40px] gap-1.5 rounded border-border text-foreground hover:border-emerald hover:text-emerald">
             <RotateCcw className="h-4 w-4" /> {t("sr_reset_filters")}
           </Button>
-          <Button onClick={saveSearch} variant="outline" className="gap-1.5 border-gold/40 text-gold-deep hover:bg-gold-soft">
+          <Button onClick={saveSearch} variant="outline" className="min-h-[40px] gap-1.5 rounded border-border text-foreground hover:border-emerald hover:text-emerald">
             <BookmarkPlus className="h-4 w-4" /> {t("sr_save_search")}
           </Button>
         </div>
@@ -235,7 +239,7 @@ export default function SearchPage() {
         <select
           value={cityFilter}
           onChange={(e) => updateCity(e.target.value)}
-          className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
+          className="min-h-[42px] rounded border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
         >
           <option value="">{t("sr_city_select")}</option>
           {cities.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -244,7 +248,7 @@ export default function SearchPage() {
           value={zoneFilter}
           onChange={(e) => updateZone(e.target.value)}
           disabled={!cityFilter}
-          className="rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card disabled:opacity-50"
+          className="min-h-[42px] rounded border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card disabled:opacity-50"
         >
           <option value="">{t("sr_zone_select")}</option>
           {zones.map((z) => <option key={z} value={z}>{z}</option>)}
@@ -255,7 +259,7 @@ export default function SearchPage() {
             value={qParam}
             onChange={(e) => setQ(e.target.value)}
             placeholder={t("sr_search_placeholder")}
-            className="w-full rounded-lg border border-border bg-background py-2 pl-9 pr-4 text-sm text-foreground outline-none focus:border-emerald dark:bg-card"
+            className="min-h-[42px] w-full rounded border border-border bg-background py-2 pl-9 pr-4 text-sm text-foreground outline-none focus:border-emerald dark:bg-card"
           />
         </div>
       </div>
@@ -285,13 +289,15 @@ export default function SearchPage() {
 
       {properties === null ? (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)}
+          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-sm" />)}
         </div>
       ) : found === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border py-20 text-center">
-          <Home className="mx-auto h-10 w-10 text-muted-foreground/40" />
-          <p className="mt-3 font-heading text-lg font-semibold text-navy">{t("sr_empty_title")}</p>
-          <p className="text-sm text-muted-foreground">{t("sr_empty_sub")}</p>
+        <div className="border border-dashed border-border px-4 py-20 text-center">
+          <p className="font-heading text-xl font-semibold text-foreground">{t("sr_empty_title")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("sr_empty_sub")}</p>
+          <button type="button" onClick={resetFilters} className="mt-4 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0">
+            {t("sr_reset_filters")} <span aria-hidden="true">→</span>
+          </button>
         </div>
       ) : (
         <>
@@ -318,20 +324,20 @@ export default function SearchPage() {
                 </p>
                 <div className="flex items-center gap-1.5">
                   <button onClick={() => goPage(Math.max(1, safePage - 1))} disabled={safePage === 1}
-                    className="flex h-9 items-center justify-center rounded-lg border border-border bg-white px-3 text-sm font-medium text-foreground transition hover:bg-secondary disabled:opacity-40 dark:bg-card">
+                    className="flex h-10 items-center justify-center rounded border border-border bg-card px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-40">
                     <ChevronLeft className="h-4 w-4" />
                   </button>
                   {start > 1 && <span className="px-1 text-muted-foreground">…</span>}
                   {pages.map((pn) => (
                     <button key={pn} onClick={() => goPage(pn)}
-                      className={"h-9 min-w-9 rounded-lg px-3 text-sm font-semibold transition " +
-                        (pn === safePage ? "bg-navy text-white shadow-soft" : "border border-border bg-white text-foreground hover:bg-secondary dark:bg-card")}>
+                      className={"h-10 min-w-10 rounded px-3 text-sm font-semibold tnum transition-colors " +
+                        (pn === safePage ? "bg-emerald text-primary-foreground" : "border border-border bg-card text-foreground hover:bg-secondary")}>
                       {pn}
                     </button>
                   ))}
                   {end < totalPages && <span className="px-1 text-muted-foreground">…</span>}
                   <button onClick={() => goPage(Math.min(totalPages, safePage + 1))} disabled={safePage === totalPages}
-                    className="flex h-9 items-center justify-center rounded-lg border border-border bg-white px-3 text-sm font-medium text-foreground transition hover:bg-secondary disabled:opacity-40 dark:bg-card">
+                    className="flex h-10 items-center justify-center rounded border border-border bg-card px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-40">
                     <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>

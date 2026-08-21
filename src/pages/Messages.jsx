@@ -64,7 +64,7 @@ export default function Messages() {
     const unsubM = base44.entities.Message.subscribe(() => loadConversations());
     const unsubC = base44.entities.Conversation.subscribe(() => loadConversations());
     return () => { try { unsubM?.(); } catch {} try { unsubC?.(); } catch {} };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [isAuthenticated, user?.id]);
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;
@@ -118,19 +118,18 @@ export default function Messages() {
     <div className="mx-auto flex h-[calc(100vh-7rem)] w-full max-w-2xl flex-col overflow-hidden bg-[#f4f6f9] dark:bg-background lg:h-[calc(100vh-3.5rem)]">
       {/* Header */}
       <div className="relative flex items-center justify-between overflow-hidden border-b border-border bg-white px-4 py-3 dark:bg-card">
-        <div className="absolute -right-8 -top-10 h-28 w-28 rounded-full bg-emerald/10 blur-2xl" />
         <div className="relative flex items-center gap-2">
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald/15 text-emerald"><MessageCircle className="h-4 w-4" /></span>
           <h1 className="font-heading text-xl font-bold text-navy dark:text-foreground">Mesaje</h1>
           {totalUnread > 0 && (
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+            <span className="flex h-5 min-w-5 items-center justify-center rounded bg-red-500 px-1.5 text-[10px] font-bold text-white">
               {totalUnread > 9 ? "+9" : totalUnread}
             </span>
           )}
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary/60" aria-label="Opțiuni">
+            <button className="rounded p-1.5 text-muted-foreground hover:bg-secondary/60" aria-label="Opțiuni">
               <MoreVertical className="h-5 w-5" />
             </button>
           </DropdownMenuTrigger>
@@ -162,7 +161,7 @@ export default function Messages() {
       <div className="flex-1 overflow-y-auto pb-20 lg:pb-0">
         {conversations === null ? (
           <div className="space-y-1 px-2 py-2">
-            {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-16 rounded-2xl" />)}
+            {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-16 rounded" />)}
           </div>
         ) : filteredConvs.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
@@ -214,7 +213,7 @@ export default function Messages() {
                         {c.last_message || c.property_title || "Niciun mesaj"}
                       </p>
                       {unread > 0 && (
-                        <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+                        <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded bg-red-500 px-1.5 text-[10px] font-bold text-white">
                           {unread > 9 ? "+9" : unread}
                         </span>
                       )}

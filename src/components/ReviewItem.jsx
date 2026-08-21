@@ -42,7 +42,7 @@ export default function ReviewItem({ review, isOwner }) {
   };
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-4 dark:bg-card">
+    <div className="rounded border border-border bg-white p-4 dark:bg-card">
       <div className="flex items-start gap-3">
         {review.reviewer_avatar_url ? (
           <img src={review.reviewer_avatar_url} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />
@@ -55,7 +55,7 @@ export default function ReviewItem({ review, isOwner }) {
           <div className="flex flex-wrap items-center gap-2">
             <p className="font-semibold text-navy dark:text-foreground">{review.reviewer_name || "Anonim"}</p>
             {review.is_verified && (
-              <span className="flex items-center gap-0.5 rounded-full bg-emerald-soft px-1.5 py-0.5 text-[10px] font-bold text-emerald">
+              <span className="flex items-center gap-0.5 rounded bg-emerald-soft px-1.5 py-0.5 text-[10px] font-bold text-emerald">
                 <BadgeCheck className="h-3 w-3" /> {t("rv_verified_badge")}
               </span>
             )}
@@ -72,7 +72,7 @@ export default function ReviewItem({ review, isOwner }) {
 
       {/* Owner reply */}
       {localReply && (
-        <div className="mt-3 ml-10 rounded-xl bg-secondary/60 p-3">
+        <div className="mt-3 ml-10 rounded bg-secondary/60 p-3">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
             <CornerDownRight className="h-3.5 w-3.5" /> {t("up_replied")}
           </div>
@@ -98,7 +98,7 @@ export default function ReviewItem({ review, isOwner }) {
                 rows={2}
                 maxLength={1000}
                 placeholder={t("up_reply_placeholder")}
-                className="w-full resize-none rounded-xl border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
+                className="w-full resize-none rounded border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald/40"
               />
               <div className="mt-2 flex gap-2">
                 <button

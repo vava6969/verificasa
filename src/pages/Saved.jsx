@@ -104,10 +104,10 @@ export default function Saved() {
       {tab === "properties" && (
         properties === null ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)}
+            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-80 rounded" />)}
           </div>
         ) : properties.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-border bg-gradient-to-b from-secondary/40 to-transparent py-20 text-center">
+          <div className="rounded border border-dashed border-border bg-gradient-to-b from-secondary/40 to-transparent py-20 text-center">
             <span className="relative mx-auto flex h-16 w-16 items-center justify-center">
               <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/20 to-gold/10 blur-md" />
               <Home className="relative h-8 w-8 text-emerald/70" />
@@ -121,7 +121,7 @@ export default function Saved() {
             {properties.map((p) => (
               <div key={p.id} className="relative">
                 <PropertyCard property={p} />
-                <button onClick={() => remove(p.id)} className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-rose-500 shadow-soft transition hover:bg-rose-500 hover:text-white" title="Elimină din salvate">
+                <button onClick={() => remove(p.id)} className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded bg-white/90 text-rose-500 shadow-soft transition hover:bg-rose-500 hover:text-white" title="Elimină din salvate">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
@@ -134,10 +134,10 @@ export default function Saved() {
       {tab === "profiles" && (
         profileUsers === null ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-2xl" />)}
+            {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-32 rounded" />)}
           </div>
         ) : profileUsers.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-border bg-gradient-to-b from-secondary/40 to-transparent py-20 text-center">
+          <div className="rounded border border-dashed border-border bg-gradient-to-b from-secondary/40 to-transparent py-20 text-center">
             <span className="relative mx-auto flex h-16 w-16 items-center justify-center">
               <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/20 to-gold/10 blur-md" />
               <UserCircle className="relative h-8 w-8 text-emerald/70" />
@@ -149,7 +149,7 @@ export default function Saved() {
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {profileUsers.map((u) => (
-              <div key={u.id} className="relative overflow-hidden rounded-2xl border border-border bg-white p-4 shadow-soft dark:bg-card">
+              <div key={u.id} className="relative overflow-hidden rounded border border-border bg-white p-4 shadow-soft dark:bg-card">
                 <button
                   onClick={() => removeProfile(u.id)}
                   className="absolute right-3 top-3 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-secondary/80 text-rose-500 transition hover:bg-rose-500 hover:text-white"

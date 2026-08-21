@@ -114,6 +114,27 @@ export default function PropertyWizard({ onDone, onCancel }) {
     if (!form.phone) { toast({ title: "Completează numărul de telefon", variant: "destructive" }); throw new Error("phone"); }
     if (!agreed) { toast({ title: "Acceptă termenii pentru a publica", variant: "destructive" }); throw new Error("terms"); }
 
+    // Limitele planului se verifică server-side înainte de publicare — altfel
+    // planurile vând „1 anunț activ" fără ca nimic să îl impună.
+    if (!isAdmin) {
+      try {
+        const res = await base44.functions.invoke("CheckListingAllowance", { photo_count: imagesCount });
+        const data = res?.data || res || {};
+        if (data.allowed === false) {
+          toast({
+            title: "Ai atins limita planului",
+            description: data.error || "Treci pe un plan superior ca să publici mai multe anunțuri.",
+            variant: "destructive",
+          });
+          throw new Error("allowance");
+        }
+      } catch (e) {
+        if (e?.message === "allowance") throw e;
+        // O eroare de rețea nu trebuie să blocheze publicarea — limita rămâne
+        // impusă oricum la aprobare.
+      }
+    }
+
     const property_code = await generateUniquePropertyCode();
     const created = await base44.entities.Property.create(
       buildPropertyPayload({ form, chips, facilities, country, user, isAdmin, property_code })
@@ -133,7 +154,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
     const origin = el
       ? { x: (el.getBoundingClientRect().left + el.getBoundingClientRect().width / 2) / window.innerWidth, y: (el.getBoundingClientRect().top + el.getBoundingClientRect().height / 2) / window.innerHeight }
       : { y: 0.85 };
-    const colors = ["#00A859", "#C5A059", "#1B222C", "#E8ECF2"];
+    const colors = ["#1F7048", "#DE4E12", "#161C29", "#F8F6F1"];
     confetti({ particleCount: 110, spread: 78, startVelocity: 42, origin, colors });
     setTimeout(() => confetti({ particleCount: 70, angle: 60, spread: 60, origin: { x: 0, y: origin.y }, colors }), 120);
     setTimeout(() => confetti({ particleCount: 70, angle: 120, spread: 60, origin: { x: 1, y: origin.y }, colors }), 120);
@@ -147,12 +168,12 @@ export default function PropertyWizard({ onDone, onCancel }) {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <div className="surface-card overflow-hidden rounded-3xl">
+    <div className="overflow-hidden border border-border bg-card">
       {/* Progress header */}
       <div className="border-b border-border/60 px-4 pb-4 pt-5 sm:px-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-navy-deep shadow-soft">
+            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded bg-gradient-to-br from-navy to-navy-deep shadow-soft">
               <span className="absolute inset-0 bg-gradient-to-br from-emerald/25 to-transparent" />
               <AnimatePresence mode="wait">
                 <motion.span
@@ -179,7 +200,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
 
         <div className="relative mt-4 h-2 w-full overflow-hidden rounded-full bg-secondary">
           <motion.div
-            className="relative h-full overflow-hidden rounded-full gradient-emerald"
+            className="relative h-full overflow-hidden rounded-full bg-emerald"
             animate={{
               width: `${progress}%`,
               boxShadow: [
@@ -230,7 +251,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
         </div>
 
         <div className="mt-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
-          <span className="rounded-full bg-navy px-2.5 py-1 text-white">{Current.title}</span>
+          <span className="rounded bg-navy px-2.5 py-1 text-white">{Current.title}</span>
           {STEPS[step + 1] && (
             <span className="flex items-center gap-1 text-muted-foreground/70">
               <ArrowRight className="h-3 w-3" /> Urmează: {STEPS[step + 1].title}
@@ -259,12 +280,12 @@ export default function PropertyWizard({ onDone, onCancel }) {
       </div>
 
       {/* Nav */}
-      <div className="sticky bottom-0 flex items-center gap-3 border-t border-border/60 bg-background/90 px-4 py-3 backdrop-blur-xl sm:px-6">
-        <Button type="button" variant="outline" onClick={back} className="gap-1.5 rounded-full">
+      <div className="sticky bottom-0 flex items-center gap-3 border-t border-border/60 bg-background/90 px-4 py-3 sm:px-6">
+        <Button type="button" variant="outline" onClick={back} className="gap-1.5 rounded">
           <ArrowLeft className="h-4 w-4" /> {step === 0 ? "Renunță" : "Înapoi"}
         </Button>
         {step < STEPS.length - 1 ? (
-          <Button type="button" onClick={next} className="flex-1 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
+          <Button type="button" onClick={next} className="flex-1 gap-1.5 rounded bg-emerald text-white shadow-soft hover:bg-emerald/90">
             Continuă <ArrowRight className="h-4 w-4" />
           </Button>
         ) : (

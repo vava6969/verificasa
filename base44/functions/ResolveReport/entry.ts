@@ -57,6 +57,14 @@ export default async function(req) {
       } catch (_) { /* best-effort */ }
     }
 
+    // Sesizările deschise scad scorul de încredere; odată rezolvată una,
+    // scorul trebuie recalculat, altfel penalizarea rămâne lipită de anunț.
+    if (report.target_type === "property" && report.target_id) {
+      try {
+        await base44.functions.invoke("ComputeTrustScore", { property_id: report.target_id });
+      } catch (_) { /* best-effort */ }
+    }
+
     // Audit log of the resolution decision.
     try {
       await base44.asServiceRole.entities.AuditLog.create({

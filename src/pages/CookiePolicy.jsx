@@ -34,7 +34,7 @@ export default function CookiePolicy() {
         <p>Împărțim cookie-urile în trei categorii, conform cerințelor legale:</p>
 
         <div className="mt-4 space-y-4">
-          <div className="rounded-xl border border-emerald/20 bg-emerald-soft/40 p-4">
+          <div className="rounded border border-emerald/20 bg-emerald-soft/40 p-4">
             <div className="flex items-center gap-2">
               <ShieldCheck className="h-5 w-5 text-emerald" />
               <h3 className="font-heading text-sm font-bold text-navy dark:text-foreground">
@@ -55,7 +55,7 @@ export default function CookiePolicy() {
             </ul>
           </div>
 
-          <div className="rounded-xl border border-border bg-secondary/30 p-4">
+          <div className="rounded border border-border bg-secondary/30 p-4">
             <div className="flex items-center gap-2">
               <Settings2 className="h-5 w-5 text-gold" />
               <h3 className="font-heading text-sm font-bold text-navy dark:text-foreground">
@@ -73,7 +73,7 @@ export default function CookiePolicy() {
             </ul>
           </div>
 
-          <div className="rounded-xl border border-border bg-secondary/30 p-4">
+          <div className="rounded border border-border bg-secondary/30 p-4">
             <div className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-blue-600" />
               <h3 className="font-heading text-sm font-bold text-navy dark:text-foreground">

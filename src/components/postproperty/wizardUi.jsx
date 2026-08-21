@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 
 export const inputCls =
-  "w-full rounded-xl border border-border bg-background px-3.5 py-3 text-base text-foreground outline-none transition focus:border-emerald focus:ring-2 focus:ring-emerald/15 dark:bg-card";
+  "w-full rounded border border-border bg-background px-3.5 py-3 text-base text-foreground outline-none transition focus:border-emerald focus:ring-2 focus:ring-emerald/15 dark:bg-card";
 
 export function Field({ label, hint, required, children }) {
   return (
@@ -23,7 +23,7 @@ export function Chip({ active, onClick, icon: Icon, label }) {
       onClick={onClick}
       whileTap={{ scale: 0.95 }}
       className={
-        "flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-sm font-semibold transition-all duration-200 " +
+        "flex items-center gap-1.5 rounded border px-3.5 py-2 text-sm font-semibold transition-colors " +
         (active
           ? "border-emerald bg-emerald text-white shadow-soft"
           : "border-border bg-white text-foreground/70 hover:border-emerald/50 hover:bg-emerald-soft/30 dark:bg-card")
@@ -43,7 +43,7 @@ export function ChoiceCard({ active, onClick, icon: Icon, iconSrc, title, sub })
       whileTap={{ scale: 0.97 }}
       whileHover={{ y: -2 }}
       className={
-        "flex flex-col items-start gap-2 rounded-2xl border p-4 text-left transition-all duration-200 " +
+        "flex flex-col items-start gap-2 rounded border p-4 text-left transition-colors " +
         (active
           ? "border-emerald bg-emerald-soft shadow-soft ring-2 ring-emerald/30"
           : "border-border bg-white hover:border-emerald/40 hover:shadow-soft dark:bg-card")

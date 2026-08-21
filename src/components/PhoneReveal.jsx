@@ -19,7 +19,7 @@ export default function PhoneReveal({ phone, whatsappPhone }) {
   if (isAuthenticated && (revealed || true)) {
     return (
       <div className="flex flex-wrap items-center gap-2">
-        <span className="flex items-center gap-2 rounded-xl bg-emerald-soft px-3 py-2 text-sm font-bold text-emerald">
+        <span className="flex items-center gap-2 rounded bg-emerald-soft px-3 py-2 text-sm font-bold text-emerald">
           <Phone className="h-4 w-4" /> {raw}
         </span>
         {whatsappPhone && (
@@ -27,12 +27,12 @@ export default function PhoneReveal({ phone, whatsappPhone }) {
             href={`https://wa.me/${whatsappPhone.replace(/\D/g, "")}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-xl bg-emerald px-3 py-2 text-sm font-bold text-white transition hover:opacity-90"
+            className="flex items-center gap-2 rounded bg-emerald px-3 py-2 text-sm font-bold text-white transition hover:opacity-90"
           >
             WhatsApp
           </a>
         )}
-        <a href={`tel:${digits}`} className="flex items-center gap-2 rounded-xl border border-emerald/40 px-3 py-2 text-sm font-bold text-emerald transition hover:bg-emerald-soft">
+        <a href={`tel:${digits}`} className="flex items-center gap-2 rounded border border-emerald/40 px-3 py-2 text-sm font-bold text-emerald transition hover:bg-emerald-soft">
           <Phone className="h-4 w-4" /> Sună
         </a>
       </div>
@@ -41,12 +41,12 @@ export default function PhoneReveal({ phone, whatsappPhone }) {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="flex items-center gap-2 rounded-xl border border-border bg-secondary/40 px-3 py-2 text-sm font-semibold text-muted-foreground">
+      <span className="flex items-center gap-2 rounded border border-border bg-secondary/40 px-3 py-2 text-sm font-semibold text-muted-foreground">
         <Lock className="h-4 w-4" /> {masked}
       </span>
       <button
         onClick={() => (window.location.href = "/login")}
-        className="flex items-center gap-1.5 rounded-xl bg-emerald px-3 py-2 text-sm font-bold text-white transition hover:opacity-90"
+        className="flex items-center gap-1.5 rounded bg-emerald px-3 py-2 text-sm font-bold text-white transition hover:opacity-90"
       >
         <Phone className="h-4 w-4" /> Vezi tot numărul
       </button>

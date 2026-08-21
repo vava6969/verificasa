@@ -1,76 +1,104 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Chivo+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------------------------------------------------------
+   VerifiCasa — "Fișa de Inspecție" design tokens.
+   Registry bones: paper ground, ink text, verde for brand/actions/verdicts.
+   Marcaj (orange) is reserved for instrument marks ON photographs and map
+   pins — never as page decoration. Both themes come from this one token set.
+--------------------------------------------------------------------------- */
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 217 24% 14%;
-    --card: 0 0% 100%;
-    --card-foreground: 217 24% 14%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 217 24% 14%;
-    --primary: 152 100% 33%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 20% 96%;
-    --secondary-foreground: 217 24% 14%;
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 37 51% 56%;
-    --accent-foreground: 217 24% 14%;
-    --destructive: 0 72% 46%;
+    /* ground */
+    --background: 43 33% 96%;            /* paper  #F8F6F1 */
+    --foreground: 221 30% 12%;           /* ink    #161C29 */
+    --card: 45 40% 98%;                  /* card, a breath lighter than paper */
+    --card-foreground: 221 30% 12%;
+    --popover: 45 40% 98%;
+    --popover-foreground: 221 30% 12%;
+
+    /* brand */
+    --primary: 150 57% 28%;              /* verde  #1F7048 */
+    --primary-foreground: 43 33% 96%;
+    --marcaj: 18 85% 47%;                /* marcaj #DE4E12 — photos + map pins only */
+    --marcaj-foreground: 43 33% 96%;
+
+    --secondary: 42 26% 92%;             /* paper-2 #F1EEE7 */
+    --secondary-foreground: 221 30% 12%;
+    --muted: 42 26% 92%;
+    --muted-foreground: 200 8% 38%;
+    --accent: 150 25% 90%;               /* verde-soft tint */
+    --accent-foreground: 150 57% 22%;
+    --destructive: 0 68% 42%;
     --destructive-foreground: 0 0% 98%;
-    --border: 214 20% 90%;
-    --input: 214 20% 90%;
-    --ring: 152 100% 33%;
-    --radius: 0.9rem;
-    --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-    --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    --navy: 217 24% 14%;
-    --navy-deep: 217 32% 9%;
-    --gold: 37 51% 56%;
-    --gold-soft: 40 60% 95%;
-    --gold-deep: 36 45% 38%;
-    --emerald: 152 100% 33%;
-    --emerald-soft: 152 80% 94%;
-    /* legacy aliases kept so existing components still compile */
-    --mint: 152 100% 33%;
-    --mint-soft: 152 80% 94%;
+
+    --border: 43 14% 84%;                /* hairline: ink over paper */
+    --input: 43 14% 84%;
+    --ring: 150 57% 28%;
+
+    /* registry corners: squared, not pill */
+    --radius: 0.25rem;
+
+    /* exactly two faces + mono for on-photo instrument marks */
+    --font-heading: 'Spectral', 'Iowan Old Style', Georgia, serif;
+    --font-body: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    --font-display: 'Spectral', 'Iowan Old Style', Georgia, serif;
+    --font-mono: 'Chivo Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* house motion */
+    --ease-house: cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* ---- legacy aliases: every old consumer resolves to the new system ---- */
+    --navy: 221 30% 12%;                 /* old navy -> ink */
+    --navy-deep: 222 27% 8%;
+    --emerald: 150 57% 28%;              /* old emerald -> verde */
+    --emerald-soft: 150 25% 90%;
+    --mint: 150 57% 28%;
+    --mint-soft: 150 25% 90%;
+    --gold: 36 22% 46%;                  /* old gold -> quiet bronze, no metal */
+    --gold-soft: 42 26% 92%;
+    --gold-deep: 36 28% 34%;
   }
 
   .dark {
-    --background: 217 32% 9%;
-    --foreground: 0 0% 98%;
-    --card: 217 28% 12%;
-    --card-foreground: 0 0% 98%;
-    --popover: 217 28% 12%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 152 100% 40%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 217 24% 18%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 217 24% 18%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 37 51% 60%;
-    --accent-foreground: 217 32% 9%;
-    --destructive: 0 62% 40%;
+    --background: 222 27% 10%;           /* night  #12161F */
+    --foreground: 44 24% 91%;            /* #EDEAE2 */
+    --card: 221 24% 13%;
+    --card-foreground: 44 24% 91%;
+    --popover: 221 24% 13%;
+    --popover-foreground: 44 24% 91%;
+
+    --primary: 150 49% 42%;              /* verde night #37A06B */
+    --primary-foreground: 222 27% 8%;
+    --marcaj: 19 100% 62%;               /* marcaj night #FF7A3D */
+    --marcaj-foreground: 222 27% 8%;
+
+    --secondary: 221 22% 16%;
+    --secondary-foreground: 44 24% 91%;
+    --muted: 221 22% 16%;
+    --muted-foreground: 44 10% 64%;
+    --accent: 150 30% 16%;
+    --accent-foreground: 150 45% 60%;
+    --destructive: 0 60% 44%;
     --destructive-foreground: 0 0% 98%;
-    --border: 217 24% 22%;
-    --input: 217 24% 22%;
-    --ring: 152 100% 40%;
-    --navy: 217 32% 9%;
-    --navy-deep: 217 38% 6%;
-    --gold: 37 51% 60%;
-    --gold-soft: 36 40% 20%;
-    --gold-deep: 36 50% 55%;
-    --emerald: 152 100% 40%;
-    --emerald-soft: 152 40% 16%;
-    --mint: 152 100% 40%;
-    --mint-soft: 152 40% 16%;
+
+    --border: 221 16% 24%;
+    --input: 221 16% 24%;
+    --ring: 150 49% 42%;
+
+    --navy: 222 27% 10%;
+    --navy-deep: 222 30% 7%;
+    --emerald: 150 49% 42%;
+    --emerald-soft: 150 30% 16%;
+    --mint: 150 49% 42%;
+    --mint-soft: 150 30% 16%;
+    --gold: 38 24% 58%;
+    --gold-soft: 40 18% 20%;
+    --gold-deep: 38 28% 62%;
   }
 }
 
@@ -85,13 +113,17 @@
   }
   h1, h2, h3, h4, h5 {
     @apply font-heading;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
   }
+  /* numbers line up in ledgers by default wherever they are tabular data */
+  td, th { font-variant-numeric: tabular-nums; }
+  ::selection { background: hsl(var(--primary) / 0.18); }
 }
 
 @layer utilities {
+  /* ---- token utilities (legacy names kept; values now map to the system) ---- */
   .text-navy { color: hsl(var(--navy)); }
   .bg-navy { background-color: hsl(var(--navy)); }
   .bg-navy-deep { background-color: hsl(var(--navy-deep)); }
@@ -109,139 +141,239 @@
   .bg-emerald { background-color: hsl(var(--emerald)); }
   .bg-emerald-soft { background-color: hsl(var(--emerald-soft)); }
   .border-emerald { border-color: hsl(var(--emerald)); }
-  .gradient-navy { background-image: linear-gradient(135deg, hsl(217 38% 6%) 0%, hsl(217 24% 14%) 60%, hsl(214 30% 20%) 100%); }
-  .gradient-gold { background-image: linear-gradient(135deg, hsl(40 60% 58%) 0%, hsl(36 45% 44%) 100%); }
-  .gradient-emerald { background-image: linear-gradient(135deg, hsl(152 100% 38%) 0%, hsl(160 90% 30%) 100%); }
-  .gradient-mint { background-image: linear-gradient(135deg, hsl(152 100% 38%) 0%, hsl(160 90% 30%) 100%); }
-  .shadow-soft { box-shadow: 0 2px 10px -3px rgb(27 34 44 / 0.10), 0 10px 30px -12px rgb(27 34 44 / 0.14); }
-  .shadow-glow { box-shadow: 0 0 0 1px hsl(152 100% 33% / 0.25), 0 14px 44px -14px hsl(152 100% 33% / 0.45); }
-  .shadow-gold { box-shadow: 0 6px 24px -10px hsl(37 51% 56% / 0.5); }
+  .text-marcaj { color: hsl(var(--marcaj)); }
+  .bg-marcaj { background-color: hsl(var(--marcaj)); }
+  .border-marcaj { border-color: hsl(var(--marcaj)); }
 
-  @keyframes vc-blob {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(18px, -14px) scale(1.08); }
-    66% { transform: translate(-16px, 12px) scale(0.94); }
-  }
-  .animate-blob { animation: vc-blob 9s ease-in-out infinite; }
+  .tnum { font-variant-numeric: tabular-nums; }
 
-  @keyframes vc-badge-fade {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.35; }
-  }
-  .animate-badge-fade {
-    animation: vc-badge-fade 1.8s ease-in-out infinite;
-  }
-
-  /* Dark-mode: flip solid white surfaces and navy text to theme tokens,
-     so text stays readable on the dark page background. Translucent
-     white badges over images keep fixed dark text via slate utilities. */
-  .dark .bg-white { background-color: hsl(var(--card)); }
-  .dark .text-navy { color: hsl(var(--foreground)); }
-  .dark .bg-gold.text-navy { color: hsl(var(--accent-foreground)); }
-
-  /* Status badges that hardcode light Tailwind palettes become unreadable
-     on the dark page — darken their backgrounds and lighten their text. */
-  .dark .bg-amber-100 { background-color: hsl(36 45% 22%); }
-  .dark .bg-amber-50  { background-color: hsl(36 40% 18%); }
-  .dark .text-amber-700 { color: hsl(38 85% 72%); }
-  .dark .bg-blue-50   { background-color: hsl(220 40% 20%); }
-  .dark .text-blue-700 { color: hsl(214 85% 74%); }
-  .dark .bg-emerald-soft, .dark .bg-mint-soft { background-color: hsl(152 40% 16%); }
-
-  /* Native <select> dropdown popups inherit the page's light text but render
-     on the OS's white popup in dark mode → invisible options. Tell the
-     browser to render native controls dark so the popup matches. */
-  .dark select { color-scheme: dark; }
-  .dark select option { background-color: hsl(var(--card)); color: hsl(var(--foreground)); }
-
-  /* Native <input> popups (date, time, color) inherit the OS light theme, so in
-     dark mode the selected value/date text renders as dark-on-dark and stays
-     invisible until the picker is opened. Tell the browser to render all
-     native input controls in dark so the value text stays legible. */
-  .dark input { color-scheme: dark; }
-  .dark textarea { color-scheme: dark; }
-
-  /* ---- Dark Immersive landing scope ----
-     Scoped overrides so shared components (countdown, about, property cards)
-     render as frosted-glass panels on the deep navy landing background. */
-  .dark .landing-dark { background-color: #12161e; color: #E8ECF2; }
-  .dark .landing-dark .bg-white,
-  .dark .landing-dark .bg-card,
-  .dark .landing-dark .bg-secondary\/40 {
-    background-color: rgb(255 255 255 / 0.05);
-    backdrop-filter: blur(14px);
-  }
-  .dark .landing-dark .text-navy,
-  .dark .landing-dark .dark\:text-foreground { color: #F2F5F9; }
-  .dark .landing-dark .text-muted-foreground { color: rgb(226 232 240 / 0.62); }
-  .dark .landing-dark .border-border { border-color: rgb(255 255 255 / 0.10); }
-  .dark .landing-dark .bg-emerald-soft { background-color: rgb(0 168 89 / 0.16); }
-  .dark .landing-dark .shadow-soft { box-shadow: 0 10px 34px -18px rgb(0 0 0 / 0.9); }
-  .dark .landing-dark .bg-navy-deep\/80 { background-color: rgb(255 255 255 / 0.07); }
-  .dark .landing-dark .gradient-navy { background-image: linear-gradient(135deg, #10141c 0%, #161d28 60%, #1b2532 100%); }
-
-  /* Frosted panels: light-mode = white glass on light bg, dark = white/5 glass */
-  .glass-panel {
-    background: rgb(255 255 255 / 0.72);
-    border: 1px solid rgb(27 34 44 / 0.08);
-    backdrop-filter: blur(16px);
-    box-shadow: 0 12px 34px -20px rgb(27 34 44 / 0.45);
-  }
-  .dark .glass-panel {
-    background: rgb(255 255 255 / 0.05);
-    border: 1px solid rgb(255 255 255 / 0.10);
-    box-shadow: 0 12px 40px -22px rgb(0 0 0 / 0.9);
-  }
-
-  /* Gradient surface cards with a subtle top light edge */
-  .surface-card {
-    background-image: linear-gradient(180deg, rgb(255 255 255 / 0.92) 0%, rgb(241 245 249 / 0.72) 100%);
-    border: 1px solid rgb(27 34 44 / 0.08);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 16px 36px -26px rgb(27 34 44 / 0.6);
-  }
-  .dark .surface-card {
-    background-image: linear-gradient(180deg, rgb(255 255 255 / 0.09) 0%, rgb(255 255 255 / 0.028) 100%);
-    border: 1px solid rgb(255 255 255 / 0.08);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.13), 0 18px 40px -26px rgb(0 0 0 / 0.9);
-  }
-
-  /* Hero bottom fade blends into the page background in both themes */
-  .hero-fade { background-image: linear-gradient(to bottom, transparent, #ffffff); }
-  .dark .hero-fade { background-image: linear-gradient(to bottom, transparent, #12161e); }
-  .glow-emerald { box-shadow: 0 0 0 1px rgb(0 168 89 / 0.30), 0 10px 30px -12px rgb(0 168 89 / 0.55); }
+  /* ---- flattened legacy effects (names kept so old consumers compile;
+          every gradient/glass/glow is now a flat registry surface) ---- */
+  .gradient-navy { background-image: none; background-color: hsl(var(--navy-deep)); }
+  .gradient-gold { background-image: none; background-color: hsl(var(--gold)); }
+  .gradient-emerald { background-image: none; background-color: hsl(var(--emerald)); }
+  .gradient-mint { background-image: none; background-color: hsl(var(--emerald)); }
   .text-gold-gradient {
-    background-image: linear-gradient(100deg, #E7CB92 0%, #C5A059 55%, #9C7B38 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    background-image: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    color: hsl(var(--gold-deep));
   }
+
+  .shadow-soft { box-shadow: 0 1px 2px rgb(22 28 41 / 0.06); }
+  .shadow-glow { box-shadow: 0 0 0 1px hsl(var(--primary) / 0.28); }
+  .shadow-gold { box-shadow: none; }
+  .glow-emerald { box-shadow: 0 0 0 1px hsl(var(--primary) / 0.3); }
+
+  .glass-panel {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    backdrop-filter: none;
+    box-shadow: 0 1px 2px rgb(22 28 41 / 0.06);
+  }
+  .surface-card {
+    background-image: none;
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 2px rgb(22 28 41 / 0.06);
+  }
+
+  /* verdict stamps replace the metallic badge + glow ring — no animation */
+  .premium-badge {
+    background: transparent;
+    background-image: none;
+    border: 1px solid hsl(var(--gold-deep));
+    color: hsl(var(--gold-deep));
+    box-shadow: none;
+    text-shadow: none;
+    animation: none;
+  }
+  .premium-glow { box-shadow: 0 0 0 1px hsl(var(--gold) / 0.4); animation: none; }
+
+  .animate-blob { animation: none; }
+  .animate-badge-fade { animation: none; }
+
+  .hero-fade { background-image: linear-gradient(to bottom, transparent, hsl(var(--background))); }
+
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-  /* Gradient buttons keep dark text on the bright green in both themes. */
-  .dark .gradient-mint.text-navy, .dark .gradient-emerald.text-navy { color: hsl(217 24% 14%); }
+  /* ---- registry primitives ---- */
 
-  /* Premium RECOMANDAT badge — metallic gold with shine sweep */
-  .premium-badge {
-    background: linear-gradient(135deg, #9C7B38 0%, #C5A059 25%, #F0D98A 50%, #C5A059 75%, #9C7B38 100%);
-    background-size: 200% 100%;
-    border: 1px solid rgb(240 217 138 / 0.6);
-    box-shadow: 0 2px 8px -2px rgb(197 160 89 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.5), 0 0 0 1px rgb(156 123 56 / 0.3);
-    text-shadow: 0 1px 1px rgb(92 72 30 / 0.5);
-    animation: vc-shine 4s ease-in-out infinite;
+  /* bordered, dated verdict stamp — the only allowed "badge" shape */
+  .vc-stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    border: 1.5px solid hsl(var(--primary));
+    color: hsl(var(--primary));
+    background: hsl(var(--primary) / 0.06);
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    padding: 4px 8px 3px;
+    border-radius: 2px;
+    white-space: nowrap;
   }
-  @keyframes vc-shine {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+  .vc-stamp--gold { border-color: hsl(var(--gold-deep)); color: hsl(var(--gold-deep)); background: hsl(var(--gold) / 0.08); }
+  .vc-stamp--ink { border-color: hsl(var(--foreground)); color: hsl(var(--foreground)); background: transparent; }
+  .vc-stamp--marcaj { border-color: hsl(var(--marcaj)); color: hsl(var(--marcaj)); background: transparent; }
+
+  /* instrument marks drawn ON photographs — the only place mono lives */
+  .vc-photomark {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: #fff;
+    text-shadow: 0 1px 2px rgb(0 0 0 / 0.55);
   }
 
-  /* Premium glow ring around RECOMANDAT property cards */
-  .premium-glow {
-    box-shadow: 0 0 0 1px rgb(197 160 89 / 0.35), 0 8px 30px -8px rgb(197 160 89 / 0.4), 0 0 24px -6px rgb(197 160 89 / 0.25);
-    animation: vc-glow-pulse 3s ease-in-out infinite;
+  /* ---- map: price-stamp pins + survey-sheet furniture ----
+     divIcon markup lives outside React, so the pins are classed here and
+     read the same tokens as the rest of the app (both themes for free). */
+  .vc-pin {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: hsl(var(--card));
+    color: hsl(var(--foreground));
+    border: 1.5px solid hsl(var(--foreground));
+    border-radius: 2px;
+    padding: 3px 7px 2px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    position: relative;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
   }
-  @keyframes vc-glow-pulse {
-    0%, 100% { box-shadow: 0 0 0 1px rgb(197 160 89 / 0.35), 0 8px 30px -8px rgb(197 160 89 / 0.4), 0 0 24px -6px rgb(197 160 89 / 0.25); }
-    50% { box-shadow: 0 0 0 1px rgb(197 160 89 / 0.55), 0 14px 44px -8px rgb(197 160 89 / 0.55), 0 0 36px -6px rgb(197 160 89 / 0.4); }
+  .vc-pin::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    width: 1.5px;
+    height: 6px;
+    background: hsl(var(--foreground));
+    transform: translateX(-50%);
+  }
+  .vc-pin .vc-pin-tick { color: hsl(var(--primary)); font-weight: 700; }
+  .vc-pin--active {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border-color: hsl(var(--primary));
+    z-index: 30;
+  }
+  .vc-pin--active::after { background: hsl(var(--primary)); }
+  .vc-pin--active .vc-pin-tick { color: hsl(var(--primary-foreground)); }
+  .vc-pin--visited { color: hsl(var(--muted-foreground)); border-color: hsl(var(--muted-foreground)); }
+  .vc-pin--visited::after { background: hsl(var(--muted-foreground)); }
+  .vc-pin--boosted::before {
+    content: "";
+    position: absolute;
+    top: -1.5px;
+    right: -1.5px;
+    width: 0;
+    height: 0;
+    border-top: 9px solid hsl(var(--marcaj));
+    border-left: 9px solid transparent;
+  }
+  .vc-bundle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: hsl(var(--card) / 0.94);
+    color: hsl(var(--foreground));
+    border: 1.5px solid hsl(var(--foreground));
+    outline: 1px solid hsl(var(--foreground) / 0.35);
+    outline-offset: 2.5px;
+    border-radius: 2px;
+    padding: 5px 9px 4px;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.22);
+  }
+  .vc-bundle--active { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: hsl(var(--primary)); }
+  .vc-maplabel {
+    font-family: var(--f-body, var(--font-body));
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: hsl(var(--foreground) / 0.65);
+    white-space: nowrap;
+    pointer-events: none;
+    text-shadow: 0 0 3px hsl(var(--background)), 0 0 6px hsl(var(--background));
+  }
+  /* survey-sheet corner marks: mono is allowed here — the map is an instrument */
+  .vc-sheet-coord {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: hsl(var(--foreground) / 0.75);
+    background: hsl(var(--background) / 0.8);
+    padding: 2px 6px;
+  }
+  /* paper-toned tiles until the client's MapTiler key lands (CSS-filtered) */
+  .vc-tiles-plan { filter: saturate(0.5) sepia(0.14) brightness(1.02) contrast(0.98); }
+  .dark .vc-tiles-plan { filter: invert(1) hue-rotate(180deg) brightness(0.85) saturate(0.25) contrast(0.95); }
+  .vc-tiles-none { filter: none; }
+
+  /* generated paper grain (SVG turbulence, no stock textures) */
+  .paper-grain { position: relative; }
+  .paper-grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---- dark-mode compatibility (solid surfaces, no glass) ---- */
+  .dark .bg-white { background-color: hsl(var(--card)); }
+  .dark .text-navy { color: hsl(var(--foreground)); }
+  .dark .bg-gold.text-navy { color: hsl(var(--background)); }
+
+  .dark .bg-amber-100 { background-color: hsl(36 30% 20%); }
+  .dark .bg-amber-50  { background-color: hsl(36 26% 17%); }
+  .dark .text-amber-700 { color: hsl(38 60% 70%); }
+  .dark .bg-blue-50   { background-color: hsl(220 30% 18%); }
+  .dark .text-blue-700 { color: hsl(214 60% 72%); }
+  .dark .bg-emerald-soft, .dark .bg-mint-soft { background-color: hsl(var(--emerald-soft)); }
+
+  .dark select { color-scheme: dark; }
+  .dark select option { background-color: hsl(var(--card)); color: hsl(var(--foreground)); }
+  .dark input { color-scheme: dark; }
+  .dark textarea { color-scheme: dark; }
+
+  /* landing scope kept as a plain solid surface (was frosted glass) */
+  .dark .landing-dark { background-color: hsl(var(--background)); color: hsl(var(--foreground)); }
+  .dark .landing-dark .bg-white,
+  .dark .landing-dark .bg-card { background-color: hsl(var(--card)); backdrop-filter: none; }
+  .dark .landing-dark .text-navy { color: hsl(var(--foreground)); }
+  .dark .landing-dark .text-muted-foreground { color: hsl(var(--muted-foreground)); }
+  .dark .landing-dark .border-border { border-color: hsl(var(--border)); }
+  .dark .landing-dark .bg-emerald-soft { background-color: hsl(var(--emerald-soft)); }
+  .dark .landing-dark .shadow-soft { box-shadow: 0 1px 2px rgb(0 0 0 / 0.4); }
+  .dark .landing-dark .gradient-navy { background-image: none; background-color: hsl(var(--navy-deep)); }
+
+  .dark .gradient-mint.text-navy, .dark .gradient-emerald.text-navy { color: hsl(var(--primary-foreground)); }
+
+  /* motion discipline: nothing moves for people who asked it not to */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

@@ -106,6 +106,19 @@ export default async function (req: Request): Promise<Response> {
 
     await svc.entities.Subscription.create(record);
 
+    // Denormalizează planul pe anunțurile utilizatorului. Ordonarea pe planuri
+    // (homepage, căutare) citește Property.poster_plan — Subscription.read e
+    // blocat la owner/admin, deci browserul nu mai poate construi harta
+    // user->plan din abonamentele altora. Best-effort: SyncPosterPlans repară
+    // oricând diferențele.
+    try {
+      const mine = await svc.entities.Property.filter({ created_by_id: me.id }, "-created_date", 200);
+      const updates = (mine || [])
+        .filter((p: any) => p.poster_plan !== planId)
+        .map((p: any) => ({ id: p.id, poster_plan: planId }));
+      if (updates.length) await svc.entities.Property.bulkUpdate(updates);
+    } catch (_) { /* best-effort */ }
+
     return Response.json({ ok: true, plan_id: planId, plan_name: PLAN_NAMES[planId], current_period_end: record.current_period_end || null });
   } catch (error: any) {
     return Response.json({ error: error?.message || String(error) });

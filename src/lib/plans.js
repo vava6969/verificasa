@@ -67,6 +67,45 @@ export const PLANS = [
 
 export const PLAN_BY_ID = Object.fromEntries(PLANS.map((p) => [p.id, p]));
 
+// ---------------------------------------------------------------------------
+// LIMITE DE CONT (entitlements)
+// Planurile vindeau „1 anunț activ" / „până la 5" / „nelimitate", dar nimic din
+// cod nu impunea nimic — un cont Basic putea publica cincizeci. Aici e sursa
+// unică de adevăr; verificarea reală se face server-side la publicare, cea din
+// client e doar curtoazie de interfață.
+// null = nelimitat.
+// ---------------------------------------------------------------------------
+export const ENTITLEMENTS = {
+  none:  { activeListings: 1,    photosPerListing: 8,  boostsPerMonth: 0, priorityWeight: 0 },
+  basic: { activeListings: 1,    photosPerListing: 15, boostsPerMonth: 0, priorityWeight: 1 },
+  pro:   { activeListings: 5,    photosPerListing: 30, boostsPerMonth: 1, priorityWeight: 2 },
+  agent: { activeListings: null, photosPerListing: null, boostsPerMonth: 3, priorityWeight: 3 },
+};
+
+export function getEntitlements(planId) {
+  return ENTITLEMENTS[planId] || ENTITLEMENTS.none;
+}
+
+// ---------------------------------------------------------------------------
+// PACHETE DE BOOST (client, 21.08 — prețuri provizorii, le schimbă Andrei)
+// Un singur loc de editat: preț, număr de boost-uri, durata unui boost.
+// ---------------------------------------------------------------------------
+export const BOOST_DURATION_DAYS = 7;
+
+export const BOOST_PACKS = [
+  { id: "b3",  boosts: 3,  priceRon: 31.99 },
+  { id: "b6",  boosts: 6,  priceRon: 58.99, popular: true },
+  { id: "b12", boosts: 12, priceRon: 80.99 },
+];
+
+export const BOOST_PACK_BY_ID = Object.fromEntries(BOOST_PACKS.map((b) => [b.id, b]));
+
+// Preț per boost — folosit pentru a arăta cinstit ce economisești la pachetele
+// mari, în loc de un procent inventat.
+export function boostUnitPrice(pack) {
+  return pack.priceRon / pack.boosts;
+}
+
 // Plan curent al unui anunț/utilizator — 0 înseamnă „fără plan activ", ceea ce
 // îl trimite mereu după Basic/Pro/Agent în orice sortare descrescătoare după rank.
 export function planRank(planId) {
@@ -77,25 +116,55 @@ export function getPlanMeta(planId) {
   return PLAN_BY_ID[planId] || null;
 }
 
-// Planul „efectiv” al unui anunț: fie un override manual pus direct pe anunț
-// (folosit azi pentru datele demo — vezi poster_plan_override pe Property),
-// fie planul real, activ, al celui care l-a postat (din planMap, construit cu
-// fetchActivePlanMap()). Override-ul e restricționat la nivel de câmp (RLS)
-// la admin, deci nu poate fi auto-acordat de un user din client.
+// Planul „efectiv” al unui anunț. Ordinea:
+//   1. poster_plan_override — override manual de admin (date demo);
+//   2. poster_plan — câmp denormalizat pe anunț, scris DOAR server-side
+//      (VerifyCheckoutSession la plată, SyncPosterPlans la backfill). Sursa
+//      principală de acum: Subscription.read e blocat la owner/admin, deci
+//      browserul nu mai poate citi abonamentele altora.
+//   3. planMap — fallback istoric (fetchActivePlanMap), care după blocarea
+//      RLS mai întoarce cel mult abonamentul propriu; inofensiv, dar util
+//      înainte de rularea SyncPosterPlans.
 export function resolvePropertyPlan(property, planMap) {
-  return property?.poster_plan_override || planMap?.get(property?.created_by_id) || null;
+  return (
+    property?.poster_plan_override ||
+    property?.poster_plan ||
+    planMap?.get(property?.created_by_id) ||
+    null
+  );
 }
 
 // Comparator gata de folosit cu Array.prototype.sort — plan mai important
-// întâi, apoi views_count descrescător, exact regula cerută pentru
-// „Anunțuri recomandate": planul postatorului decide rândul, vizualizările
-// decid ordinea în interiorul aceluiași rând/plan.
+// întâi, apoi boost, apoi views_count descrescător. Planul postatorului decide
+// rândul, boost-ul decide ordinea în interiorul rândului, vizualizările rup
+// egalitatea. Boost-ul NU sare peste plan: un anunț promovat nu poate ascunde
+// o potrivire mai bună dintr-o categorie superioară.
 export function compareByPlanThenViews(planOf) {
   return (a, b) => {
     const rankDiff = planRank(planOf(b)) - planRank(planOf(a));
     if (rankDiff !== 0) return rankDiff;
+    const boostDiff = (isBoosted(b) ? 1 : 0) - (isBoosted(a) ? 1 : 0);
+    if (boostDiff !== 0) return boostDiff;
     return (b.views_count || 0) - (a.views_count || 0);
   };
+}
+
+// Un anunț e promovat doar dacă boost-ul e activ ȘI nu a expirat — nu ne bazăm
+// exclusiv pe flag, ca un ExpireBoosts nerulat să nu lase anunțuri promovate
+// la nesfârșit.
+export function isBoosted(property) {
+  if (!property?.boost_active) return false;
+  if (!property.boost_ends_date) return true;
+  return new Date(property.boost_ends_date).getTime() > Date.now();
+}
+
+// Ordonare în interiorul unei liste deja filtrate: promovatele primele, apoi
+// vizualizările. Folosit acolo unde planul nu mai e criteriu (rânduri deja
+// grupate pe plan, rezultate de căutare).
+export function compareByBoostThenViews(a, b) {
+  const boostDiff = (isBoosted(b) ? 1 : 0) - (isBoosted(a) ? 1 : 0);
+  if (boostDiff !== 0) return boostDiff;
+  return (b.views_count || 0) - (a.views_count || 0);
 }
 
 // Opțiuni gata de folosit pentru filtrul „Plan” din SearchFiltersDrawer —

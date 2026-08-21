@@ -35,7 +35,7 @@ export default function MapInfoCards({ properties, lang }) {
   return (
     <>
       {/* Quick stats */}
-      <div className="rounded-2xl border border-border bg-card p-4 shadow-soft dark:border-white/10">
+      <div className="border border-border bg-card p-4">
         <div className="flex items-center gap-2">
           <BarChart3 className="h-4 w-4 text-emerald" />
           <p className="text-xs font-bold uppercase tracking-wider text-emerald">
@@ -43,15 +43,15 @@ export default function MapInfoCards({ properties, lang }) {
           </p>
         </div>
         <div className="mt-3 grid grid-cols-3 gap-2">
-          <div className="rounded-xl bg-emerald-soft p-2.5 text-center dark:bg-emerald/10">
+          <div className="rounded bg-emerald-soft p-2.5 text-center dark:bg-emerald/10">
             <p className="text-xl font-bold text-navy dark:text-foreground">{stats.total}</p>
             <p className="text-[10px] text-muted-foreground">{en ? "properties" : "proprietăți"}</p>
           </div>
-          <div className="rounded-xl bg-gold-soft p-2.5 text-center dark:bg-gold/10">
+          <div className="rounded bg-gold-soft p-2.5 text-center dark:bg-gold/10">
             <p className="text-xl font-bold text-navy dark:text-foreground">{stats.countyCount}</p>
             <p className="text-[10px] text-muted-foreground">{en ? "counties" : "județe"}</p>
           </div>
-          <div className="rounded-xl bg-secondary p-2.5 text-center dark:bg-white/5">
+          <div className="rounded bg-secondary p-2.5 text-center dark:bg-white/5">
             <p className="text-xl font-bold text-navy dark:text-foreground">{stats.cityCount}</p>
             <p className="text-[10px] text-muted-foreground">{en ? "cities" : "orașe"}</p>
           </div>
@@ -59,7 +59,7 @@ export default function MapInfoCards({ properties, lang }) {
       </div>
 
       {/* Top counties */}
-      <div className="rounded-2xl border border-border bg-card p-4 shadow-soft dark:border-white/10">
+      <div className="border border-border bg-card p-4">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-emerald" />
           <p className="text-xs font-bold uppercase tracking-wider text-emerald">
@@ -70,12 +70,12 @@ export default function MapInfoCards({ properties, lang }) {
           {stats.topCounties.map(([county, count], i) => (
             <div key={county} className="flex items-center justify-between text-sm">
               <span className="flex items-center gap-2 font-medium text-foreground">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-soft text-[10px] font-bold text-emerald dark:bg-emerald/10">
+                <span className="flex h-5 w-5 items-center justify-center rounded-sm border border-border text-[10px] font-bold text-foreground tnum">
                   {i + 1}
                 </span>
                 {county}
               </span>
-              <span className="rounded-full bg-emerald-soft px-2 py-0.5 text-xs font-bold text-emerald dark:bg-emerald/10">
+              <span className="text-xs font-bold text-emerald tnum">
                 {count}
               </span>
             </div>
@@ -84,7 +84,7 @@ export default function MapInfoCards({ properties, lang }) {
       </div>
 
       {/* Recently added */}
-      <div className="rounded-2xl border border-border bg-card p-4 shadow-soft dark:border-white/10">
+      <div className="border border-border bg-card p-4">
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-emerald" />
           <p className="text-xs font-bold uppercase tracking-wider text-emerald">
@@ -105,7 +105,7 @@ export default function MapInfoCards({ properties, lang }) {
                 <div className="min-w-0 flex-1">
                   <p className="flex items-center gap-1.5 truncate text-sm font-medium text-foreground">
                     {isPromoted && (
-                      <span className="inline-flex shrink-0 rounded-full bg-gold px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+                      <span className="vc-stamp vc-stamp--gold shrink-0">
                         Promovat
                       </span>
                     )}

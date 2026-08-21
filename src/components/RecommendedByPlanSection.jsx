@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronRight, Sparkles } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
-import { PLANS, resolvePropertyPlan } from "@/lib/plans";
+import { PLANS, resolvePropertyPlan, compareByBoostThenViews } from "@/lib/plans";
 import { fetchActivePlanMap } from "@/lib/subscriptions";
 import RecommendedPropertyCard from "@/components/RecommendedPropertyCard";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -55,7 +55,7 @@ export default function RecommendedByPlanSection() {
     return (
       <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 sm:pb-16 lg:px-8">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64 rounded-2xl" />)}
+          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-64 rounded" />)}
         </div>
       </section>
     );
@@ -69,7 +69,7 @@ export default function RecommendedByPlanSection() {
     (grouped[plan] || grouped.none).push(p);
   }
   for (const key of Object.keys(grouped)) {
-    grouped[key].sort((a, b) => (b.views_count || 0) - (a.views_count || 0));
+    grouped[key].sort(compareByBoostThenViews);
   }
 
   const rows = [
@@ -112,11 +112,11 @@ function PlanRow({ row, en }) {
       <div className={`mb-4 h-[2px] rounded-full bg-gradient-to-r ${accent.rule} to-transparent sm:mb-5`} />
 
       {row.items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card px-5 py-8 text-center">
+        <div className="rounded border border-dashed border-border bg-card px-5 py-8 text-center">
           <p className="font-heading text-sm font-bold text-navy dark:text-foreground">
             {en ? "No listings yet — be the first to post in this section!" : "Niciun anunț postat.. Fii primul care postează în această secțiune!"}
           </p>
-          <Link to="/upgrade" className="mt-3 inline-flex rounded-full bg-emerald px-4 py-2 text-xs font-semibold text-white shadow-soft transition hover:bg-emerald/90">
+          <Link to="/upgrade" className="mt-3 inline-flex rounded bg-emerald px-4 py-2 text-xs font-semibold text-white shadow-soft transition hover:bg-emerald/90">
             {en ? "View plans" : "Vezi planuri"}
           </Link>
         </div>
@@ -129,7 +129,7 @@ function PlanRow({ row, en }) {
           ))}
           <Link
             to="/anunturi-recomandate"
-            className={`flex w-[100px] shrink-0 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed p-3 text-center transition hover:opacity-80 sm:w-[120px] ${accent.ring} ${accent.soft}`}
+            className={`flex w-[100px] shrink-0 flex-col items-center justify-center gap-2 rounded border border-dashed p-3 text-center transition hover:opacity-80 sm:w-[120px] ${accent.ring} ${accent.soft}`}
           >
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-soft dark:bg-navy-deep">
               <ChevronRight className={`h-4 w-4 ${accent.text}`} />

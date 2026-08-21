@@ -64,13 +64,13 @@ export default function BusinessCard({ user: profile, ratings = [], average = 0,
   ].filter(Boolean);
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-end justify-center bg-black/80 p-4 backdrop-blur-sm sm:items-center" onClick={onClose}>
+    <div className="fixed inset-0 z-[200] flex items-end justify-center bg-black/80 p-4 sm:items-center" onClick={onClose}>
       <div className="w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
         {/* The card itself — dark theme. relative so the avatar can overlap
             the cover/body boundary with an explicit z-index. */}
         <div
           ref={cardRef}
-          className="relative overflow-hidden rounded-3xl border border-[#2d3736] bg-[#161f1d] shadow-2xl"
+          className="relative overflow-hidden rounded border border-[#2d3736] bg-[#161f1d] shadow-2xl"
         >
           {/* Cover banner — sits behind the avatar (z-0) */}
           <div className="relative z-0 h-32 w-full overflow-hidden bg-[#0f1715]">
@@ -143,7 +143,7 @@ export default function BusinessCard({ user: profile, ratings = [], average = 0,
                       href={row.href}
                       target={row.href.startsWith("http") ? "_blank" : undefined}
                       rel={row.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                      className="flex items-center gap-3 rounded-2xl border border-[#2d3736] bg-[#1a2624] px-3 py-2.5 transition hover:border-emerald/40"
+                      className="flex items-center gap-3 rounded border border-[#2d3736] bg-[#1a2624] px-3 py-2.5 transition hover:border-emerald/40"
                     >
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald text-white">
                         <Ico className="h-4 w-4" />
@@ -176,7 +176,7 @@ export default function BusinessCard({ user: profile, ratings = [], average = 0,
         <div className="mt-3 flex gap-2">
           <button
             onClick={onClose}
-            className="flex-1 rounded-xl border border-[#2d3736] bg-[#1a2624] py-2.5 text-sm font-semibold text-white hover:bg-[#24333]"
+            className="flex-1 rounded border border-[#2d3736] bg-[#1a2624] py-2.5 text-sm font-semibold text-white hover:bg-[#24333]"
           >
             <span className="flex items-center justify-center gap-1.5">
               <X className="h-4 w-4" /> {en ? "Close" : "Închide"}
@@ -185,7 +185,7 @@ export default function BusinessCard({ user: profile, ratings = [], average = 0,
           <button
             onClick={handleDownload}
             disabled={downloading}
-            className="flex-1 rounded-xl bg-emerald py-2.5 text-sm font-bold text-white hover:bg-emerald/90 disabled:opacity-50"
+            className="flex-1 rounded bg-emerald py-2.5 text-sm font-bold text-white hover:bg-emerald/90 disabled:opacity-50"
           >
             <span className="flex items-center justify-center gap-1.5">
               <Download className="h-4 w-4" /> {downloading ? "..." : (en ? "Download" : "Descarcă")}

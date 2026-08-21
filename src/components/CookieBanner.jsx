@@ -58,7 +58,7 @@ export default function CookieBanner() {
             transition={{ type: "spring", stiffness: 260, damping: 24 }}
             className="fixed inset-x-0 bottom-0 z-50 px-4 pb-4 sm:pb-6"
           >
-            <div className="mx-auto max-w-3xl rounded-2xl border border-emerald/30 bg-navy-deep/95 px-4 py-3.5 text-white shadow-glow backdrop-blur-md sm:px-5">
+            <div className="mx-auto max-w-3xl rounded border border-emerald/30 bg-navy-deep/95 px-4 py-3.5 text-white shadow-soft sm:px-5">
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald/20 text-emerald">
                   <Cookie className="h-5 w-5" />
@@ -80,10 +80,10 @@ export default function CookieBanner() {
                   <Button onClick={() => setShowPrefs(true)} size="sm" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
                     {t("cookie_prefs")}
                   </Button>
-                  <Button onClick={acceptAll} size="sm" className="gradient-mint text-navy hover:opacity-90">
+                  <Button onClick={acceptAll} size="sm" className="bg-emerald text-primary-foreground hover:opacity-90">
                     {t("cookie_accept")}
                   </Button>
-                  <button onClick={rejectAll} className="rounded-full p-1 text-white/50 hover:text-white" aria-label="Close">
+                  <button onClick={rejectAll} className="rounded p-1 text-white/50 hover:text-white" aria-label="Close">
                     <X className="h-4 w-4" />
                   </button>
                 </div>
@@ -99,7 +99,7 @@ export default function CookieBanner() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 backdrop-blur-sm sm:items-center"
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center"
             onClick={() => setShowPrefs(false)}
           >
             <motion.div
@@ -107,13 +107,13 @@ export default function CookieBanner() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 40, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-lg rounded-2xl border border-border bg-card p-5 shadow-soft"
+              className="w-full max-w-lg rounded border border-border bg-card p-5 shadow-soft"
             >
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">
                   {t("cookie_prefs_title")}
                 </h3>
-                <button onClick={() => setShowPrefs(false)} className="rounded-full p-1 text-muted-foreground hover:text-foreground">
+                <button onClick={() => setShowPrefs(false)} className="rounded p-1 text-muted-foreground hover:text-foreground">
                   <X className="h-4 w-4" />
                 </button>
               </div>
@@ -149,7 +149,7 @@ export default function CookieBanner() {
                 <Button onClick={rejectAll} size="sm" variant="ghost">
                   {t("cookie_reject_all")}
                 </Button>
-                <Button onClick={savePrefs} size="sm" className="gradient-mint text-navy hover:opacity-90">
+                <Button onClick={savePrefs} size="sm" className="bg-emerald text-primary-foreground hover:opacity-90">
                   {t("cookie_save_prefs")}
                 </Button>
                 <Button onClick={acceptAll} size="sm" variant="outline">
@@ -167,12 +167,12 @@ export default function CookieBanner() {
 
 function CookieRow({ title, desc, checked, disabled, onChange, t }) {
   return (
-    <div className={`flex items-start gap-3 rounded-xl border border-border p-3 ${disabled ? "bg-secondary/30" : "bg-background"}`}>
+    <div className={`flex items-start gap-3 rounded border border-border p-3 ${disabled ? "bg-secondary/30" : "bg-background"}`}>
       <div className="flex-1">
         <div className="flex items-center gap-2">
           <p className="text-sm font-semibold text-navy dark:text-foreground">{title}</p>
           {disabled && (
-            <span className="flex items-center gap-1 rounded-full bg-emerald/10 px-2 py-0.5 text-[10px] font-semibold text-emerald">
+            <span className="flex items-center gap-1 rounded bg-emerald/10 px-2 py-0.5 text-[10px] font-semibold text-emerald">
               <ShieldCheck className="h-3 w-3" /> {t("cookie_always_on")}
             </span>
           )}

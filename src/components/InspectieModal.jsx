@@ -115,17 +115,17 @@ export default function InspectieModal({ open, onClose }) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-navy-deep/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-10 flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-border bg-white shadow-2xl dark:bg-card">
+      <div className="absolute inset-0 bg-navy-deep/70" onClick={onClose} />
+      <div className="relative z-10 flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded border border-border bg-white shadow-2xl dark:bg-card">
         {/* Header — poză de fundal generată cu Higgsfield + scrim, text jos-stânga */}
         <div className="relative shrink-0 overflow-hidden">
           <img src="/images/generated/inspectie-header-v1.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/92 via-navy-deep/55 to-navy-deep/15" />
-          <button onClick={onClose} aria-label={t("ins_close")} className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition hover:bg-white/30">
+          <button onClick={onClose} aria-label={t("ins_close")} className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded bg-white/15 text-white transition hover:bg-white/30">
             <X className="h-5 w-5" />
           </button>
           <div className="relative flex min-h-[136px] flex-col justify-end p-6 text-white">
-            <span className="mb-2 flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald/25 text-emerald backdrop-blur-sm"><ShieldCheck className="h-5 w-5" /></span>
+            <span className="mb-2 flex h-10 w-10 items-center justify-center rounded bg-emerald/25 text-emerald"><ShieldCheck className="h-5 w-5" /></span>
             <h3 className="font-heading text-xl font-bold">{t("ins_title")}</h3>
             <p className="text-sm text-white/80">{t("ins_sub")}</p>
           </div>
@@ -133,7 +133,7 @@ export default function InspectieModal({ open, onClose }) {
 
         {needsAuth ? (
           <div className="flex flex-col items-center justify-center gap-4 px-6 py-12 text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-soft text-emerald"><Lock className="h-7 w-7" /></span>
+            <span className="flex h-14 w-14 items-center justify-center rounded bg-emerald-soft text-emerald"><Lock className="h-7 w-7" /></span>
             <div>
               <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">Autentificare necesară</h3>
               <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
@@ -141,10 +141,10 @@ export default function InspectieModal({ open, onClose }) {
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-2.5">
-              <Button asChild className="gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
+              <Button asChild className="gap-1.5 rounded bg-emerald text-white shadow-soft hover:bg-emerald/90">
                 <Link to="/login"><LogIn className="h-4 w-4" /> Intră în cont</Link>
               </Button>
-              <Button asChild variant="outline" className="gap-1.5 rounded-full">
+              <Button asChild variant="outline" className="gap-1.5 rounded">
                 <Link to="/register">Creează cont</Link>
               </Button>
             </div>
@@ -156,7 +156,7 @@ export default function InspectieModal({ open, onClose }) {
         <div className="shrink-0 border-b border-border/60 px-5 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-navy text-emerald">
+              <span className="flex h-9 w-9 items-center justify-center rounded bg-navy text-emerald">
                 <Current.icon className="h-4 w-4" />
               </span>
               <div>
@@ -170,11 +170,11 @@ export default function InspectieModal({ open, onClose }) {
           </div>
 
           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-            <div className="h-full rounded-full gradient-emerald transition-all duration-500" style={{ width: `${progress}%` }} />
+            <div className="h-full rounded-full bg-emerald transition-all duration-500" style={{ width: `${progress}%` }} />
           </div>
 
           <div className="mt-2.5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
-            <span className="rounded-full bg-navy px-2.5 py-1 text-white">{Current.title}</span>
+            <span className="rounded bg-navy px-2.5 py-1 text-white">{Current.title}</span>
             {STEPS[step + 1] && (
               <span className="flex items-center gap-1 text-muted-foreground/70">
                 <ArrowRight className="h-3 w-3" /> Urmează: {STEPS[step + 1].title}
@@ -250,7 +250,7 @@ export default function InspectieModal({ open, onClose }) {
                           type="button"
                           onClick={() => set({ package_interest: p.value })}
                           className={
-                            "flex items-center gap-2 rounded-2xl border px-3.5 py-3 text-left text-sm font-semibold transition " +
+                            "flex items-center gap-2 rounded border px-3.5 py-3 text-left text-sm font-semibold transition " +
                             (active
                               ? "border-emerald bg-emerald-soft text-emerald shadow-soft ring-1 ring-emerald/30"
                               : "border-border bg-white text-foreground/70 hover:border-emerald/40 dark:bg-card")
@@ -272,7 +272,7 @@ export default function InspectieModal({ open, onClose }) {
                   <textarea value={form.message} onChange={(e) => set({ message: e.target.value })} rows={5} placeholder={t("ins_ph_msg")} className={inputCls} />
                 </Field>
                 {/* Summary */}
-                <div className="rounded-2xl border border-border/60 bg-secondary/30 p-4">
+                <div className="rounded border border-border/60 bg-secondary/30 p-4">
                   <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Rezumat cerere</p>
                   <ul className="space-y-1.5 text-sm text-foreground/80">
                     <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald" /> {form.role}</li>
@@ -287,16 +287,16 @@ export default function InspectieModal({ open, onClose }) {
           </div>
 
           {/* Nav */}
-          <div className="flex shrink-0 items-center gap-3 border-t border-border/60 bg-background/90 px-5 py-3 backdrop-blur-xl">
-            <Button type="button" variant="outline" onClick={back} className="gap-1.5 rounded-full">
+          <div className="flex shrink-0 items-center gap-3 border-t border-border/60 bg-background/90 px-5 py-3">
+            <Button type="button" variant="outline" onClick={back} className="gap-1.5 rounded">
               <ArrowLeft className="h-4 w-4" /> {step === 0 ? t("ins_close") : "Înapoi"}
             </Button>
             {step < STEPS.length - 1 ? (
-              <Button type="button" onClick={next} className="flex-1 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
+              <Button type="button" onClick={next} className="flex-1 gap-1.5 rounded bg-emerald text-white shadow-soft hover:bg-emerald/90">
                 Continuă <ArrowRight className="h-4 w-4" />
               </Button>
             ) : (
-              <Button type="submit" disabled={sending} className="flex-1 gap-2 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 disabled:opacity-60">
+              <Button type="submit" disabled={sending} className="flex-1 gap-2 rounded bg-emerald text-white shadow-soft hover:bg-emerald/90 disabled:opacity-60">
                 <Send className="h-4 w-4" /> {sending ? t("ins_sending") : t("ins_btn")}
               </Button>
             )}

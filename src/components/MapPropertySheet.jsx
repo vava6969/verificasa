@@ -1,21 +1,29 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, Maximize, ArrowRight, ShieldCheck, BedDouble } from "lucide-react";
+import { X } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { Image } from "@/components/ui/image";
-import { Button } from "@/components/ui/button";
+import { Stamp, Frank, PhotoMark } from "@/components/fisa";
 
-// Sliding bottom-sheet preview shown when tapping a property pin on mobile.
-// Mini-card compact: imagine, badge Verificat, titlu, preț, specificații, 1 buton.
+const EASE = [0.16, 1, 0.3, 1];
+
+// Fișa scurtă care urcă de jos când atingi o ștampilă pe hartă. Formă de
+// registru: panou solid, colț drept sus, fapte pe un rând tabular.
 export default function MapPropertySheet({ property, onClose, lang }) {
   const { formatPrice } = useCountry();
   const en = lang === "en";
-  const isVerified = property?.owner_verified || property?.verification_level === "field_certified" || property?.ai_tour_verified;
+  const p = property;
+  const isVerified =
+    p?.owner_verified || p?.verification_level === "field_certified" || p?.ai_tour_verified;
+  const boosted = p?.boost_active || p?.featured;
+  const boostUntil = p?.boost_ends_date
+    ? new Date(p.boost_ends_date).toLocaleDateString(en ? "en-GB" : "ro-RO", { day: "2-digit", month: "short" })
+    : null;
 
   return (
     <AnimatePresence>
-      {property && (
+      {p && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -27,67 +35,78 @@ export default function MapPropertySheet({ property, onClose, lang }) {
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 32, stiffness: 320 }}
-            className="relative w-full rounded-t-3xl bg-background shadow-2xl"
+            transition={{ duration: 0.42, ease: EASE }}
+            className="relative w-full border-t border-border bg-background pb-[max(env(safe-area-inset-bottom),12px)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-center pt-2.5">
-              <div className="h-1.5 w-10 rounded-full bg-muted-foreground/30" />
+              <div className="h-1 w-10 rounded-sm bg-border" />
             </div>
             <button
               onClick={onClose}
-              className="absolute right-3 top-3 rounded-full bg-secondary p-1.5 text-muted-foreground hover:bg-secondary/80"
+              className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-sm border border-border text-muted-foreground transition-colors hover:bg-secondary"
+              aria-label={en ? "Close" : "Închide"}
             >
               <X className="h-4 w-4" />
             </button>
 
             <div className="flex gap-3 p-4 pt-3">
-              <Link to={`/property/${property.id}`} className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl">
-                {property.images?.[0] ? (
-                  <Image src={property.images[0]} fittingType="fill" className="h-full w-full" />
+              <Link to={`/property/${p.id}`} className="relative h-24 w-24 shrink-0 overflow-hidden border border-border">
+                {p.images?.[0] ? (
+                  <Image src={p.images[0]} fittingType="fill" className="h-full w-full" />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-secondary">
-                    <MapPin className="h-8 w-8 text-muted-foreground/40" />
+                    <span className="text-[10px] text-muted-foreground">—</span>
                   </div>
                 )}
-                {isVerified && (
-                  <span className="absolute left-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-emerald px-1.5 py-0.5 text-[9px] font-bold text-white shadow-soft">
-                    <ShieldCheck className="h-2.5 w-2.5" /> {en ? "Verified" : "Verif."}
-                  </span>
+                {p.surface_sqm != null && (
+                  <>
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-black/55 to-transparent" />
+                    <PhotoMark className="bottom-1 left-1.5">{p.surface_sqm} MP</PhotoMark>
+                  </>
                 )}
               </Link>
 
               <div className="min-w-0 flex-1">
-                <p className="text-lg font-bold text-navy dark:text-foreground">
-                  {formatPrice(property.price_monthly, property.currency)}
+                <p className="font-heading text-xl font-semibold text-foreground tnum">
+                  {formatPrice(p.price_monthly, p.currency)}
                 </p>
-                <p className="truncate text-sm font-semibold text-foreground">{property.title}</p>
-                <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                  <MapPin className="h-3 w-3" /> {property.city}
-                  {property.zone ? `, ${property.zone}` : ""}
+                <p className="truncate text-sm font-semibold text-foreground">{p.title}</p>
+                <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                  {p.city}{p.zone ? `, ${p.zone}` : ""}
                 </p>
-                <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                  {property.rooms != null && (
-                    <span className="flex items-center gap-1"><BedDouble className="h-3 w-3" /> {property.rooms} {en ? "r" : "cam."}</span>
+
+                <dl className="mt-1.5 flex flex-wrap items-baseline gap-x-3 text-xs">
+                  {p.rooms != null && (
+                    <div className="flex items-baseline gap-1">
+                      <dt className="text-muted-foreground">{en ? "rooms" : "cam."}</dt>
+                      <dd className="font-semibold tnum">{p.rooms}</dd>
+                    </div>
                   )}
-                  {property.surface_sqm && (
-                    <span className="flex items-center gap-1"><Maximize className="h-3 w-3" /> {property.surface_sqm} mp</span>
-                  )}
-                  <span className="font-semibold text-emerald">
-                    {property.transaction_type === "SALE"
-                      ? en ? "Sale" : "Vânzare"
-                      : en ? "Rent" : "Închiriere"}
-                  </span>
-                </div>
+                  <div className="flex items-baseline gap-1">
+                    <dt className="text-muted-foreground">{en ? "type" : "tip"}</dt>
+                    <dd className="font-semibold">
+                      {p.transaction_type === "SALE" ? (en ? "Sale" : "Vânzare") : (en ? "Rent" : "Închiriere")}
+                    </dd>
+                  </div>
+                </dl>
+
+                {(isVerified || boosted) && (
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                    {isVerified && <Stamp tone="verde">{en ? "Verified" : "Verificat"}</Stamp>}
+                    {boosted && <Frank until={boostUntil} />}
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="flex gap-2 px-4 pb-5">
-              <Button asChild className="flex-1 gap-1.5 bg-emerald text-white hover:bg-emerald/90">
-                <Link to={`/property/${property.id}`}>
-                  {en ? "View details" : "Vezi detalii"} <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
+            <div className="px-4 pb-4">
+              <Link
+                to={`/property/${p.id}`}
+                className="flex min-h-[44px] w-full items-center justify-center rounded bg-emerald px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90"
+              >
+                {en ? "Open the record" : "Deschide fișa"} <span className="ml-1.5" aria-hidden="true">→</span>
+              </Link>
             </div>
           </motion.div>
         </motion.div>

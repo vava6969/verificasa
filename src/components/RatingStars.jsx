@@ -45,7 +45,7 @@ export function StarPicker({ value = 0, onChange, size = "lg" }) {
           onClick={() => onChange(n)}
           onMouseEnter={() => setHover(n)}
           onMouseLeave={() => setHover(0)}
-          className="rounded-full p-1 transition hover:scale-110"
+          className="rounded-full p-1 transition"
           aria-label={`${n} stele`}
         >
           <Star

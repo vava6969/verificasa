@@ -77,10 +77,10 @@ export default function RecommendedListings() {
 
       {loading ? (
         <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} className="h-56 rounded-2xl" />)}
+          {Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} className="h-56 rounded" />)}
         </div>
       ) : sorted.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
+        <div className="mt-8 rounded border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
           {en ? "No listings yet." : "Niciun anunț momentan."}
         </div>
       ) : (

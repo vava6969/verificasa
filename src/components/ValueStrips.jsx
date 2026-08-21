@@ -8,9 +8,9 @@ export default function ValueStrips({ items }) {
       {items.map((v, i) => (
         <div
           key={i}
-          className="flex min-w-[82%] snap-start items-start gap-3.5 rounded-2xl surface-card p-4 sm:min-w-0 sm:p-6"
+          className="flex min-w-[82%] snap-start items-start gap-3.5 rounded surface-card p-4 sm:min-w-0 sm:p-6"
         >
-          <div className="glow-emerald flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald/15 text-emerald sm:h-12 sm:w-12">
+          <div className="glow-emerald flex h-10 w-10 shrink-0 items-center justify-center rounded bg-emerald/15 text-emerald sm:h-12 sm:w-12">
             <v.icon className="h-5 w-5 sm:h-6 sm:w-6" />
           </div>
           <div className="min-w-0">

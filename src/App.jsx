@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster"
+import { ThemeProvider } from "next-themes"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
@@ -39,6 +40,8 @@ import MyReports from '@/pages/MyReports';
 import PostProperty from '@/pages/PostProperty';
 import UserProfile from '@/pages/UserProfile';
 import RecommendedListings from '@/pages/RecommendedListings';
+import Notifications from '@/pages/Notifications';
+import Parteneri from '@/pages/Parteneri';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -82,6 +85,7 @@ const AuthenticatedApp = () => {
         <Route path="/data-deletion" element={<DataDeletion />} />
         <Route path="/cookies" element={<CookiePolicy />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/parteneri" element={<Parteneri />} />
         <Route path="/upgrade" element={<PlanuriUpgrade />} />
         {/* Destinația unică a „Vezi mai multe” de pe rândurile de pe homepage —
             listă simplă, ordonată pe plan, fără hartă (harta e la /map). */}
@@ -95,6 +99,7 @@ const AuthenticatedApp = () => {
           <Route path="/admin" element={<Admin />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/saved" element={<Saved />} />
+          <Route path="/notificari" element={<Notifications />} />
           <Route path="/searches" element={<SavedSearches />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/account" element={<Account />} />
@@ -114,17 +119,19 @@ const AuthenticatedApp = () => {
 function App() {
 
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <CountryProvider>
-          <Router>
-            <ScrollToTop />
-            <AuthenticatedApp />
-          </Router>
-          <Toaster />
-        </CountryProvider>
-      </QueryClientProvider>
-    </AuthProvider>
+    <ThemeProvider attribute="class" storageKey="vc_theme" defaultTheme="light" enableSystem={false}>
+      <AuthProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <CountryProvider>
+            <Router>
+              <ScrollToTop />
+              <AuthenticatedApp />
+            </Router>
+            <Toaster />
+          </CountryProvider>
+        </QueryClientProvider>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 

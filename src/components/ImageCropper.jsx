@@ -94,12 +94,12 @@ export default function ImageCropper({ file, aspectRatio = 1, onSave, onCancel, 
   if (!imgSrc) return null;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-navy-deep/80 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-white p-4 shadow-glow dark:bg-card">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-navy-deep/80 p-4">
+      <div className="w-full max-w-md rounded border border-border bg-white p-4 shadow-soft dark:bg-card">
         <h3 className="mb-3 font-heading text-lg font-bold text-navy dark:text-foreground">{title}</h3>
         <div
           ref={containerRef}
-          className="relative mx-auto overflow-hidden rounded-xl bg-black"
+          className="relative mx-auto overflow-hidden rounded bg-black"
           style={{ width: "100%", aspectRatio: String(aspectRatio), touchAction: "none", cursor: dragging ? "grabbing" : "grab" }}
           onMouseDown={(e) => handleStart(e.clientX, e.clientY)}
           onMouseMove={(e) => handleMove(e.clientX, e.clientY)}
@@ -139,10 +139,10 @@ export default function ImageCropper({ file, aspectRatio = 1, onSave, onCancel, 
         </div>
         <p className="mt-2 text-xs text-muted-foreground">Trage pentru a repoziționa imaginea.</p>
         <div className="mt-4 flex gap-2">
-          <button onClick={onCancel} className="flex-1 rounded-xl border border-border py-2.5 text-sm font-semibold text-muted-foreground hover:bg-secondary">
+          <button onClick={onCancel} className="flex-1 rounded border border-border py-2.5 text-sm font-semibold text-muted-foreground hover:bg-secondary">
             Anulează
           </button>
-          <button onClick={handleSave} disabled={saving} className="flex-1 rounded-xl bg-emerald py-2.5 text-sm font-semibold text-white hover:bg-emerald/90 disabled:opacity-50">
+          <button onClick={handleSave} disabled={saving} className="flex-1 rounded bg-emerald py-2.5 text-sm font-semibold text-white hover:bg-emerald/90 disabled:opacity-50">
             {saving ? "Se salvează..." : "Salvează"}
           </button>
         </div>

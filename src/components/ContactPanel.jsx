@@ -8,6 +8,7 @@ import { useCountry } from "@/components/CountryContext";
 import { initials } from "@/lib/chatUtils";
 import RatingStars from "@/components/RatingStars";
 import ReviewModal from "@/components/ReviewModal";
+import PartnerBox from "@/components/PartnerBox";
 
 // Panou de contact redesignat — fără formular, doar chat + telefon.
 // Înlocuiește vechiul formular de „pre-calificare" cu un card curat tip Zillow.
@@ -54,32 +55,31 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
   ].filter(Boolean);
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-white shadow-[0_25px_60px_-25px_rgba(16,24,40,0.35)] dark:bg-card">
-      <div className="h-[3px] bg-gradient-to-r from-emerald via-gold to-emerald" />
+    <>
+    <div className="border border-border bg-card">
       <div className="p-5 sm:p-6">
-      <h3 className="font-heading text-base font-bold text-navy dark:text-foreground">{t("contact_h")}</h3>
+      <h3 className="font-heading text-lg font-semibold text-foreground">{t("contact_h")}</h3>
       <p className="mt-0.5 text-xs text-muted-foreground">{t("contact_sub")}</p>
 
       {/* Agent identity */}
-      <Link to={targetUserId ? `/profile/${targetUserId}` : "#"} className="mt-4 flex items-center gap-3 rounded-xl p-1.5 -m-1.5 transition-colors duration-200 hover:bg-secondary/50">
+      <Link to={targetUserId ? `/profile/${targetUserId}` : "#"} className="-m-1.5 mt-4 flex items-center gap-3 rounded p-1.5 transition-colors hover:bg-secondary">
         <span className="relative shrink-0">
           {avatarUrl ? (
-            <img src={avatarUrl} alt={sellerName} className="h-14 w-14 rounded-full object-cover ring-2 ring-emerald/20" />
+            <img src={avatarUrl} alt={sellerName} className="h-14 w-14 rounded-sm border border-border object-cover" />
           ) : (
-            <span className={`flex h-14 w-14 items-center justify-center rounded-full text-base font-bold text-white ring-2 ring-emerald/20 ${isProprietar ? "bg-emerald" : "bg-blue-600"}`}>
+            <span className="flex h-14 w-14 items-center justify-center rounded-sm border border-border bg-secondary text-base font-bold text-foreground">
               {initials(sellerName)}
             </span>
           )}
           {p.owner_verified && (
-            <span className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-emerald text-white ring-2 ring-white dark:ring-card">
+            <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-sm bg-emerald text-primary-foreground">
               <BadgeCheck className="h-3 w-3" />
             </span>
           )}
         </span>
         <div className="min-w-0">
-          <p className="truncate font-heading text-sm font-bold text-navy hover:text-emerald dark:text-foreground">{sellerName}</p>
+          <p className="truncate text-sm font-bold text-foreground hover:text-emerald">{sellerName}</p>
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span className={`inline-block h-2 w-2 rounded-full ${isProprietar ? "bg-emerald" : "bg-blue-500"}`} />
             {isProprietar ? t("pc_seller_landlord") : t("pc_seller_agent")}
           </p>
           {count > 0 && (
@@ -98,27 +98,27 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
       </Link>
 
       {/* Primary CTA */}
-      <Button onClick={onMessage} className="mt-4 w-full gap-2 bg-emerald text-white shadow-soft transition-transform duration-200 hover:scale-[1.015] hover:bg-emerald/90 active:scale-[0.98]" size="lg">
+      <Button onClick={onMessage} className="mt-4 min-h-[48px] w-full gap-2 rounded bg-emerald text-primary-foreground transition-colors hover:bg-emerald/90" size="lg">
         <MessageCircle className="h-5 w-5" /> {t("pd_msg_btn")}
       </Button>
 
       {/* Secondary actions */}
       <div className="mt-2 grid grid-cols-2 gap-2">
         {hasPhone ? (
-          <Button asChild variant="outline" className="gap-1.5 border-emerald/30 text-emerald transition-transform duration-200 hover:scale-[1.015] hover:bg-emerald-soft active:scale-[0.98]">
+          <Button asChild variant="outline" className="min-h-[44px] gap-1.5 rounded border-border text-foreground hover:border-emerald hover:text-emerald">
             <a href={`tel:${callPhone}`}><Phone className="h-4 w-4" /> {t("pc_call")}</a>
           </Button>
         ) : (
-          <Button variant="outline" disabled className="gap-1.5 border-border text-muted-foreground">
+          <Button variant="outline" disabled className="min-h-[44px] gap-1.5 rounded border-border text-muted-foreground">
             <Phone className="h-4 w-4" /> {t("pc_call")}
           </Button>
         )}
         {hasWhatsApp ? (
-          <Button asChild variant="outline" className="gap-1.5 border-emerald/30 text-emerald transition-transform duration-200 hover:scale-[1.015] hover:bg-emerald-soft active:scale-[0.98]">
+          <Button asChild variant="outline" className="min-h-[44px] gap-1.5 rounded border-border text-foreground hover:border-emerald hover:text-emerald">
             <a href={`https://wa.me/${waPhone}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>
           </Button>
         ) : (
-          <Button variant="outline" disabled className="gap-1.5 border-border text-muted-foreground">
+          <Button variant="outline" disabled className="min-h-[44px] gap-1.5 rounded border-border text-muted-foreground">
             WhatsApp
           </Button>
         )}
@@ -127,30 +127,22 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
       {/* Separator */}
       <div className="my-4 h-px bg-border" />
 
-      {/* Trust markers */}
-      <div className="space-y-1.5">
-        {trustMarkers.map((m, i) => {
-          const Ico = m.icon;
-          return (
-            <div key={i} className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 text-xs font-medium text-foreground/75 transition-colors duration-200 hover:bg-secondary/50">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald/12 text-emerald">
-                <Ico className="h-3.5 w-3.5" />
-              </span>
-              {m.text}
-            </div>
-          );
-        })}
-      </div>
+      {/* Trust markers — listă riglată, fără plăcuțe cu iconițe */}
+      <ul className="mt-4 divide-y divide-border border-y border-border">
+        {trustMarkers.map((m, i) => (
+          <li key={i} className="flex items-center gap-2 py-2 text-xs font-medium text-foreground/80">
+            <span className="text-emerald" aria-hidden="true">✓</span> {m.text}
+          </li>
+        ))}
+      </ul>
 
-      <div className="mt-4 flex items-center justify-center gap-1.5 rounded-full bg-secondary/50 py-2 text-[11px] font-medium text-muted-foreground">
-        <ShieldCheck className="h-3.5 w-3.5 text-emerald" /> {t("pd_trust_footer")}
-      </div>
+      <p className="mt-3 text-center text-[11px] text-muted-foreground">{t("pd_trust_footer")}</p>
 
       {/* Leave review button — visible only for authenticated non-owner users */}
       {user && targetUserId && user.id !== targetUserId && ownerUser && (
         <button
           onClick={() => setShowReviewModal(true)}
-          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-emerald/30 py-2 text-xs font-semibold text-emerald transition-colors duration-200 hover:bg-emerald-soft"
+          className="mt-3 flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded border border-border py-2 text-xs font-semibold text-emerald transition-colors hover:border-emerald hover:bg-secondary"
         >
           <Star className="h-3.5 w-3.5" /> {t("up_leave_review")}
         </button>
@@ -161,5 +153,8 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
       )}
       </div>
     </div>
+    {/* Caseta partenerului stă imediat sub „Contactează & Programează" */}
+    <PartnerBox className="mt-4" />
+    </>
   );
 }

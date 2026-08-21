@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Beaker, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { Button } from "@/components/ui/button";
+import { Stamp } from "@/components/fisa";
 
-// Dismissible Beta popup shown once on first homepage visit (localStorage gated).
+const EASE = [0.16, 1, 0.3, 1];
+
+// Dismissible Beta notice shown once on first homepage visit (localStorage).
+// Registry form: a solid card with a stamped BETA verdict, no glass.
 export default function BetaBanner() {
   const { t } = useCountry();
   const [show, setShow] = useState(false);
@@ -15,11 +19,11 @@ export default function BetaBanner() {
         const tmr = setTimeout(() => setShow(true), 800);
         return () => clearTimeout(tmr);
       }
-    } catch {}
+    } catch { /* noop */ }
   }, []);
 
   const dismiss = () => {
-    try { localStorage.setItem("vc_beta_ack", "1"); } catch {}
+    try { localStorage.setItem("vc_beta_ack", "1"); } catch { /* noop */ }
     setShow(false);
   };
 
@@ -31,25 +35,23 @@ export default function BetaBanner() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={dismiss}
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-navy-deep/70 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-navy-deep/60 p-4"
         >
           <motion.div
-            initial={{ scale: 0.92, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.92, y: 20 }}
-            transition={{ type: "spring", stiffness: 280, damping: 24 }}
+            initial={{ y: 16, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 12, opacity: 0 }}
+            transition={{ duration: 0.5, ease: EASE }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md overflow-hidden rounded-3xl border border-gold/30 bg-white p-6 shadow-glow sm:p-8"
+            className="relative w-full max-w-md border border-border bg-card p-6 sm:p-8"
           >
-            <button onClick={dismiss} className="absolute right-4 top-4 rounded-full p-1.5 text-muted-foreground hover:bg-secondary" aria-label="Close">
+            <button onClick={dismiss} className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-secondary" aria-label="Închide">
               <X className="h-5 w-5" />
             </button>
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-soft text-gold-deep">
-              <Beaker className="h-7 w-7" />
-            </div>
-            <h3 className="mt-4 font-heading text-2xl font-bold text-navy">{t("beta_title")}</h3>
+            <Stamp tone="ink">Beta</Stamp>
+            <h3 className="mt-4 font-heading text-2xl font-semibold text-foreground">{t("beta_title")}</h3>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t("beta_msg")}</p>
-            <Button onClick={dismiss} className="mt-6 w-full gradient-mint text-navy hover:opacity-90">
+            <Button onClick={dismiss} className="mt-6 min-h-[48px] w-full rounded bg-emerald text-primary-foreground hover:bg-emerald/90">
               {t("beta_btn")}
             </Button>
           </motion.div>

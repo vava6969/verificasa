@@ -1,32 +1,53 @@
 import React from "react";
 
-// Official VerifiCasa brand logo (circular golden seal: navy field, gold house,
-// emerald checkmark). Used as the platform's primary identity.
+// VerifiCasa wordmark — option A, chosen by Megan + Andrei's "blocky" brief:
+// Hanken Grotesk Black, "Verifi" in ink and "Casa" in verde, tight tracking.
+// No plaque, no gradient, no seal image — the mark is type, and it survives
+// at app-icon size, on photographs, and inside the verification stamp.
+// Kept export for legacy imports; no longer rendered.
 export const LOGO_URL =
   "https://media.base44.com/images/public/6a5ef7d63008cd71560dfe14/4317025d6_Gemini_Generated_Image_al0itkal0itkal0i.png";
 
-export default function VerifiCasaLogo({ size = 44, withWordmark = true, tagline = false, className = "", tone = "dark" }) {
+export default function VerifiCasaLogo({
+  size = 40,
+  withWordmark = true,
+  wordmark, // legacy alias — wordmark={false} means mark-only
+  tagline = false,
+  tone = "dark", // dark = ink on paper, light = paper text over photo/ink
+  className = "",
+}) {
+  const showWordmark = wordmark === false ? false : withWordmark;
+  const inkCls = tone === "light" ? "text-white" : "text-foreground";
+  const casaCls = tone === "light" ? "text-white/80" : "text-emerald";
+
+  // Mark-only: a compact stamped VC block (used where space is tight).
+  if (!showWordmark) {
+    return (
+      <span
+        className={`inline-flex items-center justify-center border-2 font-body font-black leading-none ${tone === "light" ? "border-white text-white" : "border-emerald text-emerald"} ${className}`}
+        style={{ width: size, height: size, fontSize: size * 0.42, letterSpacing: "-0.02em", borderRadius: 2 }}
+        aria-label="VerifiCasa"
+      >
+        VC
+      </span>
+    );
+  }
+
+  const fs = Math.round(size * 0.56);
   return (
-    <div className={`flex items-center gap-2.5 ${className}`}>
-      <img
-        src={LOGO_URL}
-        alt="VerifiCasa"
-        style={{ height: size, width: size }}
-        className="rounded-full object-cover ring-1 ring-gold/50"
-      />
-      {withWordmark && (
-        <div className="min-w-0 leading-none">
-          <span className={`block truncate font-heading text-base font-extrabold tracking-tight ${tone === "light" ? "text-white" : "text-navy"} sm:text-lg`}>VerifiCasa</span>
-          <span className="mt-0.5 hidden text-[8.5px] font-semibold uppercase tracking-[0.2em] text-gold sm:block">
-            Inspecții & Verificări Imobiliare
-          </span>
-          {tagline && (
-            <span className="mt-1 inline-flex rounded-full bg-emerald-soft px-1.5 py-0.5 text-[8.5px] font-bold uppercase tracking-wide text-emerald">
-              Platformă Verificată de Închirieri
-            </span>
-          )}
-        </div>
+    <span className={`inline-flex min-w-0 flex-col leading-none ${className}`} aria-label="VerifiCasa">
+      <span
+        className="truncate font-body font-black"
+        style={{ fontSize: fs, letterSpacing: "-0.025em" }}
+      >
+        <span className={inkCls}>Verifi</span>
+        <span className={casaCls}>Casa</span>
+      </span>
+      {tagline && (
+        <span className={`mt-1 text-[10px] font-semibold ${tone === "light" ? "text-white/70" : "text-muted-foreground"}`}>
+          Inspecții și verificări imobiliare
+        </span>
       )}
-    </div>
+    </span>
   );
 }

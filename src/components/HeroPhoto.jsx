@@ -1,45 +1,51 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { Viewfinder, PhotoMark } from "@/components/fisa";
 
-// VerifiCasa hero background — set propriu de proprietăți (exterior + interioare
-// generate în același stil/locul, consistente ca brană), ce se succed printr-un
-// crossfade lin (glide) cu slow zoom continuu, opacitate crescută, pe un fond
-// navy ce păstrează lizibilitatea textului și tranziție spre alb.
+// The hero photograph as a fișă: a real property image with the inspection
+// layer drawn ON it — viewfinder brackets, measured facts annotated in the
+// frame, the property code in the margin. Crossfades through the set on a
+// slow, weighted pace.
 const HEROES = [
-  "/images/hero/villa-exterior.webp",
-  "/images/hero/villa-living-1.webp",
-  "/images/hero/villa-bedroom.webp",
-  "/images/hero/villa-living-2.webp",
+  { src: "/images/hero/villa-exterior.webp", mark: "EXTERIOR · FAȚADĂ SUD" },
+  { src: "/images/hero/villa-living-1.webp", mark: "LIVING · 24 MP" },
+  { src: "/images/hero/villa-bedroom.webp", mark: "DORMITOR · 14 MP" },
+  { src: "/images/hero/villa-living-2.webp", mark: "LIVING · LUMINĂ VEST" },
 ];
 
-export default function HeroPhoto() {
+export default function HeroPhoto({ className = "" }) {
   const [idx, setIdx] = useState(0);
+  const reduced = useReducedMotion();
 
   useEffect(() => {
+    if (reduced) return undefined;
     const id = setInterval(() => setIdx((i) => (i + 1) % HEROES.length), 7000);
     return () => clearInterval(id);
-  }, []);
+  }, [reduced]);
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-navy-deep">
-      <AnimatePresence>
+    <div className={`relative overflow-hidden border border-border bg-navy-deep ${className}`}>
+      <AnimatePresence initial={false}>
         <motion.img
           key={idx}
-          src={HEROES[idx]}
-          alt={`Proprietate verificată VerifiCasa ${idx + 1}`}
+          src={HEROES[idx].src}
+          alt="Proprietate verificată VerifiCasa"
           className="absolute inset-0 h-full w-full object-cover"
-          initial={{ opacity: 0, scale: 1.02 }}
-          animate={{ opacity: 0.72, scale: 1.14 }}
-          exit={{ opacity: 0, scale: 1.14 }}
-          transition={{
-            opacity: { duration: 2.2, ease: "easeInOut" },
-            scale: { duration: 7.2, ease: "easeOut" },
-          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
         />
       </AnimatePresence>
-      <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/65 via-navy/45 to-navy-deep/75" />
-      <div className="absolute inset-0 bg-gradient-to-r from-navy-deep/65 via-navy-deep/15 to-transparent" />
-      <div className="hero-fade absolute inset-x-0 bottom-0 h-56 sm:h-72" />
+
+      {/* thin scrim only where the marks sit */}
+      <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/45 to-transparent" />
+
+      {/* the inspection layer */}
+      <Viewfinder />
+      <PhotoMark className="left-4 bottom-3">{HEROES[idx].mark}</PhotoMark>
+      <PhotoMark className="right-4 bottom-3">VC-2026-0817</PhotoMark>
+      <PhotoMark className="right-4 top-3" >VERIFICAT ✓</PhotoMark>
     </div>
   );
 }

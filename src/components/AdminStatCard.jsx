@@ -16,7 +16,7 @@ export default function AdminStatCard({ label, value, icon: Icon, tone = "slate"
   const t = TONES[tone] || TONES.slate;
   return (
     <div
-      className="group relative isolate overflow-hidden rounded-[22px] bg-[#171a1f] px-4 pb-3.5 pt-4 transition-transform duration-300 hover:-translate-y-0.5"
+      className="group relative isolate overflow-hidden rounded-[22px] bg-[#171a1f] px-4 pb-3.5 pt-4 transition-transform duration-300"
       style={{
         boxShadow:
           "inset 0 1px 0 rgb(255 255 255 / 0.10), inset 0 0 0 1px rgb(255 255 255 / 0.05), 0 18px 34px -22px rgb(0 0 0 / 0.95)",

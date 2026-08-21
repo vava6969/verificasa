@@ -1,21 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import {
-  MapPin, Maximize, BedDouble, ShieldCheck, PawPrint, BadgePercent,
-  Eye, Building2, Phone, MessageCircle,
-  Calendar, PhoneOff,
-  Box, Crown, Car, Sofa, Heart, Camera,
-} from "lucide-react";
+import { Phone, MessageCircle, PhoneOff, Heart } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { startConversation } from "@/lib/conversations";
 import { Image } from "@/components/ui/image";
 import { base44 } from "@/api/base44Client";
+import { Stamp, Frank, PhotoMark, Viewfinder } from "@/components/fisa";
 import { formatDistanceToNowStrict } from "date-fns";
 import { ro, enGB } from "date-fns/locale";
 
-// Card compact de proprietate — badge-uri ierarhizate, chips icon-only, footer cu agent.
+// Fișa scurtă a unui anunț. Coperta poartă stratul de inspecție (colțare,
+// marcaje mono, codul proprietății), verdictul e o ștampilă cu bordură, iar
+// faptele stau pe un rând de registru cu cifre tabulare. Fără pastile, fără
+// sticlă, fără ridicare la hover — doar conturul care se închide la verde.
 export default function PropertyCard({ property, hot = false }) {
   const { currency, formatPrice, t, lang } = useCountry();
   const { isAuthenticated, user } = useAuth();
@@ -24,25 +23,22 @@ export default function PropertyCard({ property, hot = false }) {
   const p = property;
   const images = p.images?.length ? p.images : [];
   const [idx, setIdx] = useState(0);
-  const [showExtra, setShowExtra] = useState(false);
   const touchStartX = useRef(null);
+  const en = lang === "en";
 
-  // Scor de încredere calculat automat (0-100, vezi funcia ComputeTrustScore) —
-  // înlocuiește vechea logică bazată doar pe flag-uri manuale de admin.
   const trustScore = typeof p.trust_score === "number" ? p.trust_score : 0;
   const isHighTrust = trustScore >= 75;
   const isVerified = trustScore >= 40;
+  const boosted = p.boost_active || p.featured || hot;
   const seller = p.seller_role || (p.owner_verified ? "Proprietar" : "Agent");
   const isProprietar = seller === "Proprietar";
   const sellerLabel = isProprietar ? t("pc_seller_landlord") : t("pc_seller_agent");
 
-  // Save/favorite — same SavedProperty entity pattern as PropertyDetail, so a
-  // card saved here shows up instantly on /saved and vice versa.
   const [saved, setSaved] = useState(false);
   const [savePending, setSavePending] = useState(false);
   useEffect(() => {
     let cancelled = false;
-    if (!user || !p?.id) { setSaved(false); return; }
+    if (!user || !p?.id) { setSaved(false); return undefined; }
     (async () => {
       try {
         const list = await base44.entities.SavedProperty.filter({ user_id: user.id, property_id: p.id }, "-created_date", 1);
@@ -80,11 +76,6 @@ export default function PropertyCard({ property, hot = false }) {
   const primary = currency === "EUR" ? eur : ron;
   const secondary = currency === "EUR" ? ron : eur;
 
-  const go = (e, dir) => {
-    e.preventDefault(); e.stopPropagation();
-    setIdx((i) => (i + dir + images.length) % Math.max(images.length, 1));
-  };
-
   const toDetail = () => navigate(`/property/${p.id}`);
 
   const handleMessage = async (e) => {
@@ -99,32 +90,29 @@ export default function PropertyCard({ property, hot = false }) {
   };
 
   const callPhone = (p.phone || "").replace(/\D/g, "");
-  const waPhone = (p.whatsapp_phone || p.phone || "").replace(/\D/g, "");
   const hasPhone = !!callPhone && callPhone.length >= 6;
-  const dateLocale = lang === "en" ? "en-GB" : "ro-RO";
   const postedAgo = p.created_date
-    ? formatDistanceToNowStrict(new Date(p.created_date), { addSuffix: true, locale: lang === "en" ? enGB : ro })
+    ? formatDistanceToNowStrict(new Date(p.created_date), { addSuffix: true, locale: en ? enGB : ro })
     : "";
 
-  // Chips secundare — icon-only, max 3 vizibile + popover pentru restul
-  // Toate chip-urile folosesc acum un singur stil neutru, consistent — culoarea
-  // e rezervată pentru semnale importante (badge-ul Verificat, Hot), nu pentru
-  // fiecare facilitate în parte.
-  const CHIP_CLS = "bg-secondary text-foreground/65 dark:bg-white/10 dark:text-foreground/70";
-  const chips = [];
-  if (p.tour_3d_url) chips.push({ icon: Box, label: t("tab_3d"), cls: CHIP_CLS });
-  if (p.commission_free) chips.push({ icon: BadgePercent, label: t("pc_com0"), cls: CHIP_CLS });
-  if (p.pet_friendly) chips.push({ icon: PawPrint, label: t("pc_pet_btn"), cls: CHIP_CLS });
-  if (p.furnished) chips.push({ icon: Sofa, label: t("badge_furnished"), cls: CHIP_CLS });
-  if (p.parking) chips.push({ icon: Car, label: t("badge_parking"), cls: CHIP_CLS });
-  const visibleChips = chips.slice(0, 3);
-  const extraChips = chips.slice(3);
+  // Facilitățile ca text, nu ca pastile cu iconițe — se citesc dintr-o privire.
+  const features = [
+    p.tour_3d_url && t("tab_3d"),
+    p.commission_free && t("pc_com0"),
+    p.pet_friendly && t("pc_pet_btn"),
+    p.furnished && t("badge_furnished"),
+    p.parking && t("badge_parking"),
+  ].filter(Boolean);
+
+  const boostUntil = p.boost_ends_date
+    ? new Date(p.boost_ends_date).toLocaleDateString(en ? "en-GB" : "ro-RO", { day: "2-digit", month: "short" })
+    : null;
 
   return (
-    <div className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-glow dark:bg-card ${hot ? "premium-glow border-gold/50" : "border-border"}`}>
-      {/* Cover */}
+    <article className="group relative flex flex-col overflow-hidden border border-border bg-card transition-colors hover:border-emerald">
+      {/* Copertă — stratul de inspecție e desenat PE fotografie */}
       <div
-        className="relative aspect-[4/3] overflow-hidden touch-pan-y"
+        className="relative aspect-[4/3] cursor-pointer overflow-hidden touch-pan-y"
         onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
         onTouchEnd={(e) => {
           const sx = touchStartX.current;
@@ -138,133 +126,123 @@ export default function PropertyCard({ property, hot = false }) {
         onClick={toDetail}
       >
         {images.length ? (
-          <Image src={images[idx]} alt={p.title} fittingType="fill" className="h-full w-full cursor-pointer transition-transform duration-500 group-hover:scale-[1.04]" />
+          <Image src={images[idx]} alt={p.title} fittingType="fill" className="h-full w-full" />
         ) : (
-          <div className="h-full w-full bg-gradient-to-br from-navy/10 to-emerald/20" />
-        )}
-
-        {/* Dots indicator */}
-        {images.length > 1 && (
-          <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1">
-            {images.slice(0, 6).map((_, i) => (
-              <span key={i} className={`h-1.5 rounded-full transition ${i === idx ? "w-4 bg-white" : "w-1.5 bg-white/60"}`} />
-            ))}
+          <div className="flex h-full w-full items-center justify-center bg-secondary">
+            <span className="text-xs text-muted-foreground">{t("info_missing")}</span>
           </div>
         )}
 
-        {/* Badge-uri grupate stânga-sus: Verificat + Recomandat */}
-        <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
-          {isHighTrust ? (
-            <span className="flex items-center gap-1 rounded-full bg-navy px-2.5 py-1 text-[11px] font-bold text-mint shadow-soft ring-1 ring-mint/40">
-              <ShieldCheck className="h-3.5 w-3.5" /> {t("pc_trust_high")}
-            </span>
-          ) : isVerified ? (
-            <span className="flex items-center gap-1 rounded-full bg-emerald px-2.5 py-1 text-[11px] font-bold text-white shadow-soft">
-              <ShieldCheck className="h-3.5 w-3.5" /> {t("pc_verified")}
-            </span>
-          ) : null}
-          {hot && (
-            <span className="premium-badge flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white">
-              <Crown className="h-3 w-3" /> {t("pc_hot")}
-            </span>
-          )}
-        </div>
+        <Viewfinder inset="0.5rem" stroke="rgba(255,255,255,0.7)" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/50 to-transparent" />
 
-        {/* Salvează — buton inimă, ca la Zillow, dreapta-sus */}
+        {/* marcaje de instrument */}
+        {p.property_code && <PhotoMark className="bottom-2 left-2.5">{p.property_code}</PhotoMark>}
+        {p.surface_sqm != null && <PhotoMark className="bottom-2 right-2.5">{p.surface_sqm} MP</PhotoMark>}
+        {images.length > 1 && (
+          <PhotoMark className="top-2 left-2.5">
+            {String(idx + 1).padStart(2, "0")}/{String(images.length).padStart(2, "0")}
+          </PhotoMark>
+        )}
+
         <button
           type="button"
           onClick={toggleSave}
           aria-label={saved ? t("pd_unsaved") : t("pd_saved_toast")}
           disabled={savePending}
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-navy-deep/45 text-white backdrop-blur-md transition hover:bg-navy-deep/65 disabled:opacity-60"
+          className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-sm border border-white/40 bg-black/35 text-white transition-colors hover:bg-black/55 disabled:opacity-60"
         >
-          <Heart className={`h-4 w-4 transition ${saved ? "fill-rose-500 text-rose-500" : "text-white"}`} />
+          <Heart className={`h-4 w-4 ${saved ? "fill-white" : ""}`} />
         </button>
 
-        {/* Data postării — stânga-jos */}
-        {p.created_date && (
-          <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-full bg-navy-deep/60 px-2 py-0.5 text-[10px] font-medium text-white/90 backdrop-blur">
-            <Calendar className="h-2.5 w-2.5" /> {new Date(p.created_date).toLocaleDateString(dateLocale, { day: "2-digit", month: "2-digit" })}
-          </span>
-        )}
-
-        {/* Număr poze — dreapta-jos, ca la Zillow */}
-        {images.length > 0 && (
-          <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-navy-deep/60 px-2 py-0.5 text-[10px] font-semibold text-white/90 backdrop-blur">
-            <Camera className="h-2.5 w-2.5" /> {images.length}
-          </span>
+        {images.length > 1 && (
+          <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1">
+            {images.slice(0, 6).map((_, i) => (
+              <span key={i} className={`h-1 ${i === idx ? "w-4 bg-white" : "w-1 bg-white/55"}`} />
+            ))}
+          </div>
         )}
       </div>
 
-      {/* Body */}
+      {/* Verdicte — ștampile, nu pastile */}
+      {(isVerified || boosted) && (
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-border px-3.5 py-2">
+          {isHighTrust ? (
+            <Stamp tone="verde">{t("pc_trust_high")}</Stamp>
+          ) : isVerified ? (
+            <Stamp tone="verde">{t("pc_verified")}</Stamp>
+          ) : null}
+          {boosted && <Frank until={boostUntil} />}
+        </div>
+      )}
+
+      {/* Corp */}
       <div onClick={toDetail} className="flex min-w-0 flex-1 cursor-pointer flex-col p-3.5">
-        <h3 className="font-heading text-base font-bold leading-snug text-navy line-clamp-1 dark:text-foreground">{p.title || <span className="italic text-muted-foreground/70">{t("info_missing")}</span>}</h3>
-        <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-          <MapPin className="h-3 w-3 shrink-0" />
-          <span className="truncate">
-            {p.zone || p.city ? `${p.zone ? p.zone + ", " : ""}${p.city || ""}` : <span className="italic text-muted-foreground/70">{t("info_missing")}</span>}
-          </span>
+        <h3 className="line-clamp-1 font-heading text-lg font-semibold leading-snug text-foreground">
+          {p.title || <span className="italic text-muted-foreground">{t("info_missing")}</span>}
+        </h3>
+        <p className="mt-0.5 truncate text-sm text-muted-foreground">
+          {p.zone || p.city ? `${p.zone ? p.zone + ", " : ""}${p.city || ""}` : t("info_missing")}
         </p>
 
-        {/* Specs — rând unic compact */}
-        <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-foreground/70">
-          {p.rooms != null && <span className="flex items-center gap-1"><BedDouble className="h-3.5 w-3.5 text-emerald" /> {p.rooms} {t("sep_rooms")}</span>}
-          {p.surface_sqm != null && <span className="flex items-center gap-1"><Maximize className="h-3.5 w-3.5 text-emerald" /> {p.surface_sqm} mp</span>}
-          {p.floor && <span className="flex items-center gap-1"><Building2 className="h-3.5 w-3.5 text-emerald" /> {t("pc_floor")} {p.floor}</span>}
-        </div>
-
-        {/* Chips secundare — icon-only, max 3 + popover */}
-        {visibleChips.length > 0 && (
-          <div className="relative mt-2 flex flex-wrap items-center gap-1.5">
-            {visibleChips.map((c, i) => {
-              const Ico = c.icon;
-              return (
-                <span key={i} title={c.label} className={`flex items-center justify-center rounded-full px-2 py-1 text-[11px] font-semibold ${c.cls}`}>
-                  <Ico className="h-3 w-3" />
-                </span>
-              );
-            })}
-            {extraChips.length > 0 && (
-              <button
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowExtra((s) => !s); }}
-                className="flex items-center justify-center rounded-full bg-secondary px-2 py-1 text-[11px] font-bold text-muted-foreground hover:bg-secondary/80"
-              >
-                +{extraChips.length}
-              </button>
-            )}
-            {showExtra && extraChips.length > 0 && (
-              <div className="absolute left-0 top-7 z-10 flex flex-wrap gap-1.5 rounded-xl border border-border bg-white p-2 shadow-glow dark:bg-card">
-                {extraChips.map((c, i) => {
-                  const Ico = c.icon;
-                  return (
-                    <span key={i} className={`flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-semibold ${c.cls}`}>
-                      <Ico className="h-3 w-3" /> {c.label}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
+        {/* Rând de registru: fapte cu cifre tabulare */}
+        <dl className="mt-2.5 flex flex-wrap items-baseline gap-x-4 gap-y-1 border-t border-border pt-2.5 text-sm">
+          {p.rooms != null && (
+            <div className="flex items-baseline gap-1">
+              <dt className="text-muted-foreground">{t("sep_rooms")}</dt>
+              <dd className="font-semibold tnum">{p.rooms}</dd>
+            </div>
+          )}
+          {p.surface_sqm != null && (
+            <div className="flex items-baseline gap-1">
+              <dt className="text-muted-foreground">mp</dt>
+              <dd className="font-semibold tnum">{p.surface_sqm}</dd>
+            </div>
+          )}
+          {p.floor && (
+            <div className="flex items-baseline gap-1">
+              <dt className="text-muted-foreground">{t("pc_floor")}</dt>
+              <dd className="font-semibold tnum">{p.floor}</dd>
+            </div>
+          )}
+          <div className="ml-auto flex items-baseline gap-1">
+            <dt className="text-muted-foreground">{en ? "views" : "vizite"}</dt>
+            <dd className="font-semibold tnum">{p.views_count || 0}</dd>
           </div>
+        </dl>
+
+        {features.length > 0 && (
+          <p className="mt-2 line-clamp-1 text-xs text-muted-foreground">{features.join(" · ")}</p>
         )}
 
-        {/* Price */}
-        <div className="mt-3 flex items-end justify-between border-t border-border/60 pt-2.5">
+        <div className="mt-3 flex items-end justify-between border-t border-border pt-2.5">
           <div>
-            <p className="font-heading text-xl font-bold text-navy dark:text-foreground">{primary}<span className="text-xs font-medium text-muted-foreground">{p.transaction_type === "SALE" ? "" : t("pc_permonth")}</span></p>
-            <p className="text-[11px] text-muted-foreground">≈ {secondary}</p>
+            <p className="font-heading text-2xl font-semibold text-foreground tnum">
+              {primary}
+              <span className="ml-0.5 font-body text-xs font-medium text-muted-foreground">
+                {p.transaction_type === "SALE" ? "" : t("pc_permonth")}
+              </span>
+            </p>
+            <p className="text-xs text-muted-foreground tnum">≈ {secondary}</p>
           </div>
-          <span className="flex items-center gap-1 text-[11px] text-muted-foreground"><Eye className="h-3 w-3" /> {p.views_count || 0}</span>
+          {trustScore > 0 && (
+            <span className="text-right text-xs text-muted-foreground">
+              {en ? "trust" : "încredere"}<br />
+              <span className="font-heading text-base font-semibold text-foreground tnum">{trustScore}</span>
+              <span className="text-[10px]">/100</span>
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Footer — agent + icon buttons */}
-      <div className="flex items-center gap-2 border-t border-border/60 px-3.5 py-2.5">
+      {/* Subsol — cine a publicat + contact */}
+      <div className="flex items-center gap-2.5 border-t border-border px-3.5 py-2.5">
         <Link
           to={p.created_by_id ? `/profile/${p.created_by_id}` : "#"}
           onClick={(e) => e.stopPropagation()}
           className="flex shrink-0 items-center"
         >
-          <span className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold text-white ${isProprietar ? "bg-emerald" : "bg-blue-600"}`}>
+          <span className="flex h-7 w-7 items-center justify-center rounded-sm border border-border bg-secondary text-[10px] font-bold text-foreground">
             {(p.posted_by_name || p.owner_name || "V").charAt(0).toUpperCase()}
           </span>
         </Link>
@@ -273,24 +251,37 @@ export default function PropertyCard({ property, hot = false }) {
           onClick={(e) => e.stopPropagation()}
           className="min-w-0 flex-1"
         >
-          <p className="truncate text-[11px] font-semibold text-navy hover:text-emerald hover:underline dark:text-foreground">{p.posted_by_name || p.owner_name || "VerifiCasa"}</p>
-          <p className="truncate text-[10px] text-muted-foreground">{sellerLabel}{postedAgo ? ` · ${postedAgo}` : ""}</p>
+          <p className="truncate text-xs font-semibold text-foreground hover:text-emerald">
+            {p.posted_by_name || p.owner_name || "VerifiCasa"}
+          </p>
+          <p className="truncate text-[11px] text-muted-foreground">
+            {sellerLabel}{postedAgo ? ` · ${postedAgo}` : ""}
+          </p>
         </Link>
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1.5">
           {hasPhone ? (
-            <a href={`tel:${callPhone}`} onClick={(e) => e.stopPropagation()} title={t("pc_call")} className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald/30 text-emerald transition hover:bg-emerald-soft">
-              <Phone className="h-3.5 w-3.5" />
+            <a
+              href={`tel:${callPhone}`}
+              onClick={(e) => e.stopPropagation()}
+              title={t("pc_call")}
+              className="flex h-9 w-9 items-center justify-center rounded-sm border border-border text-foreground transition-colors hover:border-emerald hover:text-emerald"
+            >
+              <Phone className="h-4 w-4" />
             </a>
           ) : (
-            <span title={t("pc_no_phone")} className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-muted-foreground/40">
-              <PhoneOff className="h-3.5 w-3.5" />
+            <span title={t("pc_no_phone")} className="flex h-9 w-9 items-center justify-center rounded-sm border border-border text-muted-foreground/40">
+              <PhoneOff className="h-4 w-4" />
             </span>
           )}
-          <button onClick={handleMessage} title={t("pc_message")} className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald text-white transition hover:bg-emerald/90">
-            <MessageCircle className="h-3.5 w-3.5" />
+          <button
+            onClick={handleMessage}
+            title={t("pc_message")}
+            className="flex h-9 w-9 items-center justify-center rounded-sm bg-emerald text-primary-foreground transition-colors hover:bg-emerald/90"
+          >
+            <MessageCircle className="h-4 w-4" />
           </button>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
