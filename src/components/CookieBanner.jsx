@@ -58,7 +58,7 @@ export default function CookieBanner() {
             transition={{ type: "spring", stiffness: 260, damping: 24 }}
             className="fixed inset-x-0 bottom-0 z-50 px-4 pb-4 sm:pb-6"
           >
-            <div className="mx-auto max-w-3xl rounded border border-emerald/30 bg-navy-deep/95 px-4 py-3.5 text-white shadow-soft sm:px-5">
+            <div className="mx-auto max-w-3xl rounded-2xl border border-emerald/30 bg-navy-deep/95 px-4 py-3.5 text-white shadow-soft sm:px-5">
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald/20 text-emerald">
                   <Cookie className="h-5 w-5" />
@@ -73,17 +73,17 @@ export default function CookieBanner() {
                     {t("footer_privacy")}
                   </Link>.
                 </p>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button onClick={rejectAll} size="sm" variant="ghost" className="text-white/70 hover:bg-white/10 hover:text-white">
+                <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+                  <Button onClick={rejectAll} size="sm" variant="ghost" className="min-h-[44px] flex-1 rounded-full text-white/70 hover:bg-white/10 hover:text-white sm:flex-none">
                     {t("cookie_reject")}
                   </Button>
-                  <Button onClick={() => setShowPrefs(true)} size="sm" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
+                  <Button onClick={() => setShowPrefs(true)} size="sm" variant="outline" className="min-h-[44px] flex-1 rounded-full border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white sm:flex-none">
                     {t("cookie_prefs")}
                   </Button>
-                  <Button onClick={acceptAll} size="sm" className="bg-emerald text-primary-foreground hover:opacity-90">
+                  <Button onClick={acceptAll} size="sm" className="min-h-[44px] flex-1 rounded-full bg-emerald font-bold text-primary-foreground hover:opacity-90 sm:flex-none">
                     {t("cookie_accept")}
                   </Button>
-                  <button onClick={rejectAll} className="rounded p-1 text-white/50 hover:text-white" aria-label="Close">
+                  <button onClick={rejectAll} className="flex h-11 w-11 items-center justify-center rounded-full text-white/50 hover:text-white" aria-label="Close">
                     <X className="h-4 w-4" />
                   </button>
                 </div>

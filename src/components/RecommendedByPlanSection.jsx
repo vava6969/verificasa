@@ -93,7 +93,7 @@ function PlanRow({ row, en, coverMap }) {
         <h2 className="text-lg font-bold text-foreground sm:text-xl">{row.shortName || row.name}</h2>
         <Link
           to="/anunturi-recomandate"
-          className="ml-auto shrink-0 text-sm font-bold text-emerald transition-transform hover:translate-x-0.5"
+          className="ml-auto flex min-h-[44px] shrink-0 items-center text-sm font-bold text-emerald transition-transform hover:translate-x-0.5"
         >
           {en ? "See all" : "Vezi tot"} <span aria-hidden="true">→</span>
         </Link>

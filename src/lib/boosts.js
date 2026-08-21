@@ -56,3 +56,20 @@ export async function applyBoost(propertyId) {
     return { ok: false, error: "Nu am putut promova anunțul. Încearcă din nou." };
   }
 }
+
+// Cumpără UN boost direct pentru un anunț. Backendul pune property_id în
+// metadata sesiunii Stripe, iar VerifyBoostCheckout aplică boost-ul singur la
+// întoarcere — proprietarul apasă o dată, nu de două ori.
+export async function buyBoostForProperty(propertyId) {
+  try {
+    const res = await base44.functions.invoke("CreateBoostCheckout", {
+      pack_id: "b1",
+      property_id: propertyId,
+    });
+    const data = res?.data || res || {};
+    if (data.url) return { url: data.url };
+    return { error: data.error || "Nu am putut porni plata. Încearcă din nou." };
+  } catch (e) {
+    return { error: "Nu am putut porni plata. Încearcă din nou." };
+  }
+}

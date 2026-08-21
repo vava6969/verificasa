@@ -45,6 +45,43 @@ export default function MyProperties() {
 
   useEffect(() => { load(); loadBalance();   }, [user?.id]);
 
+  // Întoarcerea din plata unui boost cumpărat de pe un anunț. Funcția de
+  // backend a aplicat deja boost-ul; aici doar confirmăm și reîncărcăm.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const boost = params.get("boost");
+    const sessionId = params.get("session_id");
+    if (!boost) return;
+    if (boost === "success" && sessionId) {
+      base44.functions
+        .invoke("VerifyBoostCheckout", { session_id: sessionId })
+        .then((res) => {
+          const data = res?.data || res || {};
+          if (data.error) {
+            toast({ title: en ? "Could not confirm the payment" : "Nu am putut confirma plata", description: data.error, variant: "destructive" });
+          } else if (data.applied_to) {
+            toast({
+              title: en ? "Listing promoted" : "Anunț promovat",
+              description: en ? "Your listing is now boosted." : "Anunțul tău este acum promovat.",
+            });
+          } else {
+            toast({
+              title: en ? "Boosts added" : "Boost-uri adăugate",
+              description: en ? "They are in your balance." : "Le găsești în soldul tău.",
+            });
+          }
+          load(); loadBalance();
+        })
+        .catch(() => {});
+    } else if (boost === "cancelled") {
+      toast({ title: en ? "Payment cancelled" : "Plată anulată", description: en ? "You were not charged." : "Nicio sumă nu a fost taxată." });
+    }
+    params.delete("boost"); params.delete("session_id");
+    const qs = params.toString();
+    window.history.replaceState({}, "", qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (!user?.id) return undefined;
     const unsub = base44.entities.Property.subscribe(() => load());

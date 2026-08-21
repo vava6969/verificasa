@@ -51,7 +51,7 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="rounded-none border-border">
+      <AlertDialogContent className="rounded-2xl border-border">
         <AlertDialogHeader>
           <AlertDialogTitle className="font-heading text-xl font-semibold">
             {extending
@@ -79,14 +79,14 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
         )}
 
         <AlertDialogFooter>
-          <AlertDialogCancel className="min-h-[44px] rounded border-border">
+          <AlertDialogCancel className="min-h-[44px] rounded-full border-border">
             {en ? "Cancel" : "Anulează"}
           </AlertDialogCancel>
           {hasCredits ? (
             <AlertDialogAction
               onClick={(e) => { e.preventDefault(); confirm(); }}
               disabled={pending}
-              className="min-h-[44px] gap-2 rounded bg-emerald text-primary-foreground hover:bg-emerald/90"
+              className="min-h-[44px] gap-2 rounded-full bg-emerald font-bold text-primary-foreground hover:bg-emerald/90"
             >
               {pending && <Loader2 className="h-4 w-4 animate-spin" />}
               {extending ? (en ? "Extend" : "Prelungește") : (en ? "Promote" : "Promovează")}

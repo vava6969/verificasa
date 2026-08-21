@@ -11,7 +11,7 @@ export default function Footer() {
   const { t } = useCountry();
 
   const col = "space-y-2.5 text-sm";
-  const link = "block py-0.5 text-white/60 transition-colors hover:text-white";
+  const link = "flex min-h-[40px] items-center text-white/60 transition-colors hover:text-white sm:min-h-0 sm:py-1";
   const head = "text-sm font-bold text-white";
 
   return (
