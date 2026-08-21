@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
-import { formatDistanceToNowStrict } from "date-fns";
+import { formatDistanceToNowStrict, isValid } from "date-fns";
 import { ro, enGB } from "date-fns/locale";
 
 import { useCountry } from "@/components/CountryContext";
@@ -79,7 +79,7 @@ export default function PropertyDetail() {
           base44.functions.invoke("IncrementViews", { property_id: id }).catch(() => {});
         }
       } catch (e) {
-        if (cancelled) setProperty(null);
+        if (!cancelled) setProperty(null);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -161,7 +161,7 @@ export default function PropertyDetail() {
     { icon: BedDouble, label: t("stat_rooms"), value: p.rooms },
     { icon: Maximize, label: t("stat_area"), value: `${p.surface_sqm} mp` },
     { icon: Wallet, label: t("stat_deposit"), value: formatPrice(p.deposit || p.price_monthly, p.currency) },
-    { icon: Calendar, label: t("stat_avail"), value: p.available_from ? new Date(p.available_from).toLocaleDateString(locale) : t("immediate") },
+    { icon: Calendar, label: t("stat_avail"), value: p.available_from && isValid(new Date(p.available_from)) ? new Date(p.available_from).toLocaleDateString(locale) : t("immediate") },
   ];
 
   // Tab-urile galeriei (Galerie/Prezentare/Tur 3D) — aceleași butoane, refolosite
@@ -405,9 +405,13 @@ export default function PropertyDetail() {
                       )}
                       <span className="text-foreground/40">·</span>
                       <Clock className="h-3.5 w-3.5 text-emerald" />
-                      {new Date(p.created_date).toLocaleString(locale, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                      {isValid(new Date(p.created_date))
+                        ? new Date(p.created_date).toLocaleString(locale, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+                        : "—"}
                       <span className="text-foreground/40">·</span>
-                      {formatDistanceToNowStrict(new Date(p.created_date), { addSuffix: true, locale: lang === "en" ? enGB : ro })}
+                      {isValid(new Date(p.created_date))
+                        ? formatDistanceToNowStrict(new Date(p.created_date), { addSuffix: true, locale: lang === "en" ? enGB : ro })
+                        : ""}
                     </p>
                   )}
                   <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground/70">
