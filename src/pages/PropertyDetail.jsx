@@ -28,7 +28,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { startConversation } from "@/lib/conversations";
 import { createNotification } from "@/lib/notifications";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
-import { Stamp, Frank, Ledger, LedgerRow, PhotoMark } from "@/components/fisa";
+import { Stamp, Frank, Ledger, LedgerRow, PhotoMark, ScoreLedger } from "@/components/fisa";
 
 export default function PropertyDetail() {
   const { id } = useParams();
