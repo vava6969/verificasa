@@ -45,13 +45,13 @@ export default function BetaBanner() {
             onClick={(e) => e.stopPropagation()}
             className="relative w-full max-w-md border border-border bg-card p-6 sm:p-8"
           >
-            <button onClick={dismiss} className="absolute right-4 top-4 rounded p-1.5 text-muted-foreground transition-colors hover:bg-secondary" aria-label="Închide">
+            <button onClick={dismiss} className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-secondary" aria-label="Închide">
               <X className="h-5 w-5" />
             </button>
             <Stamp tone="ink">Beta</Stamp>
             <h3 className="mt-4 font-heading text-2xl font-semibold text-foreground">{t("beta_title")}</h3>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t("beta_msg")}</p>
-            <Button onClick={dismiss} className="mt-6 w-full rounded bg-emerald text-primary-foreground hover:bg-emerald/90">
+            <Button onClick={dismiss} className="mt-6 min-h-[48px] w-full rounded bg-emerald text-primary-foreground hover:bg-emerald/90">
               {t("beta_btn")}
             </Button>
           </motion.div>

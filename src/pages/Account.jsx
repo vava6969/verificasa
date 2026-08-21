@@ -45,7 +45,7 @@ function MyPlanSection() {
             ? "Pick a plan so your listings get more room and a better spot in search."
             : "Alege un plan ca anunțurile tale să aibă mai mult loc și o poziție mai bună în căutare."}
         </p>
-        <Link to="/upgrade" className="mt-3 inline-block text-sm font-bold text-emerald transition-colors hover:text-foreground">
+        <Link to="/upgrade" className="mt-3 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0">
           {en ? "See the plans" : "Vezi planurile"} <span aria-hidden="true">→</span>
         </Link>
       </section>
@@ -81,7 +81,7 @@ function MyPlanSection() {
         </Ledger>
       </div>
       <div className="p-4">
-        <Link to="/upgrade" className="text-sm font-bold text-emerald transition-colors hover:text-foreground">
+        <Link to="/upgrade" className="inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0">
           {en ? "Change plan" : "Schimbă planul"} <span aria-hidden="true">→</span>
         </Link>
       </div>
@@ -131,7 +131,7 @@ export default function Account() {
     params.delete("boost"); params.delete("session_id");
     const qs = params.toString();
     window.history.replaceState({}, "", qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   // Destinațiile contului, ca listă tipărită — nu un grid de plăcuțe colorate.

@@ -295,7 +295,7 @@ export default function SearchPage() {
         <div className="border border-dashed border-border px-4 py-20 text-center">
           <p className="font-heading text-xl font-semibold text-foreground">{t("sr_empty_title")}</p>
           <p className="mt-1 text-sm text-muted-foreground">{t("sr_empty_sub")}</p>
-          <button type="button" onClick={resetFilters} className="mt-4 text-sm font-bold text-emerald transition-colors hover:text-foreground">
+          <button type="button" onClick={resetFilters} className="mt-4 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0">
             {t("sr_reset_filters")} <span aria-hidden="true">→</span>
           </button>
         </div>

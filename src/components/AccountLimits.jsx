@@ -41,7 +41,7 @@ export default function AccountLimits({ className = "" }) {
     if (!user?.id) { setPlanId(null); return undefined; }
     (async () => { if (!cancelled) await load(); })();
     return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [user?.id]);
 
   const onRedeem = async (e) => {
@@ -113,7 +113,7 @@ export default function AccountLimits({ className = "" }) {
               ? "You have used every listing slot on this plan."
               : "Ai folosit toate locurile de anunț din acest plan."}
           </p>
-          <Link to="/upgrade" className="mt-1 inline-block text-sm font-bold text-emerald transition-colors hover:text-foreground">
+          <Link to="/upgrade" className="mt-1 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0">
             {en ? "See what Pro includes" : "Vezi ce include Pro"} <span aria-hidden="true">→</span>
           </Link>
         </div>
@@ -148,7 +148,7 @@ export default function AccountLimits({ className = "" }) {
           </button>
         </form>
 
-        <Link to="/upgrade" className="mt-3 inline-block text-sm font-bold text-emerald transition-colors hover:text-foreground">
+        <Link to="/upgrade" className="mt-3 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0">
           {en ? "Buy boosts" : "Cumpără boost-uri"} <span aria-hidden="true">→</span>
         </Link>
       </div>

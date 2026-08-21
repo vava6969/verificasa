@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 
 export default function AboutVerifiCasa() {
@@ -50,9 +49,9 @@ export default function AboutVerifiCasa() {
             <p className="mt-1.5 flex-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">{s.desc}</p>
             <Link
               to="/about"
-              className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-emerald transition-colors group-hover:gap-2 sm:text-sm"
+              className="mt-3 inline-flex min-h-[44px] items-center text-xs font-bold text-emerald transition-colors sm:min-h-0 sm:text-sm"
             >
-              Află mai multe <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+              Află mai multe <span className="ml-1" aria-hidden="true">→</span>
             </Link>
           </RevealItem>
         ))}
@@ -94,9 +93,9 @@ export default function AboutVerifiCasa() {
       <div className="mt-4 flex justify-center sm:mt-8">
         <Link
           to="/contact"
-          className="inline-flex items-center gap-1.5 rounded bg-emerald px-4 py-2 text-xs font-semibold text-white shadow-soft transition hover:bg-emerald/90 sm:text-sm"
+          className="inline-flex min-h-[44px] items-center rounded bg-emerald px-5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90"
         >
-          Contactează-ne <ArrowRight className="h-3.5 w-3.5" />
+          Contactează-ne <span className="ml-1.5" aria-hidden="true">→</span>
         </Link>
       </div>
     </section>

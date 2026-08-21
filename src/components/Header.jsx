@@ -35,7 +35,7 @@ export default function Header() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="flex h-9 w-9 items-center justify-center rounded border border-border bg-card text-foreground transition-colors hover:border-emerald"
+          className="flex h-11 w-11 items-center justify-center rounded border border-border bg-card text-foreground transition-colors hover:border-emerald sm:h-9 sm:w-9"
           aria-label={`${t("hdr_currency")} / ${t("hdr_language")}`}
         >
           <Globe className="h-4 w-4" />
@@ -91,7 +91,7 @@ export default function Header() {
                 <Link
                   to="/post-property"
                   aria-label={t("hdr_add")}
-                  className="flex h-9 items-center justify-center gap-1 rounded bg-emerald px-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90 md:px-4"
+                  className="flex h-11 items-center justify-center gap-1 rounded bg-emerald px-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90 sm:h-9 md:px-4"
                 >
                   <Plus className="h-4 w-4" />
                   <span className="hidden md:inline">{t("hdr_add")}</span>
@@ -102,7 +102,7 @@ export default function Header() {
               <>
                 <Link
                   to="/login"
-                  className="flex h-9 items-center gap-1.5 rounded bg-emerald px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90"
+                  className="flex h-11 items-center gap-1.5 rounded bg-emerald px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90 sm:h-9"
                 >
                   <User className="h-4 w-4" />
                   <span>{t("hdr_login")}</span>

@@ -45,14 +45,14 @@ export default function ActionCards({ onRequestInspection }) {
             <h3 className="font-heading text-xl font-semibold text-foreground">{c.title}</h3>
             <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">{c.desc}</p>
             {c.to ? (
-              <Link to={c.to} className="mt-5 text-sm font-bold text-emerald transition-colors hover:text-foreground">
+              <Link to={c.to} className="mt-5 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0">
                 {c.cta} <span aria-hidden="true">→</span>
               </Link>
             ) : (
               <button
                 type="button"
                 onClick={onRequestInspection}
-                className="mt-5 text-left text-sm font-bold text-emerald transition-colors hover:text-foreground"
+                className="mt-5 text-left inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0"
               >
                 {c.cta} <span aria-hidden="true">→</span>
               </button>

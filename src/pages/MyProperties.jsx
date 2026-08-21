@@ -43,13 +43,13 @@ export default function MyProperties() {
     setBalance(await fetchBoostBalance(user.id));
   };
 
-  useEffect(() => { load(); loadBalance(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.id]);
+  useEffect(() => { load(); loadBalance();   }, [user?.id]);
 
   useEffect(() => {
     if (!user?.id) return undefined;
     const unsub = base44.entities.Property.subscribe(() => load());
     return () => { try { unsub && unsub(); } catch { /* noop */ } };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [user?.id]);
 
   useEffect(() => { document.title = `${en ? "My listings" : "Anunțurile mele"} – VerifiCasa`; }, [en]);
@@ -104,7 +104,7 @@ export default function MyProperties() {
           <p className="mt-1 text-sm text-muted-foreground">
             {en ? "Publishing takes a few minutes." : "Postezi prima proprietate în câteva minute."}
           </p>
-          <Link to="/post-property" className="mt-4 inline-block text-sm font-bold text-emerald transition-colors hover:text-foreground">
+          <Link to="/post-property" className="mt-4 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0">
             {en ? "Add a listing" : "Adaugă anunț"} <span aria-hidden="true">→</span>
           </Link>
         </div>

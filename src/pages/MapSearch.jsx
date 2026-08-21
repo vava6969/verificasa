@@ -826,7 +826,7 @@ export default function MapSearch() {
               <button
                 type="button"
                 onClick={resetFilters}
-                className="mt-4 text-sm font-bold text-emerald transition-colors hover:text-foreground"
+                className="mt-4 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0"
               >
                 {t("sr_reset_filters")} <span aria-hidden="true">→</span>
               </button>

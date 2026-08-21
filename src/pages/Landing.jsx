@@ -63,7 +63,7 @@ export default function Landing() {
               <button
                 type="button"
                 onClick={() => setShowInspectie(true)}
-                className="text-sm font-bold text-emerald transition-colors hover:text-foreground"
+                className="inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0"
               >
                 {en ? "Request a verification" : "Solicită o verificare"} <span aria-hidden="true">→</span>
               </button>
