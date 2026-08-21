@@ -9,13 +9,14 @@ import { Image as UIImage } from "@/components/ui/image";
 import {
   ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck,
   Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil,
-  Sparkles, History, Flag, ClipboardCheck, Crown, Mail, Phone,
+  Sparkles, History, Flag, ClipboardCheck, Crown, Mail, Phone, Ticket,
 } from "lucide-react";
 import PropertyEditForm from "@/components/PropertyEditForm";
 import PropertyLogs from "@/components/PropertyLogs";
 import AdminReports from "@/components/AdminReports";
 import AdminResolvedReports from "@/components/AdminResolvedReports";
 import AdminStatCard from "@/components/AdminStatCard";
+import AdminCoupons from "@/components/AdminCoupons";
 import InspectionContactModal from "@/components/InspectionContactModal";
 import { useLoadMore } from "@/hooks/useLoadMore";
 import LoadMoreButton from "@/components/admin/LoadMoreButton";
@@ -269,10 +270,11 @@ export default function Admin() {
     { k: "comments", label: "Comentarii",          icon: MessageSquare },
     { k: "audit",    label: "Audit log",           icon: FileText },
     { k: "loguri",   label: "Loguri proprietate",  icon: History },
+    { k: "coduri",   label: "Coduri bonus",        icon: Ticket },
   ];
 
   return (
-    <div className="min-h-screen bg-[#f4f6f9] dark:bg-background">
+    <div className="min-h-screen bg-background">
       {/* Top bar */}
       <div className="border-b border-border bg-white dark:bg-card shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 sm:px-6 sm:py-4">
@@ -451,6 +453,8 @@ export default function Admin() {
               })()}
             </div>
 
+          ) : tab === "coduri" ? (
+            <AdminCoupons />
           ) : tab === "loguri" ? (
             <PropertyLogs properties={properties || []} audit={audit || []} comments={comments || []} inquiries={inquiries || []} />
 
