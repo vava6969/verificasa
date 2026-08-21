@@ -33,51 +33,75 @@ export default function Landing() {
     <div>
       <BetaBanner />
 
-      {/* HERO — claim left, evidence right */}
-      <section className="mx-auto max-w-7xl px-4 pb-6 pt-8 sm:px-6 sm:pt-12 lg:px-8">
-        <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-12">
-          <div className="max-w-xl">
-            <Stamp tone="verde">{en ? "Verified rentals, 100% online" : "Chirii verificate, 100% online"}</Stamp>
-            <h1 className="mt-4 font-heading text-4xl font-semibold leading-[1.05] text-foreground sm:text-5xl lg:text-[3.4rem]">
-              {t("hero_h1_a")}{" "}
-              <em className="font-medium italic text-emerald">{t("hero_h1_b")}</em>
+      {/* ——— PRIMA PAGINĂ A REGISTRULUI ———
+          Două compoziții distincte, nu una strivită:
+          · Desktop: pagină de gazetă — dateline riglat, titlu mare pe stânga,
+            fotografia-fișă sângerează până la marginea ferestrei pe dreapta,
+            iar banda de scanare 3D taie pagina pe toată lățimea, ca un
+            seismograf. Fără eyebrow-pastilă, fără accent italic în titlu:
+            ambele erau amprente de generator.
+          · Telefon: unealtă, nu afiș — titlu la scară mică, căutarea imediat
+            sub deget, fotografia și scanarea după. */}
+      <section className="mx-auto max-w-7xl px-4 pb-6 pt-6 sm:px-6 sm:pt-8 lg:px-8">
+        {/* dateline — informație, nu decor */}
+        <div className="flex items-baseline justify-between gap-4 border-y border-border py-2">
+          <p className="text-xs font-semibold text-foreground sm:text-sm">
+            {en ? "The register of verified rentals" : "Registrul chiriilor verificate"}
+          </p>
+          <p className="text-xs text-muted-foreground sm:text-sm">
+            {"România · " + new Date().toLocaleDateString(en ? "en-GB" : "ro-RO", { day: "2-digit", month: "long", year: "numeric" })}
+          </p>
+        </div>
+
+        <div className="mt-6 grid items-start gap-8 lg:mt-10 lg:grid-cols-12 lg:gap-10">
+          <div className="min-w-0 lg:col-span-5">
+            <h1 className="font-heading text-3xl font-medium leading-[1.04] tracking-[-0.02em] text-foreground sm:text-4xl lg:text-[3.6rem] xl:text-[4.1rem]">
+              {t("hero_h1_a")}
+              <br />
+              {t("hero_h1_b")}
             </h1>
-            <p className="mt-4 max-w-[48ch] text-base text-muted-foreground sm:text-lg">
+            <p className="mt-4 hidden max-w-[44ch] text-lg text-muted-foreground lg:block">
               {en
                 ? "Every listing is checked before it goes live: photos, paperwork, price. What you see is what you rent."
                 : "Fiecare anunț e verificat înainte de publicare: poze, acte, preț. Ce vezi e ce închiriezi."}
             </p>
 
-            <div className="mt-6">
+            <div className="mt-5 lg:mt-7">
               <HeroSearch />
             </div>
 
-            <div className="mt-5 flex flex-wrap items-center gap-4">
+            {/* Acțiuni: bloc plin pe telefon, rând pe desktop */}
+            <div className="mt-5 grid gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-4">
               <button
                 type="button"
                 onClick={() => setShowListeaza(true)}
-                className="rounded bg-emerald px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90"
+                className="min-h-[48px] rounded bg-emerald px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90 sm:min-h-[44px]"
               >
                 {t("hdr_add")}
               </button>
               <button
                 type="button"
                 onClick={() => setShowInspectie(true)}
-                className="inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0"
+                className="inline-flex min-h-[44px] items-center justify-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:justify-start"
               >
-                {en ? "Request a verification" : "Solicită o verificare"} <span aria-hidden="true">→</span>
+                {en ? "Request a verification" : "Solicită o verificare"} <span className="ml-1" aria-hidden="true">→</span>
               </button>
             </div>
           </div>
 
-          {/* the evidence column */}
-          <Reveal className="flex flex-col gap-3">
-            <HeroPhoto className="aspect-[4/3] w-full" />
-            <Hero3DScan className="h-44 w-full sm:h-52" />
+          {/* fotografia-fișă — pe desktop iese din container până la marginea
+              ferestrei: fotografia e dovada, are voie să rupă rama */}
+          <Reveal className="min-w-0 lg:col-span-7 lg:mr-[calc(50%-50vw)]">
+            <HeroPhoto className="aspect-[4/3] w-full lg:aspect-[16/9]" />
           </Reveal>
         </div>
 
-        <HeroCountdown className="mt-8" />
+        {/* banda de scanare — instrumentul taie pagina dintr-o parte în alta */}
+        <Reveal className="mt-3 lg:mx-[calc(50%-50vw)] lg:mt-8">
+          <Hero3DScan className="h-28 w-full sm:h-32 lg:h-36" />
+        </Reveal>
+
+        <HeroCountdown className="mt-6 lg:mt-8" />
       </section>
 
       {/* THE THREE WAYS IN */}

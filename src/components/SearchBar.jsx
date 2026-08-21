@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, MapPin, Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, Lock } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCountry } from "@/components/CountryContext";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
@@ -21,12 +21,15 @@ export default function SearchBar({ compact = false, onSubmitted }) {
     { value: "4+ Camere", label: t("type_4_vc") },
     { value: "Casă", label: t("type_house_vc") },
   ];
+  // Filtrele rapide sunt TEXT, nu pastile cu iconițe de linie — alergia la
+  // line-art e regulă de casă, iar cinci glife decorative pe eroul paginii
+  // erau exact ce o încălca.
   const TOGGLES = [
-    { key: "ai", label: t("tg_ai"), icon: Sparkles },
-    { key: "field", label: t("tg_field"), icon: ShieldCheck },
-    { key: "pet", label: t("tg_pet"), icon: PawPrint },
-    { key: "nofee", label: t("tg_nofee"), icon: BadgePercent },
-    { key: "garant0", label: t("tg_garant0"), icon: Lock },
+    { key: "ai", label: t("tg_ai") },
+    { key: "field", label: t("tg_field") },
+    { key: "pet", label: t("tg_pet") },
+    { key: "nofee", label: t("tg_nofee") },
+    { key: "garant0", label: t("tg_garant0") },
   ];
 
   const toggle = (key) => setToggles((cur) => ({ ...cur, [key]: !cur[key] }));
@@ -42,7 +45,7 @@ export default function SearchBar({ compact = false, onSubmitted }) {
     onSubmitted?.();
   };
 
-  const inputCls = "flex flex-1 items-center gap-2 rounded-lg border border-border bg-white/80 px-3 py-2.5 dark:border-white/10 dark:bg-white/5";
+  const inputCls = "flex min-h-[46px] flex-1 items-center gap-2 rounded border border-border bg-card px-3 py-2.5";
 
   return (
     <form onSubmit={handleSearch} className="w-full">
@@ -62,19 +65,19 @@ export default function SearchBar({ compact = false, onSubmitted }) {
         <div className="hidden h-8 w-px bg-border md:block" />
 
         <div className={inputCls}>
-          <Home className="h-4 w-4 shrink-0 text-emerald" />
           <select value={type} onChange={(e) => setType(e.target.value)} className="w-full cursor-pointer bg-transparent text-sm text-foreground outline-none">
             {types.map((tp) => <option key={tp.value} value={tp.value}>{tp.label}</option>)}
           </select>
         </div>
 
-        <Button type="submit" className="bg-emerald text-white shadow-soft hover:opacity-90 md:px-7">
-          <Search className="h-4 w-4" /> {t("sb_btn")}
+        <Button type="submit" className="min-h-[46px] rounded bg-emerald text-primary-foreground hover:bg-emerald/90 md:px-7">
+          {t("sb_btn")}
         </Button>
       </div>
 
       {/* Quick filter toggles */}
-      <div className="mt-2 flex flex-wrap items-center gap-2 px-1 pb-1">
+      {/* un singur rând derulabil pe telefon, se înfășoară de la md în sus */}
+      <div className="no-scrollbar mt-2 flex items-center gap-2 overflow-x-auto px-1 pb-1 md:flex-wrap">
         {TOGGLES.map((tg) => {
           const active = !!toggles[tg.key];
           return (
@@ -82,13 +85,14 @@ export default function SearchBar({ compact = false, onSubmitted }) {
               key={tg.key}
               type="button"
               onClick={() => toggle(tg.key)}
-              className={`flex min-h-[36px] items-center gap-1.5 rounded border px-3 py-1.5 text-xs font-semibold transition-colors ${
+              aria-pressed={active}
+              className={`min-h-[38px] shrink-0 rounded border px-3 text-xs font-semibold transition-colors ${
                 active
-                  ? "border-emerald bg-emerald text-white shadow-soft"
-                  : "border-border bg-white/70 text-foreground/70 hover:border-emerald/50 dark:border-white/10 dark:bg-white/5"
+                  ? "border-emerald bg-emerald text-primary-foreground"
+                  : "border-border bg-card text-foreground/75 hover:border-emerald"
               }`}
             >
-              <tg.icon className="h-3.5 w-3.5" /> {tg.label}
+              {tg.label}
             </button>
           );
         })}

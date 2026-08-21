@@ -78,9 +78,9 @@ export default function Hero3DScan({ className = "" }) {
         host.appendChild(renderer.domElement);
 
         scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 50);
-        camera.position.set(0, 1.7, 4.6);
-        camera.lookAt(0, 0.75, 0);
+        camera = new THREE.PerspectiveCamera(34, width / height, 0.1, 50);
+        camera.position.set(0, 1.35, 3.4);
+        camera.lookAt(0, 0.85, 0);
 
         const posAttr = buildHousePoints(THREE);
         positions = posAttr.array;
@@ -92,7 +92,7 @@ export default function Hero3DScan({ className = "" }) {
         geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 
         const mat = new THREE.PointsMaterial({
-          size: 0.028,
+          size: 0.034,
           vertexColors: true,
           transparent: true,
           opacity: 0.95,
@@ -125,7 +125,7 @@ export default function Hero3DScan({ className = "" }) {
           raf = requestAnimationFrame(tick);
           if (!visible) return;
           const t = clock.getElapsedTime();
-          points.rotation.y = t * 0.22;
+          points.rotation.y = t * 0.18;
           // scan plane sweeps 0 -> 2.1 and holds a beat at the top
           const cycle = (t % 6) / 6;
           const scanY = cycle < 0.85 ? (cycle / 0.85) * 2.1 : 2.1;
@@ -175,10 +175,17 @@ export default function Hero3DScan({ className = "" }) {
   return (
     <div className={`relative overflow-hidden border border-border bg-[#12161F] ${className}`}>
       <div ref={hostRef} className="absolute inset-0" aria-hidden="true" />
-      {/* instrument readout — mono lives here, on the instrument, nowhere else */}
-      <span className="vc-photomark left-3 top-2.5">SCANARE 3D · ACTIVĂ</span>
-      <span className="vc-photomark bottom-2.5 left-3">IS-4471-KMQZ</span>
-      <span className="vc-photomark bottom-2.5 right-3">54 MP · ET. 3/4</span>
+      {/* Citirea instrumentului — două rânduri flex, nu marcaje absolute:
+          la lățimi mici marcajele absolute se călcau unele peste altele și
+          tot panoul se citea ca zgomot generat, nu ca un scaner. */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-3 pt-2">
+        <span className="vc-photomark">SCANARE 3D · ACTIVĂ</span>
+        <span className="vc-photomark">VC-2026-0817</span>
+      </div>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between px-3 pb-2">
+        <span className="vc-photomark">IS-4471-KMQZ</span>
+        <span className="vc-photomark hidden sm:inline">54 MP · ET. 3/4</span>
+      </div>
     </div>
   );
 }
