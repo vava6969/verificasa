@@ -259,7 +259,7 @@ export default function Conversation() {
             if (m.is_system && m.system_type === "review_request") {
               return (
                 <div key={m.id} className="flex justify-center px-4 py-2">
-                  <div className="flex max-w-[90%] flex-col items-center gap-2 rounded border border-gold/30 bg-gradient-to-br from-gold-soft to-amber-50 px-4 py-3 text-center shadow-sm dark:border-gold/20 dark:from-gold-soft/20 dark:to-amber-900/10 sm:max-w-[70%]">
+                  <div className="flex max-w-[90%] flex-col items-center gap-2 rounded border border-gold/30 bg-gold-soft px-4 py-3 text-center dark:border-gold/20 sm:max-w-[70%]">
                     <div className="flex items-center gap-2">
                       <VerifiCasaLogo size={28} withWordmark={false} />
                       <span className="text-xs font-bold uppercase tracking-wide text-gold-deep">VerifiCasa</span>

@@ -166,7 +166,6 @@ export default function Messages() {
         ) : filteredConvs.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
             <span className="relative flex h-16 w-16 items-center justify-center">
-              <span className="absolute inset-0 rounded-full bg-gradient-to-br from-emerald/20 to-gold/10 blur-md" />
               <MessageCircle className="relative h-8 w-8 text-emerald/70" />
             </span>
             <p className="text-sm text-muted-foreground">

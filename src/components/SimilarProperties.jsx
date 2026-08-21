@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import SimilarPropertyCard from "@/components/SimilarPropertyCard";
@@ -58,7 +58,6 @@ export default function SimilarProperties({ property }) {
     <Reveal className="overflow-hidden rounded border border-border bg-white p-3 shadow-soft sm:p-6">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
-          <Sparkles className="h-5 w-5 shrink-0 text-gold" />
           <div className="min-w-0">
             <h3 className="font-heading text-base font-bold text-navy dark:text-foreground sm:text-lg">{t("similar_h")}</h3>
             <p className="truncate text-xs text-muted-foreground">{t("similar_sub", { city: property.city })}</p>

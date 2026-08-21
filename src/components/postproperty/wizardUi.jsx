@@ -52,8 +52,8 @@ export function ChoiceCard({ active, onClick, icon: Icon, iconSrc, title, sub })
       <span className="relative flex h-9 w-9 items-center justify-center">
         <span
           className={
-            "absolute inset-0 rounded-full blur-[7px] transition-opacity duration-200 " +
-            (active ? "bg-gradient-to-br from-emerald/35 to-gold/20 opacity-100" : "bg-gradient-to-br from-emerald/15 to-gold/10 opacity-70")
+            "absolute inset-0 rounded transition-opacity duration-200 " +
+            (active ? "bg-emerald/20 opacity-100" : "bg-secondary opacity-70")
           }
         />
         {iconSrc ? (

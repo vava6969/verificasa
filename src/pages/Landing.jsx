@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useCountry } from "@/components/CountryContext";
 import HeroSearch from "@/components/HeroSearch";
 import HeroPhoto from "@/components/HeroPhoto";
-import Hero3DScan from "@/components/Hero3DScan";
+import LoopVideo from "@/components/LoopVideo";
 import HeroCountdown from "@/components/HeroCountdown";
 import InspectieModal from "@/components/InspectieModal";
 import ListeazaPopup from "@/components/ListeazaPopup";
@@ -54,13 +54,13 @@ export default function Landing() {
         </div>
 
         <div className="mt-6 grid items-start gap-8 lg:mt-10 lg:grid-cols-12 lg:gap-10">
-          <div className="min-w-0 lg:col-span-5">
-            <h1 className="font-heading text-3xl font-medium leading-[1.04] tracking-[-0.02em] text-foreground sm:text-4xl lg:text-[3.6rem] xl:text-[4.1rem]">
+          <div className="min-w-0 lg:col-span-6">
+            <h1 className="font-heading text-[2rem] font-medium leading-[calc(1.12em_+_3px)] tracking-[-0.02em] text-foreground sm:text-[2.6rem] lg:text-[3rem] xl:text-[3.4rem]">
               {t("hero_h1_a")}
               <br />
               {t("hero_h1_b")}
             </h1>
-            <p className="mt-4 hidden max-w-[44ch] text-lg text-muted-foreground lg:block">
+            <p className="mt-5 hidden max-w-[52ch] text-lg leading-relaxed text-muted-foreground lg:block">
               {en
                 ? "Every listing is checked before it goes live: photos, paperwork, price. What you see is what you rent."
                 : "Fiecare anunț e verificat înainte de publicare: poze, acte, preț. Ce vezi e ce închiriezi."}
@@ -91,14 +91,16 @@ export default function Landing() {
 
           {/* fotografia-fișă — pe desktop iese din container până la marginea
               ferestrei: fotografia e dovada, are voie să rupă rama */}
-          <Reveal className="min-w-0 lg:col-span-7 lg:mr-[calc(50%-50vw)]">
+          <Reveal className="min-w-0 lg:col-span-6 lg:mr-[calc(-2rem_-_max(0px,(100vw_-_80rem)/2))]">
             <HeroPhoto className="aspect-[4/3] w-full lg:aspect-[16/9]" />
           </Reveal>
         </div>
 
-        {/* banda de scanare — instrumentul taie pagina dintr-o parte în alta */}
-        <Reveal className="mt-3 lg:mx-[calc(50%-50vw)] lg:mt-8">
-          <Hero3DScan className="h-28 w-full sm:h-32 lg:h-36" />
+        {/* banda de parcurgere — turul taie pagina dintr-o parte în alta */}
+        <Reveal className="mt-3 overflow-hidden bg-navy-deep lg:mx-[calc(50%-50vw)] lg:mt-8">
+          <div className="h-28 w-full sm:h-32 lg:h-36">
+            <LoopVideo src="/videos/hero-walkthrough-v1.mp4" objectPosition="center 55%" />
+          </div>
         </Reveal>
 
         <HeroCountdown className="mt-6 lg:mt-8" />

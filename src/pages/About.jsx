@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useCountry } from "@/components/CountryContext";
@@ -146,7 +146,7 @@ export default function About() {
         <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/80 via-navy-deep/70 to-navy-deep/90" />
         <div className="relative mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
           <motion.span initial="hidden" animate="show" variants={fadeUp} className="inline-flex items-center gap-2 rounded border border-gold/40 bg-white/10 px-4 py-1.5 text-xs font-semibold text-gold">
-            <Sparkles className="h-3.5 w-3.5" /> {c.hero_badge}
+            {c.hero_badge}
           </motion.span>
           <motion.h1 initial="hidden" animate="show" variants={fadeUp} className="mt-6 font-heading text-4xl font-extrabold leading-tight sm:text-5xl">
             {c.hero_h}

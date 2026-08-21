@@ -339,9 +339,8 @@ export function AuthComponent({ logo, brandName = "VerifiCasa" }) {
 function Shell({ logo, brandName, L, children }) {
   return (
     <div className="relative min-h-screen flex items-center justify-center px-4 py-10 overflow-hidden bg-background">
-      {/* animated gradient background */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-soft/50 via-background to-gold-soft/40" />
+        <div className="absolute inset-0 bg-secondary" />
       </div>
 
       <div className="relative z-10 w-full max-w-md">

@@ -114,7 +114,7 @@ function EmailCard({ item, index }) {
           src={item.bg}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-8 -right-6 z-0 h-36 w-36 object-contain opacity-[0.15] transition-transform duration-500 ease-out group- group-hover:opacity-[0.22] dark:opacity-[0.22] dark:group-hover:opacity-[0.3] sm:h-40 sm:w-40"
+          className="pointer-events-none absolute -bottom-8 -right-6 z-0 h-36 w-36 object-contain opacity-[0.15] transition-transform duration-500 ease-out group-hover:opacity-[0.22] dark:opacity-[0.22] dark:group-hover:opacity-[0.3] sm:h-40 sm:w-40"
         />
       )}
       <div className="relative z-10 flex items-start justify-between gap-3">
@@ -167,7 +167,7 @@ function GroupHeader({ icon: Icon, title }) {
       <h2 className="font-heading text-sm font-bold uppercase tracking-wider text-navy dark:text-foreground">
         {title}
       </h2>
-      <div className="h-px flex-1 bg-gradient-to-r from-gold/30 to-transparent" />
+      <div className="h-px flex-1 bg-border" />
     </div>
   );
 }
@@ -180,9 +180,6 @@ export default function EmailDirectory() {
 
   return (
     <div className="relative space-y-6 overflow-hidden rounded p-4 sm:p-6">
-      {/* Decorative gradient blobs — give the glass cards something to blur on light theme */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-soft/40 via-transparent to-gold-soft/40 dark:from-emerald/5 dark:to-gold/5" />
-
       <div className="relative space-y-6">
       {/* Hero email */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

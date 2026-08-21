@@ -173,8 +173,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
       <div className="border-b border-border/60 px-4 pb-4 pt-5 sm:px-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded bg-gradient-to-br from-navy to-navy-deep shadow-soft">
-              <span className="absolute inset-0 bg-gradient-to-br from-emerald/25 to-transparent" />
+            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded bg-navy-deep">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={step}
