@@ -82,7 +82,7 @@ export default function SearchBar({ compact = false, onSubmitted }) {
               key={tg.key}
               type="button"
               onClick={() => toggle(tg.key)}
-              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+              className={`flex min-h-[36px] items-center gap-1.5 rounded border px-3 py-1.5 text-xs font-semibold transition-colors ${
                 active
                   ? "border-emerald bg-emerald text-white shadow-soft"
                   : "border-border bg-white/70 text-foreground/70 hover:border-emerald/50 dark:border-white/10 dark:bg-white/5"
