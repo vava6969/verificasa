@@ -24,7 +24,25 @@ export default async function (req: Request): Promise<Response> {
     if (!pack) return Response.json({ error: "Pachet de boost necunoscut." });
 
     const origin = req.headers.get("origin") || req.headers.get("referer") || "https://verificasa.ro";
-    const baseUrl = origin.replace(/\/$/, "").replace(/\/(upgrade|account).*$/, "");
+    const baseUrl = origin.replace(/\/$/, "").replace(/\/(upgrade|account|my-properties).*$/, "");
+
+    // Cumpărare de pe un anunț: creditul se aplică singur pe acel anunț la
+    // întoarcerea din plată, ca „cumpără un boost" să fie un singur pas.
+    // Verificăm proprietatea ACUM, ca omul să nu plătească pentru un anunț
+    // pe care oricum nu-l poate promova.
+    const propertyId = typeof body?.property_id === "string" ? body.property_id : "";
+    if (propertyId) {
+      const p: any = await base44.asServiceRole.entities.Property.get(propertyId).catch(() => null);
+      if (!p) return Response.json({ error: "Anunțul nu a fost găsit." });
+      if (p.created_by_id !== me.id) {
+        return Response.json({ error: "Poți promova doar anunțurile tale." });
+      }
+      if (p.approval_status !== "APPROVED") {
+        return Response.json({ error: "Anunțul trebuie aprobat înainte de a fi promovat." });
+      }
+    }
+
+    const returnPath = propertyId ? "/my-properties" : "/account";
 
     const params = new URLSearchParams();
     params.set("mode", "payment");
@@ -32,13 +50,14 @@ export default async function (req: Request): Promise<Response> {
     params.set("line_items[0][price_data][currency]", "ron");
     params.set("line_items[0][price_data][unit_amount]", String(Math.round(pack.priceRon * 100)));
     params.set("line_items[0][price_data][product_data][name]", `VerifiCasa — ${pack.label}`);
-    params.set("success_url", `${baseUrl}/account?boost=success&session_id={CHECKOUT_SESSION_ID}`);
-    params.set("cancel_url", `${baseUrl}/upgrade?boost=cancelled`);
+    params.set("success_url", `${baseUrl}${returnPath}?boost=success&session_id={CHECKOUT_SESSION_ID}`);
+    params.set("cancel_url", `${baseUrl}${returnPath}?boost=cancelled`);
     params.set("client_reference_id", me.id);
     if (me.email) params.set("customer_email", me.email);
     params.set("metadata[pack_id]", packId);
     params.set("metadata[user_id]", me.id);
     params.set("metadata[boosts]", String(pack.boosts));
+    if (propertyId) params.set("metadata[property_id]", propertyId);
 
     const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
       method: "POST",

@@ -4,6 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import { getCities, getZones } from "@/components/locations";
 import PropertyCard from "@/components/PropertyCard";
+import { buildCoverMap } from "@/lib/covers";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -144,6 +145,8 @@ export default function SearchPage() {
       return n;
     });
   };
+
+  const coverMap = useMemo(() => buildCoverMap(properties || []), [properties]);
 
   let filtered = (properties || []).filter((p) => {
     if (p.approval_status !== "APPROVED") return false;
@@ -304,7 +307,7 @@ export default function SearchPage() {
           <RevealGroup className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {paged.map((p) => (
               <RevealItem key={p.id}>
-                <PropertyCard property={p} />
+                <PropertyCard property={p} coverMap={coverMap} />
               </RevealItem>
             ))}
           </RevealGroup>

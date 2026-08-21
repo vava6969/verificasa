@@ -6,6 +6,7 @@ import { useCountry } from "@/components/CountryContext";
 import { PLAN_BY_ID, resolvePropertyPlan, planRank } from "@/lib/plans";
 import { fetchActivePlanMap } from "@/lib/subscriptions";
 import RecommendedPropertyCard from "@/components/RecommendedPropertyCard";
+import { buildCoverMap } from "@/lib/covers";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
@@ -40,6 +41,8 @@ export default function RecommendedListings() {
     })();
     return () => { cancelled = true; };
   }, []);
+
+  const coverMap = useMemo(() => buildCoverMap(properties || []), [properties]);
 
   const sorted = useMemo(() => {
     if (!properties || !planMap) return [];
@@ -97,7 +100,7 @@ export default function RecommendedListings() {
                       <span className="h-px flex-1 bg-border" />
                     </div>
                   )}
-                  <RecommendedPropertyCard property={p} planId={p._plan === "none" ? null : p._plan} />
+                  <RecommendedPropertyCard property={p} planId={p._plan === "none" ? null : p._plan} coverMap={coverMap} />
                 </React.Fragment>
               );
             })}

@@ -10,6 +10,7 @@ export const BOOST_DURATION_DAYS = 7;
 
 // Trebuie să rămână identic cu BOOST_PACKS din src/lib/plans.js.
 export const BOOST_PACKS = {
+  b1: { boosts: 1, priceRon: 14.99, label: "1 boost" },
   b3: { boosts: 3, priceRon: 31.99, label: "3 boost-uri" },
   b6: { boosts: 6, priceRon: 58.99, label: "6 boost-uri" },
   b12: { boosts: 12, priceRon: 80.99, label: "12 boost-uri" },

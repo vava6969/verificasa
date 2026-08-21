@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Image as UIImage } from "@/components/ui/image";
 import PropertyCard from "@/components/PropertyCard";
+import { buildCoverMap } from "@/lib/covers";
 import RatingStars, { RatingBreakdown } from "@/components/RatingStars";
 import ReviewItem from "@/components/ReviewItem";
 import ReviewModal from "@/components/ReviewModal";
@@ -29,6 +30,7 @@ export default function UserProfile() {
   const [tab, setTab] = useState("listings");
   const [properties, setProperties] = useState([]);
   const [loadingProps, setLoadingProps] = useState(false);
+  const coverMap = useMemo(() => buildCoverMap(properties || []), [properties]);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showBusinessCard, setShowBusinessCard] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
@@ -397,7 +399,7 @@ export default function UserProfile() {
             <div className="py-16 text-center text-sm text-muted-foreground">{t("up_no_listings")}</div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {properties.map((p) => <PropertyCard key={p.id} property={p} />)}
+              {properties.map((p) => <PropertyCard key={p.id} property={p} coverMap={coverMap} />)}
             </div>
           )
         )}

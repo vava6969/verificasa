@@ -2,89 +2,65 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useCountry } from "@/components/CountryContext";
 import { Image } from "@/components/ui/image";
-import { getPlanMeta } from "@/lib/plans";
-import { Stamp, Frank, PhotoMark } from "@/components/fisa";
+import { PropertyBadgeRow } from "@/components/PropertyBadges";
+import { coverOf } from "@/lib/covers";
 
-// Fișă îngustă pentru rândurile „Anunțuri recomandate" — prețul conduce,
-// planul postatorului e o ștampilă discretă, nu o insignă lucioasă.
-export default function RecommendedPropertyCard({ property, planId }) {
+// Cardul din rândurile de pe prima pagină. Aceleași reguli ca PropertyCard,
+// doar mai strâns: fotografie, insigne, preț, o linie de specificații, zona.
+export default function RecommendedPropertyCard({ property, planId, coverMap }) {
   const { currency, formatPrice, t, lang } = useCountry();
   const navigate = useNavigate();
   const p = property;
-  const images = p.images?.length ? p.images : [];
-  const meta = getPlanMeta(planId);
   const en = lang === "en";
-
-  const trustScore = typeof p.trust_score === "number" ? p.trust_score : 0;
-  const isVerified = trustScore >= 40;
-  const boosted = p.boost_active || p.featured;
+  const cover = coverOf(p, coverMap);
 
   const eur = formatPrice(p.price_monthly, p.currency, "EUR");
   const ron = formatPrice(p.price_monthly, p.currency, "RON");
   const primary = currency === "EUR" ? eur : ron;
-  const secondary = currency === "EUR" ? ron : eur;
 
-  const boostUntil = p.boost_ends_date
-    ? new Date(p.boost_ends_date).toLocaleDateString(en ? "en-GB" : "ro-RO", { day: "2-digit", month: "short" })
-    : null;
+  const specs = [
+    p.rooms != null && `${p.rooms} ${en ? (p.rooms === 1 ? "room" : "rooms") : "cam."}`,
+    p.surface_sqm != null && `${p.surface_sqm} mp`,
+  ].filter(Boolean).join(" · ");
 
   return (
     <article
       onClick={() => navigate(`/property/${p.id}`)}
-      className="group flex h-full w-full cursor-pointer flex-col overflow-hidden border border-border bg-card transition-colors hover:border-emerald"
+      className="group flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
-        {images.length ? (
-          <Image src={images[0]} alt={p.title} fittingType="fill" className="h-full w-full" />
+        {cover ? (
+          <Image
+            src={cover}
+            alt={p.title}
+            fittingType="fill"
+            className="h-full w-full transition-transform duration-500 group-hover:scale-[1.04]"
+          />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-secondary">
             <span className="text-xs text-muted-foreground">{t("info_missing")}</span>
           </div>
         )}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/45 to-transparent" />
-        {p.property_code && <PhotoMark className="bottom-1.5 left-2">{p.property_code}</PhotoMark>}
-        {p.surface_sqm != null && <PhotoMark className="bottom-1.5 right-2">{p.surface_sqm} MP</PhotoMark>}
+        <PropertyBadgeRow
+          property={p}
+          planId={planId}
+          size="sm"
+          lang={lang}
+          className="absolute left-2 top-2 max-w-[calc(100%-1rem)]"
+        />
       </div>
 
-      {(isVerified || boosted || meta) && (
-        <div className="flex flex-wrap items-center gap-1.5 border-b border-border px-2.5 py-1.5">
-          {isVerified && <Stamp tone="verde">{t("pc_verified")}</Stamp>}
-          {boosted && <Frank until={boostUntil} />}
-          {meta && !boosted && <Stamp tone="ink">{meta.shortName || meta.name}</Stamp>}
-        </div>
-      )}
-
-      <div className="flex min-w-0 flex-1 flex-col p-2.5">
-        <p className="font-heading text-lg font-semibold leading-none text-foreground tnum">
+      <div className="flex min-w-0 flex-1 flex-col p-3">
+        <p className="text-lg font-bold leading-none text-foreground tnum">
           {primary}
-          <span className="ml-0.5 font-body text-[10px] font-medium text-muted-foreground">
+          <span className="ml-0.5 text-[11px] font-semibold text-muted-foreground">
             {p.transaction_type === "SALE" ? "" : t("pc_permonth")}
           </span>
         </p>
-        <p className="mt-0.5 text-[11px] text-muted-foreground tnum">≈ {secondary}</p>
-
-        <p className="mt-1.5 truncate text-xs text-muted-foreground">
+        {specs && <p className="mt-1 truncate text-xs font-semibold text-foreground/80">{specs}</p>}
+        <p className="mt-0.5 truncate text-xs text-muted-foreground">
           {p.zone || p.city ? `${p.zone ? p.zone + ", " : ""}${p.city || ""}` : "—"}
         </p>
-
-        <dl className="mt-1.5 flex flex-wrap items-baseline gap-x-3 border-t border-border pt-1.5 text-xs">
-          {p.rooms != null && (
-            <div className="flex items-baseline gap-1">
-              <dt className="text-muted-foreground">{t("sep_rooms")}</dt>
-              <dd className="font-semibold tnum">{p.rooms}</dd>
-            </div>
-          )}
-          {p.surface_sqm != null && (
-            <div className="flex items-baseline gap-1">
-              <dt className="text-muted-foreground">mp</dt>
-              <dd className="font-semibold tnum">{p.surface_sqm}</dd>
-            </div>
-          )}
-          <div className="ml-auto flex items-baseline gap-1">
-            <dt className="text-muted-foreground">{en ? "views" : "vizite"}</dt>
-            <dd className="font-semibold tnum">{p.views_count || 0}</dd>
-          </div>
-        </dl>
       </div>
     </article>
   );
