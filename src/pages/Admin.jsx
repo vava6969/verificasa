@@ -110,6 +110,9 @@ export default function Admin() {
       toast({ title: status === "APPROVED" ? "Anunt aprobat" : "Anunt respins" });
       log(status === "APPROVED" ? "approve" : "reject", "property", p.id, p.title);
       try { base44.functions.invoke("NotifyOnPropertyDecision", { property_id: p.id, decision: status }).catch(() => {}); } catch {}
+      // Aprobarea de admin e o dovadă verificată — recalculăm scorul ca banda
+      // „Dovezi verificate" să reflecte imediat decizia.
+      try { base44.functions.invoke("ComputeTrustScore", { property_id: p.id }).catch(() => {}); } catch {}
       load();
     } catch { toast({ title: "Eroare", variant: "destructive" }); }
   };

@@ -337,6 +337,11 @@
       "type": "string",
       "format": "date-time",
       "title": "Boost expira la"
+    },
+    "trust_breakdown": {
+      "type": "string",
+      "title": "Detaliere scor (JSON, scris server-side)",
+      "maxLength": 4000
     }
   },
   "required": [
