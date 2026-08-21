@@ -50,9 +50,6 @@ const makeSort = (t) => [
 ];
 const norm = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 
-const PIN_RENT = "#3b82f6";
-const PIN_SALE = "#00A859";
-const PIN_GOLD = "#C5A059";
 const PAGE_SIZE = 5;
 
 function formatCount(n) {
@@ -63,52 +60,67 @@ function formatCount(n) {
   return String(n);
 }
 
+// Preț scurt pentru ștampila de pe hartă: 1.250 € / 89 K € — cifre tabulare,
+// fără zecimale, ca ștampilele să aibă lățimi comparabile între ele.
+function stampPrice(p) {
+  const n = Number(p.price_monthly) || 0;
+  const sym = p.currency === "RON" ? "lei" : p.currency === "GBP" ? "£" : "€";
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1).replace(".0", "")}M ${sym}`;
+  if (n >= 10000) return `${Math.round(n / 1000)}K ${sym}`;
+  return `${n.toLocaleString("ro-RO")} ${sym}`;
+}
+
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// Leaflet path options iau culori concrete, nu variabile CSS — citim tokenul
+// temei o dată, ca poligonul desenat să rămână verde în ambele teme.
+function tokenColor(name, fallback) {
+  if (typeof window === "undefined") return fallback;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v ? `hsl(${v})` : fallback;
+}
+
+// Grup de anunțuri = marcă de fascicul: pătrat, cu un al doilea contur, cifre
+// tabulare. Nu cerc, nu gradient — vezi .vc-bundle în index.css.
 function clusterIcon(count, isActive) {
-  const baseSize = count >= 1000 ? 52 : count >= 100 ? 46 : count >= 10 ? 40 : 36;
-  const size = isActive ? baseSize + 6 : baseSize;
-  const bg = isActive ? "#00A859" : "#3a6c76";
-  const shadow = isActive
-    ? `box-shadow:0 0 0 10px ${bg}22,0 4px 16px rgba(0,0,0,0.35);`
-    : `box-shadow:0 2px 8px rgba(0,0,0,0.3),0 0 0 4px ${bg}33;`;
+  const w = count >= 1000 ? 48 : count >= 100 ? 42 : 36;
   return L.divIcon({
-    className: "vc-cluster",
-    html: `<div style="
-      width:${size}px;height:${size}px;border-radius:50%;
-      background:${bg};color:#fff;display:flex;align-items:center;justify-content:center;
-      font-weight:700;font-size:12px;font-family:Inter,system-ui,sans-serif;
-      ${shadow}
-      border:2.5px solid #fff;transition:all .15s ease;
-    ">${formatCount(count)}</div>`,
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
+    className: "vc-bundle-wrap",
+    html: `<span class="vc-bundle${isActive ? " vc-bundle--active" : ""}">${formatCount(count)}</span>`,
+    iconSize: [w, 26],
+    iconAnchor: [w / 2, 13],
   });
 }
 
-function propertyIcon(property) {
-  const isFeatured = property.featured || property.verification_level === "field_certified";
-  const color = isFeatured ? PIN_GOLD : property.transaction_type === "SALE" ? PIN_SALE : PIN_RENT;
-  const glow = isFeatured ? `filter:drop-shadow(0 0 6px ${color}cc);` : "";
-  const isNew =
-    property.created_date &&
-    (Date.now() - new Date(property.created_date).getTime()) / 86400000 <= 7;
-  const newBadge = isNew
-    ? `<div style="position:absolute;top:-9px;right:-12px;background:#00A859;color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:6px;border:1.5px solid #fff;white-space:nowrap;letter-spacing:.5px;font-family:Inter,system-ui,sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.4);z-index:2;">NOU!</div>`
-    : "";
+// Anunț = ștampilă de preț. Bifa verde marchează verificarea, crestătura
+// marcaj marchează promovarea (plata e declarată, nu ascunsă), starea activă
+// se inversează pe verde. Toate culorile vin din tokenii temei.
+function propertyIcon(property, { isActive = false, isVisited = false } = {}) {
+  const verified =
+    property.owner_verified ||
+    property.verification_level === "field_certified" ||
+    property.ai_tour_verified;
+  const boosted = property.boost_active || property.featured;
+  const cls = [
+    "vc-pin",
+    isActive ? "vc-pin--active" : "",
+    !isActive && isVisited ? "vc-pin--visited" : "",
+    boosted ? "vc-pin--boosted" : "",
+  ].filter(Boolean).join(" ");
+  const label = stampPrice(property);
+  const w = 24 + label.length * 7.2 + (verified ? 10 : 0);
   return L.divIcon({
-    className: "vc-property-pin",
-    html: `<div style="position:relative;">${newBadge}<svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="${glow}" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2C7.6 2 4 5.6 4 10c0 5.5 7 12 8 12s8-6.5 8-12c0-4.4-3.6-8-8-8z" fill="${color}" stroke="#fff" stroke-width="2"/>
-      <circle cx="12" cy="10" r="3" fill="#fff"/>
-    </svg></div>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 28],
+    className: "vc-pin-wrap",
+    html: `<span class="${cls}">${esc(label)}${verified ? '<span class="vc-pin-tick">✓</span>' : ""}</span>`,
+    iconSize: [w, 24],
+    iconAnchor: [w / 2, 30],
   });
 }
 
 function countyLabelIcon(name) {
   return L.divIcon({
     className: "vc-county-label",
-    html: `<span style="font-size:10px;font-weight:600;color:#4a5568;background:rgba(255,255,255,0.8);padding:1px 5px;border-radius:3px;white-space:nowrap;pointer-events:none;text-shadow:0 1px 2px rgba(255,255,255,0.9);box-shadow:0 1px 3px rgba(0,0,0,0.1);">${name}</span>`,
+    html: `<span class="vc-maplabel">${esc(name)}</span>`,
     iconSize: [0, 0],
     iconAnchor: [0, 0],
   });
@@ -131,7 +143,8 @@ function MapController({ onBoundsChange, onZoomChange, flyTarget, onFlyDone, onR
   useEffect(() => {
     onReady?.(map);
     const b = map.getBounds();
-    onBoundsChange({ north: b.getNorth(), south: b.getSouth(), east: b.getEast(), west: b.getWest() });
+    const c = map.getCenter();
+    onBoundsChange({ north: b.getNorth(), south: b.getSouth(), east: b.getEast(), west: b.getWest(), lat: c.lat, lng: c.lng });
     onZoomChange(map.getZoom());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
@@ -147,12 +160,14 @@ function MapController({ onBoundsChange, onZoomChange, flyTarget, onFlyDone, onR
   useMapEvents({
     moveend: () => {
       const b = map.getBounds();
-      onBoundsChange({ north: b.getNorth(), south: b.getSouth(), east: b.getEast(), west: b.getWest() });
+      const c = map.getCenter();
+      onBoundsChange({ north: b.getNorth(), south: b.getSouth(), east: b.getEast(), west: b.getWest(), lat: c.lat, lng: c.lng });
     },
     zoomend: () => {
       onZoomChange(map.getZoom());
       const b = map.getBounds();
-      onBoundsChange({ north: b.getNorth(), south: b.getSouth(), east: b.getEast(), west: b.getWest() });
+      const c = map.getCenter();
+      onBoundsChange({ north: b.getNorth(), south: b.getSouth(), east: b.getEast(), west: b.getWest(), lat: c.lat, lng: c.lng });
     },
   });
 
@@ -252,6 +267,25 @@ export default function MapSearch() {
   const [polygonPoints, setPolygonPoints] = useState([]);
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
   const [planMap, setPlanMap] = useState(null);
+  // Fișa de teren: fundal PLAN / SATELIT, colțuri cu coordonatele vii, scară.
+  const [basemap, setBasemap] = useState("plan");
+  // Anunțurile deja deschise se sting pe hartă — vezi .vc-pin--visited.
+  const [visitedIds, setVisitedIds] = useState(() => {
+    try { return new Set(JSON.parse(localStorage.getItem("vc_visited_props") || "[]")); }
+    catch { return new Set(); }
+  });
+  const drawColor = tokenColor("--primary", "#1F7048");
+
+  const markVisited = useCallback((id) => {
+    if (!id) return;
+    setVisitedIds((prev) => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      try { localStorage.setItem("vc_visited_props", JSON.stringify([...next].slice(-300))); } catch { /* noop */ }
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -474,12 +508,27 @@ export default function MapSearch() {
           zoomControl={false}
           scrollWheelZoom
           className="h-full w-full"
-          style={{ background: "#e8eef4" }}
+          style={{ background: "hsl(var(--secondary))" }}
         >
-          <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
-          />
+          {/* Fundal. PLAN e gradat spre paleta hârtiei prin filtru CSS
+              (.vc-tiles-plan), cu variantă inversată pentru noapte — soluția
+              provizorie până intră cheia MapTiler a clientului, moment în care
+              url-ul se schimbă pe stilul Dataviz recolorat, iar filtrul cade. */}
+          {basemap === "plan" ? (
+            <TileLayer
+              key="plan"
+              className="vc-tiles-plan"
+              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+            />
+          ) : (
+            <TileLayer
+              key="satelit"
+              className="vc-tiles-none"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              attribution='&copy; Esri, Maxar, Earthstar Geographics'
+            />
+          )}
 
           {/* County labels at low zoom */}
           {zoom < 8 &&
@@ -497,7 +546,7 @@ export default function MapSearch() {
           {polygonPoints.length >= 2 && (
             <Polygon
               positions={polygonPoints}
-              pathOptions={{ color: PIN_SALE, weight: 2, fillColor: PIN_SALE, fillOpacity: 0.12, dashArray: drawMode ? "6 4" : undefined }}
+              pathOptions={{ color: drawColor, weight: 2, fillColor: drawColor, fillOpacity: 0.1, dashArray: drawMode ? "6 4" : undefined }}
             />
           )}
           {polygonPoints.map((pt, i) => (
@@ -505,7 +554,7 @@ export default function MapSearch() {
               key={`pt-${i}`}
               center={pt}
               radius={5}
-              pathOptions={{ color: PIN_SALE, fillColor: PIN_SALE, fillOpacity: 1 }}
+              pathOptions={{ color: drawColor, fillColor: drawColor, fillOpacity: 1 }}
             />
           ))}
 
@@ -517,14 +566,19 @@ export default function MapSearch() {
               <Marker
                 key={key}
                 position={[c.lat, c.lng]}
-                icon={c.type === "property" ? propertyIcon(c) : clusterIcon(c.count, isActive)}
+                icon={
+                  c.type === "property"
+                    ? propertyIcon(c, { isActive: isActive || hoveredKey === c.id, isVisited: visitedIds.has(c.id) })
+                    : clusterIcon(c.count, isActive)
+                }
+                zIndexOffset={c.type === "property" && (isActive || hoveredKey === c.id) ? 400 : 0}
                 eventHandlers={{
                   click: () => handleClusterClick(c),
-                  mouseover: () => setHoveredKey(key),
+                  mouseover: () => setHoveredKey(c.type === "property" ? c.id : key),
                   mouseout: () => setHoveredKey(null),
                 }}
               >
-                <Tooltip direction="top" offset={[0, -10]}>
+                <Tooltip direction="top" offset={[0, -12]}>
                   {c.type === "county"
                     ? `Județul ${c.county}`
                     : c.type === "city"
@@ -545,85 +599,121 @@ export default function MapSearch() {
           <DrawController drawMode={drawMode} onAddPoint={(pt) => setPolygonPoints((prev) => [...prev, pt])} />
         </MapContainer>
 
-        {/* Back button */}
+        {/* ——— RAMA FIȘEI DE TEREN ———
+            Colțurile tipăresc coordonatele vii (se schimbă la fiecare pan),
+            marginea poartă scara și nordul. E interfață reală, nu decor: asta
+            transformă „pagina cu hartă" în fișa de teren a registrului. */}
+        <div className="pointer-events-none absolute inset-0 z-[900] border-[6px] border-background/85">
+          <span className="vc-sheet-coord absolute left-2 top-2">
+            {bounds ? `${bounds.north.toFixed(4)} N · ${bounds.west.toFixed(4)} E` : "—"}
+          </span>
+          <span className="vc-sheet-coord absolute right-2 top-2">N ↑</span>
+          <span className="vc-sheet-coord absolute bottom-2 left-2">
+            {bounds ? `${bounds.south.toFixed(4)} N · ${bounds.east.toFixed(4)} E` : "—"}
+          </span>
+          <span className="vc-sheet-coord absolute bottom-2 right-2">
+            ZOOM {String(zoom).padStart(2, "0")} · {visibleProperties.length} ÎNREG.
+          </span>
+        </div>
+
+        {/* Înapoi */}
         <button
           onClick={() => navigate("/")}
-          className="absolute left-3 top-3 z-[1000] flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-sm font-semibold text-navy shadow-soft backdrop-blur-md hover:bg-white dark:bg-card/90 dark:text-foreground"
+          className="absolute left-3 top-8 z-[1000] flex items-center gap-1.5 rounded border border-border bg-background px-3 py-1.5 text-sm font-semibold text-foreground transition-colors hover:border-emerald"
         >
           <ArrowLeft className="h-4 w-4" /> {en ? "Back" : "Înapoi"}
         </button>
 
-        {/* Custom zoom controls */}
-        <div className="absolute left-3 top-14 z-[1000] flex flex-col gap-1">
+        {/* Zoom */}
+        <div className="absolute left-3 top-20 z-[1000] flex flex-col divide-y divide-border overflow-hidden rounded border border-border bg-background">
           <button
             onClick={() => mapInstance?.zoomIn()}
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-navy shadow-soft hover:bg-secondary dark:bg-card/90 dark:text-foreground"
+            className="flex h-9 w-9 items-center justify-center text-foreground transition-colors hover:bg-secondary"
+            aria-label={en ? "Zoom in" : "Apropie"}
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-4 w-4" />
           </button>
           <button
             onClick={() => mapInstance?.zoomOut()}
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-navy shadow-soft hover:bg-secondary dark:bg-card/90 dark:text-foreground"
+            className="flex h-9 w-9 items-center justify-center text-foreground transition-colors hover:bg-secondary"
+            aria-label={en ? "Zoom out" : "Depărtează"}
           >
-            <Minus className="h-5 w-5" />
+            <Minus className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Save search */}
-        <button
-          onClick={saveSearch}
-          className="absolute right-3 top-3 z-[1000] flex items-center gap-1.5 rounded-full bg-rose-500 px-2.5 py-1.5 text-sm font-semibold text-white shadow-soft hover:bg-rose-600 sm:px-3"
-          aria-label={en ? "Save search" : "Salvează căutarea"}
-        >
-          <Heart className="h-4 w-4" /> <span className="hidden sm:inline">{en ? "Save" : "Salvează"}</span>
-        </button>
+        {/* PLAN / SATELIT — file ștampilate */}
+        <div className="absolute right-3 top-8 z-[1000] flex divide-x divide-border overflow-hidden rounded border border-border bg-background">
+          {[
+            { id: "plan", label: "PLAN" },
+            { id: "satelit", label: "SATELIT" },
+          ].map((b) => (
+            <button
+              key={b.id}
+              onClick={() => setBasemap(b.id)}
+              aria-pressed={basemap === b.id}
+              className={`px-3 py-1.5 text-xs font-bold transition-colors ${
+                basemap === b.id ? "bg-emerald text-primary-foreground" : "text-foreground hover:bg-secondary"
+              }`}
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
 
-        {/* Draw / polygon controls */}
-        <div className="absolute right-3 top-14 z-[1000] flex flex-col items-end gap-1">
+        {/* Salvează căutarea + desenare zonă */}
+        <div className="absolute right-3 top-20 z-[1000] flex flex-col items-end gap-1.5">
+          <button
+            onClick={saveSearch}
+            className="flex items-center gap-1.5 rounded border border-border bg-background px-3 py-1.5 text-sm font-semibold text-foreground transition-colors hover:border-emerald"
+          >
+            <Heart className="h-4 w-4" /> <span className="hidden sm:inline">{en ? "Save" : "Salvează"}</span>
+          </button>
+
           {drawMode ? (
-            <div className="flex flex-col gap-1">
+            <>
               <button
                 onClick={finishDraw}
-                className="flex items-center gap-1.5 rounded-full bg-emerald px-3 py-1.5 text-sm font-semibold text-white shadow-soft hover:bg-emerald/90"
+                className="flex items-center gap-1.5 rounded bg-emerald px-3 py-1.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90"
               >
                 <Check className="h-4 w-4" /> {en ? "Finish" : "Finalizează"}
               </button>
               <button
                 onClick={cancelDraw}
-                className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-foreground shadow-soft hover:bg-secondary dark:bg-card/90"
+                className="flex items-center gap-1.5 rounded border border-border bg-background px-3 py-1.5 text-sm font-semibold text-foreground transition-colors hover:border-emerald"
               >
                 <X className="h-4 w-4" /> {en ? "Cancel" : "Anulează"}
               </button>
-            </div>
+            </>
           ) : (
             <button
               onClick={() => setDrawMode(true)}
-              className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-navy shadow-soft hover:bg-secondary dark:bg-card/90 dark:text-foreground"
+              className="flex items-center gap-1.5 rounded border border-border bg-background px-3 py-1.5 text-sm font-semibold text-foreground transition-colors hover:border-emerald"
             >
-              <PenLine className="h-4 w-4" /> {en ? "Draw area" : "Desenează zonă"}
+              <PenLine className="h-4 w-4" /> {en ? "Mark a parcel" : "Marchează o parcelă"}
             </button>
           )}
           {polygonPoints.length >= 3 && !drawMode && (
             <button
               onClick={clearPolygon}
-              className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-rose-500 shadow-soft hover:bg-rose-50 dark:bg-card/90"
+              className="flex items-center gap-1.5 rounded border border-border bg-background px-3 py-1.5 text-sm font-semibold text-destructive transition-colors hover:border-destructive"
             >
-              <Trash2 className="h-4 w-4" /> {en ? "Clear area" : "Șterge zonă"}
+              <Trash2 className="h-4 w-4" /> {en ? "Clear parcel" : "Șterge parcela"}
             </button>
           )}
         </div>
 
-        {/* Draw mode banner */}
+        {/* Instrucțiune desenare */}
         {drawMode && (
-          <div className="absolute left-1/2 top-28 z-[1000] -translate-x-1/2 rounded-full bg-navy-deep px-4 py-1.5 text-xs font-semibold text-white shadow-glow">
-            {en ? "Tap map to add points" : "Apasă pe hartă pentru a adăuga puncte"}
+          <div className="absolute left-1/2 top-32 z-[1000] -translate-x-1/2 border border-border bg-background px-4 py-1.5 text-xs font-semibold text-foreground">
+            {en ? "Tap the map to add points" : "Apasă pe hartă pentru a adăuga puncte"}
           </div>
         )}
 
-        {/* Mobile: property count badge */}
+        {/* Mobil: numărul de înregistrări → deschide lista */}
         <button
           onClick={() => setShowListMobile(true)}
-          className="absolute bottom-4 left-1/2 z-[1000] flex -translate-x-1/2 items-center gap-2 rounded-full bg-navy-deep px-4 py-2 text-sm font-semibold text-white shadow-glow md:hidden"
+          className="absolute bottom-6 left-1/2 z-[1000] flex min-h-[44px] -translate-x-1/2 items-center gap-2 rounded bg-foreground px-4 py-2 text-sm font-semibold text-background md:hidden"
         >
           <MapPin className="h-4 w-4" /> {badgeCount} {en ? "properties" : "proprietăți"}
         </button>
@@ -649,21 +739,22 @@ export default function MapSearch() {
           showListMobile ? "fixed inset-0 z-[1100] block" : "hidden"
         } md:relative md:z-auto md:block md:w-[400px] md:shrink-0 md:h-full overflow-y-auto border-t md:border-t-0 md:border-l border-border bg-background`}
       >
-        <div className="sticky top-0 z-10 border-b border-border bg-background/95 p-3 backdrop-blur">
+        <div className="sticky top-0 z-10 border-b border-border bg-background p-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-bold text-navy dark:text-foreground">
-                {visibleProperties.length} {en ? "properties in this area" : "proprietăți în zonă"}
+              <p className="text-sm font-bold text-foreground tnum">
+                {visibleProperties.length} {en ? "properties in this frame" : "proprietăți în cadru"}
               </p>
               <p className="text-xs text-muted-foreground">
                 {polygonPoints.length >= 3
-                  ? en ? "Filtered by drawn area" : "Filtrat după zona desenată"
+                  ? en ? "Filtered by the marked parcel" : "Filtrat după parcela marcată"
                   : en ? "Move the map to update results" : "Mută harta pentru a actualiza"}
               </p>
             </div>
             <button
               onClick={() => setShowListMobile(false)}
-              className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary md:hidden"
+              className="rounded p-1.5 text-muted-foreground transition-colors hover:bg-secondary md:hidden"
+              aria-label={en ? "Close list" : "Închide lista"}
             >
               <X className="h-5 w-5" />
             </button>
@@ -671,7 +762,7 @@ export default function MapSearch() {
 
           {/* Filtre unificate — aceleași ca pe fostul /search, acum direct lângă hartă */}
           <div className="mt-3 space-y-2">
-            <div className="rounded-lg border border-border bg-background px-2.5 py-2 dark:bg-card">
+            <div className="rounded border border-border bg-background px-2.5 py-2 dark:bg-card">
               <LocationAutocomplete
                 country={country}
                 value={{ county: countyParam, city: cityParam, zone: zoneParam }}
@@ -686,7 +777,7 @@ export default function MapSearch() {
                 defaultValue={qParam}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder={t("sr_search_placeholder")}
-                className="w-full rounded-lg border border-border bg-background py-2 pl-8 pr-3 text-xs text-foreground outline-none focus:border-emerald dark:bg-card"
+                className="w-full rounded border border-border bg-background py-2 pl-8 pr-3 text-xs text-foreground outline-none focus:border-emerald dark:bg-card"
               />
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -712,7 +803,7 @@ export default function MapSearch() {
               <button
                 type="button"
                 onClick={resetFilters}
-                className="flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground/70 transition hover:border-emerald/50 dark:bg-card"
+                className="flex min-h-[36px] items-center gap-1.5 rounded border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground/70 transition-colors hover:border-emerald dark:bg-card"
               >
                 <RotateCcw className="h-3.5 w-3.5" /> {t("sr_reset_filters")}
               </button>
@@ -722,28 +813,44 @@ export default function MapSearch() {
 
         <div className="space-y-3 p-3">
           {properties === null ? (
-            Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-48 rounded-2xl" />)
+            Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-48 rounded-sm" />)
           ) : visibleProperties.length === 0 ? (
-            <div className="py-20 text-center">
-              <MapPin className="mx-auto h-10 w-10 text-muted-foreground/40" />
-              <p className="mt-3 text-sm font-semibold text-navy dark:text-foreground">
-                {en ? "No properties here" : "Nicio proprietate aici"}
+            <div className="border border-dashed border-border px-4 py-16 text-center">
+              <p className="text-sm font-semibold text-foreground">
+                {en ? "No properties in this frame" : "Nicio proprietate în acest cadru"}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                {en ? "Pan or zoom out to see more." : "Mută sau micșorează harta."}
+                {en ? "Pan the map or zoom out to widen the search." : "Mută harta sau depărtează pentru a lărgi căutarea."}
               </p>
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="mt-4 text-sm font-bold text-emerald transition-colors hover:text-foreground"
+              >
+                {t("sr_reset_filters")} <span aria-hidden="true">→</span>
+              </button>
             </div>
           ) : (
             <>
+              {/* Sincronizare listă ↔ hartă: cardul peste care treci ridică
+                  ștampila corespunzătoare, și invers. */}
               {displayedProperties.map((p) => (
-                <PropertyCard key={p.id} property={p} />
+                <div
+                  key={p.id}
+                  onMouseEnter={() => setHoveredKey(p.id)}
+                  onMouseLeave={() => setHoveredKey(null)}
+                  onClick={() => markVisited(p.id)}
+                  className={hoveredKey === p.id ? "ring-1 ring-emerald" : undefined}
+                >
+                  <PropertyCard property={p} />
+                </div>
               ))}
               {hasMore && (
                 <button
                   onClick={() => setDisplayCount((c) => c + PAGE_SIZE)}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald/30 bg-emerald-soft py-3 text-sm font-semibold text-emerald transition hover:bg-emerald/10 dark:bg-emerald/10"
+                  className="flex w-full items-center justify-center gap-2 rounded border border-border py-3 text-sm font-semibold text-emerald transition-colors hover:border-emerald hover:bg-secondary"
                 >
-                  <Plus className="h-4 w-4" /> {en ? "Load more" : "Încarcă mai multe"}
+                  {en ? "Load more" : "Încarcă mai multe"} <span aria-hidden="true">→</span>
                 </button>
               )}
             </>
