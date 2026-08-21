@@ -36,7 +36,7 @@ function Chip({ item, t, en, reduced }) {
     <motion.div
       variants={reduced ? undefined : pop}
       whileHover={reduced ? undefined : { y: -3 }}
-      className="flex w-[210px] shrink-0 snap-start items-center gap-3 rounded-2xl border border-border bg-card p-3.5 shadow-sm sm:w-auto sm:p-4"
+      className="flex w-[178px] shrink-0 snap-start items-center gap-2.5 rounded-2xl border border-border bg-card p-3 shadow-sm sm:w-auto sm:gap-3 sm:p-4"
     >
       <motion.img
         src={item.img}
@@ -44,7 +44,7 @@ function Chip({ item, t, en, reduced }) {
         aria-hidden="true"
         whileHover={reduced ? undefined : { scale: 1.12, rotate: -2 }}
         transition={{ type: "spring", stiffness: 380, damping: 16 }}
-        className="h-12 w-12 shrink-0 object-contain drop-shadow-sm"
+        className="h-10 w-10 shrink-0 object-contain drop-shadow-sm sm:h-12 sm:w-12"
         loading="lazy"
       />
       <div className="min-w-0">
@@ -64,7 +64,7 @@ export default function ValueProps() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-      <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
+      <h2 className="text-xl font-bold text-foreground sm:text-3xl">
         {en ? "Why VerifiCasa" : "De ce VerifiCasa"}
       </h2>
 

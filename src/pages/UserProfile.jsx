@@ -231,10 +231,10 @@ export default function UserProfile() {
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-        <Skeleton className="h-40 w-full rounded" />
-        <Skeleton className="mt-4 h-12 w-64 rounded" />
+        <Skeleton className="h-40 w-full rounded-2xl" />
+        <Skeleton className="mt-4 h-12 w-64 rounded-full" />
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 rounded" />)}
+          {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-72 rounded-2xl" />)}
         </div>
       </div>
     );
@@ -244,7 +244,7 @@ export default function UserProfile() {
     return (
       <div className="mx-auto max-w-5xl px-4 py-24 text-center sm:px-6 lg:px-8">
         <p className="font-heading text-2xl font-bold text-navy dark:text-foreground">{t("not_found")}</p>
-        <Button asChild className="mt-4 bg-emerald text-primary-foreground"><Link to="/">{t("back_home")}</Link></Button>
+        <Button asChild className="mt-4 h-11 rounded-full bg-emerald px-6 text-primary-foreground hover:bg-emerald/90"><Link to="/">{t("back_home")}</Link></Button>
       </div>
     );
   }
@@ -257,22 +257,24 @@ export default function UserProfile() {
       </Link>
 
       {/* Profile header with cover image */}
-      <div className="mt-4 overflow-hidden rounded border border-border bg-white shadow-soft dark:bg-card">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
         <div className="relative h-32 sm:h-40">
           {profile.cover_image_url ? (
-            <UIImage src={profile.cover_image_url} fittingType="fill" className="h-full w-full" />
+            <>
+              <UIImage src={profile.cover_image_url} fittingType="fill" className="h-full w-full" />
+              <div className="absolute inset-0 bg-gradient-to-t from-navy/30 to-transparent" />
+            </>
           ) : (
-            <div className="h-full w-full bg-emerald" />
+            <div className="h-full w-full bg-gradient-to-br from-emerald via-emerald to-[#2C6B57]" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
         </div>
         <div className="px-4 pb-5 sm:px-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-end gap-4">
               {profile.avatar_url ? (
-                <img src={profile.avatar_url} alt="" className="-mt-12 h-20 w-20 shrink-0 rounded-full border-4 border-white object-cover dark:border-card sm:-mt-14 sm:h-24 sm:w-24" />
+                <img src={profile.avatar_url} alt="" className="-mt-12 h-20 w-20 shrink-0 rounded-full border-4 border-card object-cover sm:-mt-14 sm:h-24 sm:w-24" />
               ) : (
-                <span className={`-mt-12 flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-white text-2xl font-bold text-white dark:border-card sm:-mt-14 sm:h-24 sm:w-24 ${isAgent ? "bg-blue-600" : "bg-emerald"}`}>
+                <span className={`-mt-12 flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-4 border-card text-2xl font-bold text-white sm:-mt-14 sm:h-24 sm:w-24 ${isAgent ? "bg-[#8A661B]" : "bg-[#1F7048]"}`}>
                   {initials(profile.full_name || profile.email)}
                 </span>
               )}
@@ -280,14 +282,14 @@ export default function UserProfile() {
                 <div className="flex items-center gap-2">
                   <h1 className="font-heading text-xl font-bold text-navy dark:text-foreground sm:text-2xl">{profile.full_name || profile.email}</h1>
                   {profile.is_verified && (
-                    <span className="flex items-center gap-1 rounded bg-emerald-soft px-2 py-0.5 text-[11px] font-bold text-emerald">
+                    <span className="flex items-center gap-1 rounded-full bg-emerald-soft px-2.5 py-1 text-[11px] font-bold text-emerald">
                       <BadgeCheck className="h-3.5 w-3.5" /> {t("up_verified_landlord")}
                     </span>
                   )}
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <span className={`inline-block h-2 w-2 rounded-full ${isAgent ? "bg-blue-500" : "bg-emerald"}`} />
+                    <span className={`inline-block h-2 w-2 rounded-full ${isAgent ? "bg-gold-deep" : "bg-emerald"}`} />
                     {isAgent ? t("up_agent") : t("up_landlord")}
                   </span>
                   {isAgent && profile.agency_name && (
@@ -308,15 +310,15 @@ export default function UserProfile() {
               </div>
             </div>
             {/* Actions */}
-            <div className="flex shrink-0 flex-wrap gap-2">
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
               {!isOwnProfile && (
-                <Button onClick={handleMessage} className="gap-2 bg-emerald text-white shadow-soft hover:bg-emerald/90">
+                <Button onClick={handleMessage} className="h-11 gap-2 rounded-full bg-emerald px-5 text-primary-foreground shadow-soft hover:bg-emerald/90">
                   <MessageCircle className="h-4 w-4" /> {t("up_send_message")}
                 </Button>
               )}
               {!isOwnProfile && user && (
-                <Button onClick={() => setShowReviewModal(true)} variant="outline" className="gap-2 border-emerald/30 text-emerald hover:bg-emerald-soft">
-                  <Star className="h-4 w-4" /> {t("up_leave_review")}
+                <Button onClick={() => setShowReviewModal(true)} variant="outline" className="h-11 gap-2 rounded-full border-emerald/30 px-5 text-emerald hover:bg-emerald-soft hover:text-emerald">
+                  <Star className="h-4 w-4 fill-gold text-gold" /> {t("up_leave_review")}
                 </Button>
               )}
               {!isOwnProfile && user && (
@@ -324,7 +326,8 @@ export default function UserProfile() {
                   onClick={toggleSaveProfile}
                   disabled={savingProfile}
                   variant="outline"
-                  className={`gap-2 ${profileSaved ? "border-emerald bg-emerald-soft text-emerald" : "border-border text-muted-foreground hover:border-emerald/50"}`}
+                  className={`h-11 w-11 gap-2 rounded-full p-0 sm:w-auto sm:px-5 ${profileSaved ? "border-emerald bg-emerald-soft text-emerald" : "border-border text-muted-foreground hover:border-emerald/50"}`}
+                  aria-label={profileSaved ? (en ? "Saved" : "Salvat") : (en ? "Save" : "Salvează")}
                 >
                   {profileSaved ? <Check className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
                   <span className="hidden sm:inline">{profileSaved ? (en ? "Saved" : "Salvat") : (en ? "Save" : "Salvează")}</span>
@@ -333,7 +336,8 @@ export default function UserProfile() {
               <Button
                 onClick={shareProfile}
                 variant="outline"
-                className="gap-2 border-border text-muted-foreground hover:border-emerald/50 hover:text-emerald"
+                className="h-11 w-11 gap-2 rounded-full border-border p-0 text-muted-foreground hover:border-emerald/50 hover:text-emerald sm:w-auto sm:px-5"
+                aria-label={en ? "Share" : "Distribuie"}
               >
                 {shared ? <Check className="h-4 w-4 text-emerald" /> : <Share2 className="h-4 w-4" />}
                 <span className="hidden sm:inline">{en ? "Share" : "Distribuie"}</span>
@@ -341,7 +345,8 @@ export default function UserProfile() {
               <Button
                 onClick={() => setShowBusinessCard(true)}
                 variant="outline"
-                className="gap-2 border-border text-muted-foreground hover:border-emerald/50 hover:text-emerald"
+                className="h-11 w-11 gap-2 rounded-full border-border p-0 text-muted-foreground hover:border-emerald/50 hover:text-emerald sm:w-auto sm:px-5"
+                aria-label={en ? "Business card" : "Card de vizită"}
               >
                 <CreditCard className="h-4 w-4" />
                 <span className="hidden sm:inline">{en ? "Business card" : "Card de vizită"}</span>
@@ -374,7 +379,7 @@ export default function UserProfile() {
       <div className="mt-5 flex gap-2 border-b border-border">
         <button
           onClick={() => setTab("listings")}
-          className={`relative px-4 py-2.5 text-sm font-semibold transition ${tab === "listings" ? "text-emerald" : "text-muted-foreground hover:text-foreground"}`}
+          className={`relative h-12 px-4 text-sm font-semibold transition ${tab === "listings" ? "text-emerald" : "text-muted-foreground hover:text-foreground"}`}
         >
           {t("up_tab_listings")}
           {properties.length > 0 && <span className="ml-1.5 text-xs">({properties.length})</span>}
@@ -382,7 +387,7 @@ export default function UserProfile() {
         </button>
         <button
           onClick={() => setTab("reviews")}
-          className={`relative px-4 py-2.5 text-sm font-semibold transition ${tab === "reviews" ? "text-emerald" : "text-muted-foreground hover:text-foreground"}`}
+          className={`relative h-12 px-4 text-sm font-semibold transition ${tab === "reviews" ? "text-emerald" : "text-muted-foreground hover:text-foreground"}`}
         >
           {t("up_tab_reviews")}
           {count > 0 && <span className="ml-1.5 text-xs">({count})</span>}
@@ -412,7 +417,7 @@ export default function UserProfile() {
               <div className="mx-auto flex justify-center"><RatingStars rating={1} size="lg" /></div>
               <p className="mt-3 text-sm text-muted-foreground">{t("up_no_reviews")}</p>
               {!isOwnProfile && user && (
-                <Button onClick={() => setShowReviewModal(true)} variant="outline" className="mt-4 gap-2 border-emerald/30 text-emerald">
+                <Button onClick={() => setShowReviewModal(true)} variant="outline" className="mt-4 h-11 gap-2 rounded-full border-emerald/30 px-5 text-emerald hover:bg-emerald-soft hover:text-emerald">
                   <Plus className="h-4 w-4" /> {t("up_leave_review")}
                 </Button>
               )}
@@ -421,7 +426,7 @@ export default function UserProfile() {
             <div className="grid gap-6 lg:grid-cols-3">
               {/* Breakdown */}
               <div className="lg:col-span-1">
-                <div className="sticky top-20 rounded border border-border bg-white p-5 dark:bg-card">
+                <div className="sticky top-20 rounded-2xl border border-border bg-card p-5 shadow-soft">
                   <div className="flex items-center gap-3">
                     <span className="font-heading text-4xl font-bold text-navy dark:text-foreground">{average.toFixed(1)}</span>
                     <div>
@@ -432,7 +437,7 @@ export default function UserProfile() {
                     </div>
                   </div>
                   <div className="mt-4">
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("up_rating_breakdown")}</p>
+                    <p className="mb-2 text-xs font-semibold text-muted-foreground">{t("up_rating_breakdown")}</p>
                     <RatingBreakdown distribution={distribution} total={count} />
                   </div>
                 </div>

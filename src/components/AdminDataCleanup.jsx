@@ -14,7 +14,11 @@ export default function AdminDataCleanup({ onDone }) {
   const [result, setResult] = useState(null);
 
   const call = async (dryRun) => {
-    const res = await base44.functions.invoke("CleanDemoData", { dry_run: dryRun });
+    const res = await base44.functions.invoke("CleanDemoData", {
+      dry_run: dryRun,
+      // promovează un anunț real, ca insigna „Promovat" să existe în aplicație
+      boost_demo: true,
+    });
     return res?.data || res || {};
   };
 
@@ -131,9 +135,17 @@ export default function AdminDataCleanup({ onDone }) {
       )}
 
       {result && (
-        <p className="mt-4 text-sm font-semibold text-emerald">
-          Gata: {result.deleted} șterse, {result.updated} corectate din {result.scanned} verificate.
-        </p>
+        <div className="mt-4 space-y-1">
+          <p className="text-sm font-semibold text-emerald">
+            Gata: {result.deleted} șterse, {result.updated} corectate din {result.scanned} verificate.
+          </p>
+          {result.boosted?.title && (
+            <p className="text-sm text-muted-foreground">
+              Anunț promovat pentru demonstrație: „{result.boosted.title}"
+              {result.boosted.note ? ` (${result.boosted.note})` : ""}
+            </p>
+          )}
+        </div>
       )}
     </section>
   );

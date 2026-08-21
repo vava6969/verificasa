@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useCountry } from "@/components/CountryContext";
 import { useToast } from "@/components/ui/use-toast";
-import { Ledger, LedgerRow } from "@/components/fisa";
 import { BOOST_DURATION_DAYS } from "@/lib/plans";
 import { applyBoost } from "@/lib/boosts";
 
@@ -70,12 +69,19 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
         </AlertDialogHeader>
 
         {hasCredits && (
-          <Ledger>
-            <LedgerRow label={en ? "Listing" : "Anunț"} value={property?.title || "—"} />
-            <LedgerRow label={en ? "Cost" : "Cost"} value="1" sub={en ? "boost" : "boost"} />
-            <LedgerRow label={en ? "Balance after" : "Sold rămas"} value={Math.max(0, balance - 1)} />
-            <LedgerRow label={en ? "Visible until" : "Vizibil până la"} value={untilLabel} />
-          </Ledger>
+          <dl className="space-y-2 rounded-2xl bg-secondary/60 px-4 py-3">
+            {[
+              [en ? "Listing" : "Anunț", property?.title || "—"],
+              [en ? "Cost" : "Cost", en ? "1 boost" : "1 boost"],
+              [en ? "Balance after" : "Sold rămas", String(Math.max(0, balance - 1))],
+              [en ? "Visible until" : "Vizibil până la", untilLabel],
+            ].map(([label, value]) => (
+              <div key={label} className="flex items-baseline justify-between gap-4">
+                <dt className="text-sm text-muted-foreground">{label}</dt>
+                <dd className="truncate text-right text-sm font-semibold text-foreground">{value}</dd>
+              </div>
+            ))}
+          </dl>
         )}
 
         <AlertDialogFooter>
@@ -92,7 +98,7 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
               {extending ? (en ? "Extend" : "Prelungește") : (en ? "Promote" : "Promovează")}
             </AlertDialogAction>
           ) : (
-            <AlertDialogAction asChild className="min-h-[44px] rounded bg-emerald text-primary-foreground hover:bg-emerald/90">
+            <AlertDialogAction asChild className="min-h-[44px] rounded-full bg-emerald font-bold text-primary-foreground hover:bg-emerald/90">
               <Link to="/upgrade">{en ? "Buy boosts" : "Cumpără boost-uri"}</Link>
             </AlertDialogAction>
           )}

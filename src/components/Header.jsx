@@ -12,16 +12,18 @@ import ThemeToggle from "@/components/ThemeToggle";
 import SiteNavMenu from "@/components/SiteNavMenu";
 import NotificationBell from "@/components/NotificationBell";
 
-// Registry chrome: the header is a solid paper bar with a hairline rule —
-// the document's frame, identical on every page. No glass, no gradient
-// scrim; the hero photograph starts UNDER the bar, not behind it.
+// Portal chrome: a solid bar (bg-background in both themes, no glass, no
+// gradient scrim) carrying round controls. Every control is a 44px circle on
+// phones, 36px on desktop.
 export default function Header() {
   const { currency, setCurrency, lang, setLang, t } = useCountry();
   const { isAuthenticated } = useAuth();
   const location = useLocation();
   const isActive = (to) => location.pathname === to || (to !== "/" && location.pathname.startsWith(to));
   const navItemCls = (to) =>
-    `text-sm font-semibold transition-colors hover:text-emerald ${isActive(to) ? "text-emerald" : "text-foreground/75"}`;
+    `flex h-9 items-center rounded-full px-3 text-sm font-semibold transition-colors hover:bg-secondary hover:text-emerald ${
+      isActive(to) ? "text-emerald" : "text-foreground/75"
+    }`;
 
   // Header shows only at the very top of the page (existing behavior kept).
   const [hidden, setHidden] = useState(false);
@@ -46,28 +48,32 @@ export default function Header() {
           />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
-        <DropdownMenuLabel className="flex items-center gap-2 text-xs text-muted-foreground">
+      <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2">
+        <DropdownMenuLabel className="flex items-center gap-2 px-2 text-xs text-muted-foreground">
           <img src="/images/generated/icon-coins.png" alt="" aria-hidden="true" className="h-5 w-5 object-contain" />
           {t("hdr_currency")}
         </DropdownMenuLabel>
         {["EUR", "RON"].map((c) => (
-          <DropdownMenuItem key={c} onClick={() => setCurrency(c)} className="cursor-pointer gap-2 font-semibold">
+          <DropdownMenuItem
+            key={c}
+            onClick={() => setCurrency(c)}
+            className="min-h-[44px] cursor-pointer gap-2 rounded-xl px-3 font-semibold"
+          >
             <span className="w-4 text-center text-muted-foreground">{c === "EUR" ? "€" : "L"}</span>
             {c}
             {currency === c && <Check className="ml-auto h-4 w-4 text-emerald" />}
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
-        <DropdownMenuLabel className="flex items-center gap-2 text-xs text-muted-foreground">
+        <DropdownMenuLabel className="flex items-center gap-2 px-2 text-xs text-muted-foreground">
           <img src="/images/generated/icon-language-globe.png" alt="" aria-hidden="true" className="h-5 w-5 object-contain" />
           {t("hdr_language")}
         </DropdownMenuLabel>
-        <DropdownMenuItem onClick={() => setLang("ro")} className="cursor-pointer font-semibold">
+        <DropdownMenuItem onClick={() => setLang("ro")} className="min-h-[44px] cursor-pointer rounded-xl px-3 font-semibold">
           Română
           {lang === "ro" && <Check className="ml-auto h-4 w-4 text-emerald" />}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setLang("en")} className="cursor-pointer font-semibold">
+        <DropdownMenuItem onClick={() => setLang("en")} className="min-h-[44px] cursor-pointer rounded-xl px-3 font-semibold">
           English
           {lang === "en" && <Check className="ml-auto h-4 w-4 text-emerald" />}
         </DropdownMenuItem>
@@ -82,11 +88,11 @@ export default function Header() {
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between gap-2">
-          <Link to="/" className="flex min-w-0 items-center">
+          <Link to="/" className="flex min-w-0 items-center rounded-full">
             <VerifiCasaLogo size={38} tagline={false} />
           </Link>
 
-          <nav className="hidden items-center gap-6 md:flex">
+          <nav className="hidden items-center gap-1 md:flex">
             <Link to="/" className={navItemCls("/")}>{t("hdr_home")}</Link>
             <Link to="/search" className={navItemCls("/search")}>{t("sb_btn")}</Link>
             <Link to="/about" className={navItemCls("/about")}>{t("hdr_about")}</Link>
@@ -95,15 +101,17 @@ export default function Header() {
 
           <div className="flex shrink-0 items-center gap-2">
             <div className="hidden md:block"><CurrencySwitch /></div>
-            <div className="hidden md:block"><ThemeToggle /></div>
-            <NotificationBell />
+            <div className="hidden md:block">
+              <ThemeToggle className="w-11 justify-center rounded-full px-0 sm:w-9" />
+            </div>
+            <NotificationBell className="rounded-full" />
 
             {isAuthenticated ? (
               <>
                 <Link
                   to="/post-property"
                   aria-label={t("hdr_add")}
-                  className="flex h-11 items-center justify-center gap-1 rounded bg-emerald px-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90 sm:h-9 md:px-4"
+                  className="flex h-11 items-center justify-center gap-1 rounded-full bg-emerald px-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90 sm:h-9 md:px-4"
                 >
                   <Plus className="h-4 w-4" />
                   <span className="hidden md:inline">{t("hdr_add")}</span>
@@ -114,7 +122,7 @@ export default function Header() {
               <>
                 <Link
                   to="/login"
-                  className="flex h-11 items-center gap-1.5 rounded bg-emerald px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90 sm:h-9"
+                  className="flex h-11 items-center gap-1.5 rounded-full bg-emerald px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90 sm:h-9"
                 >
                   <User className="h-4 w-4" />
                   <span>{t("hdr_login")}</span>

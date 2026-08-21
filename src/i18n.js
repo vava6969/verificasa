@@ -1,26 +1,5 @@
 // Full i18n dictionary: RO (Romanian) and EN (English).
 // Access via useCountry().t(key)
-export const DICT = {
-  ro: {
-    // Brand tagline
-    brand_tag: ".tur",
-    requiredComplete: "Completează numele și emailul",
-    submit_sent: "Cerere trimisă!",
-    submit_sent_desc: "Proprietarul a primit cererea ta pre-calificată.",
-    submit_err: "Eroare la trimitere",
-    not_found: "Proprietatea nu a fost găsită",
-    back_home: "Înapoi la pagina principală",
-  },
-  en: {
-    requiredComplete: "Please enter your name and email",
-    submit_sent: "Request sent!",
-    submit_sent_desc: "The owner received your pre-qualified request.",
-    submit_err: "Error sending request",
-    not_found: "Property not found",
-    back_home: "Back to home",
-  },
-};
-
 export const STR = {
   ro: {
     // header
@@ -60,9 +39,6 @@ export const STR = {
     hero_badge: "AI Virtual Walkthrough · {legalShort}",
     hero_badge_ro: "Comision Redus pentru Chiriași",
     hero_badge_uk: "0 Fees for Tenants",
-    hero_h1_a: "Închiriază inteligent.",
-    hero_h1_b: "Vizionează din telefon.",
-    hero_sub: "Fiecare anunț e verificat înainte de publicare: poze, acte, preț. Vezi ce închiriezi înainte să te deplasezi.",
     quick_studio: "Garsoniere",
     quick_2: "2 Camere",
     quick_pet: "Pet Friendly",
@@ -80,16 +56,9 @@ export const STR = {
     vp_kicker: "De ce EstateAI",
     vp_h: "O experiență de închiriere reinventată",
     vp_sub: "Tehnologie AI, încredere și comisioane corecte — totul într-o singură platformă.",
-    vp1_t: "Tururi AI Immersive",
-    vp1_d: "Vizualizează proprietatea realist din telefon — transformăm pozele 2D într-un tur video ghidat cu tranziții fluide generate de AI.",
-    vp2_t: "Verificare & Încredere",
-    vp2_d: "Proprietari verificați, tururi 3D validate teren și chiriași pre-calificați. Scade timpul de decizie cu 50%.",
-    vp3_t: "Comisioane Corecte",
-    vp3_d: "RO: comision redus 30-50% din prima chirie. UK: 0 fee pentru chiriași, conform Tenant Fees Act 2019.",
     // featured
     feat_kicker: "Proprietăți recomandate",
     feat_h: "Cu Tur AI inclus",
-    view_all: "Vezi toate",
     none_country_ro: "Nicio proprietate momentan în România.",
     none_country_uk: "No properties in UK right now.",
     // AI module
@@ -174,7 +143,6 @@ export const STR = {
     empty_sub: "Încearcă alte filtre sau schimbă țara.",
     // Property card
     pc_ai: "Tur 3D",
-    pc_verified: "Verificat",
     pc_aitour: "Tur 3D",
     pc_pet: "Pet Friendly",
     pc_permonth: "/lună",
@@ -214,7 +182,6 @@ export const STR = {
     btn_send: "Trimite cerere pre-calificată",
     sending: "Se trimite...",
     // Owner
-    owner_h: "Dashboard Proprietar",
     owner_sub: "Gestionează anunțuri, tururi 3D și cereri de vizionare.",
     owner_add: "Adaugă Anunț",
     s_active: "Anunțuri active",
@@ -652,9 +619,6 @@ export const STR = {
     hero_badge: "AI Virtual Walkthrough · {legalShort}",
     hero_badge_ro: "Reduced fees for tenants",
     hero_badge_uk: "0 Fees for Tenants",
-    hero_h1_a: "Rent smarter.",
-    hero_h1_b: "View it from your phone.",
-    hero_sub: "Every listing is checked before it goes live: photos, paperwork, price. See what you are renting before you travel.",
     quick_studio: "Studios",
     quick_2: "2 Bed",
     quick_pet: "Pet Friendly",
@@ -670,15 +634,8 @@ export const STR = {
     vp_kicker: "Why EstateAI",
     vp_h: "Rental experience, reinvented",
     vp_sub: "AI technology, trust and fair fees — all in one platform.",
-    vp1_t: "Immersive AI Tours",
-    vp1_d: "View a realistic property from your phone — we turn 2D photos into a guided video walkthrough with smooth AI-generated transitions.",
-    vp2_t: "Verification & Trust",
-    vp2_d: "Verified landlords, field-validated 3D tours and pre-qualified tenants. Cuts decision time by 50%.",
-    vp3_t: "Fair Fees",
-    vp3_d: "RO: reduced fee 30-50% of first month's rent. UK: zero tenant fees, per Tenant Fees Act 2019.",
     feat_kicker: "Recommended properties",
     feat_h: "With AI Tours included",
-    view_all: "View all",
     none_country_ro: "No properties in Romania right now.",
     none_country_uk: "No properties in UK right now.",
     ai_badge: "3D Virtual Walkthrough",
@@ -758,7 +715,6 @@ export const STR = {
     empty_title: "No properties found",
     empty_sub: "Try different filters or switch country.",
     pc_ai: "3D Walkthrough",
-    pc_verified: "Verified",
     pc_aitour: "3D Tour",
     pc_pet: "Pet Friendly",
     pc_permonth: "/month",
@@ -796,7 +752,6 @@ export const STR = {
     ph_msg: "Message to landlord...",
     btn_send: "Send pre-qualified request",
     sending: "Sending...",
-    owner_h: "Landlord Dashboard",
     owner_sub: "Manage listings, 3D tours and viewing requests.",
     owner_add: "List a Property",
     s_active: "Active listings",

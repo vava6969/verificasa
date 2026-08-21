@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { Button } from "@/components/ui/button";
-import { Stamp } from "@/components/fisa";
-
-const EASE = [0.16, 1, 0.3, 1];
 
 // Dismissible Beta notice shown once on first homepage visit (localStorage).
-// Registry form: a solid card with a stamped BETA verdict, no glass.
+// Solid rounded card, a plain emerald chip instead of a stamp, no glass.
 export default function BetaBanner() {
-  const { t } = useCountry();
+  const { t, lang } = useCountry();
+  const en = lang === "en";
+  const reduced = useReducedMotion();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -38,20 +37,37 @@ export default function BetaBanner() {
           className="fixed inset-0 z-[60] flex items-center justify-center bg-navy-deep/60 p-4"
         >
           <motion.div
-            initial={{ y: 16, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 12, opacity: 0 }}
-            transition={{ duration: 0.5, ease: EASE }}
+            initial={reduced ? false : { y: 20, scale: 0.96, opacity: 0 }}
+            animate={{ y: 0, scale: 1, opacity: 1 }}
+            exit={{ y: 12, scale: 0.98, opacity: 0 }}
+            transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 320, damping: 22 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md border border-border bg-card p-6 sm:p-8"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="vc-beta-title"
+            className="relative w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-lg sm:p-8"
           >
-            <button onClick={dismiss} className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-secondary" aria-label="Închide">
+            <button
+              onClick={dismiss}
+              className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              aria-label={en ? "Close" : "Închide"}
+            >
               <X className="h-5 w-5" />
             </button>
-            <Stamp tone="ink">Beta</Stamp>
-            <h3 className="mt-4 font-heading text-2xl font-semibold text-foreground">{t("beta_title")}</h3>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t("beta_msg")}</p>
-            <Button onClick={dismiss} className="mt-6 min-h-[48px] w-full rounded bg-emerald text-primary-foreground hover:bg-emerald/90">
+
+            <span className="inline-flex items-center rounded-full bg-emerald px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary-foreground">
+              Beta
+            </span>
+
+            <h3 id="vc-beta-title" className="mt-4 font-heading text-2xl font-semibold text-foreground">
+              {t("beta_title")}
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("beta_msg")}</p>
+
+            <Button
+              onClick={dismiss}
+              className="mt-6 min-h-[48px] w-full rounded-full bg-emerald text-primary-foreground hover:bg-emerald/90"
+            >
               {t("beta_btn")}
             </Button>
           </motion.div>

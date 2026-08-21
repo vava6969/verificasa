@@ -1,7 +1,7 @@
 import React from "react";
 import LegalPage from "@/components/LegalPage";
 import { Link } from "react-router-dom";
-import { ShieldCheck, BarChart3, Settings2 } from "lucide-react";
+import { Settings2 } from "lucide-react";
 
 export default function CookiePolicy() {
   return (
@@ -34,13 +34,10 @@ export default function CookiePolicy() {
         <p>Împărțim cookie-urile în trei categorii, conform cerințelor legale:</p>
 
         <div className="mt-4 space-y-4">
-          <div className="rounded border border-emerald/20 bg-emerald-soft/40 p-4">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-emerald" />
-              <h3 className="font-heading text-sm font-bold text-navy dark:text-foreground">
-                2.1. Cookie-uri necesare (obligatorii)
-              </h3>
-            </div>
+          <div className="rounded-2xl border border-emerald/20 bg-emerald-soft/40 p-4">
+            <h3 className="font-heading text-sm font-bold text-navy dark:text-foreground">
+              2.1. Cookie-uri necesare (obligatorii)
+            </h3>
             <p className="mt-2 text-xs leading-relaxed text-foreground/80">
               Sunt esențiale pentru funcționarea corectă a site-ului și nu pot fi
               dezactivate. Asigură autentificarea, securitatea, menținerea sesiunii
@@ -55,13 +52,10 @@ export default function CookiePolicy() {
             </ul>
           </div>
 
-          <div className="rounded border border-border bg-secondary/30 p-4">
-            <div className="flex items-center gap-2">
-              <Settings2 className="h-5 w-5 text-gold" />
-              <h3 className="font-heading text-sm font-bold text-navy dark:text-foreground">
-                2.2. Cookie-uri funcționale (opționale)
-              </h3>
-            </div>
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <h3 className="font-heading text-sm font-bold text-navy dark:text-foreground">
+              2.2. Cookie-uri funcționale (opționale)
+            </h3>
             <p className="mt-2 text-xs leading-relaxed text-foreground/80">
               Îmbunătățesc experiența de utilizare prin reținerea preferințelor
               (ex: proprietăți salvate, filtre de căutare salvate). <strong>Necesită
@@ -73,13 +67,10 @@ export default function CookiePolicy() {
             </ul>
           </div>
 
-          <div className="rounded border border-border bg-secondary/30 p-4">
-            <div className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-blue-600" />
-              <h3 className="font-heading text-sm font-bold text-navy dark:text-foreground">
-                2.3. Cookie-uri de analiză / performanță (opționale)
-              </h3>
-            </div>
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <h3 className="font-heading text-sm font-bold text-navy dark:text-foreground">
+              2.3. Cookie-uri de analiză / performanță (opționale)
+            </h3>
             <p className="mt-2 text-xs leading-relaxed text-foreground/80">
               Ne ajută să înțelegem cum utilizează vizitatorii site-ul, pentru a-l
               îmbunătăți. Colectăm date agregate, anonimizate. <strong>Necesită

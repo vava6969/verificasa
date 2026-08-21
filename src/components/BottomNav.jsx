@@ -5,11 +5,11 @@ import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useNotifications } from "@/hooks/useNotifications";
 
-// Mobile bottom navigation — the app's primary chrome. Solid paper bar with a
-// hairline rule (no glass), safe-area respected, 44px touch targets. Icons
-// stay: a bottom nav is a functional control. Messages carries its own unread
-// count; Account carries the remaining notification count so nothing unread
-// is invisible from the phone.
+// Mobile bottom navigation — the app's primary chrome. Solid bar, full-width
+// square tabs, and the active tab wears a soft emerald pill behind its icon.
+// Icons stay: a bottom nav is a functional control. Messages carries its own
+// unread count; Account carries the remaining notification count so nothing
+// unread is invisible from the phone.
 export default function BottomNav() {
   const { t, lang } = useCountry();
   const en = lang === "en";
@@ -61,33 +61,55 @@ export default function BottomNav() {
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-40 mx-auto flex max-w-7xl items-stretch justify-around border-t border-border bg-background px-1 pb-[max(env(safe-area-inset-bottom),6px)] pt-1 md:hidden"
-      aria-label="Navigare rapidă"
+      aria-label={en ? "Quick navigation" : "Navigare rapidă"}
     >
       {items.map((it) => {
         const active = isActive(it.path);
         const Icon = it.icon;
+
         if (it.primary) {
           return (
-            <button key={it.path} onClick={it.onClick} className="flex min-h-[48px] flex-1 flex-col items-center justify-center gap-0.5 py-0.5" aria-label={it.label}>
-              <span className="flex h-9 w-9 items-center justify-center rounded bg-emerald text-primary-foreground">
+            <button
+              key={it.path}
+              onClick={it.onClick}
+              className="flex min-h-[48px] flex-1 flex-col items-center justify-center gap-0.5 py-0.5"
+              aria-label={it.label}
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald text-primary-foreground shadow-soft transition-transform active:scale-95">
                 <Icon className="h-5 w-5" strokeWidth={2.5} />
               </span>
               <span className="text-[10px] font-bold text-emerald">{it.label}</span>
             </button>
           );
         }
+
         return (
-          <button key={it.path} onClick={it.onClick} className="relative flex min-h-[48px] flex-1 flex-col items-center justify-center gap-0.5 py-0.5" aria-label={it.label}>
-            <span className="relative">
-              <Icon className={`h-5 w-5 ${active ? "text-emerald" : "text-muted-foreground"}`} strokeWidth={active ? 2.4 : 2} />
+          <button
+            key={it.path}
+            onClick={it.onClick}
+            className="flex min-h-[48px] flex-1 flex-col items-center justify-center gap-0.5 py-0.5"
+            aria-label={it.label}
+            aria-current={active ? "page" : undefined}
+          >
+            <span
+              className={`relative flex h-7 w-14 items-center justify-center rounded-full transition-colors ${
+                active ? "bg-emerald text-primary-foreground" : "text-muted-foreground"
+              }`}
+            >
+              <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.4 : 2} />
               {it.badge && (
-                <span className="absolute -right-2.5 -top-1.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-sm bg-emerald px-1 text-[9px] font-bold leading-none text-primary-foreground tnum">
+                <span
+                  className={`absolute -top-0.5 right-1 flex h-[16px] min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-bold leading-none ring-2 ring-background tnum ${
+                    active ? "bg-background text-emerald" : "bg-emerald text-primary-foreground"
+                  }`}
+                >
                   {it.badge}
                 </span>
               )}
             </span>
-            <span className={`text-[10px] font-semibold ${active ? "text-emerald" : "text-muted-foreground"}`}>{it.label}</span>
-            {active && <span className="absolute inset-x-4 top-0 h-[2px] bg-emerald" aria-hidden="true" />}
+            <span className={`text-[10px] font-semibold ${active ? "text-emerald" : "text-muted-foreground"}`}>
+              {it.label}
+            </span>
           </button>
         );
       })}

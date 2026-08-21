@@ -32,7 +32,7 @@ const EMAILS = [
     desc: "Colaborări, integrări și oportunități de parteneriat strategic.",
     icon: Handshake,
     badge: "B2B",
-    accent: "blue",
+    accent: "emerald",
     bg: "/images/generated/illo-parteneri-v1.png",
   },
   {
@@ -76,7 +76,6 @@ const EMAILS = [
 const ACCENTS = {
   emerald: { ring: "ring-emerald/30", glow: "shadow-[0_10px_40px_-12px_rgba(0,168,89,0.45)]", iconBg: "bg-emerald-soft text-emerald", badge: "bg-emerald-soft text-emerald border-emerald/20" },
   rose:    { ring: "ring-rose-500/30", glow: "shadow-[0_10px_40px_-12px_rgba(225,80,80,0.4)]", iconBg: "bg-rose-50 text-rose-600 dark:bg-rose-500/15 dark:text-rose-300", badge: "bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/20" },
-  blue:   { ring: "ring-blue-500/30", glow: "shadow-[0_10px_40px_-12px_rgba(37,99,235,0.4)]", iconBg: "bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300", badge: "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/15 dark:text-blue-300 dark:border-blue-500/20" },
   amber:  { ring: "ring-amber-500/30", glow: "shadow-[0_10px_40px_-12px_rgba(217,164,65,0.45)]", iconBg: "bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-300", badge: "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/20" },
   violet: { ring: "ring-violet-500/30", glow: "shadow-[0_10px_40px_-12px_rgba(139,92,246,0.4)]", iconBg: "bg-violet-50 text-violet-600 dark:bg-violet-500/15 dark:text-violet-300", badge: "bg-violet-50 text-violet-600 border-violet-200 dark:bg-violet-500/15 dark:text-violet-300 dark:border-violet-500/20" },
   slate:  { ring: "ring-slate-500/30", glow: "shadow-[0_10px_40px_-12px_rgba(100,116,139,0.4)]", iconBg: "bg-slate-100 text-slate-600 dark:bg-slate-500/15 dark:text-slate-300", badge: "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/15 dark:text-slate-300 dark:border-slate-500/20" },

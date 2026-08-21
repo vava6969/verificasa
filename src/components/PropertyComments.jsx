@@ -13,7 +13,7 @@ import { MessageSquare, ShieldCheck, BadgeCheck, Lock, Heart, Reply, Send, Trash
 const ROLE_BADGE = {
   SUPER_ADMIN: { label: "Super Admin", cls: "bg-gold text-navy" },
   ADMIN: { label: "Admin", cls: "bg-navy text-emerald" },
-  AGENT: { label: "Agent", cls: "bg-blue-600 text-white" },
+  AGENT: { label: "Agent", cls: "bg-emerald-soft text-emerald" },
   PROPRIETAR: { label: "Proprietar", cls: "bg-emerald text-white" },
   USER: { label: "Utilizator", cls: "bg-secondary text-foreground" },
   SUPPORT: { label: "Support", cls: "bg-secondary text-foreground" },

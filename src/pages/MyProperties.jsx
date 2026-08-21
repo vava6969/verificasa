@@ -13,13 +13,44 @@ import {
 import PropertyEditForm from "@/components/PropertyEditForm";
 import BoostDialog from "@/components/BoostDialog";
 import { Image as UIImage } from "@/components/ui/image";
-import { Stamp, Frank, PhotoMark } from "@/components/fisa";
+import { PropertyBadge } from "@/components/PropertyBadges";
+import { RevealGroup, RevealItem } from "@/components/ui/reveal";
+import { coverOf } from "@/lib/covers";
 import { fetchBoostBalance } from "@/lib/boosts";
 
-// Anunțurile proprii — registru de rânduri, cu stare, promovare și editare.
+// Starea unui anunț încape într-o singură pastilă: întâi verdictul moderării,
+// pentru că el decide dacă anunțul se vede, apoi starea aleasă de proprietar.
+const STATUS_LABEL = {
+  Activ: { ro: "Activ", en: "Active" },
+  Rezervat: { ro: "Rezervat", en: "Reserved" },
+  "Închis": { ro: "Închis", en: "Closed" },
+};
+
+const CHIP = "inline-flex min-h-[24px] items-center rounded-full px-2.5 py-0.5 text-xs font-bold";
+
+function statusChip(p, en) {
+  if (p.approval_status === "REJECTED") {
+    return { label: en ? "Rejected" : "Respins", className: "bg-destructive/10 text-destructive" };
+  }
+  if (p.approval_status !== "APPROVED") {
+    return {
+      label: en ? "Pending" : "În așteptare",
+      className: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+    };
+  }
+  const known = STATUS_LABEL[p.status];
+  const label = known ? (en ? known.en : known.ro) : (p.status || (en ? "Active" : "Activ"));
+  if (!p.status || p.status === "Activ") {
+    return { label, className: "bg-emerald/10 text-emerald" };
+  }
+  return { label, className: "bg-secondary text-muted-foreground" };
+}
+
+// Anunțurile proprii — un rând compact pe anunț: fotografia conduce, prețul se
+// citește primul, iar starea și acțiunile stau sub el.
 export default function MyProperties() {
   const { user } = useAuth();
-  const { formatPrice, lang } = useCountry();
+  const { formatPrice, t, lang } = useCountry();
   const { toast } = useToast();
   const en = lang === "en";
   const [properties, setProperties] = useState(null);
@@ -86,7 +117,7 @@ export default function MyProperties() {
     if (!user?.id) return undefined;
     const unsub = base44.entities.Property.subscribe(() => load());
     return () => { try { unsub && unsub(); } catch { /* noop */ } };
-     
+
   }, [user?.id]);
 
 
@@ -105,9 +136,9 @@ export default function MyProperties() {
   if (properties === null) {
     return (
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-        <Skeleton className="h-9 w-56" />
+        <Skeleton className="h-9 w-56 rounded-full" />
         <div className="mt-6 space-y-3">
-          {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-sm" />)}
+          {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}
         </div>
       </div>
     );
@@ -115,111 +146,117 @@ export default function MyProperties() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-heading text-3xl font-semibold text-foreground">
+          <h1 className="font-heading text-2xl font-semibold text-foreground sm:text-3xl">
             {en ? "My listings" : "Anunțurile mele"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {en ? "Manage what you have published." : "Gestionează anunțurile pe care le-ai postat."}
-            {" "}
-            <span className="font-semibold text-foreground tnum">{balance}</span>{" "}
-            {en ? "boosts available" : "boost-uri disponibile"}.
+            <span className="font-bold text-foreground tnum">{balance}</span>{" "}
+            {en ? "boosts available" : "boost-uri disponibile"}
           </p>
         </div>
-        <Button asChild className="min-h-[44px] rounded bg-emerald text-primary-foreground hover:bg-emerald/90">
+        <Button asChild className="min-h-[44px] rounded-full bg-emerald px-5 text-primary-foreground hover:bg-emerald/90">
           <Link to="/post-property">{en ? "Add a listing" : "Adaugă anunț"}</Link>
         </Button>
       </div>
 
       {properties.length === 0 ? (
-        <div className="mt-8 border border-dashed border-border bg-card px-4 py-20 text-center">
-          <p className="font-heading text-xl font-semibold text-foreground">
+        <div className="mt-8 rounded-2xl border border-dashed border-border bg-card px-6 py-16 text-center">
+          <p className="font-heading text-lg font-semibold text-foreground sm:text-xl">
             {en ? "Nothing published yet." : "Nu ai adăugat niciun anunț încă."}
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {en ? "Publishing takes a few minutes." : "Postezi prima proprietate în câteva minute."}
-          </p>
-          <Link to="/post-property" className="mt-4 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0">
-            {en ? "Add a listing" : "Adaugă anunț"} <span aria-hidden="true">→</span>
-          </Link>
+          <Button asChild className="mt-4 min-h-[44px] rounded-full bg-emerald px-5 text-primary-foreground hover:bg-emerald/90">
+            <Link to="/post-property">{en ? "Add a listing" : "Adaugă anunț"}</Link>
+          </Button>
         </div>
       ) : (
-        <div className="mt-8 divide-y divide-border border border-border bg-card">
+        <RevealGroup className="mt-8 space-y-3">
           {properties.map((p) => {
             const boosted = p.boost_active;
             const boostUntil = p.boost_ends_date
               ? new Date(p.boost_ends_date).toLocaleDateString(en ? "en-GB" : "ro-RO", { day: "2-digit", month: "short" })
               : null;
             const approved = p.approval_status === "APPROVED";
-            return (
-              <div key={p.id} className="p-4">
-                <div className="flex flex-wrap items-start gap-4">
-                  <div className="relative h-20 w-28 shrink-0 overflow-hidden border border-border bg-secondary">
-                    {p.images?.[0] ? <UIImage src={p.images[0]} fittingType="fill" className="h-full w-full" /> : null}
-                    {p.property_code && (
-                      <>
-                        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-black/55 to-transparent" />
-                        <PhotoMark className="bottom-1 left-1.5">{p.property_code}</PhotoMark>
-                      </>
-                    )}
-                  </div>
+            const chip = statusChip(p, en);
+            const cover = coverOf(p);
+            const specs = [
+              [p.zone, p.city].filter(Boolean).join(", "),
+              p.rooms != null && `${p.rooms} ${en ? (p.rooms === 1 ? "room" : "rooms") : "cam."}`,
+              p.surface_sqm != null && `${p.surface_sqm} mp`,
+            ].filter(Boolean).join(" · ");
 
-                  <div className="min-w-0 flex-1">
-                    <p className="line-clamp-1 font-heading text-lg font-semibold text-foreground">{p.title}</p>
-                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                      {p.zone ? `${p.zone}, ` : ""}{p.city} · {p.property_type}
-                    </p>
-                    <p className="mt-1 font-heading text-lg font-semibold text-foreground tnum">
-                      {formatPrice(p.price_monthly, p.currency)}
-                      <span className="ml-0.5 font-body text-xs font-medium text-muted-foreground">
-                        {p.transaction_type === "SALE" ? "" : "/lună"}
-                      </span>
-                    </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                      <Stamp tone={approved ? "verde" : "ink"}>
-                        {approved ? (en ? "Approved" : "Aprobat") : (en ? "Pending" : "În așteptare")}
-                      </Stamp>
-                      <Stamp tone="ink">{p.status}</Stamp>
-                      {boosted && <Frank until={boostUntil} />}
-                      <span className="ml-1 text-xs text-muted-foreground tnum">
-                        {p.views_count || 0} {en ? "views" : "vizite"}
-                      </span>
+            return (
+              <RevealItem key={p.id}>
+                <article className="rounded-2xl border border-border bg-card p-3 shadow-sm transition-shadow hover:shadow-md sm:p-4">
+                  <div className="flex gap-3 sm:gap-4">
+                    <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-secondary sm:h-28 sm:w-40">
+                      {cover ? (
+                        <UIImage src={cover} alt={p.title || ""} fittingType="fill" className="h-full w-full object-cover" />
+                      ) : null}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-1 text-[15px] font-semibold text-foreground">{p.title}</p>
+
+                      <p className="mt-1 text-xl font-bold leading-none text-foreground tnum">
+                        {formatPrice(p.price_monthly, p.currency)}
+                        <span className="ml-1 text-xs font-semibold text-muted-foreground">
+                          {p.transaction_type === "SALE" ? "" : t("pc_permonth")}
+                        </span>
+                      </p>
+
+                      {specs && <p className="mt-1.5 truncate text-sm text-muted-foreground">{specs}</p>}
+
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <span className={`${CHIP} ${chip.className}`}>{chip.label}</span>
+                        {boosted && (
+                          <PropertyBadge kind="promovat" size="sm" lang={lang}>
+                            {boostUntil ? (en ? `Promoted · ${boostUntil}` : `Promovat · ${boostUntil}`) : undefined}
+                          </PropertyBadge>
+                        )}
+                        <span className="text-xs text-muted-foreground tnum">
+                          {p.views_count || 0} {en ? "views" : "vizite"}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="mt-3 grid grid-cols-3 gap-2 sm:mt-4 sm:flex sm:justify-end">
                     <Button
-                      size="sm"
                       onClick={() => setBoostTarget(p)}
                       disabled={!approved}
                       title={!approved ? (en ? "Approve the listing first" : "Anunțul trebuie aprobat întâi") : undefined}
-                      className="min-h-[40px] rounded bg-emerald text-primary-foreground hover:bg-emerald/90 disabled:opacity-50"
+                      className="min-h-[44px] w-full rounded-full bg-emerald px-2 text-xs text-primary-foreground hover:bg-emerald/90 disabled:opacity-50 sm:w-auto sm:px-5 sm:text-sm"
                     >
                       {boosted ? (en ? "Extend" : "Prelungește") : (en ? "Promote" : "Promovează")}
                     </Button>
                     <Button
-                      variant="outline" size="sm"
+                      variant="outline"
                       onClick={() => setEditing(editing === p.id ? null : p.id)}
-                      className="min-h-[40px] rounded border-border"
+                      className="min-h-[44px] w-full rounded-full border-border px-2 text-xs sm:w-auto sm:px-5 sm:text-sm"
                     >
                       {en ? "Edit" : "Editează"}
                     </Button>
                     <Button
-                      variant="outline" size="sm"
+                      variant="outline"
                       onClick={() => setDeleteTarget(p)}
-                      className="min-h-[40px] rounded border-destructive/40 text-destructive hover:bg-destructive/10"
+                      className="min-h-[44px] w-full rounded-full border-destructive/40 px-2 text-xs text-destructive hover:bg-destructive/10 sm:w-auto sm:px-5 sm:text-sm"
                     >
                       {en ? "Delete" : "Șterge"}
                     </Button>
                   </div>
-                </div>
 
-                {editing === p.id && <PropertyEditForm property={p} onDone={() => { setEditing(null); load(); }} />}
-              </div>
+                  {editing === p.id && (
+                    <div className="mt-4 border-t border-border pt-4">
+                      <PropertyEditForm property={p} onDone={() => { setEditing(null); load(); }} />
+                    </div>
+                  )}
+                </article>
+              </RevealItem>
             );
           })}
-        </div>
+        </RevealGroup>
       )}
 
       <BoostDialog
@@ -231,7 +268,7 @@ export default function MyProperties() {
       />
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(v) => !v && setDeleteTarget(null)}>
-        <AlertDialogContent className="rounded-none border-border">
+        <AlertDialogContent className="rounded-2xl border-border">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-heading text-xl font-semibold">
               {en ? "Delete this listing?" : "Ștergi acest anunț?"}
@@ -243,12 +280,12 @@ export default function MyProperties() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="min-h-[44px] rounded border-border">
+            <AlertDialogCancel className="min-h-[44px] rounded-full border-border">
               {en ? "Cancel" : "Anulează"}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => { e.preventDefault(); confirmDelete(); }}
-              className="min-h-[44px] rounded bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="min-h-[44px] rounded-full bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {en ? "Delete" : "Șterge"}
             </AlertDialogAction>

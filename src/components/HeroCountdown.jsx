@@ -50,10 +50,11 @@ function RollingDigits({ value, reduceMotion }) {
   );
 }
 
-// Launch counter as a ruled ledger strip: solid card, hairline-divided digit
-// cells, dated caption. No glass, no glow, no pulsing dot.
+// Launch counter: one solid rounded card, four soft digit tiles, one line of
+// copy and one button. The digits keep their odometer roll.
 export default function HeroCountdown({ className = "" }) {
-  const { t } = useCountry();
+  const { t, lang } = useCountry();
+  const en = lang === "en";
   const [time, setTime] = useState(diff());
   const reduceMotion = useReducedMotion();
 
@@ -65,33 +66,42 @@ export default function HeroCountdown({ className = "" }) {
   if (time.over) return null;
 
   const unit = (v, label) => (
-    <div className="flex flex-1 flex-col items-center gap-1 px-3 py-2 sm:px-5">
-      <span className="font-heading text-2xl font-semibold text-foreground tnum sm:text-3xl">
+    <div className="flex flex-1 flex-col items-center gap-0.5 rounded-xl bg-secondary px-1 py-2.5">
+      <span className="font-heading text-2xl font-semibold leading-none text-foreground tnum sm:text-3xl">
         <RollingDigits value={String(v).padStart(2, "0")} reduceMotion={reduceMotion} />
       </span>
-      <span className="text-[11px] font-semibold text-muted-foreground">{label}</span>
+      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground sm:text-[11px]">
+        {label}
+      </span>
     </div>
   );
 
   return (
-    <div className={`border border-border bg-card ${className}`}>
-      <div className="flex flex-col items-stretch sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center border-b border-border px-5 py-3 sm:border-b-0 sm:border-r">
-          <p className="text-xs font-bold text-emerald">{t("countdown_badge")}</p>
-          <p className="mt-0.5 text-sm font-semibold text-foreground">{t("countdown_h")}</p>
+    <div className={className}>
+      <div className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+          <div className="min-w-0">
+            <span className="inline-flex items-center rounded-full bg-emerald px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary-foreground">
+              {t("countdown_badge")}
+            </span>
+            <p className="mt-2 text-sm font-semibold text-foreground">{t("countdown_h")}</p>
+          </div>
+
+          <div className="flex shrink-0 items-stretch gap-2 sm:w-auto">
+            {unit(time.days, t("countdown_days"))}
+            {unit(time.hours, t("countdown_hours"))}
+            {unit(time.mins, t("countdown_mins"))}
+            {unit(time.secs, en ? "Seconds" : "Secunde")}
+          </div>
+
+          <Link
+            to="/about"
+            className="flex h-12 shrink-0 items-center justify-center gap-1.5 rounded-full bg-emerald px-5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90 sm:h-11"
+          >
+            {t("countdown_btn")}
+            <span aria-hidden="true">→</span>
+          </Link>
         </div>
-        <div className="flex items-stretch divide-x divide-border">
-          {unit(time.days, t("countdown_days"))}
-          {unit(time.hours, t("countdown_hours"))}
-          {unit(time.mins, t("countdown_mins"))}
-          {unit(time.secs, "sec")}
-        </div>
-        <Link
-          to="/about"
-          className="flex items-center justify-center border-t border-border px-5 py-3 text-sm font-semibold text-emerald transition-colors hover:bg-secondary sm:border-l sm:border-t-0"
-        >
-          {t("countdown_btn")} <span className="ml-1.5" aria-hidden="true">→</span>
-        </Link>
       </div>
     </div>
   );

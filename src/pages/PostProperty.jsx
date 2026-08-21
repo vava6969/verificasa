@@ -1,24 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import VerifiCasaLogo from "@/components/VerifiCasaLogo";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CheckCircle2, Plus, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import PropertyWizard from "@/components/postproperty/PropertyWizard";
 
 export default function PostProperty() {
   const [submitted, setSubmitted] = useState(false);
 
-  useEffect(() => {
-  }, []);
-
   return (
-    <div className="min-h-screen bg-[#f4f6f9] dark:bg-background">
-      <div className="sticky top-0 z-30 border-b border-border/60 bg-white/85 dark:bg-navy-deep/85">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
-          <Link to="/" className="flex min-w-0 items-center gap-2">
+    <div className="min-h-screen bg-secondary/40 dark:bg-background">
+      <div className="sticky top-0 z-30 border-b border-border/60 bg-card">
+        <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-1.5 sm:px-6">
+          <Link to="/" className="flex min-h-[44px] min-w-0 items-center gap-2">
             <VerifiCasaLogo size={34} tagline={false} />
           </Link>
-          <Link to="/" className="flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition hover:text-emerald">
+          <Link
+            to="/"
+            aria-label="Înapoi la site"
+            className="flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted-foreground transition hover:bg-secondary hover:text-emerald"
+          >
             <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">Înapoi la site</span>
           </Link>
         </div>
@@ -26,19 +27,22 @@ export default function PostProperty() {
 
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
         {submitted ? (
-          <div className="surface-card mt-8 rounded p-8 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-soft">
-              <CheckCircle2 className="h-8 w-8 text-emerald" />
-            </div>
+          <div className="surface-card mt-8 rounded-2xl p-8 text-center">
+            <img
+              src="/images/generated/icon-document-check.png"
+              alt=""
+              aria-hidden="true"
+              className="mx-auto h-16 w-16 object-contain"
+            />
             <h1 className="mt-4 font-heading text-2xl font-bold text-navy dark:text-foreground">Anunț trimis spre aprobare</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Un administrator îl va verifica în curând. Va apărea în lista publică după aprobare.
+              Îl verificăm și apare public după aprobare.
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Button variant="outline" onClick={() => setSubmitted(false)} className="gap-1.5 rounded">
+              <Button variant="outline" onClick={() => setSubmitted(false)} className="h-12 gap-1.5 rounded-full px-5">
                 <Plus className="h-4 w-4" /> Adaugă alt anunț
               </Button>
-              <Button asChild className="rounded bg-emerald text-white hover:bg-emerald/90">
+              <Button asChild className="h-12 rounded-full bg-emerald px-6 text-white hover:bg-emerald/90">
                 <Link to="/">Vezi site-ul</Link>
               </Button>
             </div>
@@ -46,10 +50,7 @@ export default function PostProperty() {
         ) : (
           <>
             <div className="mb-4 mt-2">
-              <span className="inline-flex items-center gap-1.5 rounded bg-emerald-soft px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald">
-                <ShieldCheck className="h-3.5 w-3.5" /> Anunț verificat VerifiCasa
-              </span>
-              <h1 className="mt-2 font-heading text-2xl font-bold text-navy dark:text-foreground sm:text-3xl">
+              <h1 className="font-heading text-2xl font-bold text-navy dark:text-foreground sm:text-3xl">
                 Publică-ți proprietatea
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">

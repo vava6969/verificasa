@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
-import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil, Sparkles, History, Flag, ClipboardCheck, Crown, Mail, Phone, Ticket, Wrench } from "lucide-react";
+import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil, History, Flag, ClipboardCheck, Crown, Mail, Phone, Ticket, Wrench } from "lucide-react";
 import PropertyEditForm from "@/components/PropertyEditForm";
 import PropertyLogs from "@/components/PropertyLogs";
 import AdminReports from "@/components/AdminReports";
@@ -382,7 +382,7 @@ export default function Admin() {
                       </p>
                       <p className="text-xs text-muted-foreground">{r.email} · {r.phone || "fara tel"}</p>
                     </div>
-                    <span className="rounded bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                    <span className="rounded-full bg-emerald-soft px-2.5 py-0.5 text-[11px] font-semibold text-emerald">
                       {r.status}
                     </span>
                   </div>
@@ -703,7 +703,7 @@ export default function Admin() {
                         )}
                         <Button size="sm" variant="outline" onClick={() => toggleAiTour(p)}
                           className={"gap-1 " + (p.ai_tour_verified ? "border-emerald bg-emerald text-white hover:bg-emerald/90" : "border-emerald/40 text-emerald hover:bg-emerald-soft")}>
-                          <Sparkles className="h-3.5 w-3.5" /> {p.ai_tour_verified ? "Tur 3D" : "+ Tur 3D"}
+                          {p.ai_tour_verified ? "Tur 3D" : "+ Tur 3D"}
                         </Button>
                         <Button size="sm" variant="outline" onClick={() => delProperty(p)} className="gap-1 border-destructive/30 text-destructive hover:bg-destructive/10">
                           <Trash2 className="h-3.5 w-3.5" />

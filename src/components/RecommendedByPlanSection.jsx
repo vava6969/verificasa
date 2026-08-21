@@ -90,7 +90,7 @@ function PlanRow({ row, en, coverMap }) {
         {row.badgeImg && (
           <img src={row.badgeImg} alt="" aria-hidden="true" className="h-7 w-7 shrink-0 object-contain drop-shadow-sm sm:h-8 sm:w-8" />
         )}
-        <h2 className="text-lg font-bold text-foreground sm:text-xl">{row.shortName || row.name}</h2>
+        <h2 className="text-base font-bold text-foreground sm:text-xl">{row.shortName || row.name}</h2>
         <Link
           to="/anunturi-recomandate"
           className="ml-auto flex min-h-[44px] shrink-0 items-center text-sm font-bold text-emerald transition-transform hover:translate-x-0.5"
@@ -101,11 +101,11 @@ function PlanRow({ row, en, coverMap }) {
 
       {/* Carduri late pe telefon: un rând de defilare cu o carte și un pic din
           următoarea, nu cinci miniaturi de 168px. */}
-      <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:gap-4 sm:px-0">
+      <div className="-mx-4 flex snap-x snap-mandatory items-start gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:gap-4 sm:px-0">
         {visible.map((p) => (
           <div
             key={p.id}
-            className="w-[72vw] max-w-[300px] shrink-0 snap-start sm:w-[240px] lg:w-[260px]"
+            className="w-[46vw] max-w-[210px] shrink-0 snap-start sm:w-[220px] lg:w-[240px]"
           >
             <RecommendedPropertyCard property={p} planId={row.id === "none" ? null : row.id} coverMap={coverMap} />
           </div>

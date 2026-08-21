@@ -6,7 +6,6 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Stamp } from "@/components/fisa";
 
 // Managerul de cupoane — cererea clientului: coduri pe care le dă oamenilor,
 // iar codul acordă X boost-uri bonus. Entitatea Coupon e admin-only la citire,
@@ -161,9 +160,13 @@ export default function AdminCoupons() {
                       {c.expires_date ? new Date(c.expires_date).toLocaleDateString("ro-RO") : "—"}
                     </td>
                     <td className="border-b border-border px-4 py-2.5">
-                      <Stamp tone={live ? "verde" : "ink"}>
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                          live ? "bg-emerald-soft text-emerald" : "bg-secondary text-muted-foreground"
+                        }`}
+                      >
                         {live ? "activ" : expired ? "expirat" : maxed ? "epuizat" : "oprit"}
-                      </Stamp>
+                      </span>
                     </td>
                     <td className="border-b border-border px-4 py-2.5 text-right">
                       {c.active !== false && (
@@ -184,7 +187,7 @@ export default function AdminCoupons() {
       )}
 
       <AlertDialog open={!!deactivating} onOpenChange={(v) => !v && setDeactivating(null)}>
-        <AlertDialogContent className="rounded-none border-border">
+        <AlertDialogContent className="rounded-2xl border-border">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-heading text-xl font-semibold">
               Dezactivezi codul {deactivating?.code}?

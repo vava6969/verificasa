@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { LogOut, Check } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
@@ -11,12 +11,21 @@ import { base44 } from "@/api/base44Client";
 import { getPlanMeta } from "@/lib/plans";
 import { fetchMyActiveSubscription } from "@/lib/subscriptions";
 import AccountLimits from "@/components/AccountLimits";
-import { Stamp, Ledger, LedgerRow, Hairline } from "@/components/fisa";
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 
-// Planul activ, ca fișă: sursa de adevăr e entitatea Subscription, scrisă doar
-// de VerifyCheckoutSession după o plată reușită — niciodată din client.
+// Un rând de detaliu al planului: etichetă la stânga, valoarea la dreapta.
+function PlanRow({ label, value }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 py-2.5">
+      <p className="text-sm text-muted-foreground">{label}</p>
+      <p className="text-right text-sm font-semibold text-foreground tnum">{value}</p>
+    </div>
+  );
+}
+
+// Planul activ: sursa de adevăr e entitatea Subscription, scrisă doar de
+// VerifyCheckoutSession după o plată reușită — niciodată din client.
 function MyPlanSection() {
   const { user } = useAuth();
   const { lang } = useCountry();
@@ -31,22 +40,25 @@ function MyPlanSection() {
   }, [user?.id]);
 
   if (sub === undefined) {
-    return <div className="mb-6 h-28 animate-pulse border border-border bg-card" />;
+    return <div className="mb-6 h-28 animate-pulse rounded-2xl border border-border bg-card" />;
   }
 
   if (!sub) {
     return (
-      <section className="mb-6 border border-dashed border-border bg-card p-5">
+      <section className="mb-6 rounded-2xl border border-border bg-card p-5 shadow-sm">
         <p className="font-heading text-lg font-semibold text-foreground">
           {en ? "No active plan" : "Niciun plan activ"}
         </p>
-        <p className="mt-1 max-w-[52ch] text-sm text-muted-foreground">
+        <p className="mt-1 max-w-[46ch] text-sm text-muted-foreground">
           {en
             ? "Pick a plan so your listings get more room and a better spot in search."
             : "Alege un plan ca anunțurile tale să aibă mai mult loc și o poziție mai bună în căutare."}
         </p>
-        <Link to="/upgrade" className="mt-3 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0">
-          {en ? "See the plans" : "Vezi planurile"} <span aria-hidden="true">→</span>
+        <Link
+          to="/upgrade"
+          className="mt-4 inline-flex min-h-[48px] items-center justify-center rounded-full border border-emerald/70 bg-gradient-to-t from-emerald to-emerald/85 px-6 text-sm font-semibold text-white shadow-lg shadow-emerald/40 transition active:scale-[0.99]"
+        >
+          {en ? "See the plans" : "Vezi planurile"}
         </Link>
       </section>
     );
@@ -58,31 +70,34 @@ function MyPlanSection() {
     : null;
 
   return (
-    <section className="mb-6 border border-border bg-card">
-      <div className="flex items-center justify-between gap-3 border-b border-border p-4">
+    <section className="mb-6 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+      <div className="flex items-center justify-between gap-3 bg-emerald/10 p-4 dark:bg-emerald/15">
         <div className="min-w-0">
           <p className="text-xs text-muted-foreground">{en ? "Your plan" : "Planul tău"}</p>
           <h2 className="truncate font-heading text-xl font-semibold text-foreground">
             {meta?.shortName || meta?.name || sub.plan_id}
           </h2>
         </div>
-        <Stamp tone="verde">{en ? "Active" : "Activ"}</Stamp>
+        <span className="inline-flex shrink-0 items-center rounded-full bg-emerald px-3 py-1 text-xs font-bold text-white">
+          {en ? "Active" : "Activ"}
+        </span>
       </div>
-      <div className="px-4">
-        <Ledger className="border-t-0">
-          <LedgerRow
-            label={en ? "Billing" : "Facturare"}
-            value={sub.billing_interval === "yearly" ? (en ? "Yearly" : "Anuală") : (en ? "Monthly" : "Lunară")}
-          />
-          <LedgerRow label={en ? "Active until" : "Activ până la"} value={validUntil || "—"} />
-          {sub.amount_ron ? (
-            <LedgerRow label={en ? "Last payment" : "Ultima plată"} value={`${sub.amount_ron} RON`} />
-          ) : null}
-        </Ledger>
+      <div className="divide-y divide-border px-4">
+        <PlanRow
+          label={en ? "Billing" : "Facturare"}
+          value={sub.billing_interval === "yearly" ? (en ? "Yearly" : "Anuală") : (en ? "Monthly" : "Lunară")}
+        />
+        <PlanRow label={en ? "Active until" : "Activ până la"} value={validUntil || "—"} />
+        {sub.amount_ron ? (
+          <PlanRow label={en ? "Last payment" : "Ultima plată"} value={`${sub.amount_ron} RON`} />
+        ) : null}
       </div>
       <div className="p-4">
-        <Link to="/upgrade" className="inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0">
-          {en ? "Change plan" : "Schimbă planul"} <span aria-hidden="true">→</span>
+        <Link
+          to="/upgrade"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-border bg-background px-5 text-sm font-semibold text-foreground transition-colors hover:border-emerald hover:text-emerald"
+        >
+          {en ? "Change plan" : "Schimbă planul"}
         </Link>
       </div>
     </section>
@@ -95,7 +110,6 @@ export default function Account() {
   const { unreadCount } = useNotifications();
   const { resolvedTheme, setTheme } = useTheme();
   const { toast } = useToast();
-  const navigate = useNavigate();
   const en = lang === "en";
 
   const [mounted, setMounted] = useState(false);
@@ -162,8 +176,8 @@ export default function Account() {
   ];
 
   const pickerCls = (active) =>
-    `flex min-h-[44px] items-center justify-center gap-2 rounded border px-3 text-sm font-semibold transition-colors ${
-      active ? "border-emerald bg-emerald text-primary-foreground" : "border-border bg-background text-foreground hover:border-emerald"
+    `flex min-h-[44px] items-center justify-center gap-2 rounded-full border px-3 text-sm font-semibold transition-colors ${
+      active ? "border-emerald bg-emerald text-white" : "border-border bg-background text-foreground hover:border-emerald"
     }`;
 
   return (
@@ -179,7 +193,7 @@ export default function Account() {
       <AccountLimits className="mb-6" />
 
       {/* Destinații */}
-      <section className="mb-6 border border-border bg-card">
+      <section className="mb-6 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         {sections.map((sec, si) => (
           <div key={sec.title} className={si > 0 ? "border-t border-border" : undefined}>
             <p className="px-4 pb-1 pt-3 text-xs font-semibold text-muted-foreground">{sec.title}</p>
@@ -193,7 +207,7 @@ export default function Account() {
                     {it.label}
                     <span className="flex items-center gap-2">
                       {it.badge && (
-                        <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-sm bg-emerald px-1 text-[10px] font-bold leading-none text-primary-foreground tnum">
+                        <span className="flex h-[20px] min-w-[20px] items-center justify-center rounded-full bg-emerald px-1.5 text-[10px] font-bold leading-none text-white tnum">
                           {it.badge}
                         </span>
                       )}
@@ -208,7 +222,7 @@ export default function Account() {
       </section>
 
       {/* Preferințe */}
-      <section className="border border-border bg-card p-4">
+      <section className="rounded-2xl border border-border bg-card p-4 shadow-sm">
         <h2 className="font-heading text-lg font-semibold text-foreground">
           {en ? "Preferences" : "Preferințe"}
         </h2>
@@ -254,18 +268,18 @@ export default function Account() {
             </p>
             <button
               onClick={() => window.dispatchEvent(new Event("vc-open-cookie-prefs"))}
-              className="flex min-h-[44px] w-full items-center justify-center rounded border border-border bg-background px-3 text-sm font-semibold text-foreground transition-colors hover:border-emerald hover:text-emerald"
+              className="flex min-h-[44px] w-full items-center justify-center rounded-full border border-border bg-background px-3 text-sm font-semibold text-foreground transition-colors hover:border-emerald hover:text-emerald"
             >
               {en ? "Manage cookie preferences" : "Gestionează preferințele cookies"}
             </button>
           </div>
         </div>
 
-        <Hairline className="my-4" />
+        <div className="my-4 h-px w-full bg-border" aria-hidden="true" />
 
         <Button
           variant="outline"
-          className="min-h-[44px] w-full rounded border-border"
+          className="min-h-[44px] w-full rounded-full border-border"
           onClick={() => { logout("/"); }}
         >
           <LogOut className="mr-2 h-4 w-4" /> {t("hdr_logout")}

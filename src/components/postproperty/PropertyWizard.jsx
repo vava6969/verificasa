@@ -1,12 +1,12 @@
 import React, { useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { LoadingButton } from "@/components/ui/loading-button";
-import { ArrowLeft, ArrowRight, Home, MapPin, Ruler, Sparkles, Camera, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import confetti from "canvas-confetti";
 import { generateUniquePropertyCode } from "@/lib/propertyCode";
 import { uploadPhotos } from "@/lib/imageUpload";
@@ -20,17 +20,18 @@ import StepFeatures from "./StepFeatures";
 import StepPhotos from "./StepPhotos";
 
 const STEPS = [
-  { id: 0, icon: Home,     title: "Ce publici",  sub: "Tipul anunțului și titlul" },
-  { id: 1, icon: MapPin,   title: "Locație",     sub: "Unde se află proprietatea" },
-  { id: 2, icon: Ruler,    title: "Detalii",     sub: "Preț, spațiu, descriere" },
-  { id: 3, icon: Sparkles, title: "Facilități",  sub: "Ce oferă locuința" },
-  { id: 4, icon: Camera,   title: "Poze & contact", sub: "Ultimul pas" },
+  { id: 0, title: "Ce publici",      sub: "Tipul anunțului și titlul" },
+  { id: 1, title: "Locație",         sub: "Unde se află proprietatea" },
+  { id: 2, title: "Detalii",         sub: "Preț, spațiu, descriere" },
+  { id: 3, title: "Facilități",      sub: "Ce oferă locuința" },
+  { id: 4, title: "Poze & contact",  sub: "Ultimul pas" },
 ];
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 
 export default function PropertyWizard({ onDone, onCancel }) {
-  const { country } = useCountry();
+  const { country, lang } = useCountry();
+  const reduced = useReducedMotion();
   const { user } = useAuth();
   const { toast } = useToast();
   const isAdmin = ADMIN_ROLES.includes((user?.role || "").toUpperCase());
@@ -168,94 +169,54 @@ export default function PropertyWizard({ onDone, onCancel }) {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <div className="overflow-hidden border border-border bg-card">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
       {/* Progress header */}
       <div className="border-b border-border/60 px-4 pb-4 pt-5 sm:px-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded bg-navy-deep">
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={step}
-                  initial={{ opacity: 0, scale: 0.6, rotate: -8 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  exit={{ opacity: 0, scale: 0.6, rotate: 8 }}
-                  transition={{ duration: 0.25, ease: "easeOut" }}
-                  className="relative flex items-center justify-center text-emerald"
-                >
-                  <Current.icon className="h-5 w-5" />
-                </motion.span>
-              </AnimatePresence>
-            </span>
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-emerald">
-                Pasul {step + 1} din {STEPS.length}
-              </p>
-              <h2 className="font-heading text-lg font-bold text-navy dark:text-foreground">{Current.title}</h2>
-            </div>
+        <div className="flex items-baseline justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-emerald">
+              Pasul {step + 1} din {STEPS.length}
+            </p>
+            <h2 className="truncate font-heading text-lg font-bold text-navy dark:text-foreground">{Current.title}</h2>
           </div>
-          <p className="hidden text-xs text-muted-foreground sm:block">{Current.sub}</p>
+          <p className="hidden shrink-0 text-xs text-muted-foreground sm:block">{Current.sub}</p>
         </div>
 
-        <div className="relative mt-4 h-2 w-full overflow-hidden rounded-full bg-secondary">
+        <div
+          className="relative mt-4 h-2 w-full overflow-hidden rounded-full bg-secondary"
+          role="progressbar"
+          aria-valuemin={1}
+          aria-valuemax={STEPS.length}
+          aria-valuenow={step + 1}
+        >
           <motion.div
-            className="relative h-full overflow-hidden rounded-full bg-emerald"
-            animate={{
-              width: `${progress}%`,
-              boxShadow: [
-                "0 0 6px 0 rgba(0,168,89,0.45)",
-                "0 0 14px 3px rgba(0,168,89,0.75)",
-                "0 0 6px 0 rgba(0,168,89,0.45)",
-              ],
-            }}
-            transition={{
-              width: { duration: 0.5, ease: "easeOut" },
-              boxShadow: { duration: 1.6, repeat: Infinity, ease: "easeInOut" },
-            }}
-          >
-            <motion.span
-              className="absolute inset-y-0 w-10 bg-white/50"
-              style={{ filter: "blur(3px)" }}
-              animate={{ x: ["-2.5rem", "calc(100% + 2.5rem)"] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            />
-          </motion.div>
+            className="h-full rounded-full bg-emerald"
+            initial={false}
+            animate={{ width: `${progress}%` }}
+            transition={reduced ? { duration: 0 } : { duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          />
         </div>
 
         {/* Pași parcurși */}
         <div className="mt-4 flex items-center">
           {STEPS.map((s, i) => (
             <React.Fragment key={s.id}>
-              <motion.span
-                animate={{
-                  scale: i === step ? 1.08 : 1,
-                  boxShadow: i === step ? "0 0 0 4px rgba(0,168,89,0.16)" : "0 0 0 0 rgba(0,168,89,0)",
-                }}
-                transition={{ duration: 0.3 }}
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 text-[10px] font-bold ${
+              <span
+                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 text-[10px] font-bold transition-colors duration-300 ${
                   i < step
                     ? "border-emerald bg-emerald text-white"
                     : i === step
-                    ? "border-emerald bg-card text-emerald"
+                    ? "border-emerald bg-card text-emerald ring-4 ring-emerald/15"
                     : "border-border bg-secondary text-muted-foreground/50"
                 }`}
               >
                 {i < step ? <Check className="h-3 w-3" /> : i + 1}
-              </motion.span>
+              </span>
               {i < STEPS.length - 1 && (
                 <span className={`mx-1 h-0.5 flex-1 rounded-full transition-colors duration-500 ${i < step ? "bg-emerald" : "bg-border"}`} />
               )}
             </React.Fragment>
           ))}
-        </div>
-
-        <div className="mt-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
-          <span className="rounded bg-navy px-2.5 py-1 text-white">{Current.title}</span>
-          {STEPS[step + 1] && (
-            <span className="flex items-center gap-1 text-muted-foreground/70">
-              <ArrowRight className="h-3 w-3" /> Urmează: {STEPS[step + 1].title}
-            </span>
-          )}
         </div>
       </div>
 
@@ -264,27 +225,45 @@ export default function PropertyWizard({ onDone, onCancel }) {
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
-            initial={{ opacity: 0, x: 16 }}
+            initial={reduced ? false : { opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -16 }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
+            exit={reduced ? { opacity: 1 } : { opacity: 0, x: -16 }}
+            transition={reduced ? { duration: 0 } : { duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
           >
             {step === 0 && <StepBasics form={form} set={set} />}
             {step === 1 && <StepLocation form={form} set={set} country={country} />}
             {step === 2 && <StepDetails form={form} set={set} />}
             {step === 3 && <StepFeatures form={form} set={set} chips={chips} setChips={setChips} facilities={facilities} setFacilities={setFacilities} />}
-            {step === 4 && <StepPhotos form={form} set={set} uploading={uploading} onFiles={handleFile} agreed={agreed} setAgreed={setAgreed} />}
+            {step === 4 && (
+              <>
+                <p className="mb-4 rounded-xl bg-emerald-soft px-3.5 py-2.5 text-sm font-medium text-emerald">
+                  {lang === "en"
+                    ? "Real photos, taken on your phone. No renders."
+                    : "Poze reale, făcute cu telefonul. Fără randări."}
+                </p>
+                <StepPhotos form={form} set={set} uploading={uploading} onFiles={handleFile} agreed={agreed} setAgreed={setAgreed} />
+              </>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
 
       {/* Nav */}
-      <div className="sticky bottom-0 flex items-center gap-3 border-t border-border/60 bg-background/90 px-4 py-3 sm:px-6">
-        <Button type="button" variant="outline" onClick={back} className="gap-1.5 rounded">
+      <div className="sticky bottom-0 flex items-center gap-3 border-t border-border/60 bg-card px-4 py-3 sm:px-6">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={back}
+          className="h-12 gap-1.5 rounded-full px-5"
+        >
           <ArrowLeft className="h-4 w-4" /> {step === 0 ? "Renunță" : "Înapoi"}
         </Button>
         {step < STEPS.length - 1 ? (
-          <Button type="button" onClick={next} className="flex-1 gap-1.5 rounded bg-emerald text-white shadow-soft hover:bg-emerald/90">
+          <Button
+            type="button"
+            onClick={next}
+            className="h-12 flex-1 gap-1.5 rounded-full bg-emerald text-base text-white shadow-soft hover:bg-emerald/90"
+          >
             Continuă <ArrowRight className="h-4 w-4" />
           </Button>
         ) : (
@@ -295,7 +274,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
               pendingLabel="Se publică…"
               successLabel="Publicat!"
               errorLabel="Încearcă din nou"
-              className="w-full"
+              className="w-full rounded-full"
             >
               Publică anunțul
             </LoadingButton>

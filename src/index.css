@@ -329,6 +329,12 @@
   .dark .vc-tiles-plan { filter: invert(1) hue-rotate(180deg) brightness(0.9) saturate(0.6); }
   .vc-tiles-none { filter: none; }
 
+  /* Umbră de 2px sub textul din hero: fotografiile din spate variază, iar
+     titlul trebuie să rămână lizibil peste oricare dintre ele. */
+  .hero-ink {
+    text-shadow: 0 2px 4px rgb(0 0 0 / 0.55), 0 1px 2px rgb(0 0 0 / 0.4);
+  }
+
   /* generated paper grain (SVG turbulence, no stock textures) */
   .paper-grain { position: relative; }
   .paper-grain::after {

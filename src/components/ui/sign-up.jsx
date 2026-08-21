@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Input } from "@/components/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Mail, Lock, User, Loader2, ArrowRight, ArrowLeft, Check, Home, Sparkles, ShieldCheck } from "lucide-react";
+import { Mail, Lock, User, Loader2, ArrowRight, ArrowLeft, Check, Home } from "lucide-react";
 import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";

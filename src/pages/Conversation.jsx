@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, useSearchParams, Link, Navigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import { useCountry } from "@/components/CountryContext";
 import { createNotification } from "@/lib/notifications";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,9 @@ export default function Conversation() {
   const prefill = searchParams.get("prefill") === "1";
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const { lang } = useCountry();
+  const en = lang === "en";
+  const dateLocale = en ? "en-GB" : "ro-RO";
   const { toast } = useToast();
   const [conv, setConv] = useState(null);
   const [messages, setMessages] = useState(null);
@@ -60,8 +64,12 @@ export default function Conversation() {
     (async () => {
       try {
         const prop = await base44.entities.Property.get(conv.property_id);
-        const code = prop.property_code ? ` Cod anunț: ${prop.property_code}` : "";
-        setText(`Bună ziua, sunt interesat de această proprietate: ${prop.title}. Aș dori mai multe detalii.${code}`);
+        const code = prop.property_code
+          ? (en ? ` Listing code: ${prop.property_code}` : ` Cod anunț: ${prop.property_code}`)
+          : "";
+        setText(en
+          ? `Hello, I'm interested in this property: ${prop.title}. I'd like more details.${code}`
+          : `Bună ziua, sunt interesat de această proprietate: ${prop.title}. Aș dori mai multe detalii.${code}`);
         setPendingRef({
           property_ref_id: prop.id,
           property_ref_title: prop.title,
@@ -105,8 +113,8 @@ export default function Conversation() {
 
   const otherName = conv
     ? conv.buyer_id === user?.id
-      ? conv.seller_name || otherUser?.full_name || "Proprietar"
-      : conv.buyer_name || otherUser?.full_name || "Cumpărător"
+      ? conv.seller_name || otherUser?.full_name || (en ? "Landlord" : "Proprietar")
+      : conv.buyer_name || otherUser?.full_name || (en ? "Buyer" : "Cumpărător")
     : "";
 
   const maybeSendReviewRequest = async () => {
@@ -161,7 +169,7 @@ export default function Conversation() {
         });
       }
     } catch (err) {
-      toast({ title: "Eroare la trimitere", variant: "destructive" });
+      toast({ title: en ? "Could not send the message" : "Eroare la trimitere", variant: "destructive" });
     } finally { setSending(false); }
   };
 
@@ -178,28 +186,31 @@ export default function Conversation() {
 
   const deleteConversation = async () => {
     if (!conv) return;
-    if (!confirm(`Ștergi conversația cu ${otherName}? Mesajele vor fi șterse definitiv.`)) return;
+    const ask = en
+      ? `Delete the conversation with ${otherName}? The messages will be gone for good.`
+      : `Ștergi conversația cu ${otherName}? Mesajele vor fi șterse definitiv.`;
+    if (!confirm(ask)) return;
     setBusy(true);
     try {
       await base44.entities.Message.deleteMany({ conversation_id: conv.id }).catch(() => {});
       await base44.entities.Conversation.delete(conv.id);
-      toast({ title: "Conversație ștearsă" });
+      toast({ title: en ? "Conversation deleted" : "Conversație ștearsă" });
       navigate("/messages", { replace: true });
-    } catch { toast({ title: "Eroare la ștergere", variant: "destructive" }); }
+    } catch { toast({ title: en ? "Delete failed" : "Eroare la ștergere", variant: "destructive" }); }
     finally { setBusy(false); }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#f4f6f9] dark:bg-background">
+    <div className="fixed inset-0 z-50 flex flex-col bg-background">
       {/* Header — shows other participant's name + avatar */}
       <div
-        className="flex items-center gap-2 border-b border-border bg-white px-3 py-2.5 shadow-sm dark:bg-card sm:px-4"
+        className="flex items-center gap-2 border-b border-border bg-card px-2 py-2.5 shadow-sm sm:px-4"
         style={{ paddingTop: "calc(0.625rem + env(safe-area-inset-top))" }}
       >
         <button
           onClick={() => navigate("/messages")}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary/60"
-          aria-label="Înapoi la inbox"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition hover:bg-secondary"
+          aria-label={en ? "Back to inbox" : "Înapoi la inbox"}
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
@@ -217,29 +228,32 @@ export default function Conversation() {
             to={otherUserId ? `/profile/${otherUserId}` : "#"}
             className="block truncate font-heading text-base font-bold text-navy hover:text-emerald dark:text-foreground"
           >
-            {otherName || "Conversație"}
+            {otherName || (en ? "Conversation" : "Conversație")}
           </Link>
           {conv?.property_id && conv.property_id !== "direct" ? (
             <Link to={`/property/${conv.property_id}`} className="block truncate text-xs text-muted-foreground hover:text-emerald">
-              {conv?.property_title || "Proprietate"}
+              {conv?.property_title || (en ? "Property" : "Proprietate")}
             </Link>
           ) : (
-            <p className="truncate text-xs text-muted-foreground">Conversație directă</p>
+            <p className="truncate text-xs text-muted-foreground">{en ? "Direct conversation" : "Conversație directă"}</p>
           )}
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="rounded p-1.5 text-muted-foreground hover:bg-secondary/60" aria-label="Opțiuni conversație">
+            <button
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition hover:bg-secondary"
+              aria-label={en ? "Conversation options" : "Opțiuni conversație"}
+            >
               <MoreVertical className="h-5 w-5" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem onClick={markAllRead} disabled={busy} className="gap-2">
-              <CheckCheck className="h-4 w-4 text-emerald" /> Marchează toate ca citite
+          <DropdownMenuContent align="end" className="w-56 rounded-2xl">
+            <DropdownMenuItem onClick={markAllRead} disabled={busy} className="gap-2 rounded-xl py-2.5">
+              <CheckCheck className="h-4 w-4 text-emerald" /> {en ? "Mark all as read" : "Marchează toate ca citite"}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={deleteConversation} disabled={busy} className="gap-2 text-destructive focus:text-destructive">
-              <Trash2 className="h-4 w-4" /> Șterge conversația
+            <DropdownMenuItem onClick={deleteConversation} disabled={busy} className="gap-2 rounded-xl py-2.5 text-destructive focus:text-destructive">
+              <Trash2 className="h-4 w-4" /> {en ? "Delete conversation" : "Șterge conversația"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -252,14 +266,16 @@ export default function Conversation() {
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-emerald border-t-transparent" />
           </div>
         ) : messages.length === 0 ? (
-          <div className="py-12 text-center text-sm text-muted-foreground">Niciun mesaj. Fii primul care scrie!</div>
+          <div className="py-12 text-center text-sm text-muted-foreground">
+            {en ? "No messages yet. Be the first to write." : "Niciun mesaj. Fii primul care scrie!"}
+          </div>
         ) : (
           messages.map((m) => {
             // System message — review request notification
             if (m.is_system && m.system_type === "review_request") {
               return (
-                <div key={m.id} className="flex justify-center px-4 py-2">
-                  <div className="flex max-w-[90%] flex-col items-center gap-2 rounded border border-gold/30 bg-gold-soft px-4 py-3 text-center dark:border-gold/20 sm:max-w-[70%]">
+                <div key={m.id} className="flex justify-center px-2 py-2">
+                  <div className="flex max-w-[90%] flex-col items-center gap-2 rounded-2xl border border-gold/30 bg-gold-soft px-4 py-3 text-center dark:border-gold/20 sm:max-w-[70%]">
                     <div className="flex items-center gap-2">
                       <VerifiCasaLogo size={28} withWordmark={false} />
                       <span className="text-xs font-bold uppercase tracking-wide text-gold-deep">VerifiCasa</span>
@@ -268,9 +284,9 @@ export default function Conversation() {
                     {otherUser && (
                       <button
                         onClick={() => setShowReviewModal(true)}
-                        className="mt-1 flex items-center gap-1.5 rounded bg-emerald px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald/90"
+                        className="mt-1 flex h-11 items-center gap-1.5 rounded-full bg-emerald px-5 text-xs font-bold text-primary-foreground shadow-sm transition hover:bg-emerald/90"
                       >
-                        <Star className="h-3.5 w-3.5 fill-white" /> Lasă o recenzie
+                        <Star className="h-3.5 w-3.5 fill-current" /> {en ? "Leave a review" : "Lasă o recenzie"}
                       </button>
                     )}
                   </div>
@@ -279,8 +295,10 @@ export default function Conversation() {
             }
             const mine = m.sender_id === user.id;
             const readTitle = m.read_at
-              ? `Văzut la ${new Date(m.read_at).toLocaleString("ro-RO")}`
-              : "Trimis · încă nu a fost văzut";
+              ? (en
+                ? `Seen at ${new Date(m.read_at).toLocaleString(dateLocale)}`
+                : `Văzut la ${new Date(m.read_at).toLocaleString(dateLocale)}`)
+              : (en ? "Sent · not seen yet" : "Trimis · încă nu a fost văzut");
             return (
               <div key={m.id} className={"flex gap-2 " + (mine ? "justify-end" : "justify-start")}>
                 {!mine && (
@@ -294,15 +312,19 @@ export default function Conversation() {
                 )}
                 <div className={"flex max-w-[82%] flex-col gap-0.5 sm:max-w-[70%] " + (mine ? "items-end" : "items-start")}>
                   <div className={[
-                    "rounded px-3.5 py-2.5 text-sm leading-relaxed shadow-sm sm:px-4",
-                    mine ? "rounded-br-sm bg-emerald text-white" : "rounded-bl-sm bg-white text-foreground dark:bg-card",
+                    "overflow-hidden rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm [overflow-wrap:anywhere]",
+                    // text-primary-foreground is paper in light and near-ink in
+                    // dark — both clear 5:1 on the verde bubble.
+                    mine
+                      ? "rounded-br-md bg-emerald text-primary-foreground"
+                      : "rounded-bl-md border border-border/70 bg-secondary text-secondary-foreground",
                   ].join(" ")}>
                     {m.content}
                     {m.property_ref_id && <ChatPropertyCard message={m} mine={mine} />}
                   </div>
                   <div className={"flex items-center gap-1 px-1 " + (mine ? "flex-row-reverse" : "flex-row")}>
                     <span className="text-[10px] text-muted-foreground">
-                      {new Date(m.created_date).toLocaleTimeString("ro-RO", { hour: "2-digit", minute: "2-digit" })}
+                      {new Date(m.created_date).toLocaleTimeString(dateLocale, { hour: "2-digit", minute: "2-digit" })}
                     </span>
                     {mine && (m.read_at
                       ? <span title={readTitle} className="text-emerald"><CheckCheck className="h-3.5 w-3.5" /></span>
@@ -319,22 +341,23 @@ export default function Conversation() {
       {/* Composer */}
       <form
         onSubmit={send}
-        className="flex items-center gap-2 border-t border-border bg-white px-3 py-2.5 dark:bg-card sm:px-4 sm:py-3"
+        className="flex items-center gap-2 border-t border-border bg-card px-3 py-2.5 sm:px-4 sm:py-3"
         style={{ paddingBottom: "calc(0.625rem + env(safe-area-inset-bottom))" }}
       >
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Scrie un mesaj..."
-          className="flex-1 rounded border border-border bg-background px-4 py-3 text-base outline-none focus:border-emerald dark:bg-card"
+          placeholder={en ? "Write a message..." : "Scrie un mesaj..."}
+          aria-label={en ? "Write a message" : "Scrie un mesaj"}
+          className="h-12 min-w-0 flex-1 rounded-full border border-border bg-background px-4 text-base outline-none focus:border-emerald"
         />
         <Button
           type="submit"
           disabled={sending || !text.trim()}
-          className="h-12 w-12 shrink-0 rounded-full bg-emerald p-0 text-white shadow-md hover:bg-emerald/90 disabled:opacity-50"
-          aria-label="Trimite"
+          className="h-12 w-12 shrink-0 rounded-full bg-emerald p-0 text-primary-foreground shadow-md hover:bg-emerald/90 disabled:opacity-50"
+          aria-label={en ? "Send" : "Trimite"}
         >
-          {sending ? <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" /> : <Send className="h-5 w-5" />}
+          {sending ? <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" /> : <Send className="h-5 w-5" />}
         </Button>
       </form>
 

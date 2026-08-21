@@ -3,13 +3,12 @@ import {
   ResponsiveContainer, BarChart, Bar, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from "recharts";
-import { Eye, MessageSquare, BarChart3 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Paleta graficelor, derivată din tokenii registrului — verde conduce,
-// marcaj punctează, restul sunt tonuri de cerneală. Fără curcubeu.
-const COLORS = ["#1F7048", "#DE4E12", "#161C29", "#4E7A63", "#8A9A90", "#B08A5E", "#5C6360"];
+// Brand palette only: verde leads, bronze is the premium second, muted ink
+// third. Everything after is a tint of those three — never a rainbow.
+const COLORS = ["#1F7048", "#8A661B", "#5C6360", "#4E7A63", "#B08A5E", "#8A9A90", "#2C6B57"];
 
 function monthLabel(ym, lang) {
   const [y, m] = ym.split("-").map(Number);
@@ -18,16 +17,16 @@ function monthLabel(ym, lang) {
   return d.toLocaleDateString(loc, { month: "short", year: "2-digit" });
 }
 
-function ChartCard({ title, subtitle, icon: Icon, children }) {
+function ChartCard({ title, subtitle, iconSrc, children }) {
   return (
-    <div className="rounded border border-border bg-white p-5 shadow-soft">
-      <div className="mb-3 flex items-center gap-2">
-        <div className="flex h-9 w-9 items-center justify-center rounded bg-emerald-soft text-emerald">
-          <Icon className="h-4.5 w-4.5" />
-        </div>
-        <div>
-          <h3 className="font-heading text-base font-bold text-navy">{title}</h3>
-          <p className="text-xs text-muted-foreground">{subtitle}</p>
+    <div className="rounded-2xl border border-border bg-card p-4 shadow-soft sm:p-5">
+      <div className="mb-3 flex items-center gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-soft">
+          <img src={iconSrc} alt="" aria-hidden="true" className="h-7 w-7 object-contain" />
+        </span>
+        <div className="min-w-0">
+          <h3 className="font-heading text-base font-bold text-navy dark:text-foreground">{title}</h3>
+          <p className="truncate text-xs text-muted-foreground">{subtitle}</p>
         </div>
       </div>
       {children}
@@ -59,7 +58,7 @@ export default function OwnerCharts({ ownerId, lang }) {
   if (loading) {
     return (
       <div className="mt-8 grid gap-4 lg:grid-cols-2">
-        {Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-72 rounded" />)}
+        {Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-72 rounded-2xl" />)}
       </div>
     );
   }
@@ -77,21 +76,25 @@ export default function OwnerCharts({ ownerId, lang }) {
   });
 
   const TooltipStyle = {
-    contentStyle: { borderRadius: 12, border: "1px solid hsl(var(--border))", fontSize: 12 },
-    labelStyle: { fontWeight: 700, color: "hsl(var(--navy))" },
+    contentStyle: {
+      borderRadius: 16,
+      border: "1px solid hsl(var(--border))",
+      background: "hsl(var(--card))",
+      color: "hsl(var(--foreground))",
+      fontSize: 12,
+    },
+    itemStyle: { color: "hsl(var(--foreground))" },
+    labelStyle: { fontWeight: 700, color: "hsl(var(--foreground))" },
   };
 
   return (
     <div className="mt-8">
-      <div className="mb-3 flex items-center gap-2">
-        <BarChart3 className="h-5 w-5 text-emerald" />
-        <h2 className="font-heading text-xl font-bold text-navy">
-          {isEn ? "Performance analytics" : "Analiză performanță"}
-        </h2>
-      </div>
+      <h2 className="mb-3 font-heading text-xl font-bold text-navy dark:text-foreground">
+        {isEn ? "Performance analytics" : "Analiză performanță"}
+      </h2>
       <div className="grid gap-4 lg:grid-cols-2">
         <ChartCard
-          icon={Eye}
+          iconSrc="/images/generated/icon-gauge.png"
           title={isEn ? "Monthly views" : "Vizionări / lună"}
           subtitle={isEn ? "Views per listing, last 6 months" : "Vizionări pe anunț, ultimele 6 luni"}
         >
@@ -103,14 +106,14 @@ export default function OwnerCharts({ ownerId, lang }) {
               <Tooltip {...TooltipStyle} />
               {data.properties.length <= 5 && <Legend wrapperStyle={{ fontSize: 11 }} />}
               {data.properties.map((p, i) => (
-                <Bar key={p.id} dataKey={p.title} fill={COLORS[i % COLORS.length]} radius={[4, 4, 0, 0]} maxBarSize={26} />
+                <Bar key={p.id} dataKey={p.title} fill={COLORS[i % COLORS.length]} radius={[8, 8, 0, 0]} maxBarSize={26} />
               ))}
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
 
         <ChartCard
-          icon={MessageSquare}
+          iconSrc="/images/generated/icon-chat.png"
           title={isEn ? "Inquiries evolution" : "Cereri primite / lună"}
           subtitle={isEn ? "Inquiries per listing, last 6 months" : "Cereri pe anunț, ultimele 6 luni"}
         >

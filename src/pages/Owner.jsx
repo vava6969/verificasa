@@ -6,9 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Camera, Eye, MessageSquare, FileText, Plus, Download,
-} from "lucide-react";
+import { Eye, Plus, Download } from "lucide-react";
 import OwnerCharts from "@/components/OwnerCharts";
 import PropertyWizard from "@/components/postproperty/PropertyWizard";
 
@@ -61,12 +59,13 @@ export default function Owner() {
 
   useEffect(() => { load(); }, [user?.id]);
 
+  const en = lang === "en";
   const totalViews = (properties || []).reduce((a, p) => a + (p.views_count || 0), 0);
 
   const STAT_CARDS = [
-    { icon: FileText, label: t("s_active"), value: properties?.length ?? "—" },
-    { icon: Eye, label: "Total Vizionări Anunțuri", value: totalViews },
-    { icon: MessageSquare, label: t("s_inq"), value: inquiries.length },
+    { img: "/images/generated/icon-document-check.png", label: t("s_active"), value: properties?.length ?? "—" },
+    { img: "/images/generated/icon-gauge.png", label: en ? "Total listing views" : "Vizionări totale", value: totalViews },
+    { img: "/images/generated/icon-chat.png", label: t("s_inq"), value: inquiries.length },
   ];
 
   return (
@@ -74,24 +73,27 @@ export default function Owner() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="font-heading text-3xl font-bold text-navy">{t("owner_h")}</h1>
+            <h1 className="font-heading text-3xl font-bold text-navy dark:text-foreground">{t("owner_h")}</h1>
             <p className="mt-1 text-sm text-muted-foreground">{t("owner_sub")}</p>
           </div>
-          <Button onClick={() => setShowForm((s) => !s)} className="bg-emerald text-primary-foreground shadow-soft hover:opacity-90">
+          <Button
+            onClick={() => setShowForm((s) => !s)}
+            className="h-11 rounded-full bg-emerald px-5 text-primary-foreground shadow-soft hover:bg-emerald/90"
+          >
             <Plus className="h-4 w-4" /> {t("owner_add")}
           </Button>
         </div>
 
         <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-4">
           {STAT_CARDS.map((s, i) => (
-            <div key={i} className="surface-card rounded p-2.5 sm:p-4">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-soft sm:h-10 sm:w-10">
-                  <s.icon className="h-4 w-4 text-emerald sm:h-5 sm:w-5" />
-                </div>
+            <div key={i} className="surface-card rounded-2xl p-3 sm:p-4">
+              <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-soft sm:h-12 sm:w-12">
+                  <img src={s.img} alt="" aria-hidden="true" className="h-6 w-6 object-contain sm:h-7 sm:w-7" />
+                </span>
                 <div className="min-w-0">
-                  <p className="font-heading text-lg font-bold leading-none text-navy sm:text-2xl">{s.value}</p>
-                  <p className="mt-0.5 truncate text-[10px] text-muted-foreground sm:text-xs">{s.label}</p>
+                  <p className="font-heading text-lg font-bold leading-none text-navy dark:text-foreground sm:text-2xl">{s.value}</p>
+                  <p className="mt-1 line-clamp-2 text-[11px] leading-tight text-muted-foreground sm:text-xs">{s.label}</p>
                 </div>
               </div>
             </div>
@@ -108,32 +110,40 @@ export default function Owner() {
 
         {/* PROPERTIES */}
         <div className="mt-8">
-          <h2 className="font-heading text-xl font-bold text-navy">{t("my_props")}</h2>
+          <h2 className="font-heading text-xl font-bold text-navy dark:text-foreground">{t("my_props")}</h2>
           {properties === null ? (
-            <div className="mt-4 space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-28 rounded" />)}</div>
+            <div className="mt-4 space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-2xl" />)}</div>
           ) : properties.length === 0 ? (
-            <div className="mt-4 rounded border border-dashed border-border py-16 text-center">
-              <Camera className="mx-auto h-8 w-8 text-muted-foreground/40" />
+            <div className="mt-4 rounded-2xl border border-dashed border-border py-16 text-center">
+              <img
+                src="/images/generated/icon-camera-verify.png"
+                alt=""
+                aria-hidden="true"
+                className="mx-auto h-12 w-12 object-contain opacity-70"
+              />
               <p className="mt-3 text-sm text-muted-foreground">{t("no_props")}</p>
             </div>
           ) : (
             <div className="mt-4 space-y-3">
               {properties.map((p) => (
-                <div key={p.id} className="flex flex-wrap items-center gap-4 rounded border border-border bg-white p-4 shadow-soft">
-                  <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-secondary">
+                <div key={p.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-soft sm:gap-4 sm:p-4">
+                  <div className="h-16 w-24 shrink-0 overflow-hidden rounded-xl bg-secondary">
                     {p.images?.[0] ? <UIImage src={p.images[0]} fittingType="fill" className="h-full w-full" /> : null}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-heading font-bold text-navy line-clamp-1">{p.title}</p>
-                    <p className="text-xs text-muted-foreground">{p.zone}, {p.city} · {p.property_type}</p>
+                    <p className="font-heading font-bold text-navy line-clamp-1 dark:text-foreground">{p.title}</p>
+                    <p className="truncate text-xs text-muted-foreground">{p.zone}, {p.city} · {p.property_type}</p>
                   </div>
-                  <div className="flex items-center gap-4 text-xs">
+                  <div className="flex w-full flex-wrap items-center gap-2 text-xs sm:w-auto sm:gap-3">
                     <span className="flex items-center gap-1 text-muted-foreground"><Eye className="h-3.5 w-3.5" /> {p.views_count || 0}</span>
-                    <span className={`flex items-center gap-1 ${p.ai_video_url ? "text-mint" : "text-muted-foreground"}`}>AI {p.ai_video_url ? t("ai_active") : t("ai_none")}</span>
-                    <span className={`rounded px-2 py-0.5 text-[11px] font-semibold ${p.approval_status === "APPROVED" ? "bg-mint-soft text-navy" : "bg-amber-100 text-amber-700"}`}>{p.approval_status === "APPROVED" ? "Aprobat" : "În așteptare"}</span>
-                    <span className={`rounded px-2 py-0.5 text-[11px] font-semibold ${p.status === "Activ" ? "bg-mint-soft text-navy" : "bg-secondary text-muted-foreground"}`}>{p.status}</span>
+                    <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${p.approval_status === "APPROVED" ? "bg-emerald-soft text-emerald" : "bg-gold-soft text-gold-deep"}`}>
+                      {p.approval_status === "APPROVED" ? (en ? "Approved" : "Aprobat") : (en ? "Pending" : "În așteptare")}
+                    </span>
+                    <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${p.status === "Activ" ? "bg-emerald-soft text-emerald" : "bg-secondary text-muted-foreground"}`}>{p.status}</span>
                   </div>
-                  <Button variant="outline" size="sm" className="gap-1"><Download className="h-3.5 w-3.5" /> {t("contract_pdf")}</Button>
+                  <Button variant="outline" className="h-11 shrink-0 gap-1.5 rounded-full px-4 text-xs">
+                    <Download className="h-3.5 w-3.5" /> {t("contract_pdf")}
+                  </Button>
                 </div>
               ))}
             </div>
@@ -143,22 +153,22 @@ export default function Owner() {
         {/* INQUIRIES */}
         {inquiries.length > 0 && (
           <div className="mt-8">
-            <h2 className="font-heading text-xl font-bold text-navy">{t("inq_title")}</h2>
+            <h2 className="font-heading text-xl font-bold text-navy dark:text-foreground">{t("inq_title")}</h2>
             <div className="mt-4 space-y-3">
               {inquiries.map((inq) => (
-                <div key={inq.id} className="rounded border border-border bg-white p-4 shadow-soft">
+                <div key={inq.id} className="rounded-2xl border border-border bg-card p-4 shadow-soft">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <p className="font-heading font-bold text-navy">{inq.name} <span className="text-xs font-normal text-muted-foreground">— {inq.property_title}</span></p>
-                      <p className="text-xs text-muted-foreground">{inq.email} · {inq.phone || t("inq_no_phone")}</p>
+                    <div className="min-w-0">
+                      <p className="font-heading font-bold text-navy dark:text-foreground">{inq.name} <span className="text-xs font-normal text-muted-foreground">— {inq.property_title}</span></p>
+                      <p className="truncate text-xs text-muted-foreground">{inq.email} · {inq.phone || t("inq_no_phone")}</p>
                     </div>
-                    <span className={`rounded px-2.5 py-0.5 text-[11px] font-semibold ${inq.status === "Nou" ? "bg-blue-50 text-blue-700" : inq.status === "Calificat" ? "bg-mint-soft text-navy" : inq.status === "Vizionare programată" ? "bg-amber-50 text-amber-700" : "bg-secondary text-muted-foreground"}`}>{inq.status}</span>
+                    <span className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ${inq.status === "Nou" ? "bg-emerald text-primary-foreground" : inq.status === "Calificat" ? "bg-emerald-soft text-emerald" : inq.status === "Vizionare programată" ? "bg-gold-soft text-gold-deep" : "bg-secondary text-muted-foreground"}`}>{inq.status}</span>
                   </div>
                   {(inq.occupation || inq.estimated_income) && (
                     <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
                       {inq.occupation && <span>{t("inq_occupation")} {inq.occupation}</span>}
                       {inq.estimated_income && <span>{t("inq_income")} {inq.estimated_income}</span>}
-                      {inq.move_date && <span>{t("inq_move")} {new Date(inq.move_date).toLocaleDateString("ro-RO")}</span>}
+                      {inq.move_date && <span>{t("inq_move")} {new Date(inq.move_date).toLocaleDateString(en ? "en-GB" : "ro-RO")}</span>}
                     </div>
                   )}
                 </div>

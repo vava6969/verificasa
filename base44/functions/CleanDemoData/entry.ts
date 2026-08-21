@@ -177,12 +177,52 @@ export default async function (req: Request): Promise<Response> {
       try { await svc.entities.Property.update(u.id, u.patch); updated += 1; } catch (_) { /* skip */ }
     }
 
+    // Un anunț promovat real, ca insigna „Promovat" și ordonarea plătită să se
+    // vadă în aplicație fără să aștepte prima plată a unui client. Alegem un
+    // anunț credibil, aprobat, al unui agent — exact cazul pe care îl vinde
+    // sistemul de boost.
+    let boosted: any = null;
+    if (body?.boost_demo === true) {
+      const deletedIds = new Set(toDelete.map((d) => d.id));
+      const patched = new Map(toUpdate.map((u) => [u.id, u.patch]));
+      const candidates = (properties as any[])
+        .filter((p) => !deletedIds.has(p.id))
+        .filter((p) => p.approval_status === "APPROVED" && p.status === "Activ")
+        .filter((p) => !patched.has(p.id))
+        .filter((p) => p.seller_role === "Agent");
+      const pool = candidates.length ? candidates : (properties as any[]).filter((p) => !deletedIds.has(p.id));
+      const already = (properties as any[]).find((p) => p.boost_active);
+      if (already) {
+        boosted = { id: already.id, title: already.title, note: "exista deja un anunț promovat" };
+      } else if (pool.length) {
+        const chosen = pool[hashId("boost") % pool.length];
+        const ends = new Date(Date.now() + 7 * 86400000).toISOString();
+        try {
+          await svc.entities.Boost.create({
+            property_id: chosen.id,
+            user_id: chosen.created_by_id || me.id,
+            starts_date: new Date().toISOString(),
+            ends_date: ends,
+            status: "active",
+            credits_spent: 0,
+          });
+        } catch (_) { /* registrul e opțional pentru demonstrație */ }
+        try {
+          await svc.entities.Property.update(chosen.id, { boost_active: true, boost_ends_date: ends });
+          boosted = { id: chosen.id, title: chosen.title, ends_date: ends };
+        } catch (e: any) {
+          boosted = { error: e?.message || "nu am putut promova anunțul" };
+        }
+      }
+    }
+
     return Response.json({
       ok: true,
       dry_run: false,
       scanned: properties.length,
       deleted,
       updated,
+      boosted,
       details: toUpdate.map((u) => ({ id: u.id, title: u.title, reasons: u.reasons })),
     });
   } catch (e: any) {

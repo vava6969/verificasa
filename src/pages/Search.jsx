@@ -8,7 +8,7 @@ import { buildCoverMap } from "@/lib/covers";
 import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, BookmarkPlus, RotateCcw, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { BookmarkPlus, RotateCcw, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
@@ -16,14 +16,15 @@ import { resolvePropertyPlan, PLAN_FILTER_OPTIONS, compareByBoostThenViews } fro
 import { fetchActivePlanMap } from "@/lib/subscriptions";
 
 // VerifiCasa verification filters — each applies a real-property predicate.
+// Plain text pills: no ornament icons, the label carries the meaning.
 const VERIF_FILTERS = [
-  { key: "ai", labelKey: "tg_ai", icon: Sparkles, test: (p) => !!p.tour_3d_url || !!p.ai_video_url || !!p.ai_tour_verified },
-  { key: "field", labelKey: "tg_field", icon: ShieldCheck, test: (p) => p.owner_verified || p.verification_level === "field_certified" || p.ai_tour_verified },
-  { key: "pet", labelKey: "tg_pet", icon: PawPrint, test: (p) => !!p.pet_friendly },
-  { key: "nofee", labelKey: "tg_nofee", icon: BadgePercent, test: (p) => !!p.commission_free },
-  { key: "studio", labelKey: "type_studio_vc", icon: Home, test: (p) => ["Garsonieră", "Studio"].includes(p.property_type) },
-  { key: "2camere", labelKey: "type_2_vc", icon: Home, test: (p) => p.property_type === "2 Camere" },
-  { key: "parking", labelKey: "sr_parking", icon: Home, test: (p) => !!p.parking },
+  { key: "ai", labelKey: "tg_ai", test: (p) => !!p.tour_3d_url || !!p.ai_video_url || !!p.ai_tour_verified },
+  { key: "field", labelKey: "tg_field", test: (p) => p.owner_verified || p.verification_level === "field_certified" || p.ai_tour_verified },
+  { key: "pet", labelKey: "tg_pet", test: (p) => !!p.pet_friendly },
+  { key: "nofee", labelKey: "tg_nofee", test: (p) => !!p.commission_free },
+  { key: "studio", labelKey: "type_studio_vc", test: (p) => ["Garsonieră", "Studio"].includes(p.property_type) },
+  { key: "2camere", labelKey: "type_2_vc", test: (p) => p.property_type === "2 Camere" },
+  { key: "parking", labelKey: "sr_parking", test: (p) => !!p.parking },
 ];
 
 const makeFairness = (t) => [
@@ -227,11 +228,11 @@ export default function SearchPage() {
             {found === 1 ? t("sr_found_one", { n: found }) : t("sr_found_many", { n: found })}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button onClick={resetFilters} variant="outline" className="min-h-[40px] gap-1.5 rounded border-border text-foreground hover:border-emerald hover:text-emerald">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button onClick={resetFilters} variant="outline" className="min-h-[44px] gap-1.5 rounded-full border-border text-foreground hover:border-emerald hover:text-emerald">
             <RotateCcw className="h-4 w-4" /> {t("sr_reset_filters")}
           </Button>
-          <Button onClick={saveSearch} variant="outline" className="min-h-[40px] gap-1.5 rounded border-border text-foreground hover:border-emerald hover:text-emerald">
+          <Button onClick={saveSearch} variant="outline" className="min-h-[44px] gap-1.5 rounded-full border-border text-foreground hover:border-emerald hover:text-emerald">
             <BookmarkPlus className="h-4 w-4" /> {t("sr_save_search")}
           </Button>
         </div>
@@ -242,7 +243,7 @@ export default function SearchPage() {
         <select
           value={cityFilter}
           onChange={(e) => updateCity(e.target.value)}
-          className="min-h-[42px] rounded border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
+          className="min-h-[44px] rounded-full border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
         >
           <option value="">{t("sr_city_select")}</option>
           {cities.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -251,18 +252,18 @@ export default function SearchPage() {
           value={zoneFilter}
           onChange={(e) => updateZone(e.target.value)}
           disabled={!cityFilter}
-          className="min-h-[42px] rounded border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card disabled:opacity-50"
+          className="min-h-[44px] rounded-full border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card disabled:opacity-50"
         >
           <option value="">{t("sr_zone_select")}</option>
           {zones.map((z) => <option key={z} value={z}>{z}</option>)}
         </select>
-        <div className="relative min-w-[220px] flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <div className="relative min-w-[200px] flex-1">
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={qParam}
             onChange={(e) => setQ(e.target.value)}
             placeholder={t("sr_search_placeholder")}
-            className="min-h-[42px] w-full rounded border border-border bg-background py-2 pl-9 pr-4 text-sm text-foreground outline-none focus:border-emerald dark:bg-card"
+            className="min-h-[44px] w-full rounded-full border border-border bg-background py-2 pl-11 pr-4 text-sm text-foreground outline-none focus:border-emerald dark:bg-card"
           />
         </div>
       </div>
@@ -292,19 +293,21 @@ export default function SearchPage() {
 
       {properties === null ? (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-sm" />)}
+          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)}
         </div>
       ) : found === 0 ? (
-        <div className="border border-dashed border-border px-4 py-20 text-center">
+        <div className="rounded-2xl border border-border bg-card px-4 py-20 text-center">
           <p className="font-heading text-xl font-semibold text-foreground">{t("sr_empty_title")}</p>
           <p className="mt-1 text-sm text-muted-foreground">{t("sr_empty_sub")}</p>
-          <button type="button" onClick={resetFilters} className="mt-4 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0">
+          <button type="button" onClick={resetFilters} className="mt-4 inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-emerald px-5 text-sm font-bold text-primary-foreground transition-colors hover:bg-emerald/90">
             {t("sr_reset_filters")} <span aria-hidden="true">→</span>
           </button>
         </div>
       ) : (
         <>
-          <RevealGroup className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {/* once={false} so a filter change or a page turn can never leave a
+              card stuck at opacity 0; the key replays the stagger per page. */}
+          <RevealGroup key={safePage} once={false} stagger={0.06} className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {paged.map((p) => (
               <RevealItem key={p.id}>
                 <PropertyCard property={p} coverMap={coverMap} />
@@ -326,21 +329,21 @@ export default function SearchPage() {
                     : `${found} anunțuri · Pagina ${safePage} din ${totalPages}`}
                 </p>
                 <div className="flex items-center gap-1.5">
-                  <button onClick={() => goPage(Math.max(1, safePage - 1))} disabled={safePage === 1}
-                    className="flex h-10 items-center justify-center rounded border border-border bg-card px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-40">
+                  <button onClick={() => goPage(Math.max(1, safePage - 1))} disabled={safePage === 1} aria-label={lang === "en" ? "Previous page" : "Pagina anterioară"}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-card text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-40">
                     <ChevronLeft className="h-4 w-4" />
                   </button>
                   {start > 1 && <span className="px-1 text-muted-foreground">…</span>}
                   {pages.map((pn) => (
                     <button key={pn} onClick={() => goPage(pn)}
-                      className={"h-10 min-w-10 rounded px-3 text-sm font-semibold tnum transition-colors " +
+                      className={"h-11 min-w-[40px] rounded-full px-2 text-sm font-semibold tnum transition-colors " +
                         (pn === safePage ? "bg-emerald text-primary-foreground" : "border border-border bg-card text-foreground hover:bg-secondary")}>
                       {pn}
                     </button>
                   ))}
                   {end < totalPages && <span className="px-1 text-muted-foreground">…</span>}
-                  <button onClick={() => goPage(Math.min(totalPages, safePage + 1))} disabled={safePage === totalPages}
-                    className="flex h-10 items-center justify-center rounded border border-border bg-card px-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-40">
+                  <button onClick={() => goPage(Math.min(totalPages, safePage + 1))} disabled={safePage === totalPages} aria-label={lang === "en" ? "Next page" : "Pagina următoare"}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-card text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-40">
                     <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>

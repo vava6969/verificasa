@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
 import { useNotifications } from "@/hooks/useNotifications";
 
 const EASE = [0.16, 1, 0.3, 1];
 
-// Site menu, top-right. Registry form: a plain typed list on a solid card —
-// no icon tiles, no per-item stagger, no glass. The trigger is a code-drawn
-// hamburger (functional control) carrying the unread badge; the menu now
-// includes Notificări so the badge finally leads somewhere.
+// Site menu, top-right. A solid rounded panel on a round trigger — no glass,
+// no icon tiles. The trigger carries the unread badge; the menu includes
+// Notificări so the badge leads somewhere. Every row is a 44px rounded target.
 export default function SiteNavMenu() {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
@@ -58,15 +58,13 @@ export default function SiteNavMenu() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="relative flex h-11 w-11 flex-col items-center justify-center gap-[5px] rounded border border-border bg-card transition-colors hover:border-emerald sm:h-9 sm:w-9"
+        className="relative flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:border-emerald sm:h-9 sm:w-9"
         aria-label={en ? "Menu" : "Meniu"}
         aria-expanded={open}
       >
-        <span className="h-[2px] w-4 bg-foreground" />
-        <span className="h-[2px] w-4 bg-foreground" />
-        <span className="h-[2px] w-4 bg-foreground" />
-        {isAuthenticated && unreadCount > 0 && (
-          <span className="absolute -right-1.5 -top-1.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-sm bg-emerald px-1 text-[10px] font-bold leading-none text-primary-foreground tnum">
+        {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        {!open && isAuthenticated && unreadCount > 0 && (
+          <span className="absolute -right-1 -top-1 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-emerald px-1 text-[10px] font-bold leading-none text-primary-foreground ring-2 ring-background tnum">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
@@ -75,11 +73,12 @@ export default function SiteNavMenu() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={reduced ? false : { opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.3, ease: EASE }}
-            className="absolute right-0 top-11 z-50 w-56 border border-border bg-card p-1.5 shadow-soft"
+            initial={reduced ? false : { opacity: 0, y: -6, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -4, scale: 0.98 }}
+            transition={{ duration: 0.28, ease: EASE }}
+            style={{ transformOrigin: "top right" }}
+            className="absolute right-0 top-[calc(100%+8px)] z-50 max-h-[calc(100vh-5rem)] w-60 overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-2 shadow-lg"
             role="menu"
           >
             {items.map((it) => (
@@ -88,11 +87,11 @@ export default function SiteNavMenu() {
                 type="button"
                 role="menuitem"
                 onClick={() => go(it.path)}
-                className="flex w-full items-center justify-between gap-3 rounded px-3 py-2.5 text-left text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+                className="flex min-h-[44px] w-full items-center justify-between gap-3 rounded-xl px-3.5 text-left text-sm font-semibold text-foreground transition-colors hover:bg-secondary hover:text-emerald"
               >
                 {it.label}
                 {it.badge && (
-                  <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-sm bg-emerald px-1 text-[10px] font-bold leading-none text-primary-foreground tnum">
+                  <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-emerald px-1.5 text-[10px] font-bold leading-none text-primary-foreground tnum">
                     {it.badge}
                   </span>
                 )}

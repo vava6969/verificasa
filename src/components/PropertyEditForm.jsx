@@ -6,7 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import DateField from "@/components/DateField";
 import { Image as UIImage } from "@/components/ui/image";
 import GooglePlacesAutocomplete from "@/components/GooglePlacesAutocomplete";
-import { Trash2, Camera, Video, Lock } from "lucide-react";
+import { Trash2, Camera } from "lucide-react";
 import { uploadPhotos } from "@/lib/imageUpload";
 
 const MAX_PHOTOS = 20;
@@ -27,6 +27,26 @@ const TRANSACTIONS = ["RENT", "SALE"];
 const CURRENCIES = ["EUR", "RON", "GBP"];
 const FAIRNESS = [{ v: "", label: "—" }, { v: "sub_piata", label: "Sub piață" }, { v: "corect", label: "Corect" }, { v: "peste_medie", label: "Peste medie" }];
 const VERIF = [{ v: "unverified", label: "Neverificat" }, { v: "video_ai", label: "Video / AI" }, { v: "field_certified", label: "Certificat pe teren" }];
+
+// 44px minimum touch height, rounded-xl, 16px text so iOS doesn't zoom the page.
+const inputCls =
+  "w-full min-h-[44px] rounded-xl border border-border bg-background px-3.5 py-2.5 text-base text-foreground outline-none transition focus:border-emerald focus:ring-2 focus:ring-emerald/15 dark:bg-card";
+const lab = "text-xs font-semibold text-muted-foreground";
+const sectionCls = "mb-2 mt-5 font-heading text-sm font-bold text-navy dark:text-foreground";
+const checkCls =
+  "flex min-h-[44px] cursor-pointer items-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-medium text-foreground transition hover:border-emerald/50";
+const boxCls = "h-4 w-4 shrink-0 rounded border-border accent-emerald";
+
+// Hoisted so it keeps a stable component identity between renders — declaring it
+// inside PropertyEditForm remounted every field on each keystroke and dropped focus.
+function Field({ label, children }) {
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className={lab}>{label}</span>
+      {children}
+    </label>
+  );
+}
 
 export default function PropertyEditForm({ property, onDone, isAdmin = false }) {
   const { toast } = useToast();
@@ -74,9 +94,6 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-
-  const inputCls = "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none focus:border-emerald dark:bg-card";
-  const lab = "text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70";
 
   const upd = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const numOrNull = (v) => (v === "" || v == null ? null : Number(v));
@@ -148,7 +165,6 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         commission_free: form.commission_free,
         reserve_instant: form.reserve_instant,
         is_swap_available: form.is_swap_available,
-        landmark: form.landmark,
         latitude: form.latitude,
         longitude: form.longitude,
         images: form.images,
@@ -170,22 +186,15 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
     }
   };
 
-  const Field = ({ label, children }) => (
-    <label className="flex flex-col gap-1">
-      <span className={lab}>{label}</span>
-      {children}
-    </label>
-  );
-
   return (
-    <form onSubmit={handleSubmit} className="rounded border border-emerald/30 bg-emerald-soft/40 p-5">
-      <div className="mb-3 flex items-center justify-between">
+    <form onSubmit={handleSubmit} className="rounded-2xl border border-emerald/25 bg-emerald-soft/40 p-4 sm:p-5">
+      <div className="mb-3 flex items-center justify-between gap-2">
         <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">Editează anunțul</h3>
-        {isAdmin && <span className="rounded bg-navy px-2.5 py-0.5 text-[10px] font-bold uppercase text-emerald">Mod admin</span>}
+        {isAdmin && <span className="shrink-0 rounded-full bg-navy px-3 py-1 text-[11px] font-semibold text-white">Mod admin</span>}
       </div>
 
       {/* Date de bază */}
-      <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-emerald">Date de bază</p>
+      <p className={`${sectionCls} mt-0`}>Date de bază</p>
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Titlu"><input value={form.title} onChange={(e) => upd("title", e.target.value)} className={inputCls} /></Field>
         <Field label="Tip tranzacție">
@@ -210,26 +219,32 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       <textarea value={form.description} onChange={(e) => upd("description", e.target.value)} placeholder="Descriere" rows={3} className={`mt-3 ${inputCls}`} />
 
       {/* Poze */}
-      <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Poze ({form.images.length}/{MAX_PHOTOS})</p>
-      <div className="flex flex-wrap gap-2">
+      <p className={sectionCls}>Poze ({form.images.length}/{MAX_PHOTOS})</p>
+      <p className="mb-2 -mt-1 text-xs text-muted-foreground">Poze reale, făcute cu telefonul. Fără randări.</p>
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
         {form.images.map((img, i) => (
-          <div key={i} className="group relative h-20 w-28 overflow-hidden rounded-lg border border-border bg-secondary">
+          <div key={i} className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-secondary">
             <UIImage src={img} fittingType="fill" className="h-full w-full" />
-            <button type="button" onClick={() => removeImage(i)} aria-label="Șterge poza" className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded bg-navy-deep/70 text-white opacity-0 transition group-hover:opacity-100 hover:bg-rose-600">
-              <Trash2 className="h-3.5 w-3.5" />
+            <button
+              type="button"
+              onClick={() => removeImage(i)}
+              aria-label="Șterge poza"
+              className="absolute right-1 top-1 flex h-9 w-9 items-center justify-center rounded-full bg-navy-deep/75 text-white transition hover:bg-rose-600"
+            >
+              <Trash2 className="h-4 w-4" />
             </button>
           </div>
         ))}
         {form.images.length < MAX_PHOTOS && (
-          <label className="flex h-20 w-28 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-border bg-secondary/30 text-xs text-muted-foreground transition hover:border-emerald hover:text-emerald">
-            {uploading ? <span className="animate-pulse">Se încarcă…</span> : (<><Camera className="h-4 w-4" /> Adaugă</>)}
+          <label className="flex aspect-[4/3] cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-border bg-card/60 text-xs font-medium text-muted-foreground transition hover:border-emerald hover:text-emerald">
+            {uploading ? <span className="animate-pulse">Se încarcă…</span> : (<><Camera className="h-5 w-5" /> Adaugă</>)}
             <input type="file" accept="image/*" multiple className="hidden" onChange={handleAddPhotos} />
           </label>
         )}
       </div>
 
       {/* Locație */}
-      <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Locație</p>
+      <p className={sectionCls}>Locație</p>
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Oraș și zonă">
           <div className={inputCls}>
@@ -254,7 +269,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       </div>
 
       {/* Specificații */}
-      <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Specificații</p>
+      <p className={sectionCls}>Specificații</p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Field label="Camere"><input type="number" value={form.rooms} onChange={(e) => upd("rooms", e.target.value)} className={inputCls} /></Field>
         <Field label="Suprafață (mp)"><input type="number" value={form.surface_sqm} onChange={(e) => upd("surface_sqm", e.target.value)} className={inputCls} /></Field>
@@ -272,18 +287,18 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         </Field>
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-4 text-sm">
-        <label className="flex items-center gap-2"><input type="checkbox" checked={form.furnished} onChange={(e) => upd("furnished", e.target.checked)} /> Mobilat</label>
-        <label className="flex items-center gap-2"><input type="checkbox" checked={form.pet_friendly} onChange={(e) => upd("pet_friendly", e.target.checked)} /> Pet friendly</label>
-        <label className="flex items-center gap-2"><input type="checkbox" checked={form.parking} onChange={(e) => upd("parking", e.target.checked)} /> Parcare</label>
-        <label className="flex items-center gap-2"><input type="checkbox" checked={form.featured} onChange={(e) => upd("featured", e.target.checked)} /> Featured</label>
-        <label className="flex items-center gap-2"><input type="checkbox" checked={form.commission_free} onChange={(e) => upd("commission_free", e.target.checked)} /> Fără comision</label>
-        <label className="flex items-center gap-2"><input type="checkbox" checked={form.reserve_instant} onChange={(e) => upd("reserve_instant", e.target.checked)} /> Rezervare instantă</label>
-        <label className="flex items-center gap-2"><input type="checkbox" checked={form.is_swap_available} onChange={(e) => upd("is_swap_available", e.target.checked)} /> Schimb de chirie</label>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <label className={checkCls}><input type="checkbox" className={boxCls} checked={form.furnished} onChange={(e) => upd("furnished", e.target.checked)} /> Mobilat</label>
+        <label className={checkCls}><input type="checkbox" className={boxCls} checked={form.pet_friendly} onChange={(e) => upd("pet_friendly", e.target.checked)} /> Pet friendly</label>
+        <label className={checkCls}><input type="checkbox" className={boxCls} checked={form.parking} onChange={(e) => upd("parking", e.target.checked)} /> Parcare</label>
+        <label className={checkCls}><input type="checkbox" className={boxCls} checked={form.featured} onChange={(e) => upd("featured", e.target.checked)} /> Featured</label>
+        <label className={checkCls}><input type="checkbox" className={boxCls} checked={form.commission_free} onChange={(e) => upd("commission_free", e.target.checked)} /> Fără comision</label>
+        <label className={checkCls}><input type="checkbox" className={boxCls} checked={form.reserve_instant} onChange={(e) => upd("reserve_instant", e.target.checked)} /> Rezervare instantă</label>
+        <label className={checkCls}><input type="checkbox" className={boxCls} checked={form.is_swap_available} onChange={(e) => upd("is_swap_available", e.target.checked)} /> Schimb de chirie</label>
       </div>
 
       {/* Contact */}
-      <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Contact & proprietar</p>
+      <p className={sectionCls}>Contact & proprietar</p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Field label="Telefon"><input inputMode="numeric" value={form.phone} onChange={(e) => upd("phone", onlyPhoneDigits(e.target.value))} placeholder="07xx..." className={inputCls} /></Field>
         <Field label="WhatsApp (internațional)"><input inputMode="tel" value={form.whatsapp_phone} onChange={(e) => upd("whatsapp_phone", onlyPhoneDigits(e.target.value))} placeholder="407xx..." className={inputCls} /></Field>
@@ -297,7 +312,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       </div>
 
       {/* Costuri & tur AI */}
-      <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Costuri & Tur 3D</p>
+      <p className={sectionCls}>Costuri & Tur 3D</p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Field label="Estimare utilități/lună"><input type="number" value={form.monthly_utilities_estimate} onChange={(e) => upd("monthly_utilities_estimate", e.target.value)} className={inputCls} /></Field>
         <Field label="Întreținere/lună"><input type="number" value={form.maintenance_fee} onChange={(e) => upd("maintenance_fee", e.target.value)} className={inputCls} /></Field>
@@ -313,28 +328,24 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
           efectiv se setează momentan manual, de admin, mai jos. */}
       {!isAdmin && (
         form.tour_3d_url ? (
-          <div className="mt-3 flex items-center gap-3 rounded border border-emerald/30 bg-emerald-soft/40 p-3.5">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-emerald-soft text-emerald">
-              <Video className="h-4 w-4" />
-            </span>
+          <div className="mt-3 flex items-center gap-3 rounded-2xl border border-emerald/25 bg-card p-4">
+            <img src="/images/generated/icon-video.png" alt="" aria-hidden="true" className="h-12 w-12 shrink-0 object-contain" />
             <span>
               <span className="block text-sm font-semibold text-navy dark:text-foreground">Tur 3D activ</span>
-              <span className="block text-xs text-muted-foreground">Turul tău virtual este vizibil pe anunț</span>
+              <span className="block text-xs text-muted-foreground">Vizibil pe anunț</span>
             </span>
           </div>
         ) : (
-          <div className="mt-3 flex items-center justify-between gap-3 rounded border border-dashed border-border bg-secondary/30 p-3.5">
-            <div className="flex items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-secondary text-muted-foreground">
-                <Video className="h-4 w-4" />
-              </span>
-              <span>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <img src="/images/generated/icon-video.png" alt="" aria-hidden="true" className="h-12 w-12 shrink-0 object-contain opacity-60" />
+              <span className="min-w-0">
                 <span className="block text-sm font-semibold text-navy dark:text-foreground">Tur 3D</span>
-                <span className="block text-xs text-muted-foreground">Adaugă link-ul tău către tur — disponibil cu Plan Pro</span>
+                <span className="block text-xs text-muted-foreground">Disponibil cu Plan Pro</span>
               </span>
             </div>
-            <span className="flex shrink-0 items-center gap-1 rounded bg-gold-soft px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-gold-deep">
-              <Lock className="h-3 w-3" /> Plan Pro
+            <span className="shrink-0 rounded-full bg-gold-soft px-3 py-1.5 text-xs font-semibold text-gold-deep">
+              Plan Pro
             </span>
           </div>
         )
@@ -343,15 +354,15 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       {/* Badge-uri & verificări — admin only */}
       {isAdmin && (
         <>
-          <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-wide text-emerald">Badge-uri & verificări (admin)</p>
+          <p className={sectionCls}>Badge-uri & verificări (admin)</p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <Field label="Nivel verificare">
               <select value={form.verification_level} onChange={(e) => upd("verification_level", e.target.value)} className={inputCls}>
                 {VERIF.map((v) => <option key={v.v} value={v.v}>{v.label}</option>)}
               </select>
             </Field>
-            <label className="flex items-center gap-2 self-end pb-2"><input type="checkbox" checked={form.owner_verified} onChange={(e) => upd("owner_verified", e.target.checked)} /> Proprietar verificat</label>
-            <label className="flex items-center gap-2 self-end pb-2"><input type="checkbox" checked={form.ai_tour_verified} onChange={(e) => upd("ai_tour_verified", e.target.checked)} /> Activare badge Tur 3D</label>
+            <label className={`${checkCls} self-end`}><input type="checkbox" className={boxCls} checked={form.owner_verified} onChange={(e) => upd("owner_verified", e.target.checked)} /> Proprietar verificat</label>
+            <label className={`${checkCls} self-end`}><input type="checkbox" className={boxCls} checked={form.ai_tour_verified} onChange={(e) => upd("ai_tour_verified", e.target.checked)} /> Activare badge Tur 3D</label>
             <Field label="Link Tur 3D (admin, Plan Pro)">
               <input value={form.tour_3d_url} onChange={(e) => upd("tour_3d_url", e.target.value)} placeholder="https://tur3d.verificasa.ro/property/..." className={inputCls} />
             </Field>
@@ -363,10 +374,10 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       )}
 
       <div className="mt-5 flex items-center gap-2">
-        <Button type="submit" disabled={saving} className="bg-emerald text-white hover:bg-emerald/90">
+        <Button type="submit" disabled={saving} className="h-12 rounded-full bg-emerald px-6 text-white hover:bg-emerald/90">
           {saving ? "Salvez..." : "Salvează"}
         </Button>
-        <Button type="button" variant="outline" onClick={onDone}>Renunță</Button>
+        <Button type="button" variant="outline" onClick={onDone} className="h-12 rounded-full px-5">Renunță</Button>
       </div>
     </form>
   );

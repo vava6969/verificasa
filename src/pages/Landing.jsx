@@ -29,7 +29,7 @@ export default function Landing() {
 
       {/* HERO — fotografie pe toată lățimea, text peste ea */}
       <section className="relative">
-        <div className="relative h-[78vh] min-h-[440px] w-full overflow-hidden sm:h-[70vh] sm:min-h-[520px] lg:h-[76vh]">
+        <div className="relative h-[58vh] min-h-[380px] w-full overflow-hidden sm:h-[66vh] sm:min-h-[500px] lg:h-[74vh]">
           {/* Poziționarea vine din wrapper, nu din className-ul pasat: clasa
               `relative` proprie a HeroPhoto câștiga în cascadă peste `absolute`
               și împingea tot textul hero sub fotografie, tăiat de
@@ -41,30 +41,30 @@ export default function Landing() {
 
           <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-8 sm:px-6 sm:pb-12 lg:px-8 lg:pb-16">
             <Reveal>
-              <h1 className="max-w-[15ch] text-[2.4rem] font-bold leading-[1.03] tracking-tight text-white sm:text-6xl lg:text-7xl">
+              <h1 className="hero-ink max-w-[15ch] text-[1.85rem] font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-7xl">
                 {t("hero_h1_a")}
               </h1>
-              <p className="mt-2 max-w-[22ch] text-lg font-semibold text-white/85 sm:text-2xl">
+              <p className="hero-ink mt-1.5 max-w-[24ch] text-sm font-semibold text-white/90 sm:text-xl lg:text-2xl">
                 {t("hero_h1_b")}
               </p>
             </Reveal>
 
-            <Reveal delay={0.12} className="mt-6 w-full sm:mt-8 lg:max-w-4xl">
+            <Reveal delay={0.12} className="mt-4 w-full sm:mt-7 lg:max-w-4xl">
               <HeroSearch />
             </Reveal>
 
-            <Reveal delay={0.2} className="mt-4 flex flex-wrap items-center gap-3">
+            <Reveal delay={0.2} className="mt-3 flex flex-wrap items-center gap-2 sm:mt-4 sm:gap-3">
               <button
                 type="button"
                 onClick={() => setShowListeaza(true)}
-                className="min-h-[48px] rounded-full bg-emerald px-6 text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:scale-[1.03]"
+                className="min-h-[44px] rounded-full bg-emerald px-5 text-[13px] font-bold text-primary-foreground shadow-lg transition-transform hover:scale-[1.03] sm:min-h-[48px] sm:px-6 sm:text-sm"
               >
                 {t("hdr_add")}
               </button>
               <button
                 type="button"
                 onClick={() => setShowInspectie(true)}
-                className="inline-flex min-h-[48px] items-center rounded-full border border-white/50 px-6 text-sm font-bold text-white transition-colors hover:bg-white/15"
+                className="inline-flex min-h-[44px] items-center rounded-full border border-white/50 px-5 text-[13px] font-bold text-white backdrop-brightness-90 transition-colors hover:bg-white/15 sm:min-h-[48px] sm:px-6 sm:text-sm"
               >
                 {en ? "Request a check" : "Cere o verificare"}
               </button>
@@ -79,7 +79,7 @@ export default function Landing() {
       {/* ANUNȚURI RECOMANDATE — sus, e ce vine lumea să vadă */}
       <div id="featured" className="pt-2">
         <Reveal className="mx-auto mb-4 max-w-7xl px-4 sm:mb-6 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-foreground sm:text-3xl">{t("featured_h")}</h2>
+          <h2 className="text-xl font-bold text-foreground sm:text-3xl">{t("featured_h")}</h2>
         </Reveal>
         <RecommendedByPlanSection />
       </div>

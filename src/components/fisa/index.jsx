@@ -72,7 +72,7 @@ export function ScoreMark({ score, size = "md", className }) {
   const band = s >= 75 ? "text-emerald border-emerald" : s >= 40 ? "text-foreground border-foreground/60" : "text-muted-foreground border-border";
   const sz = size === "lg" ? "text-2xl px-3 py-1.5" : "text-base px-2 py-1";
   return (
-    <span className={cn("inline-flex items-baseline gap-1 rounded-sm border-[1.5px] font-heading font-semibold tnum", band, sz, className)}>
+    <span className={cn("inline-flex items-baseline gap-1 rounded-full border-[1.5px] font-heading font-semibold tnum", band, sz, className)}>
       {s}
       <span className="text-[0.6em] font-body font-semibold text-muted-foreground">/100</span>
     </span>
@@ -92,9 +92,9 @@ export function Meter({ label, used = 0, limit, unlimited = false, reset, classN
         </p>
       </div>
       {!unlimited && (
-        <div className="mt-1.5 h-1 w-full overflow-hidden rounded-sm bg-secondary">
+        <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
           <div
-            className={cn("h-full rounded-sm", over ? "bg-destructive" : "bg-emerald")}
+            className={cn("h-full rounded-full", over ? "bg-destructive" : "bg-emerald")}
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -117,7 +117,7 @@ export function ScoreLedger({ score, breakdown, className, labels = {} }) {
   const deductions = Array.isArray(breakdown?.deductions) ? breakdown.deductions : [];
 
   return (
-    <section className={cn("border border-border bg-card", className)}>
+    <section className={cn("overflow-hidden rounded-2xl border border-border bg-card", className)}>
       <div className="flex items-center justify-between gap-4 border-b border-border px-4 py-3">
         <div className="min-w-0">
           <h3 className="font-heading text-lg font-semibold text-foreground">
@@ -131,7 +131,14 @@ export function ScoreLedger({ score, breakdown, className, labels = {} }) {
           <p className="font-heading text-3xl font-semibold leading-none text-foreground tnum">
             {s}<span className="font-body text-sm font-medium text-muted-foreground">/100</span>
           </p>
-          <Stamp tone={tone} className="mt-1.5">{verdict}</Stamp>
+          <span
+            className={cn(
+              "mt-1.5 inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold",
+              tone === "verde" ? "bg-emerald-soft text-emerald" : "bg-secondary text-muted-foreground",
+            )}
+          >
+            {verdict}
+          </span>
         </div>
       </div>
 

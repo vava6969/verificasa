@@ -18,9 +18,9 @@ export default function SearchFiltersDrawer({
     (budget ? 1 : 0) + (roomsMin ? 1 : 0) + (surfaceMin ? 1 : 0) +
     (fairness ? 1 : 0) + (furnished ? 1 : 0) + (swap ? 1 : 0);
 
-  const field = "w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card";
+  const field = "min-h-[44px] w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card";
   const chip = (active) =>
-    `flex min-h-[40px] items-center gap-1.5 rounded border px-3.5 py-2 text-sm font-semibold transition-colors ${
+    `flex min-h-[44px] items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
       active ? "border-emerald bg-emerald text-white shadow-soft" : "border-border bg-background text-foreground/70 hover:border-emerald/50 dark:bg-card"
     }`;
 
@@ -33,32 +33,30 @@ export default function SearchFiltersDrawer({
       >
         <SlidersHorizontal className="h-4 w-4" /> {t("sr_advanced")}
         {count > 0 && (
-          <span className="ml-1 rounded-sm bg-white/25 px-1.5 text-xs tnum">{count}</span>
+          <span className="ml-1 rounded-full bg-white/25 px-2 py-0.5 text-xs tnum">{count}</span>
         )}
       </button>
 
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerContent className="max-h-[88vh] rounded-t-3xl border-border px-4 pb-8">
-          <DrawerTitle className="mt-4 flex items-center gap-2 px-1 font-heading text-base">
-            <SlidersHorizontal className="h-4 w-4 text-emerald" /> {t("sr_advanced")}
-          </DrawerTitle>
+          <DrawerTitle className="mt-4 px-1 font-heading text-base">{t("sr_advanced")}</DrawerTitle>
 
           <div className="mt-4 space-y-5 overflow-y-auto px-1">
             <div className="flex flex-wrap gap-2">
               {filters.map((f) => (
-                <button key={f.key} onClick={() => onToggle(f.key)} className={chip(activeFilters.has(f.key))}>
-                  <f.icon className="h-3.5 w-3.5" /> {t(f.labelKey)}
+                <button key={f.key} type="button" onClick={() => onToggle(f.key)} className={chip(activeFilters.has(f.key))}>
+                  {t(f.labelKey)}
                 </button>
               ))}
             </div>
 
             {planOptions?.length > 0 && (
               <div>
-                <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Plan</p>
+                <p className="mb-2 text-xs font-semibold text-muted-foreground">Plan</p>
                 <div className="flex flex-wrap gap-2">
                   {planOptions.map((opt) => (
                     <button key={opt.id} type="button" onClick={() => onTogglePlan(opt.id)} className={chip(planFilters?.has(opt.id))}>
-                      {opt.icon && <img src={opt.icon} alt="" className="h-4 w-4 object-contain" />} {opt.label}
+                      {opt.icon && <img src={opt.icon} alt="" className="h-5 w-5 shrink-0 object-contain" />} {opt.label}
                     </button>
                   ))}
                 </div>
@@ -86,8 +84,8 @@ export default function SearchFiltersDrawer({
             </div>
 
             <div className="flex gap-2 pt-1">
-              <Button variant="outline" className="min-h-[44px] flex-1 rounded border-border" onClick={onReset}>{t("sr_reset_filters")}</Button>
-              <Button className="min-h-[44px] flex-1 gap-1.5 rounded bg-emerald text-primary-foreground hover:bg-emerald/90" onClick={() => setOpen(false)}>
+              <Button variant="outline" className="min-h-[48px] flex-1 rounded-full border-border" onClick={onReset}>{t("sr_reset_filters")}</Button>
+              <Button className="min-h-[48px] flex-1 gap-1.5 rounded-full bg-emerald text-primary-foreground hover:bg-emerald/90" onClick={() => setOpen(false)}>
                 <Check className="h-4 w-4" /> {t("sb_btn")}
               </Button>
             </div>

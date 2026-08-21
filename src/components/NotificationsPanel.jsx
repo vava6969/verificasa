@@ -2,37 +2,42 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Star, CheckCheck } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useCountry } from "@/components/CountryContext";
 import { cn } from "@/lib/utils";
 
-// Notifications as a dated log — the registry form. Each entry is a ruled
-// row: type label, text, time, unread mark. No icon tiles, no emoji.
+// Soft notification card: one rounded panel, pill tabs, one line per entry.
 
 const TYPE_LABEL = {
-  comment: "Comentariu",
-  reply: "Răspuns",
-  like: "Apreciere",
-  message: "Mesaj",
-  property: "Proprietate",
-  review: "Recenzie",
-  system: "Sistem",
+  ro: { comment: "Comentariu", reply: "Răspuns", like: "Apreciere", message: "Mesaj", property: "Proprietate", review: "Recenzie", system: "Sistem" },
+  en: { comment: "Comment", reply: "Reply", like: "Like", message: "Message", property: "Listing", review: "Review", system: "System" },
 };
 
-function timeAgo(dateStr) {
+function timeAgo(dateStr, lang) {
   if (!dateStr) return "";
+  const en = lang === "en";
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "acum";
+  if (mins < 1) return en ? "now" : "acum";
   if (mins < 60) return `${mins} min`;
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs} h`;
-  return `${Math.floor(hrs / 24)} zile`;
+  const days = Math.floor(hrs / 24);
+  return en ? `${days}d` : `${days} zile`;
 }
 
-const TABS = ["Recente", "Citite", "Marcate"];
+const TAB_IDS = ["recente", "citite", "marcate"];
 
 export default function NotificationsPanel() {
   const { notifications, unreadCount, markAsRead, markAllRead, loading } = useNotifications();
-  const [activeTab, setActiveTab] = useState("Recente");
+  const { lang } = useCountry();
+  const L = (ro, en) => (lang === "en" ? en : ro);
+  const labels = TYPE_LABEL[lang === "en" ? "en" : "ro"];
+  const TAB_LABEL = {
+    recente: L("Recente", "Recent"),
+    citite: L("Citite", "Read"),
+    marcate: L("Marcate", "Starred"),
+  };
+  const [activeTab, setActiveTab] = useState("recente");
   const [starred, setStarred] = useState(() => {
     try { return new Set(JSON.parse(localStorage.getItem("vc_starred_notifs") || "[]")); }
     catch { return new Set(); }
@@ -49,52 +54,54 @@ export default function NotificationsPanel() {
   };
 
   const filtered = notifications.filter((n) => {
-    if (activeTab === "Recente") return !n.read;
-    if (activeTab === "Citite") return n.read;
-    if (activeTab === "Marcate") return starred.has(n.id);
+    if (activeTab === "recente") return !n.read;
+    if (activeTab === "citite") return n.read;
+    if (activeTab === "marcate") return starred.has(n.id);
     return true;
   });
 
   return (
-    <section className="border border-border bg-card">
+    <section className="overflow-hidden rounded-2xl border border-border bg-card">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border px-5 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4">
         <div className="flex items-baseline gap-2.5">
-          <h2 className="font-heading text-lg font-semibold text-foreground">Notificări</h2>
+          <h2 className="font-heading text-lg font-semibold text-foreground">{L("Notificări", "Notifications")}</h2>
           {unreadCount > 0 && (
-            <span className="text-sm font-semibold text-emerald tnum">{unreadCount} necitite</span>
+            <span className="text-sm font-semibold text-emerald tnum">
+              {L(`${unreadCount} necitite`, `${unreadCount} unread`)}
+            </span>
           )}
         </div>
         {unreadCount > 0 && (
           <button
             onClick={markAllRead}
-            className="flex items-center gap-1 text-xs font-semibold text-emerald hover:underline"
+            className="-mr-2 flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-emerald transition-colors hover:bg-secondary"
           >
-            <CheckCheck className="h-3.5 w-3.5" /> Marchează tot citit
+            <CheckCheck className="h-4 w-4" /> {L("Marchează tot citit", "Mark all read")}
           </button>
         )}
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center border-b border-border px-4">
-        {TABS.map((tab) => (
+      <div className="flex items-center gap-2 overflow-x-auto px-5 pb-4">
+        {TAB_IDS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={cn(
-              "-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition-colors",
+              "min-h-[44px] shrink-0 rounded-full border px-4 text-sm transition-colors",
               activeTab === tab
-                ? "border-emerald font-semibold text-emerald"
-                : "border-transparent text-muted-foreground hover:text-foreground"
+                ? "border-emerald bg-emerald font-semibold text-primary-foreground"
+                : "border-border bg-background font-medium text-muted-foreground hover:border-emerald/50 hover:text-foreground dark:bg-card"
             )}
           >
-            {tab}
+            {TAB_LABEL[tab]}
           </button>
         ))}
       </div>
 
       {/* Rows */}
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-border border-t border-border">
         {loading && notifications.length === 0 ? (
           <div className="flex items-center justify-center py-10">
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-emerald border-t-transparent" />
@@ -102,37 +109,39 @@ export default function NotificationsPanel() {
         ) : filtered.length === 0 ? (
           <div className="px-5 py-12 text-center">
             <p className="text-sm text-muted-foreground">
-              {activeTab === "Marcate"
-                ? "Nicio notificare marcată."
-                : activeTab === "Citite"
-                  ? "Nimic în arhivă încă."
-                  : "Nimic necitit. Totul la zi."}
+              {activeTab === "marcate"
+                ? L("Nicio notificare marcată.", "Nothing starred.")
+                : activeTab === "citite"
+                  ? L("Nimic în arhivă încă.", "Nothing archived yet.")
+                  : L("Nimic necitit. Totul la zi.", "Nothing unread. All caught up.")}
             </p>
           </div>
         ) : (
           filtered.map((n) => {
-            const label = TYPE_LABEL[n.type] || TYPE_LABEL.system;
+            const label = labels[n.type] || labels.system;
             const isStarred = starred.has(n.id);
 
             const body = (
-              <div className={cn("flex items-start gap-4 px-5 py-3.5 transition-colors hover:bg-secondary/60", !n.read && "bg-secondary/40")}>
+              <div className={cn("flex min-h-[64px] items-center gap-3 px-5 py-3 transition-colors hover:bg-secondary/60", !n.read && "bg-secondary/40")}>
                 {/* unread mark */}
-                <span className={cn("mt-2 h-1.5 w-1.5 shrink-0 rounded-full", !n.read ? "bg-emerald" : "bg-transparent")} aria-hidden="true" />
+                <span className={cn("h-2 w-2 shrink-0 rounded-full", !n.read ? "bg-emerald" : "bg-transparent")} aria-hidden="true" />
 
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-semibold text-muted-foreground">
                     {label}
                     {n.actor_name && <span className="font-normal"> · {n.actor_name}</span>}
+                    <span className="font-normal tnum"> · {timeAgo(n.created_date, lang)}</span>
                   </p>
                   <p className="mt-0.5 line-clamp-2 text-sm font-medium leading-snug text-foreground">{n.text}</p>
                 </div>
 
-                <div className="flex shrink-0 flex-col items-end gap-1.5">
-                  <button onClick={(e) => toggleStar(n.id, e)} className="p-0.5" aria-label={isStarred ? "Scoate marcajul" : "Marchează"}>
-                    <Star className={cn("h-4 w-4 transition-colors", isStarred ? "fill-gold-deep text-gold-deep" : "text-border hover:text-muted-foreground")} />
-                  </button>
-                  <span className="text-[11px] text-muted-foreground tnum">{timeAgo(n.created_date)}</span>
-                </div>
+                <button
+                  onClick={(e) => toggleStar(n.id, e)}
+                  className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-secondary"
+                  aria-label={isStarred ? L("Scoate marcajul", "Remove star") : L("Marchează", "Star")}
+                >
+                  <Star className={cn("h-4 w-4 transition-colors", isStarred ? "fill-emerald text-emerald" : "text-border hover:text-muted-foreground")} />
+                </button>
               </div>
             );
 
@@ -141,7 +150,7 @@ export default function NotificationsPanel() {
                 {body}
               </Link>
             ) : (
-              <div key={n.id} onClick={() => markAsRead(n.id)}>{body}</div>
+              <div key={n.id} onClick={() => markAsRead(n.id)} className="cursor-pointer">{body}</div>
             );
           })
         )}

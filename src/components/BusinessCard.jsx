@@ -101,7 +101,7 @@ export default function BusinessCard({ user: profile, ratings = [], average = 0,
                   style={{ objectFit: "cover", objectPosition: "center" }}
                 />
               ) : (
-                <span className={`flex h-20 w-20 items-center justify-center rounded-full border-4 border-[#161f1d] text-2xl font-bold text-white shadow-lg ${isAgent ? "bg-blue-600" : "bg-emerald"}`}>
+                <span className={`flex h-20 w-20 items-center justify-center rounded-full border-4 border-[#161f1d] text-2xl font-bold text-white shadow-lg ${isAgent ? "bg-navy" : "bg-emerald"}`}>
                   {initials(profile?.full_name || profile?.email)}
                 </span>
               )}
