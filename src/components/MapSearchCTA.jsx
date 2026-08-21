@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useCountry } from "@/components/CountryContext";
+import LoopVideo from "@/components/LoopVideo";
 
 // Homepage card for the map: the photograph does the talking, the scrim is a
 // solid gradient to ink, the action is squared verde. No hover zoom.
@@ -10,12 +11,12 @@ export default function MapSearchCTA() {
 
   return (
     <div className="relative overflow-hidden border border-border">
-      <img
-        src="/images/generated/map-search-cta-v3.png"
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover object-center"
-        loading="lazy"
-      />
+      <div className="absolute inset-0">
+        <LoopVideo
+          src="/videos/map-walk-v1.mp4"
+          poster="/videos/map-walk-poster.jpg"
+        />
+      </div>
       <div className="absolute inset-0 bg-gradient-to-t from-navy-deep via-navy-deep/55 to-navy-deep/10" />
 
       <div className="relative flex min-h-[230px] flex-col justify-end p-6 sm:min-h-[270px] sm:p-8">
