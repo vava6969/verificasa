@@ -1,0 +1,105 @@
+{
+  "name": "Boost",
+  "type": "object",
+  "title": "Boost",
+  "properties": {
+    "property_id": {
+      "type": "string",
+      "title": "Anunț"
+    },
+    "user_id": {
+      "type": "string",
+      "title": "Utilizator"
+    },
+    "starts_date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Începe"
+    },
+    "ends_date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Expiră"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "expired",
+        "cancelled"
+      ],
+      "default": "active",
+      "title": "Status"
+    },
+    "credits_spent": {
+      "type": "number",
+      "default": 1,
+      "title": "Credite consumate"
+    }
+  },
+  "required": [
+    "property_id",
+    "user_id",
+    "ends_date"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "ADMIN"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "SUPER_ADMIN"
+          }
+        }
+      ]
+    },
+    "read": null,
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "ADMIN"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "SUPER_ADMIN"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "ADMIN"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "SUPER_ADMIN"
+          }
+        }
+      ]
+    }
+  }
+}

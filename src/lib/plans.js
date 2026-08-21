@@ -67,6 +67,45 @@ export const PLANS = [
 
 export const PLAN_BY_ID = Object.fromEntries(PLANS.map((p) => [p.id, p]));
 
+// ---------------------------------------------------------------------------
+// LIMITE DE CONT (entitlements)
+// Planurile vindeau „1 anunț activ" / „până la 5" / „nelimitate", dar nimic din
+// cod nu impunea nimic — un cont Basic putea publica cincizeci. Aici e sursa
+// unică de adevăr; verificarea reală se face server-side la publicare, cea din
+// client e doar curtoazie de interfață.
+// null = nelimitat.
+// ---------------------------------------------------------------------------
+export const ENTITLEMENTS = {
+  none:  { activeListings: 1,    photosPerListing: 8,  boostsPerMonth: 0, priorityWeight: 0 },
+  basic: { activeListings: 1,    photosPerListing: 15, boostsPerMonth: 0, priorityWeight: 1 },
+  pro:   { activeListings: 5,    photosPerListing: 30, boostsPerMonth: 1, priorityWeight: 2 },
+  agent: { activeListings: null, photosPerListing: null, boostsPerMonth: 3, priorityWeight: 3 },
+};
+
+export function getEntitlements(planId) {
+  return ENTITLEMENTS[planId] || ENTITLEMENTS.none;
+}
+
+// ---------------------------------------------------------------------------
+// PACHETE DE BOOST (client, 21.08 — prețuri provizorii, le schimbă Andrei)
+// Un singur loc de editat: preț, număr de boost-uri, durata unui boost.
+// ---------------------------------------------------------------------------
+export const BOOST_DURATION_DAYS = 7;
+
+export const BOOST_PACKS = [
+  { id: "b3",  boosts: 3,  priceRon: 31.99 },
+  { id: "b6",  boosts: 6,  priceRon: 58.99, popular: true },
+  { id: "b12", boosts: 12, priceRon: 80.99 },
+];
+
+export const BOOST_PACK_BY_ID = Object.fromEntries(BOOST_PACKS.map((b) => [b.id, b]));
+
+// Preț per boost — folosit pentru a arăta cinstit ce economisești la pachetele
+// mari, în loc de un procent inventat.
+export function boostUnitPrice(pack) {
+  return pack.priceRon / pack.boosts;
+}
+
 // Plan curent al unui anunț/utilizator — 0 înseamnă „fără plan activ", ceea ce
 // îl trimite mereu după Basic/Pro/Agent în orice sortare descrescătoare după rank.
 export function planRank(planId) {

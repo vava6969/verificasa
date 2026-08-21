@@ -1,0 +1,56 @@
+import { secrets } from "base44:runtime";
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { BOOST_PACKS } from "../../shared/boosts.js";
+
+// Sesiune Stripe Checkout pentru un pachet de boost-uri. Spre deosebire de
+// planuri, aici e mode=payment (plată unică), nu subscription.
+//
+// Prețurile sunt trimise inline (price_data), nu ca Price ID-uri pre-create,
+// tocmai pentru că Andrei a spus că le schimbă — se editează într-un singur
+// loc, în shared/boosts.js, fără să mai fie nevoie de nimic în Stripe.
+export default async function (req: Request): Promise<Response> {
+  try {
+    const base44 = createClientFromRequest(req);
+    const me = await base44.auth.me().catch(() => null);
+    if (!me?.id) return Response.json({ error: "Trebuie să fii autentificat." });
+
+    const secretKey = secrets.get("StripeTest");
+    if (!secretKey) return Response.json({ error: "Plățile nu sunt configurate încă." });
+
+    let body: any = {};
+    try { body = await req.json(); } catch (_) { body = {}; }
+    const packId = body?.pack_id;
+    const pack = (BOOST_PACKS as any)[packId];
+    if (!pack) return Response.json({ error: "Pachet de boost necunoscut." });
+
+    const origin = req.headers.get("origin") || req.headers.get("referer") || "https://verificasa.ro";
+    const baseUrl = origin.replace(/\/$/, "").replace(/\/(upgrade|account).*$/, "");
+
+    const params = new URLSearchParams();
+    params.set("mode", "payment");
+    params.set("line_items[0][quantity]", "1");
+    params.set("line_items[0][price_data][currency]", "ron");
+    params.set("line_items[0][price_data][unit_amount]", String(Math.round(pack.priceRon * 100)));
+    params.set("line_items[0][price_data][product_data][name]", `VerifiCasa — ${pack.label}`);
+    params.set("success_url", `${baseUrl}/account?boost=success&session_id={CHECKOUT_SESSION_ID}`);
+    params.set("cancel_url", `${baseUrl}/upgrade?boost=cancelled`);
+    params.set("client_reference_id", me.id);
+    if (me.email) params.set("customer_email", me.email);
+    params.set("metadata[pack_id]", packId);
+    params.set("metadata[user_id]", me.id);
+    params.set("metadata[boosts]", String(pack.boosts));
+
+    const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${secretKey}`, "Content-Type": "application/x-www-form-urlencoded" },
+      body: params.toString(),
+    });
+    const json: any = await res.json().catch(() => null);
+    if (!res.ok || !json?.url) {
+      return Response.json({ error: json?.error?.message || `Stripe a refuzat cererea (HTTP ${res.status}).` });
+    }
+    return Response.json({ ok: true, url: json.url });
+  } catch (e: any) {
+    return Response.json({ error: e?.message || String(e) });
+  }
+}
