@@ -75,8 +75,7 @@ export default function Contact() {
           <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-emerald" />
           <p>
             <span className="mr-1">🇷🇴</span>
-            Oferim servicii de verificare în toată România — peste 300 de orașe acoperite, cu
-            validare online pentru fiecare anunț publicat.
+            Oferim servicii de verificare în toată România, cu validare online pentru fiecare anunț publicat.
           </p>
         </div>
       </section>

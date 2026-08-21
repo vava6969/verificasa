@@ -224,7 +224,7 @@ export default function EmailDirectory() {
           </div>
           <div className="space-y-2 text-sm">
             <p className="font-bold text-amber-800 dark:text-amber-200">
-              ⚠️ Atenție la phishing — Verifică mereu expeditorul
+              Atenție la phishing — Verifică mereu expeditorul
             </p>
             <ul className="space-y-1.5 text-amber-700/90 dark:text-amber-200/80">
               <li className="flex items-start gap-2">

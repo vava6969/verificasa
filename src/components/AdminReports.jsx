@@ -58,7 +58,7 @@ export default function AdminReports({ reports = [], properties = [], onReload }
   return (
     <div className="space-y-3">
       {reports.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Nicio sesizare. 🎉</p>
+        <p className="text-sm text-muted-foreground">Nicio sesizare deschisă.</p>
       ) : (
         <>
         {reports.slice(0, repCount).map((r) => (

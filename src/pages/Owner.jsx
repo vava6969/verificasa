@@ -157,8 +157,8 @@ export default function Owner() {
                   {(inq.occupation || inq.estimated_income) && (
                     <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
                       {inq.occupation && <span>{t("inq_occupation")} {inq.occupation}</span>}
-                      {inq.estimated_income && <span>💰 {t("inq_income")} {inq.estimated_income}</span>}
-                      {inq.move_date && <span>📅 {t("inq_move")} {new Date(inq.move_date).toLocaleDateString("ro-RO")}</span>}
+                      {inq.estimated_income && <span>{t("inq_income")} {inq.estimated_income}</span>}
+                      {inq.move_date && <span>{t("inq_move")} {new Date(inq.move_date).toLocaleDateString("ro-RO")}</span>}
                     </div>
                   )}
                 </div>

@@ -24,29 +24,29 @@ export const EMPTY_FORM = {
 };
 
 export const CHIP_OPTS = [
-  { key: "wifi", icon: Wifi, emoji: "📶", label: "Internet / Wi-Fi", feature: "📶 Internet / Wi-Fi" },
-  { key: "noise", icon: VolumeX, emoji: "🔊", label: "Zonă liniștită", feature: "🔊 Zonă liniștită" },
-  { key: "light", icon: Sun, emoji: "☀️", label: "Orientare / Luminozitate", feature: "☀️ Orientare Sud" },
-  { key: "water", icon: Droplet, emoji: "💧", label: "Presiune apă verificată", feature: "💧 Presiune apă OK" },
+  { key: "wifi", icon: Wifi, label: "Internet / Wi-Fi", feature: "Internet / Wi-Fi" },
+  { key: "noise", icon: VolumeX, label: "Zonă liniștită", feature: "Zonă liniștită" },
+  { key: "light", icon: Sun, label: "Orientare / Luminozitate", feature: "Orientare Sud" },
+  { key: "water", icon: Droplet, label: "Presiune apă verificată", feature: "Presiune apă OK" },
 ];
 
 export const FACILITY_OPTS = [
-  { key: "ac", icon: Snowflake, emoji: "❄️", label: "Aer Condiționat" },
-  { key: "balcon", icon: Sunset, emoji: "🌇", label: "Balcon" },
-  { key: "lift", icon: ArrowUpDown, emoji: "🛗", label: "Lift" },
-  { key: "centrala", icon: Flame, emoji: "🔥", label: "Centrală proprie" },
-  { key: "termopan", icon: Layers, emoji: "🪟", label: "Geamuri Termopan" },
-  { key: "mobilat", icon: Armchair, emoji: "🛋️", label: "Mobilat complet" },
-  { key: "bucatarie", icon: ChefHat, emoji: "🍽️", label: "Bucătărie utilată" },
-  { key: "tv", icon: Tv, emoji: "📺", label: "Smart TV" },
-  { key: "masina_spalat", icon: Shirt, emoji: "🧺", label: "Mașină de spălat" },
-  { key: "terasa", icon: Trees, emoji: "🌿", label: "Terasă / Grădină" },
+  { key: "ac", icon: Snowflake, label: "Aer Condiționat" },
+  { key: "balcon", icon: Sunset, label: "Balcon" },
+  { key: "lift", icon: ArrowUpDown, label: "Lift" },
+  { key: "centrala", icon: Flame, label: "Centrală proprie" },
+  { key: "termopan", icon: Layers, label: "Geamuri Termopan" },
+  { key: "mobilat", icon: Armchair, label: "Mobilat complet" },
+  { key: "bucatarie", icon: ChefHat, label: "Bucătărie utilată" },
+  { key: "tv", icon: Tv, label: "Smart TV" },
+  { key: "masina_spalat", icon: Shirt, label: "Mașină de spălat" },
+  { key: "terasa", icon: Trees, label: "Terasă / Grădină" },
 ];
 
 export const OPTION_OPTS = [
-  { key: "parking", icon: Car, emoji: "🅿️", label: "Parcare" },
-  { key: "pet_friendly", icon: PawPrint, emoji: "🐾", label: "Pet Friendly" },
-  { key: "commission_free", icon: Tag, emoji: "🆓", label: "Fără Comision" },
+  { key: "parking", icon: Car, label: "Parcare" },
+  { key: "pet_friendly", icon: PawPrint, label: "Pet Friendly" },
+  { key: "commission_free", icon: Tag, label: "Fără Comision" },
 ];
 
 // Builds the Property entity payload from wizard/form state.
@@ -102,7 +102,7 @@ export function buildPropertyPayload({ form, chips, facilities, country, user, i
     water_pressure_ok: !!chips.water,
     features: [
       ...CHIP_OPTS.filter((c) => chips[c.key]).map((c) => c.feature),
-      ...FACILITY_OPTS.filter((f) => facilities[f.key]).map((f) => `${f.emoji} ${f.label}`),
+      ...FACILITY_OPTS.filter((f) => facilities[f.key]).map((f) => f.label),
     ],
   };
 }

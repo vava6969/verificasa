@@ -70,7 +70,7 @@ const CONTENT = {
       { q: "Cum funcționează verificarea?", a: "Verificăm online fiecare anunț înainte de publicare — poze, acte și preț — și calculăm un scor de încredere atașat anunțului." },
       { q: "Ce este turul 3D?", a: "Proprietarul poate adăuga propriul tur 3D, realizat cu aplicația noastră integrată VerifiCasa 3D, disponibilă cu Plan Pro — îl poți explora online din telefon sau calculator înainte de o vizionare." },
       { q: "Cât costă să listez o proprietate?", a: "Publicarea anunțului și verificarea de bază sunt gratuite. Detaliile despre planurile disponibile se vor regăsi pe site sau aplicația mobilă, în rubrica special destinată acestui plan." },
-      { q: "În ce orașe sunteți activi?", a: "Poți căuta în toată România — peste 300 de orașe și cartiere sunt deja în platformă. Verificarea este online, deci disponibilă peste tot, din prima zi." },
+      { q: "În ce orașe sunteți activi?", a: "Poți căuta în toată România. Verificarea se face online, deci e disponibilă oriunde, din prima zi." },
       { q: "Cum contactez un proprietar sau agent?", a: "Direct din anunț — prin mesagerie în platformă, telefon sau WhatsApp, fără să-ți expui numărul până nu decizi tu." },
       { q: "Pot salva proprietatea sau căutarea pentru mai târziu?", a: "Da — cu un cont gratuit poți salva proprietatea (inima de pe anunț) sau întreaga căutare, ca s-o regăsești oricând în cont." },
     ],

@@ -114,6 +114,27 @@ export default function PropertyWizard({ onDone, onCancel }) {
     if (!form.phone) { toast({ title: "Completează numărul de telefon", variant: "destructive" }); throw new Error("phone"); }
     if (!agreed) { toast({ title: "Acceptă termenii pentru a publica", variant: "destructive" }); throw new Error("terms"); }
 
+    // Limitele planului se verifică server-side înainte de publicare — altfel
+    // planurile vând „1 anunț activ" fără ca nimic să îl impună.
+    if (!isAdmin) {
+      try {
+        const res = await base44.functions.invoke("CheckListingAllowance", { photo_count: imagesCount });
+        const data = res?.data || res || {};
+        if (data.allowed === false) {
+          toast({
+            title: "Ai atins limita planului",
+            description: data.error || "Treci pe un plan superior ca să publici mai multe anunțuri.",
+            variant: "destructive",
+          });
+          throw new Error("allowance");
+        }
+      } catch (e) {
+        if (e?.message === "allowance") throw e;
+        // O eroare de rețea nu trebuie să blocheze publicarea — limita rămâne
+        // impusă oricum la aprobare.
+      }
+    }
+
     const property_code = await generateUniquePropertyCode();
     const created = await base44.entities.Property.create(
       buildPropertyPayload({ form, chips, facilities, country, user, isAdmin, property_code })
