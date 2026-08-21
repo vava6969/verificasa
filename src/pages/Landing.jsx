@@ -30,8 +30,14 @@ export default function Landing() {
       {/* HERO — fotografie pe toată lățimea, text peste ea */}
       <section className="relative">
         <div className="relative h-[78vh] min-h-[440px] w-full overflow-hidden sm:h-[70vh] sm:min-h-[520px] lg:h-[76vh]">
-          <HeroPhoto rounded={false} className="absolute inset-0 h-full w-full" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/30 to-black/70" />
+          {/* Poziționarea vine din wrapper, nu din className-ul pasat: clasa
+              `relative` proprie a HeroPhoto câștiga în cascadă peste `absolute`
+              și împingea tot textul hero sub fotografie, tăiat de
+              overflow-hidden. Telefonul vedea doar poza. */}
+          <div className="absolute inset-0">
+            <HeroPhoto rounded={false} className="h-full w-full" />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/80" />
 
           <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-8 sm:px-6 sm:pb-12 lg:px-8 lg:pb-16">
             <Reveal>

@@ -5,12 +5,14 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 // și marcajele mono au dispărut — clientul a cerut explicit să nu mai apară
 // ID-uri peste poze. Ce rămâne e o trecere lentă printr-un set de imagini
 // reale, cu un zoom foarte lent care ține cadrul viu.
+// Doar fotografii românești din setul generat — vilele mediteraneene cu
+// palmieri au ieșit din rotație, nu vindem chirii în Malaga.
 const HEROES = [
   "/images/properties/exterior-02.webp",
-  "/images/hero/villa-living-1.webp",
-  "/images/properties/interior-08.webp",
-  "/images/hero/villa-exterior.webp",
   "/images/properties/interior-01.webp",
+  "/images/properties/exterior-04.webp",
+  "/images/properties/interior-08.webp",
+  "/images/properties/exterior-06.webp",
 ];
 
 export default function HeroPhoto({ className = "", rounded = true }) {

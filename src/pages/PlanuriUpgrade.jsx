@@ -59,13 +59,13 @@ function PricingSwitch({ annual, onSwitch, en }) {
                 <motion.span
                   layoutId="planSwitchPill"
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  className="absolute left-0 top-0 h-11 w-full rounded-full border-4 border-blue-600 bg-gradient-to-t from-blue-500 via-blue-400 to-blue-600 shadow-sm shadow-blue-600 sm:h-12"
+                  className="absolute left-0 top-0 h-11 w-full rounded-full border-4 border-emerald bg-gradient-to-t from-emerald via-emerald/85 to-emerald shadow-sm shadow-emerald/60 sm:h-12"
                 />
               )}
               <span className="relative flex items-center gap-2 whitespace-nowrap">
                 {opt.label}
                 {opt.note && (
-                  <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-black">
+                  <span className="rounded-full bg-white/90 px-2 py-0.5 text-xs font-semibold text-emerald">
                     {opt.note}
                   </span>
                 )}
@@ -95,7 +95,7 @@ function Tick() {
   return (
     <span
       aria-hidden="true"
-      className="mr-3 grid h-6 w-6 shrink-0 place-content-center rounded-full bg-gradient-to-t from-blue-500 to-blue-400 text-[13px] font-bold leading-none text-white shadow-sm shadow-blue-500/50"
+      className="mr-3 grid h-6 w-6 shrink-0 place-content-center rounded-full bg-gradient-to-t from-emerald to-emerald/80 text-[13px] font-bold leading-none text-white shadow-sm shadow-emerald/50"
     >
       ✓
     </span>
@@ -107,14 +107,15 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en }) {
   const price = annual ? plan.yearly : plan.monthly;
   const decimals = price % 1 !== 0;
   const icons = FEATURE_ICONS[plan.id] || [];
-  const headline = plan.benefits.slice(0, 3);
-  const includes = plan.benefits.slice(3);
+  const bens = en && plan.benefits_en ? plan.benefits_en : plan.benefits;
+  const headline = bens.slice(0, 3);
+  const includes = bens.slice(3);
   const label = INCLUDES_LABEL[plan.id] || INCLUDES_LABEL.basic;
 
   return (
     <Card
       className={`relative flex h-full flex-col overflow-visible border-neutral-200 dark:border-white/10 ${
-        popular ? "bg-blue-50 ring-2 ring-blue-500 dark:bg-blue-950/30" : "bg-white dark:bg-neutral-900"
+        popular ? "bg-emerald/5 ring-2 ring-emerald dark:bg-emerald/10" : "bg-white dark:bg-neutral-900"
       }`}
     >
       {plan.badgeImg && (
@@ -122,7 +123,7 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en }) {
           src={plan.badgeImg}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -right-3 -top-8 z-20 h-[4.5rem] w-[4.5rem] object-contain drop-shadow-lg sm:-right-4 sm:-top-9 sm:h-[5.5rem] sm:w-[5.5rem]"
+          className="pointer-events-none absolute right-3 top-3 z-20 h-12 w-12 object-contain drop-shadow-lg sm:-right-4 sm:-top-9 sm:h-[5.5rem] sm:w-[5.5rem]"
         />
       )}
 
@@ -140,12 +141,12 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en }) {
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-[1.75rem]">{plan.name}</h3>
           </div>
           {popular && (
-            <span className="shrink-0 rounded-full bg-blue-500 px-3 py-1 text-sm font-medium text-white">
+            <span className="shrink-0 rounded-full bg-emerald px-3 py-1 text-sm font-semibold text-white">
               Popular
             </span>
           )}
         </div>
-        <p className="mb-4 min-h-[2.5rem] text-sm text-gray-600 dark:text-neutral-400">{plan.description}</p>
+        <p className="mb-4 min-h-[2.5rem] text-sm text-gray-600 dark:text-neutral-400">{en && plan.description_en ? plan.description_en : plan.description}</p>
         <div className="flex items-baseline">
           <span className="text-4xl font-bold text-gray-900 dark:text-white">
             <NumberFlow
@@ -167,7 +168,7 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en }) {
           disabled={checkingOut === plan.id}
           className={`mb-4 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl p-4 text-lg font-semibold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 ${
             popular
-              ? "border border-blue-400 bg-gradient-to-t from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/60"
+              ? "border border-emerald/70 bg-gradient-to-t from-emerald to-emerald/85 text-white shadow-lg shadow-emerald/50"
               : "border border-neutral-700 bg-gradient-to-t from-neutral-900 to-neutral-600 text-white shadow-lg shadow-neutral-900/40"
           }`}
         >
@@ -217,11 +218,11 @@ function BoostCard({ pack, cheapestUnit, onBuy, pending, en }) {
   return (
     <Card
       className={`relative flex h-full flex-col overflow-visible border-neutral-200 dark:border-white/10 ${
-        pack.popular ? "bg-blue-50 ring-2 ring-blue-500 dark:bg-blue-950/30" : "bg-white dark:bg-neutral-900"
+        pack.popular ? "bg-emerald/5 ring-2 ring-emerald dark:bg-emerald/10" : "bg-white dark:bg-neutral-900"
       }`}
     >
       {best && (
-        <span className="absolute -top-3 left-4 z-20 rounded-full bg-gradient-to-t from-blue-500 to-blue-400 px-3 py-1 text-xs font-semibold text-white shadow shadow-blue-500/50">
+        <span className="absolute -top-3 left-4 z-20 rounded-full bg-gradient-to-t from-emerald to-emerald/80 px-3 py-1 text-xs font-semibold text-white shadow shadow-emerald/50">
           {en ? "Best rate" : "Cel mai bun preț"}
         </span>
       )}
@@ -256,7 +257,7 @@ function BoostCard({ pack, cheapestUnit, onBuy, pending, en }) {
           disabled={pending === pack.id}
           className={`mt-5 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl px-4 text-base font-semibold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 ${
             pack.popular || pack.single
-              ? "border border-blue-400 bg-gradient-to-t from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/60"
+              ? "border border-emerald/70 bg-gradient-to-t from-emerald to-emerald/85 text-white shadow-lg shadow-emerald/50"
               : "border border-neutral-700 bg-gradient-to-t from-neutral-900 to-neutral-600 text-white shadow-lg shadow-neutral-900/40"
           }`}
         >
@@ -362,16 +363,16 @@ export default function PlanuriUpgrade() {
       <div
         className="pointer-events-none absolute left-[10%] right-[10%] top-0 z-0 h-full w-[80%] dark:hidden"
         style={{
-          backgroundImage: "radial-gradient(circle at center, #206ce8 0%, transparent 70%)",
-          opacity: 0.6,
+          backgroundImage: "radial-gradient(circle at center, #1F7048 0%, transparent 70%)",
+          opacity: 0.35,
           mixBlendMode: "multiply",
         }}
       />
       <div
         className="pointer-events-none absolute left-[10%] right-[10%] top-0 z-0 hidden h-full w-[80%] dark:block"
         style={{
-          backgroundImage: "radial-gradient(circle at center, #206ce8 0%, transparent 70%)",
-          opacity: 0.28,
+          backgroundImage: "radial-gradient(circle at center, #37A06B 0%, transparent 70%)",
+          opacity: 0.18,
         }}
       />
 
@@ -379,7 +380,7 @@ export default function PlanuriUpgrade() {
         <div className="mx-auto mb-6 max-w-3xl text-center">
           <Reveal as="h1" index={0} className="mb-4 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl md:text-6xl">
             {en ? "Plans that fit " : "Planuri potrivite "}
-            <span className="inline-block rounded-xl border border-dashed border-blue-500 bg-blue-100 px-2 py-1 dark:bg-blue-500/10">
+            <span className="inline-block rounded-xl border border-dashed border-emerald bg-emerald/10 px-2 py-1 dark:bg-emerald/15">
               {en ? "you" : "pentru tine"}
             </span>
           </Reveal>
@@ -394,7 +395,7 @@ export default function PlanuriUpgrade() {
           <PricingSwitch annual={annual} onSwitch={setAnnual} en={en} />
         </Reveal>
 
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-5 py-8 md:grid-cols-3 md:gap-4">
+        <div className="mx-auto mt-2 grid max-w-7xl grid-cols-1 gap-5 py-8 sm:mt-6 md:grid-cols-3 md:gap-4">
           {PLANS.map((plan, i) => (
             <Reveal key={plan.id} as="div" index={3 + i} className="h-full">
               <PlanCard
@@ -437,7 +438,7 @@ export default function PlanuriUpgrade() {
 
           <Reveal as="p" index={2} className="mt-6 text-center text-sm text-gray-600 dark:text-neutral-400">
             {en ? "Got a code? Redeem it in " : "Ai un cod? Îl folosești în "}
-            <a href="/account" className="font-semibold text-blue-600 hover:underline dark:text-blue-400">
+            <a href="/account" className="font-semibold text-emerald hover:underline">
               {en ? "your account" : "Contul meu"}
             </a>
             {en ? " for bonus boosts." : " și primești boost-uri bonus."}
