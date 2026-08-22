@@ -90,8 +90,13 @@ export default function VerifiCasaLogo({
     );
   }
 
+  // „Casa" e verde ORIUNDE. Pe tuș era alb-80%, deci sigla din subsol nu semăna
+  // cu cea din antet: sus verde, jos gri. Verdele din token urmează tema, iar pe
+  // fundal de tuș varianta de zi (#1F7048) e prea închisă ca să se citească —
+  // pe `tone="light"` folosim verdele de noapte, literal, ca Tailwind să nu-l
+  // curețe la build.
   const inkCls = tone === "light" ? "text-white" : "text-foreground";
-  const casaCls = tone === "light" ? "text-white/80" : "text-emerald";
+  const casaCls = tone === "light" ? "text-[#37A06B]" : "text-emerald";
   const fs = Math.round(size * 0.52);
 
   return (

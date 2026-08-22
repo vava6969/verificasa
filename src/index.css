@@ -355,6 +355,34 @@
     text-shadow: 0 2px 4px rgb(0 0 0 / 0.55), 0 1px 2px rgb(0 0 0 / 0.4);
   }
 
+  /* ---- meniul din antet ----
+     Regula casei: starea de REPAUS e cea VIZIBILĂ, iar animația doar o
+     precedă. Varianta pe framer-motion ținea panoul și fiecare rând la
+     `opacity: 0` până rula un cadru — măsurat, la o secundă după click, cu
+     bucla de cadre sugrumată, meniul era complet invizibil. Același tipar care
+     a ascuns secțiuni întregi (vezi ui/reveal.jsx).
+
+     Verificat: și o animație CSS ține primul keyframe cât timp nu apucă să
+     avanseze, deci `opacity: 0` în keyframe e la fel de periculos ca la framer —
+     măsurat, panoul rămânea la zero. Așa că NICIUNA dintre animațiile de aici nu
+     atinge opacitatea. Doar transform: în cel mai rău caz panoul e ușor micșorat
+     și rândurile împinse 7px, adică vizibile. */
+  @keyframes vc-menu-panel {
+    from { transform: translateY(-8px) scale(0.94); }
+    to   { transform: none; }
+  }
+  @keyframes vc-menu-row {
+    from { transform: translateY(-7px); }
+    to   { transform: none; }
+  }
+  .vc-menu-panel {
+    animation: vc-menu-panel 0.26s var(--ease-house);
+    transform-origin: top right;
+  }
+  .vc-menu-row {
+    animation: vc-menu-row 0.3s var(--ease-house) backwards;
+  }
+
   /* generated paper grain (SVG turbulence, no stock textures) */
   .paper-grain { position: relative; }
   .paper-grain::after {

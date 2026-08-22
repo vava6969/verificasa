@@ -71,7 +71,7 @@ const LINKS = [
 
 const BOUNCE = "cubic-bezier(0.34, 1.56, 0.64, 1)";
 
-export default function SocialLinks({ className, soon = "În curând" }) {
+export default function SocialLinks({ className, soon = "În curând", compact = false }) {
   // Cele stinse primesc motivul în `aria-label` (deci cititorul de ecran îl
   // aude) plus o singură notă vizibilă sub rând — nu câte o etichetă lângă
   // fiecare iconiță, care rupea rândul pe telefon și umfla subsolul cu 60px.
@@ -81,8 +81,11 @@ export default function SocialLinks({ className, soon = "În curând" }) {
     <div className={className}>
     <ul className="flex flex-wrap items-center gap-2">
       {LINKS.map(({ key, label, href, Icon, hover, external = true }, i) => {
+        // Pe telefon cercurile sunt de 40px în loc de 44: rândul rămâne apăsabil
+        // cu degetul, dar subsolul nu mai cheltuie un rând întreg pe el.
         const base =
-          "flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/70";
+          (compact ? "flex h-10 w-10" : "flex h-11 w-11") +
+          " items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/70";
         const motion =
           "transition-[transform,color,border-color,background-color] duration-300 will-change-transform hover:-translate-y-1 hover:scale-110 hover:bg-white/10 active:scale-90 focus-visible:-translate-y-1 focus-visible:scale-110 focus-visible:outline-none";
 
@@ -124,7 +127,9 @@ export default function SocialLinks({ className, soon = "În curând" }) {
       })}
     </ul>
 
-    {pending.length > 0 && (
+    {/* Nota care explică iconițele stinse costă un rând întreg. Pe telefon
+        motivul rămâne în `aria-label`-ul fiecăreia; pe desktop se scrie. */}
+    {!compact && pending.length > 0 && (
       <p aria-hidden="true" className="mt-1.5 text-[10.5px] text-white/35">
         {pending.join(" · ")} — {soon.toLowerCase()}
       </p>

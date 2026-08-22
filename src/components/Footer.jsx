@@ -45,30 +45,35 @@ export default function Footer() {
   const head = "text-[13px] font-bold text-white";
   // Pe telefon linkurile sunt inline, despărțite prin puncte — ținta de atins
   // rămâne generoasă pe verticală fără să coste un rând întreg per link.
+  // 26px pe verticală în loc de 30: tot o țintă rezonabilă pentru deget într-un
+  // rând curgător, dar unsprezece linkuri costă cu ~40px mai puțin.
   const inlineLink =
-    "inline-flex min-h-[30px] items-center text-white/65 transition-colors hover:text-white";
+    "inline-flex min-h-[26px] items-center text-white/65 transition-colors hover:text-white";
 
   return (
     <footer className="bg-navy-deep text-white/70">
-      <Reveal className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-10 lg:px-8">
-        {/* ——— TELEFON: compact, fără coloane ——— */}
+      <Reveal className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-10 lg:px-8">
+        {/* ——— TELEFON: cât mai mic cu putință ———
+            Subsolul ajunsese la 369px pe un ecran de 812 — aproape jumătate de
+            telefon, la capătul fiecărei pagini. Aici e strâns la strictul
+            necesar: sigla mică, rândul de contact fără nota explicativă, TOATE
+            linkurile legale într-o singură curgere despărțită prin puncte,
+            apoi pastilele ANPC/ODR.
+
+            Linkurile de platformă (Caută, Hartă, Tur 3D, Planuri, Parteneri,
+            Despre) NU se repetă aici pe telefon: sunt deja în meniul din antet,
+            care e pe fiecare pagină. Șase linkuri duplicate costau două rânduri
+            în capătul fiecărui ecran fără să ducă nicăieri nou.
+
+            Ce NU dispare: Termeni, Confidențialitate, Cookies, Ștergerea
+            datelor, Contact și ANPC/SAL/ODR. Alea trăiesc DOAR în subsol și
+            sunt obligatorii — se strâng, nu se ascund după un buton. */}
         <div className="md:hidden">
-          {/* Fără paragraful de prezentare aici: pe telefon costa cincizeci de
-              pixeli ca să repete ce scrie deja în hero. Rămâne pe desktop. */}
-          <VerifiCasaLogo size={30} tone="light" />
+          <VerifiCasaLogo size={26} tone="light" />
 
-          <SocialLinks className="mt-3" />
+          <SocialLinks className="mt-2.5" compact />
 
-          <nav className="mt-4 flex flex-wrap items-center gap-x-1 gap-y-1 text-[12.5px] font-semibold">
-            {platform.map((l, i) => (
-              <React.Fragment key={l.to}>
-                {i > 0 && <span aria-hidden="true" className="text-white/25">·</span>}
-                <Link to={l.to} className={inlineLink}>{l.label}</Link>
-              </React.Fragment>
-            ))}
-          </nav>
-
-          <nav className="mt-1 flex flex-wrap items-center gap-x-1 gap-y-1 text-[12px]">
+          <nav className="mt-2.5 flex flex-wrap items-center gap-x-1 text-[11.5px] font-semibold leading-tight">
             {legal.map((l, i) => (
               <React.Fragment key={l.to}>
                 {i > 0 && <span aria-hidden="true" className="text-white/25">·</span>}
@@ -79,7 +84,7 @@ export default function Footer() {
 
           <LegalBadges />
 
-          <p className="mt-3 border-t border-white/15 pt-3 text-[11px] text-white/40">
+          <p className="mt-2.5 border-t border-white/15 pt-2.5 text-[10.5px] text-white/40">
             {t("footer_copy")}
           </p>
         </div>

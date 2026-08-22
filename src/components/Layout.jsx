@@ -4,7 +4,6 @@ import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
 import InstagramPopup from "@/components/InstagramPopup";
-import CookieBanner from "@/components/CookieBanner";
 import { titleForPath } from "@/lib/pageTitle";
 
 export default function Layout() {
@@ -49,7 +48,6 @@ export default function Layout() {
           jos părea că se plimbă odată cu pagina în loc să rămână lipită. */}
       {!hideBottomNav && <BottomNav />}
       <InstagramPopup />
-      <CookieBanner />
     </>
   );
 }

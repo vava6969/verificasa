@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import VerifiCasaLogo from "@/components/VerifiCasaLogo";
+import LanguageToggle from "@/components/LanguageToggle";
+import ThemeToggle from "@/components/ThemeToggle";
 
 // Single shell for every auth page: login/register, forgot password, reset
 // password and OAuth consent. One architecture, so the page does not change
@@ -15,11 +17,11 @@ import VerifiCasaLogo from "@/components/VerifiCasaLogo";
 // the wordmark carries the branding instead of a decorative lucide medallion.
 
 const SHOTS = [
-  { src: "/images/auth/bucuresti.webp", place: "București", area: "Cotroceni" },
-  { src: "/images/auth/cluj.webp", place: "Cluj-Napoca", area: "Mărăști" },
-  { src: "/images/auth/brasov.webp", place: "Brașov", area: "Schei" },
-  { src: "/images/auth/constanta.webp", place: "Constanța", area: "Faleză Nord" },
-  { src: "/images/auth/timisoara.webp", place: "Timișoara", area: "Cetate" },
+  { src: "/images/auth/bucuresti-v2.webp", place: "București", area: "Cotroceni" },
+  { src: "/images/auth/cluj-v2.webp", place: "Cluj-Napoca", area: "Mărăști" },
+  { src: "/images/auth/brasov-v2.webp", place: "Brașov", area: "Schei" },
+  { src: "/images/auth/constanta-v2.webp", place: "Constanța", area: "Faleză Nord" },
+  { src: "/images/auth/timisoara-v2.webp", place: "Timișoara", area: "Cetate" },
 ];
 
 const HOLD_MS = 8000;
@@ -84,6 +86,16 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
               "linear-gradient(180deg, hsl(var(--navy-deep) / 0.58) 0%, hsl(var(--navy-deep) / 0.74) 100%)",
           }}
         />
+      </div>
+
+      {/* Comenzile de limbă și temă.
+          Paginile de autentificare nu trec prin Layout, deci nu au Header — iar
+          fără el nu exista niciun buton de limbă sau de zi/noapte pe primul
+          ecran pe care îl vede cineva. Stau sus-dreapta, peste fotografie,
+          deasupra cardului. */}
+      <div className="absolute right-3 top-3 z-20 flex items-center gap-2 sm:right-5 sm:top-5">
+        <LanguageToggle />
+        <ThemeToggle className="rounded-full" />
       </div>
 
       {/* Card */}

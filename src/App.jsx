@@ -7,6 +7,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
+import CookieBanner from '@/components/CookieBanner';
 import RouteErrorBoundary from '@/components/RouteErrorBoundary';
 import Layout from '@/components/Layout';
 import Landing from '@/pages/Landing';
@@ -137,6 +138,14 @@ function App() {
             <Router>
               <ScrollToTop />
               <AuthenticatedApp />
+              {/* Consimțământul pentru cookie-uri stătea în Layout, dar
+                  autentificarea, înregistrarea, recuperarea parolei și
+                  consimțământul OAuth sunt rute din AFARA lui — deci exact
+                  paginile pe care ajunge un vizitator nou nu cereau nimic.
+                  Sub GDPR/ePrivacy bannerul trebuie să apară înainte de orice
+                  cookie neesențial, pe ORICE pagină, așa că stă aici, o
+                  singură dată, deasupra întregului router. */}
+              <CookieBanner />
             </Router>
             <Toaster />
           </CountryProvider>
