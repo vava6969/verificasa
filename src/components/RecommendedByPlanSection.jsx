@@ -7,6 +7,7 @@ import { fetchActivePlanMap } from "@/lib/subscriptions";
 import RecommendedPropertyCard from "@/components/RecommendedPropertyCard";
 import { buildCoverMap } from "@/lib/covers";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/lib/AuthContext";
 
 // Homepage — „Anunțuri recomandate", pe 4 rânduri distincte, delimitate strict
 // de planul celui care a postat (Agent > Pro > Basic > fără plan), fiecare
@@ -14,9 +15,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 // decide RÂNDUL, vizualizările decid doar ordinea în interiorul aceluiași rând
 // — un anunț Agent cu puține vizualizări tot apare înaintea unui anunț Pro cu
 // mai multe. Vezi src/lib/plans.js pentru sursa de adevăr a planurilor.
+const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
+
 export default function RecommendedByPlanSection() {
   const { lang } = useCountry();
+  const { user } = useAuth();
   const en = lang === "en";
+  // Un raft gol arată ca un magazin fără marfă, deci publicul vede doar
+  // rândurile care au ceva în ele. Adminul le vede pe toate, goale sau nu: el
+  // are nevoie de structura pe planuri ca să știe ce lipsește și unde, nu de o
+  // pagină care tace.
+  const isAdmin = ADMIN_ROLES.includes((user?.role || "").toUpperCase());
   const [properties, setProperties] = useState(null);
   const [planMap, setPlanMap] = useState(null);
 
@@ -71,16 +80,17 @@ export default function RecommendedByPlanSection() {
   return (
     <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 sm:pb-16 lg:px-8">
       {rows.map((row) => (
-        <PlanRow key={row.id} row={row} en={en} coverMap={coverMap} />
+        <PlanRow key={row.id} row={row} en={en} coverMap={coverMap} showEmpty={isAdmin} />
       ))}
     </section>
   );
 }
 
-function PlanRow({ row, en, coverMap }) {
-  // Un rând gol nu mai afișează o casetă punctată cu invitația de a fi primul:
-  // arăta ca un magazin gol. Rândul pur și simplu nu apare.
-  if (row.items.length === 0) return null;
+function PlanRow({ row, en, coverMap, showEmpty = false }) {
+  // Publicul nu vede rafturi goale. Adminul da — vezi nota din componenta de
+  // deasupra.
+  const empty = row.items.length === 0;
+  if (empty && !showEmpty) return null;
 
   const visible = row.items.slice(0, 8);
 
@@ -120,6 +130,11 @@ function PlanRow({ row, en, coverMap }) {
           derula singur banda cu exact 16px la încărcare și lipea primul card
           de marginea ecranului. scroll-padding mută punctul de oprire pe
           gutieră, deci scrollLeft rămâne 0 și cardul stă unde îi e locul. */}
+      {empty ? (
+        <p className="py-5 text-sm text-muted-foreground">
+          {en ? "No listings on this plan yet." : "Niciun anunț pe acest plan deocamdată."}
+        </p>
+      ) : (
       <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory items-start gap-3 overflow-x-auto px-4 pb-2 scroll-px-4 sm:mx-0 sm:gap-4 sm:px-0 sm:scroll-px-0">
         {visible.map((p) => (
           <div
@@ -130,6 +145,7 @@ function PlanRow({ row, en, coverMap }) {
           </div>
         ))}
       </div>
+      )}
     </div>
   );
 }
