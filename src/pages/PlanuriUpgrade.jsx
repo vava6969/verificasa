@@ -141,7 +141,20 @@ function PricingSwitch({ annual, onSwitch, en }) {
 // Un efect de hover care nu se poate stinge nu e un efect, e o pata. Ramane
 // unde exista un pointer care poate PLECA de pe card; pe telefon cardurile
 // stau pe fundalul curat al paginii, care e si contrastul corect.
+//
+// Treapta gratuita nu avea imagine, deci trei carduri din patru schimbau pagina
+// si unul nu facea nimic — se citea ca un efect stricat, nu ca o treapta.
+// Nu s-a generat o imagine noua: e RECICLATA din /tur-3d, o pagina mult mai
+// putin vizitata, si e referita acolo unde sta deja. Un singur fisier, un
+// singur download, aceeasi memorie cache pentru cine a trecut pe acolo.
+// Casa aceea — o singura cladire modesta, fotografiata frontal pe vreme
+// acoperita — sta exact sub Basic pe scara si nu are marcaje de tur 3D arse in
+// imagine, cum are tur3d-interior-hotspot (doua bile albe, care ar fi promis
+// un tur 3D tocmai pe planul care nu primeste niciunul).
+// ATENTIE: daca se schimba vreodata poza casei de pe /tur-3d, se schimba si
+// fundalul treptei gratuite de aici.
 const TIER_BACKDROP = {
+  none: "/images/tur3d/tur3d-house-1-v1.webp",
   basic: "/images/upgrade/tier-basic-v1.webp",
   pro: "/images/upgrade/tier-pro-v1.webp",
   agent: "/images/upgrade/tier-agent-v1.webp",
@@ -548,6 +561,8 @@ export default function PlanuriUpgrade() {
             key={id}
             src={src}
             alt=""
+            decoding="async"
+            fetchPriority="low"
             className={`absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-700 ease-out ${
               tier === id ? "scale-100 opacity-100" : "scale-105 opacity-0"
             }`}
