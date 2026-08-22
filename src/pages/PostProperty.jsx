@@ -36,11 +36,11 @@ export default function PostProperty() {
     return () => { cancelled = true; };
   }, [submitted, user?.id]);
 
-  // Un anunț proaspăt trimis e „în așteptare", iar CreateBoostCheckout refuză
-  // explicit orice anunț neaprobat — deci NU putem oferi „cumpără și aplică
-  // acum". Ecranul spune adevărul: promovarea pornește după aprobare. Pentru
-  // admini, care publică direct aprobat, butonul chiar promovează pe loc.
+  // ApplyBoost acceptă și anunțul PENDING al propriului autor (23.08) — deci
+  // stepperul funcționează imediat după trimitere; efectul public pornește la
+  // aprobare, și exact asta spune textul. Doar anunțul respins rămâne refuzat.
   const approved = created?.approval_status === "APPROVED";
+  const boostable = created?.approval_status !== "REJECTED";
   const maxQty = Math.max(1, balance);
 
   const promote = async () => {
@@ -137,7 +137,7 @@ export default function PostProperty() {
 
               {/* Contorul cerut de client: câte promovări ai și câte pui pe
                   anunțul ăsta, chiar aici, la finalul publicării. */}
-              {approved && balance >= 1 && (
+              {boostable && balance >= 1 && (
                 <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3">
                   <div className="min-w-0">
                     <p className="text-sm font-bold text-foreground">
@@ -172,7 +172,7 @@ export default function PostProperty() {
               )}
 
               <div className="mt-4 flex flex-wrap gap-2">
-                {approved && balance >= 1 ? (
+                {boostable && balance >= 1 ? (
                   <Button
                     onClick={promote}
                     disabled={applying}
@@ -190,7 +190,7 @@ export default function PostProperty() {
                     </Link>
                   </Button>
                 )}
-                {approved && balance >= 1 && (
+                {boostable && balance >= 1 && (
                   <Button asChild variant="outline" className="h-11 rounded-full px-5 text-sm">
                     <Link to="/upgrade">{en ? "Buy more" : "Cumpără mai multe"}</Link>
                   </Button>

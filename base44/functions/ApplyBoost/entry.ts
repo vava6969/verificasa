@@ -27,8 +27,13 @@ export default async function (req: Request): Promise<Response> {
     if (p.created_by_id !== me.id && !isAdmin) {
       return Response.json({ error: "Poți promova doar anunțurile tale." });
     }
-    if (p.approval_status !== "APPROVED") {
-      return Response.json({ error: "Anunțul trebuie aprobat înainte de a fi promovat." });
+    // Clientul, 23.08: boost-urile se aleg pe ultimul pas al publicării, când
+    // anunțul e încă „în așteptare". Un anunț PENDING al propriului autor se
+    // poate promova de pe acum — boost-ul stă pe anunț și contează public din
+    // clipa aprobării; cum boost-urile nu expiră, nimic nu se pierde. Singurul
+    // refuz rămâne anunțul respins.
+    if (p.approval_status === "REJECTED") {
+      return Response.json({ error: "Un anunț respins nu poate fi promovat." });
     }
 
     const balance = await getBalance(svc, me.id);

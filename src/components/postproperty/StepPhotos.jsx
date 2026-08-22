@@ -1,18 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Upload, X, Loader2, ArrowUpRight } from "lucide-react";
+import { Upload, X, Loader2, Plus, Minus } from "lucide-react";
 import { Image as UIImage } from "@/components/ui/image";
 import { Field, inputCls } from "./wizardUi";
 import { MIN_PHOTOS, MAX_PHOTOS, onlyPhoneDigits } from "@/lib/propertyPayload";
-import { TOUR_3D_APP_URL } from "@/lib/appLinks";
 import { useWiz, SELLER_ROLE_EN } from "./wizardCopy";
 
-// Aplicația de captură 3D. Cât timp `TOUR_3D_APP_URL` e null, butonul stă stins
-// și marcat „În curând" — nu trimitem proprietarul într-o filă goală. Link-ul
-// către explicații merge însă de pe acum: pagina /tur-3d există chiar dacă
-// aplicația nu, deci omul are unde să afle ce urmează.
+// Turul 3D e o singură linie cu un link (cererea clientului, a doua oară:
+// „small line and a link", nu banner). Locul bannerului l-a luat promovarea:
+// alegi aici câte boost-uri pui pe anunț, iar publicarea le aplică.
 
-export default function StepPhotos({ form, set, uploading, onFiles, agreed, setAgreed }) {
+export default function StepPhotos({
+  form, set, uploading, onFiles, agreed, setAgreed,
+  boostQty, setBoostQty, boostBalance,
+}) {
   const { w, en } = useWiz();
   const urls = form.images ? form.images.split(",").filter(Boolean) : [];
   const removeAt = (i) => set({ images: urls.filter((_, idx) => idx !== i).join(",") });
@@ -48,44 +49,57 @@ export default function StepPhotos({ form, set, uploading, onFiles, agreed, setA
         </p>
       </div>
 
-      {/* Tur 3D (opțional) — nu e o condiție ca să publici: rămâne un pas
-          separat, făcut după poze. */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4">
-        <div className="flex min-w-0 items-center gap-3">
-          <img
-            src="/images/generated/icon-video.png"
-            alt=""
-            aria-hidden="true"
-            className={"h-12 w-12 shrink-0 object-contain" + (TOUR_3D_APP_URL ? "" : " opacity-60")}
-          />
-          <span className="min-w-0">
-            <span className="block text-sm font-semibold text-navy dark:text-foreground">{w.p_tour_t}</span>
-            <span className="block text-xs text-muted-foreground">{w.p_tour_d}</span>
-            <Link to="/tur-3d" className="mt-1 inline-flex text-xs font-semibold text-emerald underline-offset-2 hover:underline">
-              {w.p_tour_how}
-            </Link>
-          </span>
-        </div>
+      {/* Turul 3D: o linie, un link, atât. */}
+      <p className="text-xs text-muted-foreground">
+        {w.p_tour_t} ·{" "}
+        <Link to="/tur-3d" className="font-semibold text-emerald underline-offset-2 hover:underline">
+          {w.p_tour_how}
+        </Link>
+      </p>
 
-        {TOUR_3D_APP_URL ? (
-          <a
-            href={TOUR_3D_APP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full bg-emerald px-5 text-sm font-bold text-white shadow-soft transition hover:bg-emerald/90 active:scale-[0.98]"
+      {/* PROMOVARE — pe ultimul pas al formularului, după macheta clientului:
+          titlu, soldul, minus/plus. Cantitatea se aplică la Publică; linkul de
+          cumpărare se deschide în filă nouă ca formularul să nu se piardă. */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3">
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-foreground">{w.p_boost_t}</p>
+          <p className="text-xs text-muted-foreground">
+            {boostBalance > 0 ? w.p_boost_have(boostBalance) : w.p_boost_none}
+            {" · "}
+            <a
+              href="/upgrade"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-emerald underline-offset-2 hover:underline"
+            >
+              {boostBalance > 0 ? w.p_boost_more : w.p_boost_buy}
+            </a>
+          </p>
+          {boostQty > 0 && (
+            <p className="mt-1 text-[11px] text-muted-foreground/80">{w.p_boost_note}</p>
+          )}
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setBoostQty((n) => Math.max(0, n - 1))}
+            disabled={boostQty <= 0}
+            aria-label="-1"
+            className="tap-44 flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-emerald disabled:opacity-40"
           >
-            {w.p_tour_open}
-            <ArrowUpRight className="h-4 w-4" />
-          </a>
-        ) : (
-          <span
-            title={w.p_tour_soon}
-            className="inline-flex min-h-[32px] shrink-0 cursor-default items-center gap-1.5 rounded-full border border-border px-5 text-sm font-bold text-muted-foreground opacity-60"
+            <Minus className="h-4 w-4" />
+          </button>
+          <span className="w-7 text-center text-base font-bold tnum text-foreground">{boostQty}</span>
+          <button
+            type="button"
+            onClick={() => setBoostQty((n) => Math.min(boostBalance, n + 1))}
+            disabled={boostQty >= boostBalance}
+            aria-label="+1"
+            className="tap-44 flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-emerald disabled:opacity-40"
           >
-            {w.p_tour_open}
-            <ArrowUpRight className="h-4 w-4" />
-          </span>
-        )}
+            <Plus className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

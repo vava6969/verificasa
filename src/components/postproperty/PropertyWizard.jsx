@@ -12,6 +12,7 @@ import { generateUniquePropertyCode } from "@/lib/propertyCode";
 import { uploadPhotos } from "@/lib/imageUpload";
 import { callFnQuiet } from "@/lib/serverCall";
 import { fetchMyActiveSubscription } from "@/lib/subscriptions";
+import { fetchBoostBalance, applyBoost } from "@/lib/boosts";
 import {
   EMPTY_FORM, MIN_PHOTOS, MAX_PHOTOS, MIN_FEATURES, buildPropertyPayload,
 } from "@/lib/propertyPayload";
@@ -47,6 +48,24 @@ export default function PropertyWizard({ onDone, onCancel }) {
   const [agreed, setAgreed] = useState(false);
   const [uploading, setUploading] = useState(false);
   const publishRef = useRef(null);
+
+  // Promovarea de pe ultimul pas: câte boost-uri pune pe anunțul ăsta.
+  // Soldul se ia la intrare și se ia din nou când fila redevine activă —
+  // cumpărarea se deschide în altă filă, iar la întoarcere contorul e la zi.
+  const [boostQty, setBoostQty] = useState(0);
+  const [boostBalance, setBoostBalance] = useState(0);
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    const load = () => fetchBoostBalance(user.id).then((b) => {
+      if (cancelled) return;
+      setBoostBalance(b);
+      setBoostQty((q) => Math.min(q, b));
+    });
+    load();
+    window.addEventListener("focus", load);
+    return () => { cancelled = true; window.removeEventListener("focus", load); };
+  }, [user?.id]);
 
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
   const imagesCount = useMemo(() => (form.images ? form.images.split(",").filter(Boolean).length : 0), [form.images]);
@@ -164,6 +183,14 @@ export default function PropertyWizard({ onDone, onCancel }) {
       }
     } catch (_) {
       // Best-effort: dacă pică, SyncPosterPlans repară la următoarea rulare.
+    }
+
+    // Boost-urile alese pe ultimul pas. NU aruncă: anunțul e deja creat, iar
+    // ApplyBoost rezervă-și-restituie creditul singur — dacă pică, soldul
+    // rămâne în cont și omul află din toast, nu dintr-o publicare „eșuată".
+    if (boostQty > 0) {
+      const res = await applyBoost(created.id, boostQty).catch(() => ({ error: true }));
+      if (res?.error) toast({ title: w.p_boost_fail });
     }
 
     if (!isAdmin) {
@@ -286,7 +313,11 @@ export default function PropertyWizard({ onDone, onCancel }) {
                 <p className="mb-4 rounded-xl bg-emerald-soft px-3.5 py-2.5 text-sm font-medium text-emerald">
                   {w.real_photos}
                 </p>
-                <StepPhotos form={form} set={set} uploading={uploading} onFiles={handleFile} agreed={agreed} setAgreed={setAgreed} />
+                <StepPhotos
+                  form={form} set={set} uploading={uploading} onFiles={handleFile}
+                  agreed={agreed} setAgreed={setAgreed}
+                  boostQty={boostQty} setBoostQty={setBoostQty} boostBalance={boostBalance}
+                />
               </>
             )}
           </motion.div>
