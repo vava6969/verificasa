@@ -458,13 +458,6 @@ export default function PlanuriUpgrade() {
             ))}
           </div>
 
-          <Reveal as="p" index={2} className="mt-6 text-center text-sm text-gray-600 dark:text-neutral-400">
-            {en ? "Got a code? Redeem it in " : "Ai un cod? Îl folosești în "}
-            <a href="/account" className="font-semibold text-emerald hover:underline">
-              {en ? "your account" : "Contul meu"}
-            </a>
-            {en ? " for bonus boosts." : " și primești boost-uri bonus."}
-          </Reveal>
 
           <p className="mx-auto mt-10 max-w-3xl text-center text-xs text-gray-500 dark:text-neutral-500">
             {en

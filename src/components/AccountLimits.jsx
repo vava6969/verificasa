@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
 import { useToast } from "@/components/ui/use-toast";
 import { getEntitlements, BOOST_DURATION_DAYS } from "@/lib/plans";
 import { fetchMyActiveSubscription } from "@/lib/subscriptions";
-import { fetchBoostBalance, fetchActiveListingCount, redeemCoupon } from "@/lib/boosts";
+import { fetchBoostBalance, fetchActiveListingCount } from "@/lib/boosts";
 
 // „Limitele contului" — cererea clientului (punctul 7): ce limite ai și cât ai
 // consumat. Plus soldul de boost-uri și revendicarea unui cod, tot aici, ca
@@ -66,8 +65,6 @@ export default function AccountLimits({ className = "" }) {
   const [planId, setPlanId] = useState(undefined);
   const [used, setUsed] = useState(0);
   const [balance, setBalance] = useState(0);
-  const [code, setCode] = useState("");
-  const [redeeming, setRedeeming] = useState(false);
 
   const load = async () => {
     if (!user?.id) return;
@@ -88,31 +85,6 @@ export default function AccountLimits({ className = "" }) {
     return () => { cancelled = true; };
 
   }, [user?.id]);
-
-  const onRedeem = async (e) => {
-    e.preventDefault();
-    const trimmed = code.trim();
-    if (!trimmed || redeeming) return;
-    setRedeeming(true);
-    const res = await redeemCoupon(trimmed);
-    setRedeeming(false);
-    if (res.ok) {
-      setCode("");
-      setBalance(res.balance ?? balance + (res.boosts || 0));
-      toast({
-        title: en ? "Code redeemed" : "Cod revendicat",
-        description: en
-          ? `${res.boosts} bonus boosts added to your account.`
-          : `${res.boosts} boost-uri bonus au fost adăugate în cont.`,
-      });
-    } else {
-      toast({
-        title: en ? "Code not accepted" : "Codul nu a fost acceptat",
-        description: (en && res.error_en) ? res.error_en : res.error,
-        variant: "destructive",
-      });
-    }
-  };
 
   if (planId === undefined) {
     return <div className={`h-40 animate-pulse rounded-2xl border border-border bg-card ${className}`} />;
@@ -196,23 +168,6 @@ export default function AccountLimits({ className = "" }) {
             ? `One boost lifts a listing for ${BOOST_DURATION_DAYS} days. Spend them from My listings.`
             : `Un boost ridică un anunț ${BOOST_DURATION_DAYS} zile. Îi folosești din Anunțurile mele.`}
         </p>
-
-        <form onSubmit={onRedeem} className="mt-3 flex flex-wrap gap-2">
-          <input
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder={en ? "Bonus code" : "Cod bonus"}
-            aria-label={en ? "Bonus code" : "Cod bonus"}
-            className="min-h-[44px] min-w-0 flex-1 rounded-full border border-border bg-background px-4 text-sm uppercase text-foreground outline-none focus:border-emerald"
-          />
-          <button
-            type="submit"
-            disabled={redeeming || !code.trim()}
-            className="flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-border bg-background px-5 text-sm font-semibold text-foreground transition-colors hover:border-emerald hover:text-emerald disabled:opacity-50"
-          >
-            {redeeming ? <><Loader2 className="h-4 w-4 animate-spin" /> {en ? "Checking" : "Se verifică"}</> : (en ? "Redeem" : "Revendică")}
-          </button>
-        </form>
 
         <Link
           to="/upgrade"

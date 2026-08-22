@@ -41,14 +41,6 @@ function unwrap(res) {
   return { ok: !!data.ok, error: data.error || null, ...data };
 }
 
-export async function redeemCoupon(code) {
-  try {
-    return unwrap(await base44.functions.invoke("RedeemCoupon", { code }));
-  } catch (e) {
-    return { ok: false, error: "Nu am putut valida codul. Încearcă din nou." };
-  }
-}
-
 export async function applyBoost(propertyId) {
   try {
     return unwrap(await base44.functions.invoke("ApplyBoost", { property_id: propertyId }));

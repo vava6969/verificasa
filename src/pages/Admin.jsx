@@ -6,13 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
-import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil, History, Flag, ClipboardCheck, Crown, Mail, Phone, Ticket, Wrench } from "lucide-react";
+import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil, History, Flag, ClipboardCheck, Crown, Mail, Phone, Wrench } from "lucide-react";
 import PropertyEditForm from "@/components/PropertyEditForm";
 import PropertyLogs from "@/components/PropertyLogs";
 import AdminReports from "@/components/AdminReports";
 import AdminResolvedReports from "@/components/AdminResolvedReports";
 import AdminStatCard from "@/components/AdminStatCard";
-import AdminCoupons from "@/components/AdminCoupons";
 import AdminDataCleanup from "@/components/AdminDataCleanup";
 import InspectionContactModal from "@/components/InspectionContactModal";
 import { useLoadMore } from "@/hooks/useLoadMore";
@@ -267,7 +266,6 @@ export default function Admin() {
     { k: "comments", label: "Comentarii",          icon: MessageSquare },
     { k: "audit",    label: "Audit log",           icon: FileText },
     { k: "loguri",   label: "Loguri proprietate",  icon: History },
-    { k: "coduri",   label: "Coduri bonus",        icon: Ticket },
     { k: "date",     label: "Curățare date",       icon: Wrench },
   ];
 
@@ -451,8 +449,6 @@ export default function Admin() {
               })()}
             </div>
 
-          ) : tab === "coduri" ? (
-            <AdminCoupons />
           ) : tab === "date" ? (
             <AdminDataCleanup onDone={load} />
           ) : tab === "loguri" ? (
