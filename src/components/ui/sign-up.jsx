@@ -84,9 +84,11 @@ export function AuthComponent() {
     setLoading(true);
     try {
       await base44.auth.register({ email, password });
-      if (fullName) {
-        try { await base44.auth.updateMe({ full_name: fullName }); } catch {}
-      }
+      // Numele NU se salveaza aici. `register` nu deschide sesiune — SDK-ul pune
+      // Bearer-ul abia in `setToken`, dupa OTP — deci `updateMe` primea 401 si
+      // cadea intr-un catch gol. Rezultat: full_name gol, iar fallback-urile
+      // `full_name || email` afisau adresa de email a omului la comentarii,
+      // recenzii si in conversatii. Se salveaza in verifyOtp, dupa setToken.
       setShowOtp(true);
     } catch (err) {
       setError(err.message || t("au_err_register"));
@@ -101,6 +103,13 @@ export function AuthComponent() {
     try {
       const result = await base44.auth.verifyOtp({ email, otpCode: otp });
       if (result?.access_token) base44.auth.setToken(result.access_token);
+      // Prima clipa in care exista sesiune. Acum numele chiar se scrie.
+      // Asteptat inainte de redirect: `Settings` are un cooldown de 7 zile la
+      // schimbarea numelui, deci un utilizator care si-ar repara singur numele
+      // lipsa si-l consuma imediat.
+      if (fullName.trim()) {
+        try { await base44.auth.updateMe({ full_name: fullName.trim() }); } catch {}
+      }
       setDone(true);
       setTimeout(() => { window.location.href = safeReturnTo(); }, 1400);
     } catch (err) {
