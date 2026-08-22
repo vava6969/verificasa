@@ -209,7 +209,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
     // Link-ul de tur pus pe ultimul pas. SetTourUrl re-verifică toate regulile
     // server-side (plan, ferestre de 3 zile, cotă, blocajul de 30 de zile) —
     // aici doar îl trimitem; un refuz nu strică publicarea.
-    if (wizTourUrl.trim() && tourStatus?.allowed) {
+    if (wizTourUrl.trim() && tourStatus?.allowed && tourStatus.remaining > 0) {
       const res = await saveTourUrl(created.id, wizTourUrl.trim()).catch(() => ({ ok: false }));
       if (!res?.ok) toast({ title: w.p_tour_fail, description: res?.error || undefined });
     }

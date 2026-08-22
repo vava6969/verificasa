@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Upload, X, Loader2, Plus, Minus } from "lucide-react";
+import { Upload, X, Loader2, Plus, Minus, ChevronDown } from "lucide-react";
 import { Image as UIImage } from "@/components/ui/image";
 import { Field, inputCls } from "./wizardUi";
 import { MIN_PHOTOS, MAX_PHOTOS, onlyPhoneDigits } from "@/lib/propertyPayload";
@@ -21,6 +21,12 @@ export default function StepPhotos({
   const { w, en } = useWiz();
   const urls = form.images ? form.images.split(",").filter(Boolean) : [];
   const removeAt = (i) => set({ images: urls.filter((_, idx) => idx !== i).join(",") });
+  const [bannerOpen, setBannerOpen] = useState(true);
+
+  // REGULĂ DURĂ (Megan, 23.08): câmpul de link apare NUMAI dacă omul chiar
+  // mai are un tur de folosit. `allowed` singur nu ajunge — pentru admini
+  // poarta răspunde mereu „da", iar un cont fără plan afișa câmpul la 0/0.
+  const canAddTour = !!(tourStatus?.allowed && tourStatus.remaining > 0);
 
   return (
     <div className="space-y-5">
@@ -53,11 +59,21 @@ export default function StepPhotos({
         </p>
       </div>
 
-      {/* BANNERUL DE PLAN: planul → boost-urile → tururile, o singură casetă. */}
+      {/* BANNERUL DE PLAN: planul → boost-urile → tururile, o singură casetă,
+          pliabilă din antet. Înălțimea o animează wizardul (observer-ul de pe
+          corpul pasului), deci pliatul nu smucește pagina. */}
       <div className="rounded-2xl border border-border bg-card">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 px-4 py-2.5">
-          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{w.p_plan_t}</p>
-          <p className="flex items-center gap-2.5">
+        <button
+          type="button"
+          onClick={() => setBannerOpen((o) => !o)}
+          aria-expanded={bannerOpen}
+          className={`flex w-full flex-wrap items-center justify-between gap-2 px-4 py-2.5 text-left ${bannerOpen ? "border-b border-border/60" : ""}`}
+        >
+          <span className="flex items-center gap-2">
+            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${bannerOpen ? "" : "-rotate-90"}`} />
+            <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{w.p_plan_t}</span>
+          </span>
+          <span className="flex items-center gap-2.5">
             <span
               className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold ${
                 tourStatus?.planId ? "bg-emerald/10 text-emerald" : "bg-secondary text-muted-foreground"
@@ -71,13 +87,15 @@ export default function StepPhotos({
               href="/upgrade"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
               className="text-xs font-semibold text-emerald underline-offset-2 hover:underline"
             >
               {w.p_plan_see}
             </a>
-          </p>
-        </div>
+          </span>
+        </button>
 
+        {bannerOpen && (<>
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div className="min-w-0">
             <p className="text-sm font-bold text-foreground">{w.p_boost_t}</p>
@@ -141,7 +159,7 @@ export default function StepPhotos({
               </span>
             )}
           </div>
-          {tourStatus?.allowed && (
+          {canAddTour && (
             <div className="mt-2.5">
               <span className="mb-1 block text-xs font-semibold text-muted-foreground">{w.p_tour_link_l}</span>
               <input
@@ -155,6 +173,7 @@ export default function StepPhotos({
             </div>
           )}
         </div>
+        </>)}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
