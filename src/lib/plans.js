@@ -15,6 +15,8 @@ export const PLANS = [
     iconImg: "/images/generated/plan-icon-basic-v2.png",
     badgeImg: "/images/generated/plan-badge-basic-v2.png",
     accent: "navy",
+    tours3d: null,
+    boostsIncluded: null,
     benefits: [
       "1 anunț activ pe platformă",
       "Galerie foto/video standard",
@@ -44,6 +46,8 @@ export const PLANS = [
     iconImg: "/images/generated/plan-icon-pro-v2.png",
     badgeImg: "/images/generated/plan-badge-pro-v2.png",
     accent: "emerald",
+    tours3d: null,
+    boostsIncluded: null,
     benefits: [
       "Până la 5 anunțuri active",
       "Galerie extinsă, până la 250MB/fișier",
@@ -73,6 +77,8 @@ export const PLANS = [
     iconImg: "/images/generated/plan-icon-agent-v2.png",
     badgeImg: "/images/generated/plan-badge-agent-v2.png",
     accent: "gold",
+    tours3d: null,
+    boostsIncluded: null,
     benefits: [
       "Anunțuri nelimitate",
       "Stocare nelimitată",
@@ -92,6 +98,13 @@ export const PLANS = [
   },
 ];
 
+// Câte tururi 3D și câte boost-uri intră în fiecare plan. `null` înseamnă „nu
+// s-a anunțat încă" — pagina /tur-3d scrie „în curând" în loc să inventeze o
+// cifră. Când clientul dă numerele, se completează mai sus și apar peste tot.
+//
+// ATENȚIE: aceste câmpuri sunt deocamdată DOAR afișaj. Nimic nu numără tururi
+// și nimic nu blochează la limită — ENTITLEMENTS de mai jos nu are noțiunea de
+// tur, iar `boostsPerMonth` nu e citit nicăieri.
 export const PLAN_BY_ID = Object.fromEntries(PLANS.map((p) => [p.id, p]));
 
 // ---------------------------------------------------------------------------

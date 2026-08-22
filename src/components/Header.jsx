@@ -32,6 +32,7 @@ export default function Header() {
   const NAV = [
     { to: "/", label: t("hdr_home") },
     { to: "/search", label: t("sb_btn") },
+    { to: "/tur-3d", label: lang === "en" ? "3D Tour" : "Tur 3D" },
     { to: "/about", label: t("hdr_about") },
     { to: "/upgrade", label: t("hdr_upgrade") },
   ];

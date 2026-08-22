@@ -25,6 +25,7 @@ export default function Footer() {
   const platform = [
     { to: "/search", label: t("f_search") },
     { to: "/map", label: "Hartă" },
+    { to: "/tur-3d", label: "Tur 3D" },
     { to: "/about", label: t("footer_about") },
     { to: "/upgrade", label: "Planuri" },
     { to: "/parteneri", label: "Parteneri" },

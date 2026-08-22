@@ -44,6 +44,7 @@ import UserProfile from '@/pages/UserProfile';
 import RecommendedListings from '@/pages/RecommendedListings';
 import Notifications from '@/pages/Notifications';
 import Parteneri from '@/pages/Parteneri';
+import Tur3D from '@/pages/Tur3D';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -92,6 +93,9 @@ const AuthenticatedApp = () => {
         <Route path="/cookies" element={<CookiePolicy />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/parteneri" element={<Parteneri />} />
+        {/* Pagina de prezentare a aplicației de tur 3D — marketing, public,
+            fără login. Turul în sine trăiește la /3D/:cod, care e altă treabă. */}
+        <Route path="/tur-3d" element={<Tur3D />} />
         <Route path="/upgrade" element={<PlanuriUpgrade />} />
         {/* Destinația unică a „Vezi mai multe” de pe rândurile de pe homepage —
             listă simplă, ordonată pe plan, fără hartă (harta e la /map). */}

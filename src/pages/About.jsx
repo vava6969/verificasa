@@ -6,19 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useCountry } from "@/components/CountryContext";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-
-// Glossy in-house PNG glyphs (224x224, equal optical size) — rendered in a fixed
-// square box so every icon lands on the same footprint.
-function Glyph({ src, className = "h-12 w-12" }) {
-  return (
-    <img
-      src={src}
-      alt=""
-      aria-hidden="true"
-      className={`${className} shrink-0 object-contain drop-shadow-[0_4px_10px_rgba(16,24,40,0.16)]`}
-    />
-  );
-}
+import Glyph from "@/components/Glyph";
 
 // Real photographs, not renders. Used as the supporting strip in the story block.
 const STORY_SHOTS = [
@@ -255,18 +243,13 @@ export default function About() {
           </h2>
         </Reveal>
         <RevealGroup className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {c.steps.map((s, i) => (
+          {c.steps.map((s) => (
             <RevealItem
               key={s.title}
-              className="relative rounded-2xl border border-border bg-card p-6 shadow-soft transition-shadow hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)]"
+              className="rounded-2xl border border-border bg-card p-6 shadow-soft transition-shadow hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)]"
             >
-              {/* The step number is pinned to the card, not parked next to the
-                  glyph. Sitting beside it, the gap read differently on every
-                  card, because the glyphs do not fill their box the same way —
-                  a magnifier is a thin diagonal, a handshake fills the square. */}
-              <span className="absolute right-5 top-5 font-heading text-2xl font-bold leading-none text-emerald/25">
-                {i + 1}
-              </span>
+              {/* Fără număr pe card. Cardurile stau oricum în ordine, de la stânga la
+                  dreapta — cifra nu spunea nimic ce nu spunea deja poziția. */}
               <Glyph src={s.icon} className="h-11 w-11" />
               <h3 className="mt-4 font-heading text-base font-bold text-navy dark:text-foreground">{s.title}</h3>
               <p className="mt-1.5 text-sm text-muted-foreground">{s.desc}</p>

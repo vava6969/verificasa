@@ -1,6 +1,8 @@
 import React from "react";
 import { Instagram, Mail } from "lucide-react";
 import AppleIcon from "@/components/AppleIcon";
+import GooglePlayIcon from "@/components/GooglePlayIcon";
+import { APP_STORE_URL, PLAY_STORE_URL } from "@/lib/appLinks";
 import { cn } from "@/lib/utils";
 
 // Rândul de contact din subsol, ca iconițe în loc de text: Instagram, TikTok,
@@ -13,27 +15,15 @@ import { cn } from "@/lib/utils";
 // merită un runtime de animație, iar așa merge și când bufferul de cadre e
 // sugrumat (vezi comentariul din ui/reveal.jsx).
 
-// Când magazinele primesc URL-uri reale, se completează aici și cele două
-// iconițe se aprind singure. Până atunci se văd stinse, marcate „În curând" —
-// niciodată un link mort către un magazin unde aplicația nu există.
-const APP_STORE_URL = null;
-const PLAY_STORE_URL = null;
+// URL-urile magazinelor stau în @/lib/appLinks — același loc din care le
+// citesc pasul 5 din formular și pagina Tur 3D. Cât timp sunt `null`, cele
+// două iconițe se văd stinse, marcate „În curând"; niciodată un link mort
+// către un magazin unde aplicația încă nu există.
 
 function TikTokIcon({ className }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1-2.59-2.59 2.59 2.59 0 0 1 3.24-2.5v-3.1a5.68 5.68 0 0 0-.65-.04A5.68 5.68 0 0 0 4.18 15.3 5.68 5.68 0 0 0 9.86 21a5.68 5.68 0 0 0 5.68-5.68V9.01a7.35 7.35 0 0 0 4.28 1.37V7.29a4.28 4.28 0 0 1-3.22-1.47z" />
-    </svg>
-  );
-}
-
-function GooglePlayIcon({ className }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3.6 2.4a1 1 0 0 0-.35.76v17.68a1 1 0 0 0 .35.76l10-9.6-10-9.6z" fill="currentColor" />
-      <path d="M17.2 8.6 14.1 6.8 4.2 2.06 13.6 12l3.6-3.4z" fill="currentColor" opacity=".78" />
-      <path d="M17.2 15.4 13.6 12 4.2 21.94l9.9-4.74 3.1-1.8z" fill="currentColor" opacity=".62" />
-      <path d="m17.2 8.6-3.6 3.4 3.6 3.4 3.05-1.77c.73-.42.73-1.84 0-2.26L17.2 8.6z" fill="currentColor" opacity=".9" />
     </svg>
   );
 }

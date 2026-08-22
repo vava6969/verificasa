@@ -1,13 +1,15 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Upload, X, Loader2, ArrowUpRight } from "lucide-react";
 import { Image as UIImage } from "@/components/ui/image";
 import { Field, inputCls } from "./wizardUi";
 import { MIN_PHOTOS, MAX_PHOTOS, onlyPhoneDigits } from "@/lib/propertyPayload";
+import { TOUR_3D_APP_URL } from "@/lib/appLinks";
 
-// Aplicația de captură 3D. Când există un URL real, butonul de mai jos se
-// aprinde singur — până atunci se vede stins și marcat „În curând", ca să nu
-// trimitem proprietarul într-o filă goală. Un singur loc de schimbat.
-const TOUR_3D_APP_URL = null;
+// Aplicația de captură 3D. Cât timp `TOUR_3D_APP_URL` e null, butonul stă stins
+// și marcat „În curând" — nu trimitem proprietarul într-o filă goală. Link-ul
+// către explicații merge însă de pe acum: pagina /tur-3d există chiar dacă
+// aplicația nu, deci omul are unde să afle ce urmează.
 
 export default function StepPhotos({ form, set, uploading, onFiles, agreed, setAgreed }) {
   const urls = form.images ? form.images.split(",").filter(Boolean) : [];
@@ -60,6 +62,12 @@ export default function StepPhotos({ form, set, uploading, onFiles, agreed, setA
             <span className="block text-xs text-muted-foreground">
               Îl faci cu aplicația noastră, din telefon · Plan Pro
             </span>
+            <Link
+              to="/tur-3d"
+              className="mt-1 inline-flex text-xs font-semibold text-emerald underline-offset-2 hover:underline"
+            >
+              Cum funcționează
+            </Link>
           </span>
         </div>
 
