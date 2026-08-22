@@ -13,6 +13,7 @@ import { uploadPhotos } from "@/lib/imageUpload";
 import { callFnQuiet } from "@/lib/serverCall";
 import { fetchMyActiveSubscription } from "@/lib/subscriptions";
 import { fetchBoostBalance, applyBoost } from "@/lib/boosts";
+import { fetchTourStatus, setTourUrl as saveTourUrl } from "@/lib/tours";
 import {
   EMPTY_FORM, MIN_PHOTOS, MAX_PHOTOS, MIN_FEATURES, buildPropertyPayload,
 } from "@/lib/propertyPayload";
@@ -56,18 +57,28 @@ export default function PropertyWizard({ onDone, onCancel }) {
   const [boostQty, setBoostQty] = useState(0);
   const [boostBalance, setBoostBalance] = useState(0);
   const [buyOpen, setBuyOpen] = useState(false);
+  // Bannerul de plan de pe ultimul pas (cererea clientului, 23.08): planul,
+  // boost-urile rămase, tururile 3D disponibile și — dacă are voie — chiar
+  // câmpul de link. O singură citire acoperă plan + tururi.
+  const [tourStatus, setTourStatus] = useState(null);
+  const [wizTourUrl, setWizTourUrl] = useState("");
   useEffect(() => {
     if (!user?.id) return;
     let cancelled = false;
-    const load = () => fetchBoostBalance(user.id).then((b) => {
-      if (cancelled) return;
-      setBoostBalance(b);
-      setBoostQty((q) => Math.min(q, b));
-    });
+    const load = () => {
+      fetchBoostBalance(user.id).then((b) => {
+        if (cancelled) return;
+        setBoostBalance(b);
+        setBoostQty((q) => Math.min(q, b));
+      });
+      fetchTourStatus({ userId: user.id, isAdmin }).then((t) => {
+        if (!cancelled) setTourStatus(t);
+      });
+    };
     load();
     window.addEventListener("focus", load);
     return () => { cancelled = true; window.removeEventListener("focus", load); };
-  }, [user?.id]);
+  }, [user?.id, isAdmin]);
 
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
   const imagesCount = useMemo(() => (form.images ? form.images.split(",").filter(Boolean).length : 0), [form.images]);
@@ -195,6 +206,14 @@ export default function PropertyWizard({ onDone, onCancel }) {
       if (res?.error) toast({ title: w.p_boost_fail });
     }
 
+    // Link-ul de tur pus pe ultimul pas. SetTourUrl re-verifică toate regulile
+    // server-side (plan, ferestre de 3 zile, cotă, blocajul de 30 de zile) —
+    // aici doar îl trimitem; un refuz nu strică publicarea.
+    if (wizTourUrl.trim() && tourStatus?.allowed) {
+      const res = await saveTourUrl(created.id, wizTourUrl.trim()).catch(() => ({ ok: false }));
+      if (!res?.ok) toast({ title: w.p_tour_fail, description: res?.error || undefined });
+    }
+
     if (!isAdmin) {
       base44.functions.invoke("NotifyAdminsOnNewProperty", {
         property_id: created.id, title: form.title, owner_name: form.owner_name || "",
@@ -320,6 +339,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
                   agreed={agreed} setAgreed={setAgreed}
                   boostQty={boostQty} setBoostQty={setBoostQty} boostBalance={boostBalance}
                   onBuyBoosts={() => setBuyOpen(true)}
+                  tourStatus={tourStatus} tourUrl={wizTourUrl} setTourUrl={setWizTourUrl}
                 />
               </>
             )}

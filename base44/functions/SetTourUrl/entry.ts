@@ -36,13 +36,35 @@ export default async function (req: Request): Promise<Response> {
 
     // Ștergerea nu e limitată de nimic: dacă vrei turul jos, se duce jos, iar
     // cota se eliberează (un tur = un anunț care are link, vezi mai jos).
+    // DATA rămâne pe anunț: ea ține blocajul de 30 de zile de mai jos, altfel
+    // șterge-și-pune ocolea regula într-un minut.
     if (!url) {
-      await svc.entities.Property.update(propertyId, { tour_3d_url: "", tour_3d_set_date: "" });
+      await svc.entities.Property.update(propertyId, { tour_3d_url: "" });
       return Response.json({ ok: true, cleared: true });
     }
 
     if (!/^https?:\/\//i.test(url)) {
       return Response.json({ error: "Link-ul trebuie să înceapă cu http:// sau https://" });
+    }
+
+    // Clientul, 23.08: link-ul turului se poate SCHIMBA o dată la 30 de zile
+    // pe același anunț. Primul link e liber; retrimiterea aceluiași link e
+    // no-op permis; adminii trec peste.
+    const CHANGE_LOCK_DAYS = 30;
+    if (!isAdmin && p.tour_3d_set_date && url !== p.tour_3d_url) {
+      const since = Date.now() - new Date(p.tour_3d_set_date).getTime();
+      const lockMs = CHANGE_LOCK_DAYS * 86400000;
+      if (Number.isFinite(since) && since >= 0 && since < lockMs) {
+        const days = Math.ceil((lockMs - since) / 86400000);
+        return Response.json({
+          error: `Link-ul turului 3D se poate schimba o dată la ${CHANGE_LOCK_DAYS} de zile. Mai ${days === 1 ? "e o zi" : `sunt ${days} zile`}.`,
+          reason: "change_lock",
+          daysLeft: days,
+        });
+      }
+    }
+    if (url === p.tour_3d_url) {
+      return Response.json({ ok: true, unchanged: true });
     }
 
     // Planul și momentul plății.

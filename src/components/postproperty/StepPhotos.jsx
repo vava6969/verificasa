@@ -5,14 +5,18 @@ import { Image as UIImage } from "@/components/ui/image";
 import { Field, inputCls } from "./wizardUi";
 import { MIN_PHOTOS, MAX_PHOTOS, onlyPhoneDigits } from "@/lib/propertyPayload";
 import { useWiz, SELLER_ROLE_EN } from "./wizardCopy";
+import { tourReasonText } from "@/lib/tours";
 
-// Turul 3D e o singură linie cu un link (cererea clientului, a doua oară:
-// „small line and a link", nu banner). Locul bannerului l-a luat promovarea:
-// alegi aici câte boost-uri pui pe anunț, iar publicarea le aplică.
+// BANNERUL DE PLAN de pe ultimul pas (cererea clientului, 23.08, din
+// screen-share): planul omului, boost-urile rămase cu stepper, tururile 3D
+// disponibile și — doar dacă regulile îl lasă — câmpul de link al turului.
+// Regulile propriu-zise (plan plătit, ferestrele de 3 zile, cota, blocajul
+// de 30 de zile la schimbare) le impune SetTourUrl, server-side.
 
 export default function StepPhotos({
   form, set, uploading, onFiles, agreed, setAgreed,
   boostQty, setBoostQty, boostBalance, onBuyBoosts,
+  tourStatus, tourUrl, setTourUrl,
 }) {
   const { w, en } = useWiz();
   const urls = form.images ? form.images.split(",").filter(Boolean) : [];
@@ -49,56 +53,107 @@ export default function StepPhotos({
         </p>
       </div>
 
-      {/* Turul 3D: o linie, un link, atât. */}
-      <p className="text-xs text-muted-foreground">
-        {w.p_tour_t} ·{" "}
-        <Link to="/tur-3d" className="font-semibold text-emerald underline-offset-2 hover:underline">
-          {w.p_tour_how}
-        </Link>
-      </p>
+      {/* BANNERUL DE PLAN: planul → boost-urile → tururile, o singură casetă. */}
+      <div className="rounded-2xl border border-border bg-card">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 px-4 py-2.5">
+          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{w.p_plan_t}</p>
+          <p className="flex items-center gap-2.5">
+            <span
+              className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold ${
+                tourStatus?.planId ? "bg-emerald/10 text-emerald" : "bg-secondary text-muted-foreground"
+              }`}
+            >
+              {tourStatus?.planId
+                ? tourStatus.planId.charAt(0).toUpperCase() + tourStatus.planId.slice(1)
+                : w.p_plan_none}
+            </span>
+            <a
+              href="/upgrade"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-semibold text-emerald underline-offset-2 hover:underline"
+            >
+              {w.p_plan_see}
+            </a>
+          </p>
+        </div>
 
-      {/* PROMOVARE — pe ultimul pas al formularului, după macheta clientului:
-          titlu, soldul, minus/plus. Cantitatea se aplică la Publică; linkul de
-          cumpărare deschide plata în pagină (BoostCheckoutModal), deci
-          formularul completat pe jumătate nu se pierde. */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3">
-        <div className="min-w-0">
-          <p className="text-sm font-bold text-foreground">{w.p_boost_t}</p>
-          <p className="text-xs text-muted-foreground">
-            {boostBalance > 0 ? w.p_boost_have(boostBalance) : w.p_boost_none}
-            {" · "}
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-foreground">{w.p_boost_t}</p>
+            <p className="text-xs text-muted-foreground">
+              {boostBalance > 0 ? w.p_boost_have(boostBalance) : w.p_boost_none}
+              {" · "}
+              <button
+                type="button"
+                onClick={onBuyBoosts}
+                className="font-semibold text-emerald underline-offset-2 hover:underline"
+              >
+                {boostBalance > 0 ? w.p_boost_more : w.p_boost_buy}
+              </button>
+            </p>
+            {boostQty > 0 && (
+              <p className="mt-1 text-[11px] text-muted-foreground/80">{w.p_boost_note}</p>
+            )}
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
             <button
               type="button"
-              onClick={onBuyBoosts}
-              className="font-semibold text-emerald underline-offset-2 hover:underline"
+              onClick={() => setBoostQty((n) => Math.max(0, n - 1))}
+              disabled={boostQty <= 0}
+              aria-label="-1"
+              className="tap-44 flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-emerald disabled:opacity-40"
             >
-              {boostBalance > 0 ? w.p_boost_more : w.p_boost_buy}
+              <Minus className="h-4 w-4" />
             </button>
-          </p>
-          {boostQty > 0 && (
-            <p className="mt-1 text-[11px] text-muted-foreground/80">{w.p_boost_note}</p>
-          )}
+            <span className="w-7 text-center text-base font-bold tnum text-foreground">{boostQty}</span>
+            <button
+              type="button"
+              onClick={() => setBoostQty((n) => Math.min(boostBalance, n + 1))}
+              disabled={boostQty >= boostBalance}
+              aria-label="+1"
+              className="tap-44 flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-emerald disabled:opacity-40"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          </div>
         </div>
-        <div className="flex shrink-0 items-center gap-1">
-          <button
-            type="button"
-            onClick={() => setBoostQty((n) => Math.max(0, n - 1))}
-            disabled={boostQty <= 0}
-            aria-label="-1"
-            className="tap-44 flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-emerald disabled:opacity-40"
-          >
-            <Minus className="h-4 w-4" />
-          </button>
-          <span className="w-7 text-center text-base font-bold tnum text-foreground">{boostQty}</span>
-          <button
-            type="button"
-            onClick={() => setBoostQty((n) => Math.min(boostBalance, n + 1))}
-            disabled={boostQty >= boostBalance}
-            aria-label="+1"
-            className="tap-44 flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-emerald disabled:opacity-40"
-          >
-            <Plus className="h-4 w-4" />
-          </button>
+
+        <div className="border-t border-border/60 px-4 py-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-foreground">{w.p_tours_t}</p>
+              <p className="text-xs text-muted-foreground">
+                {tourStatus == null
+                  ? "…"
+                  : tourStatus.allowed
+                    ? w.p_tours_have(tourStatus.remaining, tourStatus.quota)
+                    : tourReasonText(tourStatus, en)}
+                {" · "}
+                <Link to="/tur-3d" className="font-semibold text-emerald underline-offset-2 hover:underline">
+                  {w.p_tour_how}
+                </Link>
+              </p>
+            </div>
+            {tourStatus?.quota > 0 && (
+              <span className="shrink-0 rounded-full bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+                {tourStatus.remaining} / {tourStatus.quota}
+              </span>
+            )}
+          </div>
+          {tourStatus?.allowed && (
+            <div className="mt-2.5">
+              <span className="mb-1 block text-xs font-semibold text-muted-foreground">{w.p_tour_link_l}</span>
+              <input
+                value={tourUrl}
+                onChange={(e) => setTourUrl(e.target.value)}
+                placeholder="https://..."
+                inputMode="url"
+                className={inputCls}
+              />
+              <p className="mt-1 text-[11px] text-muted-foreground/80">{w.p_tour_link_note}</p>
+            </div>
+          )}
         </div>
       </div>
 
