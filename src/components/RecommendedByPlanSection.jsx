@@ -86,11 +86,22 @@ function PlanRow({ row, en, coverMap }) {
 
   return (
     <div className="mb-7 last:mb-0 sm:mb-10">
+      {/* Titlul întâi, insigna după el. Cât timp insigna stătea înaintea
+          cuvantului, rândurile cu plan își începeau titlul la 54px, iar cele
+          fără plan la 16px — două margini din stânga diferite pe aceeași
+          pagină, și niciuna peste cardurile de dedesubt. Acum toate titlurile
+          pornesc din gutieră, exact de unde pornesc și cardurile. */}
       <div className="mb-3 flex items-center gap-2.5 sm:mb-4">
-        {row.badgeImg && (
-          <img src={row.badgeImg} alt="" aria-hidden="true" className="h-7 w-7 shrink-0 object-contain drop-shadow-sm sm:h-8 sm:w-8" />
-        )}
         <h2 className="text-base font-bold text-foreground sm:text-xl">{row.shortName || row.name}</h2>
+        {row.badgeImg && (
+          <img
+            src={row.badgeImg}
+            alt=""
+            aria-hidden="true"
+            onError={(e) => { e.currentTarget.style.display = "none"; }}
+            className="h-7 w-7 shrink-0 object-contain drop-shadow-sm sm:h-8 sm:w-8"
+          />
+        )}
         <Link
           to="/anunturi-recomandate"
           className="ml-auto tap-44 flex shrink-0 items-center text-sm font-bold text-emerald transition-transform hover:translate-x-0.5"
@@ -100,8 +111,16 @@ function PlanRow({ row, en, coverMap }) {
       </div>
 
       {/* Carduri late pe telefon: un rând de defilare cu o carte și un pic din
-          următoarea, nu cinci miniaturi de 168px. */}
-      <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory items-start gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:gap-4 sm:px-0">
+          următoarea, nu cinci miniaturi de 168px.
+          `scroll-px-4` NU e decorativ. Banda iese din marginea secțiunii cu
+          -mx-4 și își pune gutiera înapoi cu px-4, deci primul card ar trebui să
+          înceapă la 16px, fix sub titlu. Dar cu snap-mandatory, punctul de
+          oprire al unui copil `snap-start` se aliniază la marginea zonei de
+          derulare, adică la CUTIA DE PADDING, nu la conținut: browserul
+          derula singur banda cu exact 16px la încărcare și lipea primul card
+          de marginea ecranului. scroll-padding mută punctul de oprire pe
+          gutieră, deci scrollLeft rămâne 0 și cardul stă unde îi e locul. */}
+      <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory items-start gap-3 overflow-x-auto px-4 pb-2 scroll-px-4 sm:mx-0 sm:gap-4 sm:px-0 sm:scroll-px-0">
         {visible.map((p) => (
           <div
             key={p.id}

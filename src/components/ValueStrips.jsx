@@ -4,7 +4,7 @@ import React from "react";
 // with glowing emerald icon chips.
 export default function ValueStrips({ items }) {
   return (
-    <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-5 sm:overflow-visible sm:px-0">
+    <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 scroll-px-4 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-5 sm:overflow-visible sm:px-0 sm:scroll-px-0">
       {items.map((v, i) => (
         <div
           key={i}
