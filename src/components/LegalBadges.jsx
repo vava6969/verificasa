@@ -33,7 +33,7 @@ const BADGES = [
 
 export default function LegalBadges() {
   return (
-    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+    <div className="mt-3 flex flex-col gap-2.5">
       {BADGES.map((b) => (
         <a
           key={b.href}
@@ -41,7 +41,7 @@ export default function LegalBadges() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={b.label}
-          className="flex w-full max-w-[248px] items-center gap-2.5 rounded border border-white/25 bg-white px-2.5 py-2 transition-colors hover:border-emerald"
+          className="flex w-full max-w-[260px] items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-transparent transition-shadow hover:shadow-md hover:ring-emerald"
         >
           {b.logo && (
             <img
@@ -49,12 +49,12 @@ export default function LegalBadges() {
               alt=""
               aria-hidden="true"
               onError={(e) => { e.currentTarget.style.display = "none"; }}
-              className="h-9 w-auto shrink-0 object-contain"
+              className="h-10 w-auto shrink-0 object-contain"
               loading="lazy"
             />
           )}
-          <span className="flex min-w-0 flex-1 flex-col items-center gap-1 text-center">
-            <span className="text-[9px] font-extrabold uppercase leading-[1.25] tracking-[0.02em] text-[#1b2a6b]">
+          <span className="flex min-w-0 flex-1 flex-col items-center gap-1.5 text-center">
+            <span className="text-[11px] font-extrabold uppercase leading-snug tracking-[0.02em] text-[#1b2a6b]">
               {b.lines.map((l) => (
                 <React.Fragment key={l}>
                   {l}
@@ -62,7 +62,7 @@ export default function LegalBadges() {
                 </React.Fragment>
               ))}
             </span>
-            <span className="rounded-sm bg-[#1b2a6b] px-2 py-[2px] text-[8px] font-bold uppercase tracking-wide text-white">
+            <span className="rounded-full bg-[#1b2a6b] px-3.5 py-1 text-[9px] font-extrabold uppercase tracking-wide text-white">
               Detalii
             </span>
           </span>
