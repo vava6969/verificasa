@@ -106,7 +106,10 @@
   * {
     @apply border-border outline-ring/50;
   }
-  html { overflow-x: clip; }
+  /* Gutter-ul scrollbarului stă rezervat mereu: altfel paginile scurte
+     (pașii mici din wizard) pierd scrollbarul și tot conținutul centrat
+     sare lateral cu ~15px la fiecare schimbare de pas. */
+  html { overflow-x: clip; scrollbar-gutter: stable; }
   body {
     @apply bg-background text-foreground font-body antialiased;
     overflow-x: clip;

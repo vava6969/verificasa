@@ -51,6 +51,7 @@ export const WIZ = {
     err_year: "Completează anul construcției.",
     err_available: "Alege data de la care e disponibilă.",
     err_desc: "Adaugă o descriere.",
+    err_features: (n) => `Bifează cel puțin ${n} dotări sau facilități.`,
     err_photos: (n) => `Încarcă cel puțin ${n} poze`,
     err_phone: "Completează numărul de telefon",
     err_terms: "Acceptă termenii pentru a publica",
@@ -101,6 +102,8 @@ export const WIZ = {
     // pasul 4
     f_verified: "Facilități verificate",
     f_verified_note: "Apar evidențiate în pagina anunțului.",
+    f_picked: (c, n) => `Bifate: ${c} din minim ${n}`,
+    f_picked_ok: "Gata, poți continua.",
     f_amenities: "Dotări",
     f_options: "Opțiuni",
     f_options_note: "Apar automat în filtrele de căutare.",
@@ -160,6 +163,7 @@ export const WIZ = {
     err_year: "Fill in the year it was built.",
     err_available: "Pick the date it becomes available.",
     err_desc: "Add a description.",
+    err_features: (n) => `Tick at least ${n} features or amenities.`,
     err_photos: (n) => `Upload at least ${n} photos`,
     err_phone: "Fill in your phone number",
     err_terms: "Accept the terms to publish",
@@ -206,6 +210,8 @@ export const WIZ = {
 
     f_verified: "Verified features",
     f_verified_note: "These are highlighted on the listing page.",
+    f_picked: (c, n) => `Ticked: ${c} of at least ${n}`,
+    f_picked_ok: "Done, you can continue.",
     f_amenities: "Amenities",
     f_options: "Options",
     f_options_note: "These appear automatically in search filters.",

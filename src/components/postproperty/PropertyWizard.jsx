@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useCountry } from "@/components/CountryContext";
@@ -13,12 +13,12 @@ import { uploadPhotos } from "@/lib/imageUpload";
 import { callFnQuiet } from "@/lib/serverCall";
 import { fetchMyActiveSubscription } from "@/lib/subscriptions";
 import {
-  EMPTY_FORM, MIN_PHOTOS, MAX_PHOTOS, buildPropertyPayload,
+  EMPTY_FORM, MIN_PHOTOS, MAX_PHOTOS, MIN_FEATURES, buildPropertyPayload,
 } from "@/lib/propertyPayload";
 import StepBasics from "./StepBasics";
 import StepLocation from "./StepLocation";
 import StepDetails from "./StepDetails";
-import StepFeatures from "./StepFeatures";
+import StepFeatures, { countFeatures } from "./StepFeatures";
 import StepPhotos from "./StepPhotos";
 import { useWiz } from "./wizardCopy";
 
@@ -85,6 +85,9 @@ export default function PropertyWizard({ onDone, onCancel }) {
       if (!form.available_from) return w.err_available;
       if (!form.description.trim()) return w.err_desc;
     }
+    // Minim 3 bife la dotări, din oricare grup — anunțurile goale la
+    // capitolul ăsta arată la fel de goale și în pagina publică.
+    if (s === 3 && countFeatures(chips, facilities, form) < MIN_FEATURES) return w.err_features(MIN_FEATURES);
     return null;
   };
 
@@ -111,7 +114,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
   };
 
   const handlePublish = async () => {
-    for (let s = 0; s <= 2; s++) {
+    for (let s = 0; s <= 3; s++) {
       const err = validateStep(s);
       if (err) { setStep(s); toast({ title: err, variant: "destructive" }); throw new Error(err); }
     }
@@ -190,6 +193,20 @@ export default function PropertyWizard({ onDone, onCancel }) {
     onDone?.(created);
   };
 
+  // Corpul pasului își schimbă înălțimea brusc la fiecare pas, și cardul —
+  // plus tot ce e sub el — sare. Măsurăm conținutul și lăsăm o TRANZIȚIE CSS
+  // să ducă înălțimea acolo (tranziția aterizează pe valoarea-țintă chiar și
+  // când se oprește cadrul de animație — regula casei; un keyframe nu).
+  const bodyInnerRef = useRef(null);
+  const [bodyH, setBodyH] = useState(null);
+  useEffect(() => {
+    const el = bodyInnerRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => setBodyH(el.offsetHeight));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   const Current = STEPS[step];
   const progress = ((step + 1) / STEPS.length) * 100;
 
@@ -246,7 +263,12 @@ export default function PropertyWizard({ onDone, onCancel }) {
       </div>
 
       {/* Step body */}
-      <div className="overflow-hidden px-4 py-5 sm:px-6 sm:py-6">
+      <div className="px-4 py-5 sm:px-6 sm:py-6">
+        <div
+          style={{ height: bodyH == null ? "auto" : bodyH }}
+          className="overflow-hidden transition-[height] duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
+        >
+          <div ref={bodyInnerRef}>
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
@@ -269,6 +291,8 @@ export default function PropertyWizard({ onDone, onCancel }) {
             )}
           </motion.div>
         </AnimatePresence>
+          </div>
+        </div>
       </div>
 
       {/* Nav */}

@@ -6,6 +6,9 @@ import {
 
 export const MAX_PHOTOS = 20;
 export const MIN_PHOTOS = 3;
+// Clientul, 23.08: pasul de dotări nu se trece cu mâna goală — minim 3 bife,
+// oricare, din oricare grup (verificate + dotări + opțiuni la un loc).
+export const MIN_FEATURES = 3;
 
 export const onlyPhoneDigits = (v) => {
   const clean = String(v || "").replace(/[^0-9+]/g, "");

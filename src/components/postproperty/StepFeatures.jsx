@@ -1,7 +1,15 @@
 import React from "react";
 import { Chip } from "./wizardUi";
-import { CHIP_OPTS, FACILITY_OPTS, OPTION_OPTS, optLabel } from "@/lib/propertyPayload";
+import { CHIP_OPTS, FACILITY_OPTS, OPTION_OPTS, MIN_FEATURES, optLabel } from "@/lib/propertyPayload";
 import { useWiz } from "./wizardCopy";
+import { Check } from "lucide-react";
+
+// Minim 3 bife pe pasul ăsta (cererea clientului) — contorul de aici doar
+// arată unde ești; regula o impune wizardul, la Continuă și la Publică.
+export const countFeatures = (chips, facilities, form) =>
+  Object.values(chips).filter(Boolean).length +
+  Object.values(facilities).filter(Boolean).length +
+  OPTION_OPTS.filter((c) => !!form[c.key]).length;
 
 const Group = ({ title, note, children }) => (
   <div>
@@ -13,9 +21,22 @@ const Group = ({ title, note, children }) => (
 
 export default function StepFeatures({ form, set, chips, setChips, facilities, setFacilities }) {
   const { w, en } = useWiz();
+  const picked = countFeatures(chips, facilities, form);
+  const enough = picked >= MIN_FEATURES;
 
   return (
     <div className="space-y-6">
+      <p
+        aria-live="polite"
+        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
+          enough ? "bg-emerald-soft text-emerald" : "bg-secondary text-muted-foreground"
+        }`}
+      >
+        {enough && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
+        {w.f_picked(picked, MIN_FEATURES)}
+        {enough && <span className="font-medium">· {w.f_picked_ok}</span>}
+      </p>
+
       <Group title={w.f_verified} note={w.f_verified_note}>
         {CHIP_OPTS.map((c) => (
           <Chip key={c.key} icon={c.icon} label={optLabel(c, en)} active={!!chips[c.key]} onClick={() => setChips((s) => ({ ...s, [c.key]: !s[c.key] }))} />
