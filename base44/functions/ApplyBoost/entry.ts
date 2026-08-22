@@ -33,14 +33,11 @@ export default async function (req: Request): Promise<Response> {
       return Response.json({ error: "Nu ai boost-uri disponibile.", balance: 0 });
     }
 
-    // Boost-ul nu expiră, deci nu se mai prelungește nimic: un anunț deja
-    // promovat nu are ce să mai primească, iar creditul nu se cheltuie degeaba.
+    // Boost-urile se adună pe același anunț și nu expiră: al doilea nu
+    // prelungește nimic, urcă anunțul mai sus. Vezi compareByBoostThenViews.
     const now = Date.now();
-    if (p.boost_active) {
-      const bal = await getBalance(svc, me.id);
-      return Response.json({ ok: true, already: true, balance: bal });
-    }
     const endsDate = BOOST_NEVER_ENDS;
+    const nextCount = (Number(p.boost_count) || 0) + 1;
 
     // ORDINEA CONTEAZĂ. Înainte, anunțul se promova întâi și creditul se scădea
     // după — fără tranzacție și fără revenire. Dacă scăderea eșua (registrul
@@ -68,6 +65,7 @@ export default async function (req: Request): Promise<Response> {
       await svc.entities.Property.update(propertyId, {
         boost_active: true,
         boost_ends_date: endsDate,
+        boost_count: nextCount,
       });
     } catch (applyErr: any) {
       const restored = await addCredits(svc, {
@@ -80,7 +78,7 @@ export default async function (req: Request): Promise<Response> {
       });
     }
 
-    return Response.json({ ok: true, balance: after, boost_ends_date: endsDate });
+    return Response.json({ ok: true, balance: after, boost_count: nextCount });
   } catch (e: any) {
     return Response.json({ error: e?.message || "Eroare la promovare." });
   }

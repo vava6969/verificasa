@@ -163,7 +163,7 @@ export default function Owner() {
                       title={!approved ? (en ? "Approve the listing first" : "Anunțul trebuie aprobat întâi") : undefined}
                       className="h-11 flex-1 rounded-full bg-emerald px-4 text-xs text-primary-foreground hover:bg-emerald/90 disabled:opacity-50 sm:flex-none"
                     >
-                      {boosted ? (en ? "Promoted" : "Promovat") : (en ? "Promote" : "Promovează")}
+                      {boosted ? (en ? "Promote more" : "Promovează mai mult") : (en ? "Promote" : "Promovează")}
                     </Button>
                     <Button variant="outline" className="h-11 flex-1 gap-1.5 rounded-full px-4 text-xs sm:flex-none">
                       <Download className="h-3.5 w-3.5" /> {t("contract_pdf")}

@@ -248,11 +248,23 @@ export function isBoosted(property) {
   return !!property?.boost_active;
 }
 
+// Câte boost-uri s-au pus pe anunț. Se adună și nu expiră, deci numărul urcă.
+// `boost_count` e denormalizat pe anunț; câtă vreme schema nu e publicată încă,
+// câmpul lipsește și rămâne flagul, care valorează cel puțin unu.
+export function boostCount(property) {
+  const n = Number(property?.boost_count);
+  if (Number.isFinite(n) && n > 0) return n;
+  return property?.boost_active ? 1 : 0;
+}
+
 // Ordonare în interiorul unei liste deja filtrate: promovatele primele, apoi
 // vizualizările. Folosit acolo unde planul nu mai e criteriu (rânduri deja
 // grupate pe plan, rezultate de căutare).
 export function compareByBoostThenViews(a, b) {
-  const boostDiff = (isBoosted(b) ? 1 : 0) - (isBoosted(a) ? 1 : 0);
+  // Mai multe boost-uri urcă mai sus: clientul a cerut ca un anunț să poată fi
+  // promovat de câte ori vrea proprietarul, iar asta nu înseamnă nimic dacă
+  // al doilea boost nu schimbă nimic în ordine.
+  const boostDiff = boostCount(b) - boostCount(a);
   if (boostDiff !== 0) return boostDiff;
   return (b.views_count || 0) - (a.views_count || 0);
 }
@@ -261,6 +273,11 @@ export function compareByBoostThenViews(a, b) {
 // Agent primul (cel mai important), apoi Pro, apoi Basic — fiecare cu
 // iconița mică de badge folosită și pe carduri, pentru recunoaștere vizuală
 // instantă în filtrele de căutare/hartă.
-export const PLAN_FILTER_OPTIONS = PLANS.slice()
-  .reverse()
-  .map((p) => ({ id: p.id, label: p.shortName || p.name, icon: p.badgeImg }));
+// Filtrul avea doar planurile platite, deci majoritatea anunturilor nu se
+// puteau filtra deloc: cine e pe gratis nu apare sub niciun buton. „Free" e
+// ultimul, cu id-ul „none", exact cheia in care cade orice anunt fara plan
+// (vezi Search.jsx si RecommendedByPlanSection).
+export const PLAN_FILTER_OPTIONS = [
+  ...PLANS.slice().reverse().map((p) => ({ id: p.id, label: p.shortName || p.name, icon: p.badgeImg })),
+  { id: FREE_PLAN.id, label: FREE_PLAN.shortName || "Free", icon: FREE_PLAN.badgeImg || null },
+];

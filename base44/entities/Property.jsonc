@@ -336,7 +336,12 @@
     "boost_ends_date": {
       "type": "string",
       "format": "date-time",
-      "title": "Boost expira la"
+      "title": "Boost expira la (nefolosit - boost-urile nu expira)"
+    },
+    "boost_count": {
+      "type": "number",
+      "default": 0,
+      "title": "Cate boost-uri are anuntul (se aduna, nu expira)"
     },
     "trust_breakdown": {
       "type": "string",

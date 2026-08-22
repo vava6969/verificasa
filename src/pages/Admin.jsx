@@ -13,6 +13,7 @@ import AdminReports from "@/components/AdminReports";
 import AdminResolvedReports from "@/components/AdminResolvedReports";
 import AdminStatCard from "@/components/AdminStatCard";
 import AdminDataCleanup from "@/components/AdminDataCleanup";
+import AdminPlanSync from "@/components/AdminPlanSync";
 import { callFn, callFnQuiet } from "@/lib/serverCall";
 import InspectionContactModal from "@/components/InspectionContactModal";
 import { useLoadMore } from "@/hooks/useLoadMore";
@@ -471,7 +472,10 @@ export default function Admin() {
             </div>
 
           ) : tab === "date" ? (
-            <AdminDataCleanup onDone={load} />
+            <div className="space-y-4">
+              <AdminDataCleanup onDone={load} />
+              <AdminPlanSync />
+            </div>
           ) : tab === "loguri" ? (
             <PropertyLogs properties={properties || []} audit={audit || []} comments={comments || []} inquiries={inquiries || []} />
 

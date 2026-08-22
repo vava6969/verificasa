@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useCountry } from "@/components/CountryContext";
 import { useToast } from "@/components/ui/use-toast";
-import { SINGLE_BOOST_PACK, isBoosted } from "@/lib/plans";
+import { SINGLE_BOOST_PACK, boostCount } from "@/lib/plans";
 import { applyBoost, buyBoostForProperty } from "@/lib/boosts";
 
 // Confirmarea consumului unui boost. Cheltuirea unui credit e ireversibilă, iar
@@ -20,9 +20,9 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
   const en = lang === "en";
 
   const hasCredits = balance >= 1;
-  // Boost-ul nu expiră, deci nu se prelungește — un anunț deja promovat nu mai
-  // are ce cumpăra.
-  const already = isBoosted(property);
+  // Boost-urile se adună pe același anunț și nu expiră: al doilea nu prelungește
+  // nimic, urcă anunțul mai sus în categoria lui.
+  const have = boostCount(property);
 
   // Sold zero: cumperi UNUL, pentru ACEST anunț, dintr-o singură apăsare.
   // Backendul pune property_id în metadata sesiunii Stripe, iar
@@ -72,15 +72,15 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
       <AlertDialogContent className="rounded-2xl border-border">
         <AlertDialogHeader>
           <AlertDialogTitle className="font-heading text-xl font-semibold">
-            {already
-              ? (en ? "Already promoted" : "Deja promovat")
+            {have > 0
+              ? (en ? "Promote it further?" : "Îl promovezi mai mult?")
               : (en ? "Promote this listing?" : "Promovezi acest anunț?")}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm text-muted-foreground">
-            {already
+            {have > 0
               ? (en
-                ? "This listing is promoted for as long as it stays up. There is nothing more to buy for it."
-                : "Anunțul e promovat cât timp stă publicat. Nu mai ai ce cumpăra pentru el.")
+                ? `This listing already carries ${have} ${have === 1 ? "boost" : "boosts"}. Another one lifts it higher still, and none of them expire.`
+                : `Anunțul are deja ${have} boost${have === 1 ? "" : "-uri"}. Încă unul îl ridică și mai sus, și niciunul nu expiră.`)
               : hasCredits
               ? (en
                 ? "Promoted listings rank above the rest of their band, for as long as they are up, and are labelled as paid placement."
@@ -91,7 +91,7 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        {!already && !hasCredits && (
+        {!hasCredits && (
           // Pachetele rămân la un tap distanță — cine promovează des ia 6 sau
           // 12 deodată, la un preț pe boost mai mic.
           <p className="text-sm text-muted-foreground">
@@ -102,12 +102,13 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
           </p>
         )}
 
-        {!already && hasCredits && (
+        {hasCredits && (
           <dl className="space-y-2 rounded-2xl bg-secondary/60 px-4 py-3">
             {[
               [en ? "Listing" : "Anunț", property?.title || "—"],
               [en ? "Cost" : "Cost", en ? "1 boost" : "1 boost"],
               [en ? "Balance after" : "Sold rămas", String(Math.max(0, balance - 1))],
+              [en ? "Boosts after" : "Boost-uri după", String(have + 1)],
               [en ? "Lasts" : "Durează", en ? "as long as the listing is up" : "cât timp anunțul e publicat"],
             ].map(([label, value]) => (
               <div key={label} className="flex items-baseline justify-between gap-4">
@@ -122,7 +123,7 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
           <AlertDialogCancel className="min-h-[44px] rounded-full border-border">
             {en ? "Cancel" : "Anulează"}
           </AlertDialogCancel>
-          {already ? null : hasCredits ? (
+          {hasCredits ? (
             <AlertDialogAction
               onClick={(e) => { e.preventDefault(); confirm(); }}
               disabled={pending}

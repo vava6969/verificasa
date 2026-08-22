@@ -74,6 +74,8 @@ export default async function (req: Request): Promise<Response> {
           await svc.entities.Property.update(propertyId, {
             boost_active: true,
             boost_ends_date: boostEndsDate,
+            // Boost-urile se aduna pe acelasi anunt - vezi ApplyBoost.
+            boost_count: (Number(p.boost_count) || 0) + 1,
           });
           balance = await addCredits(svc, {
             userId: me.id, delta: -1, reason: "spend", sourceId: propertyId, note: p.title || "",

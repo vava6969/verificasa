@@ -11,6 +11,7 @@ import confetti from "canvas-confetti";
 import { generateUniquePropertyCode } from "@/lib/propertyCode";
 import { uploadPhotos } from "@/lib/imageUpload";
 import { callFnQuiet } from "@/lib/serverCall";
+import { fetchMyActiveSubscription } from "@/lib/subscriptions";
 import {
   EMPTY_FORM, MIN_PHOTOS, MAX_PHOTOS, buildPropertyPayload,
 } from "@/lib/propertyPayload";
@@ -143,6 +144,25 @@ export default function PropertyWizard({ onDone, onCancel }) {
     const created = await base44.entities.Property.create(
       buildPropertyPayload({ form, chips, facilities, country, user, isAdmin, property_code })
     );
+    // Planul proprietarului se scrie PE anunț, nu se citește din abonament.
+    // Subscription.read e blocat la owner/admin, deci un vizitator nu are cum
+    // să afle pe ce plan e altcineva — de-aia anunțurile de Agent se vedeau
+    // doar când era logat chiar agentul: pentru toți ceilalți cădeau în
+    // „fără plan" și rândul de Agent rămânea gol. Property.read e null, deci
+    // câmpul ăsta se vede de oriunde.
+    //
+    // Se scrie printr-un UPDATE după create, nu în payload-ul de create:
+    // pe Base44, un câmp nou e ignorat în tăcere la create până la publish,
+    // dar e acceptat la update.
+    try {
+      const mySub = await fetchMyActiveSubscription(user?.id);
+      if (mySub?.plan_id) {
+        await base44.entities.Property.update(created.id, { poster_plan: mySub.plan_id });
+      }
+    } catch (_) {
+      // Best-effort: dacă pică, SyncPosterPlans repară la următoarea rulare.
+    }
+
     if (!isAdmin) {
       base44.functions.invoke("NotifyAdminsOnNewProperty", {
         property_id: created.id, title: form.title, owner_name: form.owner_name || "",
