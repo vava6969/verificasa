@@ -16,10 +16,75 @@ import { useToast } from "@/components/ui/use-toast";
 // Anunțurile noi se ștampilează singure la publicare (vezi PropertyWizard).
 // Butonul ăsta e pentru tot ce există deja și pentru abonamentele acordate de
 // mână din panoul Base44, care nu trec prin VerifyCheckoutSession.
+// Câte anunțuri de fiecare plan în datele de demonstrație. E forma pe care o
+// avea aplicația înainte ca cineva să șteargă suprascrierile din panoul Base44:
+// 5 Agent, 4 Pro, 12 Basic. Restul rămân fără plan.
+const DEMO_SPREAD = { agent: 5, pro: 4, basic: 12 };
+
 export default function AdminPlanSync() {
   const { toast } = useToast();
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState(null);
+  const [seeding, setSeeding] = useState(false);
+  const [seeded, setSeeded] = useState(null);
+
+  // Pune la loc planurile de demonstrație pe anunțuri.
+  //
+  // `poster_plan_override` bate `poster_plan` în resolvePropertyPlan, deci
+  // câmpul ăsta — nu abonamentele — e cel care umple rândurile Agent și Pro de
+  // pe prima pagină cât timp nu există abonați adevărați. Nimic din aplicație
+  // nu îl scria: se punea de mână din panou, și tot de mână a fost șters.
+  //
+  // Alegerea e deterministă, nu la întâmplare: anunțurile se ordonează după id,
+  // iar cele care se declară „Agent" primesc primele planul Agent — un anunț
+  // de agenție pe planul de agenție se citește coerent. Rulat de două ori dă
+  // același rezultat.
+  const seedDemoPlans = async () => {
+    setSeeding(true);
+    setSeeded(null);
+    try {
+      const all = await base44.entities.Property.filter(
+        { approval_status: "APPROVED", country: "RO" }, "-created_date", 200
+      );
+      const sorted = [...(all || [])].sort((a, b) => String(a.id).localeCompare(String(b.id)));
+      const agentsFirst = [
+        ...sorted.filter((p) => p.seller_role === "Agent"),
+        ...sorted.filter((p) => p.seller_role !== "Agent"),
+      ];
+
+      const plan = new Map();
+      let i = 0;
+      for (const [id, n] of Object.entries(DEMO_SPREAD)) {
+        for (let k = 0; k < n && i < agentsFirst.length; k += 1, i += 1) {
+          plan.set(agentsFirst[i].id, id);
+        }
+      }
+
+      let changed = 0;
+      for (const prop of sorted) {
+        const want = plan.get(prop.id) || null;
+        const have = prop.poster_plan_override || null;
+        if (want === have) continue;
+        // Base44 nu acceptă "" pe un câmp cu enum, deci golirea trece prin null.
+        await base44.entities.Property.update(prop.id, { poster_plan_override: want });
+        changed += 1;
+      }
+
+      setSeeded({ changed, total: sorted.length, ...DEMO_SPREAD });
+      toast({
+        title: "Planuri demo aplicate",
+        description: `${changed} anunțuri modificate — ${DEMO_SPREAD.agent} Agent, ${DEMO_SPREAD.pro} Pro, ${DEMO_SPREAD.basic} Basic.`,
+      });
+    } catch (e) {
+      toast({
+        title: "Nu am putut aplica planurile demo",
+        description: e?.message || "Încearcă din nou.",
+        variant: "destructive",
+      });
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   const run = async () => {
     setRunning(true);
@@ -74,6 +139,30 @@ export default function AdminPlanSync() {
           {result.failed ? ` · ${result.failed} eșuate` : ""}.
         </p>
       )}
+
+      <div className="mt-5 border-t border-border pt-4">
+        <h4 className="font-heading text-base font-bold text-foreground">Planuri pe datele de demonstrație</h4>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Pune la loc {DEMO_SPREAD.agent} Agent, {DEMO_SPREAD.pro} Pro și {DEMO_SPREAD.basic} Basic pe anunțurile
+          existente, ca rândurile Agent și Pro de pe prima pagină să aibă ce arăta cât timp nu există
+          abonați adevărați. Scrie `poster_plan_override`, care bate planul real. Rulat de două ori dă
+          același rezultat.
+        </p>
+        <button
+          type="button"
+          onClick={seedDemoPlans}
+          disabled={seeding}
+          className="mt-3 flex min-h-[44px] items-center gap-2 rounded-full border border-border px-5 font-bold text-foreground transition-colors hover:border-emerald disabled:opacity-50"
+        >
+          {seeding && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+          {seeding ? "Se aplică…" : "Aplică planurile demo"}
+        </button>
+        {seeded && (
+          <p className="mt-3 text-sm text-muted-foreground">
+            {seeded.changed} anunțuri modificate din {seeded.total}.
+          </p>
+        )}
+      </div>
     </section>
   );
 }
