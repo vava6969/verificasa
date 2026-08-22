@@ -4,7 +4,6 @@ import { useCountry } from "@/components/CountryContext";
 import HeroSearch from "@/components/HeroSearch";
 import HeroPhoto from "@/components/HeroPhoto";
 import LoopVideo from "@/components/LoopVideo";
-import HeroCountdown from "@/components/HeroCountdown";
 import InspectieModal from "@/components/InspectieModal";
 import MapSearchCTA from "@/components/MapSearchCTA";
 import ActionCards from "@/components/ActionCards";
@@ -75,7 +74,7 @@ export default function Landing() {
       </section>
 
       {/* THE THREE WAYS IN */}
-      <ActionCards onRequestInspection={() => setShowInspectie(true)} />
+      <ActionCards />
 
       {/* ANUNȚURI RECOMANDATE — sus, e ce vine lumea să vadă */}
       <div id="featured" className="pt-2">
@@ -107,7 +106,6 @@ export default function Landing() {
         </Reveal>
       </section>
 
-      <HeroCountdown className="mx-auto max-w-7xl px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8" />
 
       {/* DESPRE */}
       <AboutVerifiCasa />

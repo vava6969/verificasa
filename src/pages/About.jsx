@@ -7,6 +7,7 @@ import { useCountry } from "@/components/CountryContext";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import Glyph from "@/components/Glyph";
+import HeroCountdown from "@/components/HeroCountdown";
 
 // Real photographs, not renders. Used as the supporting strip in the story block.
 const STORY_SHOTS = [
@@ -169,6 +170,11 @@ export default function About() {
           </motion.div>
         </div>
       </section>
+
+      {/* Numărătoarea a venit de pe prima pagină. Acolo stătea între căutare și
+          anunțuri, pe drumul cuiva care voia doar să vadă case; aici e la locul
+          ei, în pagina care povestește unde suntem cu produsul. */}
+      <HeroCountdown className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 sm:pt-12 lg:px-8" />
 
       {/* PILLARS */}
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-16 lg:px-8">
