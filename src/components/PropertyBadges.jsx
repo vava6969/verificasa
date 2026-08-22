@@ -46,6 +46,10 @@ const SIZES = {
   lg: { chip: "h-8 gap-1.5 pl-1.5 pr-3.5 text-[13px]", img: "h-6 w-6" },
 };
 
+// Înălțimea rândului, egală cu înălțimea pastilei din SIZES. Stă separat pentru
+// că rândul gol nu are pastile din care să o moștenească.
+const ROW_H = { xs: "h-5", sm: "h-6", md: "h-7", lg: "h-8" };
+
 export function PropertyBadge({ kind, size = "md", lang = "ro", className, children }) {
   const meta = KINDS[kind];
   if (!meta) return null;
@@ -96,7 +100,7 @@ export function PropertyBadge({ kind, size = "md", lang = "ro", className, child
  * singur insigna „Verificat" — exact minciuna pe care listingSanity a fost
  * scris să o oprească.
  */
-export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", className, max }) {
+export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", className, max, reserve = false }) {
   const boosted = property?.boost_active || property?.featured;
   const isAgent = property?.seller_role === "Agent";
   // Un anunț implauzibil (preț de sute de mii, o cameră pe 345 mp) nu are voie
@@ -114,10 +118,19 @@ export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", c
   else if (plan && !boosted) kinds.push(plan);
 
   const shown = kinds.slice(0, max ?? (size === "xs" ? 2 : size === "sm" ? 1 : 2));
-  if (!shown.length) return null;
+
+  // `reserve` ține rândul deschis și când nu e nicio insignă. Întedărăt un card
+  // cu „Promovat" era mai înalt decât vecinii lui și împingea prețul și tot ce
+  // urmează cu un rând mai jos — trei carduri alături, trei linii de bază
+  // diferite. Locul se păstrează acum indiferent de ce are anunțul.
+  if (!shown.length) {
+    return reserve
+      ? <div aria-hidden="true" className={cn(ROW_H[size], className)} />
+      : null;
+  }
 
   return (
-    <div className={cn("pointer-events-none flex flex-nowrap items-center gap-1.5", className)}>
+    <div className={cn("pointer-events-none flex flex-nowrap items-center gap-1.5", ROW_H[size], className)}>
       {shown.map((kind) => (
         <PropertyBadge key={kind} kind={kind} size={size} lang={lang} />
       ))}

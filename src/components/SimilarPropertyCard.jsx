@@ -50,6 +50,7 @@ export default function SimilarPropertyCard({ property, hot = false, coverMap })
           property={{ ...p, boost_active: boosted }}
           size="sm"
           lang={lang}
+          reserve
           className="mb-1.5 max-w-full"
         />
         <p className="text-base font-bold leading-none text-foreground tnum sm:text-lg">
@@ -58,8 +59,13 @@ export default function SimilarPropertyCard({ property, hot = false, coverMap })
             {p.transaction_type === "SALE" ? "" : t("pc_permonth")}
           </span>
         </p>
-        {specs && <p className="mt-1 truncate text-xs font-semibold text-foreground/80">{specs}</p>}
-        <p className="mt-0.5 truncate text-xs text-muted-foreground">
+        {/* Ambele rânduri se desenează mereu, chiar goale: un anunț fără
+            camere trecute nu are voie să-și ridice cardul cu un rând față de
+            vecinul lui. */}
+        <p className="mt-1 min-h-[1rem] truncate text-xs font-semibold text-foreground/80">
+          {specs || " "}
+        </p>
+        <p className="mt-0.5 min-h-[1rem] truncate text-xs text-muted-foreground">
           {p.zone || p.city ? `${p.zone ? p.zone + ", " : ""}${p.city || ""}` : "—"}
         </p>
       </div>

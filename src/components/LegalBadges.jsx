@@ -1,28 +1,71 @@
 import React from "react";
 
 /**
- * ANPC SAL + EU ODR — obligatorii în subsol. Erau două carduri suprapuse cu
- * etichetă, descriere și buton „Detalii", aproape o sută de pixeli pentru două
- * linkuri: exact ce umfla subsolul. Acum sunt două pastile pe un rând.
+ * ANPC SAL + SOL — obligatorii în subsolul oricărei firme din România.
+ *
+ * Erau două pastile mici cu textul „ANPC SAL" și „ODR · UE". Legea cere
+ * bannerele, nu o abreviere: două casete albe, cu textul oficial cu majuscule
+ * și butonul DETALII, care duc la paginile ANPC și la platforma europeană.
+ *
+ * Bannerele oficiale sunt desenate aici, nu sunt imagini luate de pe alt site:
+ * un banner găzduit la ei dispare când îl mută, și atunci subsolul rămâne cu
+ * două pătrate goale. Singura bucată care chiar trebuie să fie fișier este
+ * stema ANPC; dacă lipsește, caseta rămâne întreagă și doar textul rămâne —
+ * pune-o la public/images/legal/anpc-logo.png și apare singură.
  */
-export default function LegalBadges() {
-  const badges = [
-    { href: "https://anpc.ro/ce-este-sal/", tag: "ANPC SAL" },
-    { href: "https://consumer-redress.ec.europa.eu/site-relocation_en", tag: "ODR · UE" },
-  ];
 
+const ANPC_LOGO = "/images/legal/anpc-logo.png";
+
+const BADGES = [
+  {
+    href: "https://anpc.ro/ce-este-sal/",
+    logo: ANPC_LOGO,
+    lines: ["Soluționarea alternativă", "a litigiilor"],
+    label: "ANPC SAL",
+  },
+  {
+    href: "https://consumer-redress.ec.europa.eu/site-relocation_en",
+    logo: null,
+    lines: ["Soluționarea online", "a litigiilor"],
+    label: "SOL",
+  },
+];
+
+export default function LegalBadges() {
   return (
-    <div className="mt-2.5 flex flex-wrap gap-1.5">
-      {badges.map((b) => (
+    <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+      {BADGES.map((b) => (
         <a
           key={b.href}
           href={b.href}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wide text-white/70 transition-colors hover:border-emerald/60 hover:text-white"
+          aria-label={b.label}
+          className="flex w-full max-w-[248px] items-center gap-2.5 rounded border border-white/25 bg-white px-2.5 py-2 transition-colors hover:border-emerald"
         >
-          {b.tag}
-          <span aria-hidden="true">↗</span>
+          {b.logo && (
+            <img
+              src={b.logo}
+              alt=""
+              aria-hidden="true"
+              onError={(e) => { e.currentTarget.style.display = "none"; }}
+              className="h-9 w-auto shrink-0 object-contain"
+              loading="lazy"
+            />
+          )}
+          <span className="flex min-w-0 flex-1 flex-col items-center gap-1 text-center">
+            <span className="text-[9px] font-extrabold uppercase leading-[1.25] tracking-[0.02em] text-[#1b2a6b]">
+              {b.lines.map((l) => (
+                <React.Fragment key={l}>
+                  {l}
+                  <br />
+                </React.Fragment>
+              ))}
+            </span>
+            <span className="rounded-sm bg-[#1b2a6b] px-2 py-[2px] text-[8px] font-bold uppercase tracking-wide text-white">
+              Detalii
+            </span>
+          </span>
         </a>
       ))}
     </div>

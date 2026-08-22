@@ -75,9 +75,14 @@ export default function PropertyWizard({ onDone, onCancel }) {
     if (s === 0 && !form.title.trim()) return w.err_title;
     if (s === 1 && !form.city) return w.err_city;
     if (s === 2) {
+      // Ordinea e cea de pe ecran, de sus în jos: mesajul trimite omul la
+      // primul câmp pe care îl vede gol, nu la ultimul din listă.
+      // Etajul a ieșit dintre obligatorii — o casă nu are etaj.
       if (!form.price_monthly) return w.err_price;
       if (!form.surface_sqm) return w.err_surface;
-      if (!form.floor) return w.err_floor;
+      if (!String(form.building_year || "").trim()) return w.err_year;
+      if (!form.available_from) return w.err_available;
+      if (!form.description.trim()) return w.err_desc;
     }
     return null;
   };

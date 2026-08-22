@@ -46,7 +46,7 @@ export default function ActionCards() {
         {cards.map((c) => (
           <RevealItem key={c.title}>
             <Link to={c.to} className="block">
-              <span className="relative flex h-32 items-end overflow-hidden rounded-2xl sm:h-44">
+              <span className="group relative flex h-32 items-end overflow-hidden rounded-2xl sm:h-44">
                 {c.partner ? (
                   <>
                     <span className="absolute inset-0 bg-emerald/12 dark:bg-emerald/20" />
@@ -67,13 +67,13 @@ export default function ActionCards() {
                   </>
                 ) : (
                   <>
-                    {/* Fotografia stă pe loc. Creșterea la hover era un efect
-                        pe care clientul l-a refuzat. */}
+                    {/* Fotografia crește puțin sub cursor — atât, un pas, nu
+                        o animație. */}
                     <img
                       src={c.img}
                       alt=""
                       aria-hidden="true"
-                      className="absolute inset-0 h-full w-full object-cover"
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
                       loading="lazy"
                     />
                     <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
