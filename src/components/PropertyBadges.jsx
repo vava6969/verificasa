@@ -112,7 +112,6 @@ export function PropertyBadge({ kind, size = "md", lang = "ro", className, child
  */
 export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", className, max, reserve = false }) {
   const boosted = property?.boost_active || property?.featured;
-  const isAgent = property?.seller_role === "Agent";
   // Un anunț implauzibil (preț de sute de mii, o cameră pe 345 mp) nu are voie
   // să poarte „Verificat", oricât de mare i-ar fi scorul din date.
   const verified =
@@ -126,16 +125,18 @@ export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", c
   const resolved = planId || property?.poster_plan || null;
   const plan = resolved && KINDS[resolved] ? resolved : null;
 
-  // Ordinea cerută de client: se vede Întâi că e promovat, apoi pe ce plan e
-  // proprietarul. „Verificat" trece pe locul trei — dar nu cade de pe card:
-  // ce nu încape ca pastilă scrisă se desenează ca iconiță, vezi mai jos.
-  // Planul NU mai dispare când anunțul e promovat: clientul a cerut explicit
-  // să se vadă amândouă.
+  // Ordinea cerută de client: întâi că e promovat, apoi pe ce plan e
+  // proprietarul, apoi verificarea.
+  //
+  // A DOUA PASTILĂ E PLANUL, MEREU. Până acum `seller_role === "Agent"` — o
+  // căsuță pe care și-o bifează singur cine publică — câștiga înaintea planului
+  // plătit, așa că un anunț stătea în rândul „Basic" purtând insigna „Agent":
+  // rândul spunea una, insigna alta, pe același card. Meseria declarată nu e
+  // același lucru cu abonamentul, și doar abonamentul sortează rândurile.
+  // Rolul rămâne scris sub numele omului, în banda de contact a cardului mare.
   const kinds = [];
   if (boosted) kinds.push("promovat");
-  if (isAgent) kinds.push("agent");
-  else if (plan) kinds.push(plan);
-  else kinds.push("free");
+  kinds.push(plan || "free");
   if (verified) kinds.push("verificat");
 
   // Două pastile scrise, și atât. A treia încercase să încapă ca iconiță de
