@@ -46,11 +46,16 @@ export default function Conversation() {
     ? conv.buyer_id === user?.id ? conv.seller_id : conv.buyer_id
     : null;
 
+  // null = inca se incarca, true/false = verdict. Fara asta, loadMessages()
+  // rula pe orice id din URL si randa firul altcuiva.
+  const isParticipant =
+    conv === null ? null : conv === false ? false : conv.buyer_id === user?.id || conv.seller_id === user?.id;
+
   // Fetch the other participant's full user record (avatar, name, etc.)
   useEffect(() => {
-    if (!otherUserId) return;
+    if (!otherUserId || isParticipant !== true) return;
     base44.entities.User.get(otherUserId).then(setOtherUser).catch(() => setOtherUser(null));
-  }, [otherUserId]);
+  }, [otherUserId, isParticipant]);
 
   // Prefill: când utilizatorul apasă „Trimite mesaj" de pe pagina anunț,
   // pre-completăm textul șablon și atașăm cardul de proprietate la primul mesaj.
@@ -97,6 +102,11 @@ export default function Conversation() {
 
   useEffect(() => {
     if (!isAuthenticated) return;
+    // Asteapta verdictul conversatiei. Efectul asta si cel care incarca `conv`
+    // se declansau in paralel, deci mesajele se citeau inainte sa se stie daca
+    // firul e al meu.
+    if (isParticipant === null) return;
+    if (isParticipant === false) { setMessages([]); return; }
     let cancelled = false;
     loadMessages();
     const unsub = base44.entities.Message.subscribe((event) => {
@@ -105,11 +115,13 @@ export default function Conversation() {
     });
     return () => { cancelled = true; try { unsub?.(); } catch {} };
      
-  }, [id, isAuthenticated, user?.id]);
+  }, [id, isAuthenticated, user?.id, isParticipant]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;
+  // Firul altcuiva: inapoi in lista, nu randa chrome-ul conversatiei.
+  if (isParticipant === false) return <Navigate to="/messages" replace />;
 
   const otherName = conv
     ? conv.buyer_id === user?.id
@@ -126,14 +138,20 @@ export default function Conversation() {
         "-created_date", 1
       ).catch(() => []);
       if (existing.length === 0) {
-        await base44.entities.Message.create({
+        const created = await base44.entities.Message.create({
           conversation_id: conv.id,
           sender_id: "system",
           sender_name: "VerifiCasa",
+          recipient_id: otherUserId || "",
           content: "Sper că am fost pe placul așteptărilor tale, m-ar ajuta foarte mult o recenzie din partea dumneavoastră.",
           is_system: true,
           system_type: "review_request",
-        }).catch(() => {});
+        }).catch(() => null);
+        // recipient_id e camp nou: pana la publish e inghitit tacut la `create`,
+        // dar acceptat la `update`. Stampila de urmarire il pune oricum.
+        if (created?.id && !created.recipient_id && otherUserId) {
+          base44.entities.Message.update(created.id, { recipient_id: otherUserId }).catch(() => {});
+        }
       }
     } catch { /* best-effort */ }
   };
@@ -145,14 +163,23 @@ export default function Conversation() {
     const content = text.trim();
     const ref = pendingRef;
     try {
+      // Cine primeste mesajul, scris pe mesaj. Conversation stie asta, dar RLS
+      // nu poate face join, deci datul trebuie denormalizat ca sa se poata
+      // inchide vreodata citirea.
+      const recipientId = conv.buyer_id === user.id ? conv.seller_id : conv.buyer_id;
       const msgData = {
         conversation_id: conv.id,
         sender_id: user.id,
         sender_name: user.full_name || user.email,
+        recipient_id: recipientId || "",
         content,
       };
       if (ref) Object.assign(msgData, ref);
-      await base44.entities.Message.create(msgData);
+      const createdMsg = await base44.entities.Message.create(msgData);
+      // Camp nou => tacut ignorat la `create` pana la publish. Il stampilam.
+      if (createdMsg?.id && !createdMsg.recipient_id && recipientId) {
+        base44.entities.Message.update(createdMsg.id, { recipient_id: recipientId }).catch(() => {});
+      }
       // Auto review-request after 3+ messages (once per conversation)
       maybeSendReviewRequest();
       base44.entities.Conversation.update(conv.id, { last_message: content }).catch(() => {});

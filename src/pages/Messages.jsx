@@ -79,8 +79,15 @@ export default function Messages() {
     if (busy) return;
     setBusy(true);
     try {
+      // Message.list() intoarce mesajele TUTUROR, nu doar ale mele. Fara filtrul
+      // pe conversatiile mele, „marcheaza tot ca citit" stampila read_at pe
+      // corespondenta privata a strainilor — exact ca loadConversations, care
+      // filtreaza pe `mine`, doar ca aici filtrul lipsea.
+      const myConvIds = new Set(conversations.map((c) => c.id));
       const allMsgs = await base44.entities.Message.list("-created_date", 500).catch(() => []);
-      const toUpdate = allMsgs.filter((m) => m.sender_id !== user.id && !m.read_at);
+      const toUpdate = allMsgs.filter(
+        (m) => myConvIds.has(m.conversation_id) && m.sender_id !== user.id && !m.read_at
+      );
       if (!toUpdate.length) { toast({ title: en ? "Everything is already read" : "Toate mesajele sunt deja citite" }); return; }
       const now = new Date().toISOString();
       await Promise.all(toUpdate.map((m) => base44.entities.Message.update(m.id, { read_at: now }).catch(() => {})));
