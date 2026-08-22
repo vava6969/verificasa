@@ -39,25 +39,43 @@ export default async function (req: Request): Promise<Response> {
     const from = currentEnd > now ? currentEnd : now;
     const endsDate = new Date(from + BOOST_DURATION_DAYS * 86400000).toISOString();
 
-    await svc.entities.Boost.create({
-      property_id: propertyId,
-      user_id: me.id,
-      starts_date: new Date(now).toISOString(),
-      ends_date: endsDate,
-      status: "active",
-      credits_spent: 1,
-    });
-
-    // Câmpuri denormalizate: sortarea și ștampila „Promovat" le citesc direct
-    // de pe anunț, fără un query separat per card.
-    await svc.entities.Property.update(propertyId, {
-      boost_active: true,
-      boost_ends_date: endsDate,
-    });
-
+    // ORDINEA CONTEAZĂ. Înainte, anunțul se promova întâi și creditul se scădea
+    // după — fără tranzacție și fără revenire. Dacă scăderea eșua (registrul
+    // BoostCredit are `create` doar pentru admin și trece prin asServiceRole),
+    // anunțul rămânea promovat pe gratis și în registru nu apărea nimic.
+    //
+    // Acum creditul se REZERVĂ întâi. Dacă aplicarea eșuează după aceea, îl dăm
+    // înapoi cu un rând de „refund", ca soldul să nu se piardă în tăcere.
     const after = await addCredits(svc, {
       userId: me.id, delta: -1, reason: "spend", sourceId: propertyId, note: p.title || "",
     });
+
+    try {
+      await svc.entities.Boost.create({
+        property_id: propertyId,
+        user_id: me.id,
+        starts_date: new Date(now).toISOString(),
+        ends_date: endsDate,
+        status: "active",
+        credits_spent: 1,
+      });
+
+      // Câmpuri denormalizate: sortarea și ștampila „Promovat" le citesc direct
+      // de pe anunț, fără un query separat per card.
+      await svc.entities.Property.update(propertyId, {
+        boost_active: true,
+        boost_ends_date: endsDate,
+      });
+    } catch (applyErr: any) {
+      const restored = await addCredits(svc, {
+        userId: me.id, delta: 1, reason: "refund", sourceId: propertyId,
+        note: "Promovare eșuată — credit returnat",
+      }).catch(() => null);
+      return Response.json({
+        error: applyErr?.message || "Promovarea nu a putut fi aplicată. Creditul a rămas în cont.",
+        balance: restored ?? after + 1,
+      });
+    }
 
     return Response.json({ ok: true, balance: after, boost_ends_date: endsDate });
   } catch (e: any) {

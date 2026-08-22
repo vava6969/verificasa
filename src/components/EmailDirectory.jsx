@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import {
   Headset, ShieldAlert, Handshake, Megaphone, Briefcase,
   Scale, Building2, Mail, Copy, Check, ExternalLink, AlertTriangle,
@@ -98,14 +97,17 @@ function EmailCard({ item, index }) {
   };
 
   return (
-    <motion.a
+    // Cardul E elementul de grilă (poartă `sm:col-span-2`), deci nu poate fi
+    // înfășurat într-un Reveal fără să se mute grila. În schimb a scăpat de
+    // framer: `whileInView` îl ținea la `opacity: 0` până rula un cadru, iar
+    // când bucla de cadre e sugrumată rămânea invizibil — la fel ca pagina de
+    // planuri. Acum intrarea e doar o translație (tailwindcss-animate), deci în
+    // cel mai rău caz cardul e împins câțiva pixeli, niciodată ascuns, iar
+    // ridicarea la hover e CSS.
+    <a
       href={`mailto:${item.email}`}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, delay: (index % 2) * 0.08, ease: "easeOut" }}
-      whileHover={{ y: -6, scale: 1.01 }}
-      className={`group relative flex flex-col gap-3 overflow-hidden rounded border border-white/50 bg-white/40 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_30px_-14px_rgba(27,34,44,0.18)] transition-all hover:border-gold/50 hover:bg-white/55 dark:border-white/10 dark:bg-white/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_10px_36px_-16px_rgba(0,0,0,0.7)] dark:hover:bg-white/[0.08] ${isHero ? "sm:col-span-2 " + a.glow : ""} ${a.ring} hover:ring-2`}
+      style={{ animationDelay: `${(index % 2) * 0.08}s` }}
+      className={`group relative flex flex-col gap-3 animate-in slide-in-from-bottom-4 duration-500 hover:-translate-y-1.5 hover:scale-[1.01] overflow-hidden rounded border border-white/50 bg-white/40 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_30px_-14px_rgba(27,34,44,0.18)] transition-all hover:border-gold/50 hover:bg-white/55 dark:border-white/10 dark:bg-white/[0.05] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_10px_36px_-16px_rgba(0,0,0,0.7)] dark:hover:bg-white/[0.08] ${isHero ? "sm:col-span-2 " + a.glow : ""} ${a.ring} hover:ring-2`}
     >
       {item.bg && (
         <img
@@ -154,7 +156,7 @@ function EmailCard({ item, index }) {
           Copiat!
         </span>
       )}
-    </motion.a>
+    </a>
   );
 }
 
@@ -203,13 +205,9 @@ export default function EmailDirectory() {
       </div>
 
       {/* Security warning */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-40px" }}
-        transition={{ duration: 0.5 }}
-        className="rounded border border-amber-300/50 bg-amber-50/70 p-5 dark:border-amber-500/25 dark:bg-amber-500/[0.07]"
-      >
+      {/* Un avertisment de securitate nu are voie să depindă de un cadru de
+          animație ca să fie vizibil. */}
+      <div className="animate-in slide-in-from-bottom-4 rounded border border-amber-300/50 bg-amber-50/70 p-5 duration-500 dark:border-amber-500/25 dark:bg-amber-500/[0.07]">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-300">
             <AlertTriangle className="h-5 w-5" />
@@ -234,7 +232,7 @@ export default function EmailDirectory() {
             </ul>
           </div>
         </div>
-      </motion.div>
+      </div>
       </div>
     </div>
   );
