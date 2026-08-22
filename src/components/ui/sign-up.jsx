@@ -174,7 +174,7 @@ export function AuthComponent() {
 
       {error && <ErrorNote className="mt-3.5">{error}</ErrorNote>}
 
-      <form onSubmit={isSignup ? submitSignup : submitSignin} className="mt-3 space-y-2 sm:mt-5 sm:space-y-3.5">
+      <form onSubmit={isSignup ? submitSignup : submitSignin} className="mt-3 space-y-1.5 sm:mt-5 sm:space-y-3.5">
         <Field
           id="email"
           name="email"
@@ -230,7 +230,7 @@ export function AuthComponent() {
               onChange={setFullName}
               autoComplete="name"
             />
-            <label className="flex items-start gap-2.5 text-[13px] leading-snug text-muted-foreground sm:text-sm">
+            <label className="flex items-start gap-2 text-[12px] leading-snug text-muted-foreground sm:text-sm">
               <input
                 type="checkbox"
                 checked={agreed}
@@ -258,7 +258,7 @@ export function AuthComponent() {
       </form>
 
       {/* Social comes after the form: the email path is the real one. */}
-      <div className="my-3.5 flex items-center gap-3 sm:my-5">
+      <div className="my-2.5 flex items-center gap-3 sm:my-5">
         <div className="h-px flex-1 bg-border" />
         <span className="text-[11px] text-muted-foreground sm:text-xs">{t("au_or")}</span>
         <div className="h-px flex-1 bg-border" />
@@ -281,7 +281,10 @@ export function AuthComponent() {
 function Field({ id, name, label, hint, type = "text", value, onChange, autoComplete, autoFocus }) {
   return (
     <div className="space-y-1 sm:space-y-1.5">
-      <label htmlFor={id} className="text-[13px] font-semibold text-foreground sm:text-sm">{label}</label>
+      <div className="flex items-baseline justify-between gap-3">
+        <label htmlFor={id} className="text-[13px] font-semibold text-foreground sm:text-sm">{label}</label>
+        {hint && <span className="truncate text-[11px] leading-none text-muted-foreground">{hint}</span>}
+      </div>
       <Input
         id={id}
         name={name}
@@ -292,7 +295,6 @@ function Field({ id, name, label, hint, type = "text", value, onChange, autoComp
         autoFocus={autoFocus}
         className="h-10 border-white/15 bg-white/[0.06] sm:h-11"
       />
-      {hint && <p className="text-[10.5px] leading-tight text-muted-foreground sm:text-xs">{hint}</p>}
     </div>
   );
 }
@@ -320,7 +322,7 @@ function SocialButton({ children, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="flex h-10 items-center justify-center gap-2 rounded border border-white/15 bg-white/[0.06] text-[13px] font-medium text-foreground transition-colors hover:border-primary/60 hover:bg-white/[0.12] sm:h-11 sm:text-sm"
+      className="tap-44 flex h-9 items-center justify-center gap-2 rounded border border-white/15 bg-white/[0.06] text-[13px] font-medium text-foreground transition-colors hover:border-primary/60 hover:bg-white/[0.12] sm:h-11 sm:text-sm"
     >
       {children}
     </button>

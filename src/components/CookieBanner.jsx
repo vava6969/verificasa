@@ -79,7 +79,7 @@ export default function CookieBanner() {
             exit={{ y: 80, opacity: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 24 }}
             ref={barRef}
-            className="fixed inset-x-0 bottom-0 z-50 px-3 pb-3 sm:px-4 sm:pb-6"
+            className="fixed inset-x-0 bottom-0 z-50 px-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] sm:px-4 sm:pb-[calc(env(safe-area-inset-bottom)+1.5rem)]"
           >
             <div className="mx-auto max-w-3xl rounded-2xl border border-emerald/30 bg-navy-deep/95 px-3.5 py-2.5 text-white shadow-soft sm:px-5 sm:py-3.5">
               <div className="flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-3">

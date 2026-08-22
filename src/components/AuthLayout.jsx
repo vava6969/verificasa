@@ -71,7 +71,7 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
   const shot = SHOTS[index];
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-background">
+    <div className="relative min-h-screen-safe w-full overflow-hidden bg-background">
       {/* Photographs. The first paints immediately, the rest arrive after it. */}
       <div className="absolute inset-0" aria-hidden="true">
         {SHOTS.map((s, i) =>
@@ -92,17 +92,16 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
             />
           ) : null
         )}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, hsl(var(--navy-deep) / 0.48) 0%, hsl(var(--navy-deep) / 0.68) 100%)",
-          }}
-        />
+        {/* Ziua și noaptea se văd AICI. Cardul nu poate răspunde temei — rămâne
+            întunecat în ambele, altfel tuporul cald peste fotografie nu se mai
+            citește — deci comutatorul părea stricat: apăsai și nu se schimba
+            nimic. Perdeaua de peste fotografie se subțiază ziua și se îngroașă
+            noaptea, deci se vede imediat ce-ai apăsat, iar poza rămâne poză. */}
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,hsl(var(--navy-deep)/0.26)_0%,hsl(var(--navy-deep)/0.50)_100%)] dark:bg-[linear-gradient(180deg,hsl(var(--navy-deep)/0.54)_0%,hsl(var(--navy-deep)/0.76)_100%)]" />
         {/* Marca și comenzile stau direct pe fotografie, iar prima imagine are o
             fereastră luminoasă exact sub ele. Fără puțin pământ sub rândul de
             sus, albul se pierde în geam. */}
-        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/45 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-[calc(env(safe-area-inset-top)+6rem)] bg-gradient-to-b from-black/45 to-transparent" />
       </div>
 
       {/* Un singur rând sus: sigla în stânga, limba și tema în dreapta.
@@ -115,7 +114,7 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
           nu mai avea ce centra, sigla urca în rândul comenzilor și pastila de
           limbă se așeza direct peste ea. Acum sunt în același rând, deci nu au
           cum să se mai suprapună, iar coloana de dedesubt îi rezervă locul. */}
-      <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-5">
+      <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between gap-4 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.75rem)] sm:px-6 sm:pb-5 sm:pt-[calc(env(safe-area-inset-top)+1.25rem)]">
         <Link to="/" className="tap-44 flex items-center">
           <VerifiCasaLogo size={44} tone="light" tagline={false} />
         </Link>
@@ -126,8 +125,13 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
       </div>
 
       {/* Card */}
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 pb-[calc(var(--cookie-banner-h,0px)+1rem)] pt-[4rem] sm:pt-28">
-        <div className="dark w-full max-w-[19.5rem] rounded border border-white/12 bg-card/55 px-4 py-3.5 shadow-[0_26px_60px_-26px_rgba(0,0,0,0.8)] backdrop-blur-2xl sm:max-w-[22rem] sm:p-6">
+      <div className="relative z-10 flex min-h-screen-safe flex-col items-center justify-center px-4 pb-[calc(var(--cookie-banner-h,0px)+env(safe-area-inset-bottom)+1rem)] pt-[calc(env(safe-area-inset-top)+4rem)] sm:pt-[calc(env(safe-area-inset-top)+7rem)]">
+        <div className="dark w-full max-w-[19.5rem] rounded border border-white/15 bg-card/30 px-4 py-3 shadow-[0_26px_60px_-26px_rgba(0,0,0,0.75)] backdrop-blur-[3px] backdrop-brightness-[0.42] sm:max-w-[22rem] sm:p-6"
+          // Cu geamul atât de subțire, cel mai luminos petic de fotografie ajunge
+          // sub text — iar cenușiul de noapte pentru text secundar pică sub prag
+          // acolo. Se ridică tokenul o dată, pe card, nu clasă cu clasă.
+          style={{ "--muted-foreground": "44 14% 78%" }}
+        >
           <h1 className="font-heading text-lg font-extrabold tracking-tight text-foreground sm:text-2xl">
             {title}
           </h1>
@@ -135,14 +139,14 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
             <p className="mt-1 text-[13px] leading-snug text-muted-foreground sm:mt-1.5 sm:text-sm">{subtitle}</p>
           )}
 
-          <div className="mt-3 sm:mt-5">{children}</div>
+          <div className="mt-2.5 sm:mt-5">{children}</div>
         </div>
 
         {footer && <div className="mt-3 text-center text-[13px] text-white/85 sm:mt-5 sm:text-sm">{footer}</div>}
       </div>
 
       {/* The location of the shot currently on screen. */}
-      <p className="pointer-events-none absolute bottom-3 left-4 z-10 font-mono text-[10px] uppercase tracking-[0.14em] text-white/60 sm:bottom-5 sm:left-5 sm:text-[11px]">
+      <p className="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] left-4 z-10 font-mono text-[10px] uppercase tracking-[0.14em] text-white/60 sm:left-5 sm:text-[11px]">
         {shot.place} <span className="text-white/35">·</span> {shot.area}
       </p>
     </div>

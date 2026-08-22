@@ -335,7 +335,7 @@ export default function SearchPage() {
 
 
       {properties === null ? (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)}
         </div>
       ) : found === 0 ? (
@@ -350,7 +350,7 @@ export default function SearchPage() {
         <>
           {/* once={false} so a filter change or a page turn can never leave a
               card stuck at opacity 0; the key replays the stagger per page. */}
-          <RevealGroup key={safePage} once={false} stagger={0.06} className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <RevealGroup key={safePage} once={false} stagger={0.06} className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
             {paged.map((p) => (
               <RevealItem key={p.id}>
                 <PropertyCard property={p} coverMap={coverMap} />

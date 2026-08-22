@@ -39,7 +39,10 @@ export default function PostProperty() {
 
   return (
     <div className="min-h-screen bg-secondary/40 dark:bg-background">
-      <div className="sticky top-0 z-30 border-b border-border/60 bg-card">
+      {/* Formularul nu trece prin Layout, deci antetul ăsta e primul lucru
+          de sus. Pe un telefon cu decupaj, sticky top-0 înseamnă sub decupaj
+          dacă nu se adaugă marginea sigură — la fel ca în Header. */}
+      <div className="sticky top-0 z-30 border-b border-border/60 bg-card" style={{ paddingTop: "env(safe-area-inset-top)" }}>
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-1.5 sm:px-6">
           <Link to="/" className="flex min-h-[44px] min-w-0 items-center gap-2">
             <VerifiCasaLogo size={34} tagline={false} />

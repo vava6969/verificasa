@@ -152,6 +152,13 @@
      de 36px — adică telefonul primea versiunea CEA MAI groasă a interfeței, iar
      ecranul mare pe cea fină. Exact invers. Butonul se vede acum la 36px peste
      tot, iar suprafața de atins rămâne 44x44 printr-un pseudo-element. */
+  /* 100vh on a phone is the height with the browser toolbars COLLAPSED, so
+     anything centred inside it sits partly under the toolbar until you
+     scroll. svh is the smallest viewport: it always fits, and it does not
+     resize under you the way dvh does. The vh line stays first as the
+     fallback for browsers that do not know svh. */
+  .min-h-screen-safe { min-height: 100vh; min-height: 100svh; }
+
   .tap-44 { position: relative; }
   .tap-44::before {
     content: "";

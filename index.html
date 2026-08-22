@@ -18,7 +18,11 @@
     <link rel="icon" type="image/svg+xml" href="/images/brand/verificasa-icon.svg" />
     <link rel="apple-touch-icon" href="/images/brand/verificasa-icon.svg" />
     <meta name="theme-color" content="#1F7048" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- viewport-fit=cover is what makes env(safe-area-inset-*) return real
+         numbers. Header, BottomNav, Footer, the toast viewport, the map sheet
+         and the auth shell all pad by those insets; without this attribute
+         every one of those reads 0 and the padding silently does nothing. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="VerifiCasa — platformă imobiliară pentru închirieri verificate online: fiecare anunț este verificat înainte de publicare și primește un scor de încredere. România." />
     <meta name="application-name" content="VerifiCasa" />
     <meta property="og:site_name" content="VerifiCasa" />

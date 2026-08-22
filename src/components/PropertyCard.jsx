@@ -101,6 +101,8 @@ export default function PropertyCard({ property, hot = false, coverMap }) {
     p.floor,
   ].filter(Boolean).join(" · ");
 
+  const place = p.zone || p.city ? `${p.zone ? p.zone + ", " : ""}${p.city || ""}` : t("info_missing");
+
   const step = (dir) => (e) => {
     e.preventDefault(); e.stopPropagation();
     if (images.length < 2) return;
@@ -110,7 +112,7 @@ export default function PropertyCard({ property, hot = false, coverMap }) {
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl active:scale-[0.985] active:shadow-md">
       <div
-        className="relative aspect-[4/3] cursor-pointer overflow-hidden touch-pan-y"
+        className="relative aspect-[16/10] cursor-pointer overflow-hidden touch-pan-y sm:aspect-[4/3]"
         onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
         onTouchEnd={(e) => {
           const sx = touchStartX.current;
@@ -176,7 +178,7 @@ export default function PropertyCard({ property, hot = false, coverMap }) {
         )}
       </div>
 
-      <div onClick={toDetail} className="flex min-w-0 flex-1 cursor-pointer flex-col p-3.5 sm:p-4">
+      <div onClick={toDetail} className="flex min-w-0 flex-1 cursor-pointer flex-col p-3 sm:p-4">
         {/* Insignele stau SUB fotografie, nu peste ea.
             Fotografia e argumentul de vânzare al anunțului; două pastile în
             colțul ei acopereau exact partea pe care o priveşte omul. Aici spun
@@ -188,22 +190,30 @@ export default function PropertyCard({ property, hot = false, coverMap }) {
           className="mb-2 max-w-full"
         />
 
-        <p className="text-[1.35rem] font-bold leading-none text-foreground tnum sm:text-2xl">
+        <p className="text-[1.15rem] font-bold leading-none text-foreground tnum sm:text-2xl">
           {primary}
           <span className="ml-1 text-sm font-semibold text-muted-foreground">
             {p.transaction_type === "SALE" ? "" : t("pc_permonth")}
           </span>
         </p>
 
-        {specs && <p className="mt-1.5 truncate text-sm font-semibold text-foreground/80">{specs}</p>}
-
-        <p className="mt-1 truncate text-sm text-muted-foreground">
-          {p.zone || p.city ? `${p.zone ? p.zone + ", " : ""}${p.city || ""}` : t("info_missing")}
+        {/* Telefon: faptele si locul pe un singur rand. Desktop: doua randuri
+            plus titlul, unde exista latime pentru ele. */}
+        <p className="mt-1 truncate text-[13px] text-muted-foreground sm:hidden">
+          {specs && <span className="font-semibold text-foreground/80">{specs}</span>}
+          {specs && place ? " · " : ""}
+          {place}
         </p>
 
-        <h3 className="mt-1.5 line-clamp-1 text-sm text-muted-foreground">
-          {p.title || ""}
-        </h3>
+        <div className="hidden sm:block">
+          {specs && <p className="mt-1.5 truncate text-sm font-semibold text-foreground/80">{specs}</p>}
+
+          <p className="mt-1 truncate text-sm text-muted-foreground">{place}</p>
+
+          <h3 className="mt-1.5 line-clamp-1 text-sm text-muted-foreground">
+            {p.title || ""}
+          </h3>
+        </div>
       </div>
 
       {/* Rândul cu cine a postat + butoanele de sunat/mesaj NU apar pe telefon.
