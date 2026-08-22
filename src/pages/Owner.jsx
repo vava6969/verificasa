@@ -125,7 +125,7 @@ export default function Owner() {
           {properties === null ? (
             <div className="mt-4 space-y-3">{Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-2xl" />)}</div>
           ) : properties.length === 0 ? (
-            <div className="mt-4 rounded-2xl border border-dashed border-border py-16 text-center">
+            <div className="mt-4 rounded-2xl border border-dashed border-border py-9 text-center sm:py-16">
               <img
                 src="/images/generated/icon-camera-verify.png"
                 alt=""

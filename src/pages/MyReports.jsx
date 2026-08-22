@@ -44,7 +44,7 @@ export default function MyReports() {
         {reports === null ? (
           Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-2xl" />)
         ) : reports.length === 0 ? (
-          <div className="rounded-2xl border border-border bg-card px-6 py-14 text-center">
+          <div className="rounded-2xl border border-border bg-card px-5 py-8 text-center sm:px-6 sm:py-14">
             <img src="/images/generated/icon-flag.png" alt="" aria-hidden="true" className="mx-auto h-12 w-12 object-contain" />
             <p className="mt-3 text-sm text-muted-foreground">Nu ai trimis nicio sesizare încă.</p>
           </div>

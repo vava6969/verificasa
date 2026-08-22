@@ -51,7 +51,12 @@ export default function Footer() {
     "inline-flex min-h-[26px] items-center text-white/65 transition-colors hover:text-white";
 
   return (
-    <footer className="bg-navy-deep text-white/70">
+    // Spatiul pentru bara fixa de jos sta AICI, pe subsol, nu pe <main>.
+    // Era pe <main>, iar subsolul e fratele lui, nu copilul: rezulta ca ultimul
+    // rand al subsolului — pastilele ANPC/SAL si ODR-UE, care sunt obligatorii —
+    // statea sub bara de navigare si nu se putea atinge. Padding-ul pe subsol
+    // duce si fundalul inchis pana sub bara, deci nu apare nicio dunga.
+    <footer className="bg-navy-deep pb-[calc(4.5rem+env(safe-area-inset-bottom))] text-white/70 md:pb-0">
       <Reveal className="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-10 lg:px-8">
         {/* ——— TELEFON: cât mai mic cu putință ———
             Subsolul ajunsese la 369px pe un ecran de 812 — aproape jumătate de

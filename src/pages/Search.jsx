@@ -34,6 +34,13 @@ const makeFairness = (t) => [
   { value: "peste_medie", label: t("sr_fairness_above") },
 ];
 
+// Cate anunturi intra intr-o pagina. Multipli de 12, ca randul sa se umple si
+// pe grila de 2 coloane (telefon larg) si pe cea de 3 (desktop) — 10 lasa
+// mereu un card singur pe ultimul rand. Plafonul e 200, cat aduce list() de la
+// server, deci 48 nu poate depasi ce avem in mana.
+const PER_PAGE_OPTIONS = [12, 24, 48];
+const DEFAULT_PER_PAGE = 12;
+
 const makeSort = (t) => [
   { value: "", label: t("sr_sort") },
   { value: "newest", label: t("sr_sort_newest") },
@@ -68,6 +75,16 @@ export default function SearchPage() {
   const setQ = (v) => setParams((prev) => {
     const next = new URLSearchParams(prev);
     if (v) next.set("q", v); else next.delete("q");
+    return next;
+  }, { replace: true });
+
+  // Marimea paginii traieste in URL, ca sa plece cu o cautare salvata sau cu un
+  // link trimis mai departe. Orice valoare din afara listei cade pe implicit.
+  const perParam = parseInt(params.get("per"), 10);
+  const perPage = PER_PAGE_OPTIONS.includes(perParam) ? perParam : DEFAULT_PER_PAGE;
+  const updatePer = (val) => setParams((prev) => {
+    const next = new URLSearchParams(prev);
+    if (Number(val) === DEFAULT_PER_PAGE) next.delete("per"); else next.set("per", val);
     return next;
   }, { replace: true });
 
@@ -122,7 +139,7 @@ export default function SearchPage() {
   }, []);
 
   // Reset to first page whenever filters change
-  useEffect(() => { setPage(1); }, [cityParam, zoneParam, typeParam, qParam, budget, roomsMin, surfaceMin, furnished, swap, fairness, sort, activeFilters.size, planFilters.size]);
+  useEffect(() => { setPage(1); }, [cityParam, zoneParam, typeParam, qParam, perPage, budget, roomsMin, surfaceMin, furnished, swap, fairness, sort, activeFilters.size, planFilters.size]);
 
   const toggle = (key) => {
     setActiveFilters((prev) => {
@@ -184,7 +201,7 @@ export default function SearchPage() {
   else filtered = [...filtered].sort(compareByBoostThenViews);
 
   const found = filtered.length;
-  const PER_PAGE = 10;
+  const PER_PAGE = perPage;
   const totalPages = Math.max(1, Math.ceil(found / PER_PAGE));
   const safePage = Math.min(page, totalPages);
   const paged = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
@@ -243,7 +260,7 @@ export default function SearchPage() {
         <select
           value={cityFilter}
           onChange={(e) => updateCity(e.target.value)}
-          className="min-h-[44px] rounded-full border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
+          className="vc-select min-h-[44px] rounded-full border border-border bg-background py-2.5 pl-4 pr-10 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
         >
           <option value="">{t("sr_city_select")}</option>
           {cities.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -252,10 +269,20 @@ export default function SearchPage() {
           value={zoneFilter}
           onChange={(e) => updateZone(e.target.value)}
           disabled={!cityFilter}
-          className="min-h-[44px] rounded-full border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card disabled:opacity-50"
+          className="vc-select min-h-[44px] rounded-full border border-border bg-background py-2.5 pl-4 pr-10 text-sm font-medium text-foreground outline-none focus:border-emerald disabled:opacity-50 dark:bg-card"
         >
           <option value="">{t("sr_zone_select")}</option>
           {zones.map((z) => <option key={z} value={z}>{z}</option>)}
+        </select>
+        <select
+          value={perPage}
+          onChange={(e) => updatePer(e.target.value)}
+          aria-label={t("sr_per_page")}
+          className="vc-select min-h-[44px] rounded-full border border-border bg-background py-2.5 pl-4 pr-10 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
+        >
+          {PER_PAGE_OPTIONS.map((n) => (
+            <option key={n} value={n}>{t("sr_per_page_n", { n })}</option>
+          ))}
         </select>
         <div className="relative min-w-[200px] flex-1">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -296,10 +323,10 @@ export default function SearchPage() {
           {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-80 rounded-2xl" />)}
         </div>
       ) : found === 0 ? (
-        <div className="rounded-2xl border border-border bg-card px-4 py-20 text-center">
+        <div className="rounded-2xl border border-border bg-card px-4 py-10 text-center sm:py-20">
           <p className="font-heading text-xl font-semibold text-foreground">{t("sr_empty_title")}</p>
           <p className="mt-1 text-sm text-muted-foreground">{t("sr_empty_sub")}</p>
-          <button type="button" onClick={resetFilters} className="mt-4 inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-emerald px-5 text-sm font-bold text-primary-foreground transition-colors hover:bg-emerald/90">
+          <button type="button" onClick={resetFilters} className="mt-4 inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-emerald px-5 text-sm font-bold text-primary-foreground transition-[transform,background-color] duration-200 ease-out hover:bg-emerald/90 active:scale-[0.96]">
             {t("sr_reset_filters")} <span aria-hidden="true">→</span>
           </button>
         </div>

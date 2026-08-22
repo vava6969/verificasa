@@ -141,7 +141,7 @@ export default function AdminReports({ reports = [], properties = [], onReload }
                 <select
                   value={form.status}
                   onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}
-                  className="rounded-lg border border-border bg-white px-2.5 py-1.5 text-xs font-semibold outline-none dark:bg-card"
+                  className="vc-select vc-select-sm rounded-lg border border-border bg-white py-1.5 pl-2.5 pr-7 text-xs font-semibold outline-none dark:bg-card"
                 >
                   <option value="RESOLVED">Rezolvat</option>
                   <option value="REJECTED">Respins</option>
@@ -150,7 +150,7 @@ export default function AdminReports({ reports = [], properties = [], onReload }
                   <select
                     value={form.auto_action}
                     onChange={(e) => setForm((f) => ({ ...f, auto_action: e.target.value }))}
-                    className="rounded-lg border border-border bg-white px-2.5 py-1.5 text-xs font-semibold outline-none dark:bg-card"
+                    className="vc-select vc-select-sm rounded-lg border border-border bg-white py-1.5 pl-2.5 pr-7 text-xs font-semibold outline-none dark:bg-card"
                   >
                     <option value="none">Fără acțiune pe anunț</option>
                     <option value="hide">Retrage/Ascunde anunț</option>
@@ -160,7 +160,7 @@ export default function AdminReports({ reports = [], properties = [], onReload }
                   <select
                     value={form.auto_action}
                     onChange={(e) => setForm((f) => ({ ...f, auto_action: e.target.value }))}
-                    className="rounded-lg border border-border bg-white px-2.5 py-1.5 text-xs font-semibold outline-none dark:bg-card"
+                    className="vc-select vc-select-sm rounded-lg border border-border bg-white py-1.5 pl-2.5 pr-7 text-xs font-semibold outline-none dark:bg-card"
                   >
                     <option value="none">Fără acțiune</option>
                     <option value="hide">Șterge comentariul</option>

@@ -184,7 +184,7 @@ export default function Contact() {
                 name="topic"
                 value={topicIdx}
                 onChange={(e) => setTopicIdx(Number(e.target.value))}
-                className={FIELD}
+                className={`${FIELD} vc-select pr-10`}
               >
                 {c.topics.map((o, i) => (
                   <option key={o.value} value={i}>{o.label}</option>

@@ -199,20 +199,20 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Titlu"><input value={form.title} onChange={(e) => upd("title", e.target.value)} className={inputCls} /></Field>
         <Field label="Tip tranzacție">
-          <select value={form.transaction_type} onChange={(e) => upd("transaction_type", e.target.value)} className={inputCls}>
+          <select value={form.transaction_type} onChange={(e) => upd("transaction_type", e.target.value)} className={`${inputCls} vc-select pr-10`}>
             {TRANSACTIONS.map((x) => <option key={x} value={x}>{x === "RENT" ? "Închiriere" : "Vânzare"}</option>)}
           </select>
         </Field>
         <Field label="Preț">
           <div className="flex gap-2">
             <input type="number" value={form.price_monthly} onChange={(e) => upd("price_monthly", e.target.value)} className={inputCls} />
-            <select value={form.currency} onChange={(e) => upd("currency", e.target.value)} className={`${inputCls} w-28`}>
+            <select value={form.currency} onChange={(e) => upd("currency", e.target.value)} className={`${inputCls} vc-select w-28 pr-10`}>
               {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
         </Field>
         <Field label="Tip proprietate">
-          <select value={form.property_type} onChange={(e) => upd("property_type", e.target.value)} className={inputCls}>
+          <select value={form.property_type} onChange={(e) => upd("property_type", e.target.value)} className={`${inputCls} vc-select pr-10`}>
             {TYPES.map((tp) => <option key={tp} value={tp}>{tp}</option>)}
           </select>
         </Field>
@@ -282,7 +282,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
           <DateField value={form.available_from} onChange={(e) => upd("available_from", e.target.value)} placeholder="Selectează o dată" className="w-full" />
         </Field>
         <Field label="Status">
-          <select value={form.status} onChange={(e) => upd("status", e.target.value)} className={inputCls}>
+          <select value={form.status} onChange={(e) => upd("status", e.target.value)} className={`${inputCls} vc-select pr-10`}>
             {STATUS.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
         </Field>
@@ -305,7 +305,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         <Field label="WhatsApp (internațional)"><input inputMode="tel" value={form.whatsapp_phone} onChange={(e) => upd("whatsapp_phone", onlyPhoneDigits(e.target.value))} placeholder="407xx..." className={inputCls} /></Field>
         <Field label="Nume proprietar"><input value={form.owner_name} onChange={(e) => upd("owner_name", e.target.value)} className={inputCls} /></Field>
         <Field label="Rol vânzător">
-          <select value={form.seller_role} onChange={(e) => upd("seller_role", e.target.value)} className={inputCls}>
+          <select value={form.seller_role} onChange={(e) => upd("seller_role", e.target.value)} className={`${inputCls} vc-select pr-10`}>
             <option value="Proprietar">Proprietar</option>
             <option value="Agent">Agent</option>
           </select>
@@ -318,7 +318,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         <Field label="Estimare utilități/lună"><input type="number" value={form.monthly_utilities_estimate} onChange={(e) => upd("monthly_utilities_estimate", e.target.value)} className={inputCls} /></Field>
         <Field label="Întreținere/lună"><input type="number" value={form.maintenance_fee} onChange={(e) => upd("maintenance_fee", e.target.value)} className={inputCls} /></Field>
         <Field label="Corectitudine preț">
-          <select value={form.price_fairness} onChange={(e) => upd("price_fairness", e.target.value)} className={inputCls}>
+          <select value={form.price_fairness} onChange={(e) => upd("price_fairness", e.target.value)} className={`${inputCls} vc-select pr-10`}>
             {FAIRNESS.map((f) => <option key={f.v} value={f.v}>{f.label}</option>)}
           </select>
         </Field>
@@ -358,7 +358,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
           <p className={sectionCls}>Badge-uri & verificări (admin)</p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <Field label="Nivel verificare">
-              <select value={form.verification_level} onChange={(e) => upd("verification_level", e.target.value)} className={inputCls}>
+              <select value={form.verification_level} onChange={(e) => upd("verification_level", e.target.value)} className={`${inputCls} vc-select pr-10`}>
                 {VERIF.map((v) => <option key={v.v} value={v.v}>{v.label}</option>)}
               </select>
             </Field>

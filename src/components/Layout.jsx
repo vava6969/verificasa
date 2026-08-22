@@ -38,7 +38,10 @@ export default function Layout() {
     <>
       <div className="flex min-h-screen flex-col overflow-x-clip bg-background">
         <Header />
-        <main className="flex-1 overflow-x-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
+        {/* Spatiul de sub bara fixa s-a mutat pe <footer> — vezi comentariul de
+            acolo. Aici lasa o gaura intre continut si subsol si tot nu salva
+            ultimul rand al subsolului, fiindca subsolul e in afara lui <main>. */}
+        <main className="flex-1 overflow-x-hidden">
           <Outlet />
         </main>
         <Footer />

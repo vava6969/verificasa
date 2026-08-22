@@ -83,7 +83,7 @@ export default function RecommendedListings() {
           {Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} className="h-56 rounded" />)}
         </div>
       ) : sorted.length === 0 ? (
-        <div className="mt-8 rounded border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
+        <div className="mt-8 rounded border border-dashed border-border py-9 text-center text-sm text-muted-foreground sm:py-16">
           {en ? "No listings yet." : "Niciun anunț momentan."}
         </div>
       ) : (

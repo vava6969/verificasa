@@ -254,7 +254,7 @@ export default function Admin() {
 
   if (isAuthenticated && !isAllowed) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+      <div className="mx-auto max-w-3xl px-4 py-10 text-center sm:py-20">
         <ShieldAlert className="mx-auto h-10 w-10 text-destructive" />
         <h1 className="mt-3 font-heading text-2xl font-bold text-navy dark:text-foreground">Acces restrictionat</h1>
         <p className="mt-1 text-sm text-muted-foreground">Doar administratorii pot accesa acest panou.</p>
@@ -547,7 +547,7 @@ export default function Admin() {
                       value={u.role || "user"}
                       onChange={(e) => changeRole(u, e.target.value)}
                       disabled={u.id === user.id || !isSuper}
-                      className="rounded border border-border bg-white px-3 py-1.5 text-xs font-semibold outline-none focus:border-emerald disabled:opacity-60 dark:bg-card"
+                      className="vc-select vc-select-sm rounded border border-border bg-white py-1.5 pl-3 pr-7 text-xs font-semibold outline-none focus:border-emerald disabled:opacity-60 dark:bg-card"
                     >
                       {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
                     </select>

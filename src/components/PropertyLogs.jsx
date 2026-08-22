@@ -91,7 +91,7 @@ export default function PropertyLogs({ properties = [], audit = [], comments = [
 
       <div className="rounded border border-border bg-white p-4 dark:bg-card">
         {!pid ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="flex flex-col items-center justify-center py-9 text-center sm:py-16">
             <History className="h-8 w-8 text-muted-foreground/50" />
             <p className="mt-2 text-sm text-muted-foreground">Selectează o proprietate pentru a vedea istoricul acțiunilor:</p>
             <p className="mt-1 text-xs text-muted-foreground/70">cine a aprobat/respins anunțul, cine a trimis cereri de închiriere, cine a comentat.</p>

@@ -96,7 +96,7 @@ export default function ReportModal({
               <select
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="mt-1 w-full rounded border border-border bg-secondary/30 px-3 py-2.5 text-sm outline-none focus:border-mint"
+                className="vc-select mt-1 w-full rounded border border-border bg-secondary/30 py-2.5 pl-3 pr-10 text-sm outline-none focus:border-mint"
               >
                 <option value="">Selectează motivul…</option>
                 {REASONS.map((r) => <option key={r} value={r}>{r}</option>)}

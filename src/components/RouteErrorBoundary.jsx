@@ -33,7 +33,7 @@ export default class RouteErrorBoundary extends React.Component {
     if (!this.state.error) return this.props.children;
 
     return (
-      <div className="mx-auto max-w-2xl px-4 py-20 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 sm:py-20 lg:px-8">
         <p className="text-[13px] font-semibold text-muted-foreground">Eroare</p>
         <h1 className="mt-1 font-heading text-2xl font-semibold text-foreground sm:text-3xl">
           Pagina nu a putut fi afișată

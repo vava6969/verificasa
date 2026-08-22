@@ -108,7 +108,7 @@ export default function PropertyCard({ property, hot = false, coverMap }) {
   };
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl">
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl active:scale-[0.985] active:shadow-md">
       <div
         className="relative aspect-[4/3] cursor-pointer overflow-hidden touch-pan-y"
         onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
@@ -148,7 +148,7 @@ export default function PropertyCard({ property, hot = false, coverMap }) {
           onClick={toggleSave}
           aria-label={saved ? t("pd_unsaved") : t("pd_saved_toast")}
           disabled={savePending}
-          className="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/92 text-neutral-700 shadow-[0_1px_3px_rgba(0,0,0,0.25)] transition-transform hover:scale-105 disabled:opacity-60 dark:bg-neutral-900/90 dark:text-neutral-200"
+          className="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/92 text-neutral-700 shadow-[0_1px_3px_rgba(0,0,0,0.25)] transition-transform duration-200 ease-out hover:scale-105 active:scale-90 disabled:opacity-60 dark:bg-neutral-900/90 dark:text-neutral-200"
         >
           <Heart className={`h-[18px] w-[18px] ${saved ? "fill-rose-500 text-rose-500" : ""}`} />
         </button>
@@ -229,7 +229,7 @@ export default function PropertyCard({ property, hot = false, coverMap }) {
               onClick={(e) => e.stopPropagation()}
               title={t("pc_call")}
               aria-label={t("pc_call")}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-emerald hover:text-emerald"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-foreground transition-[transform,border-color,color] duration-200 ease-out hover:border-emerald hover:text-emerald active:scale-90 active:border-emerald active:text-emerald"
             >
               <Phone className="h-[18px] w-[18px]" />
             </a>
@@ -238,7 +238,7 @@ export default function PropertyCard({ property, hot = false, coverMap }) {
             onClick={handleMessage}
             title={t("pc_message")}
             aria-label={t("pc_message")}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald text-primary-foreground transition-transform hover:scale-105"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald text-primary-foreground transition-transform duration-200 ease-out hover:scale-105 active:scale-90"
           >
             <MessageCircle className="h-[18px] w-[18px]" />
           </button>

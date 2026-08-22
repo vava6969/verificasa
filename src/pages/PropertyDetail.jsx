@@ -104,7 +104,7 @@ export default function PropertyDetail() {
 
   if (!property) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl px-4 py-10 text-center sm:px-6 sm:py-20 lg:px-8">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
           <MapPin className="h-8 w-8 text-muted-foreground/50" />
         </div>

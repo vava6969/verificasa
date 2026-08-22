@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { useReducedMotion } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -12,9 +13,15 @@ const EASE = [0.16, 1, 0.3, 1];
 // no icon tiles. The trigger carries the unread badge; the menu includes
 // Notificări so the badge leads somewhere. Every row is a 44px rounded target.
 //
-// Mișcarea: panoul crește din colțul din dreapta-sus, adică fix de sub buton, iar
-// rândurile alunecă unul după altul, la 30ms distanță. Scara dinspre trigger
-// arată DE UNDE a venit panoul; decalajul dă ochiului timp să prindă lista.
+// Mișcarea: panoul crește din colțul din dreapta-sus, adică fix de sub buton,
+// depășește puțin ținta și se așază înapoi; rândurile intră dinspre dreapta,
+// unul după altul, la 55ms distanță. Scara dinspre trigger arată DE UNDE a venit
+// panoul; decalajul dă ochiului timp să prindă lista. În spate se lasă un scrim,
+// ca deschiderea meniului să se vadă și cu coada ochiului.
+//
+// Fiecare rând răspunde și la `active:`, nu doar la `hover:`. Pe telefon
+// `(hover: none)` e adevărat, deci un meniu care se mișcă numai la hover nu se
+// mișcă deloc — exact reclamația „nu se întâmplă nimic când apăs".
 //
 // Animația e în CSS (vc-menu-panel / vc-menu-row în index.css), NU pe
 // framer-motion. Motivul e măsurat, nu teoretic: cu framer, panoul și toate cele
@@ -73,7 +80,7 @@ export default function SiteNavMenu() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="relative flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:border-emerald sm:h-9 sm:w-9"
+        className="relative flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-[transform,border-color,background-color] duration-200 ease-out hover:border-emerald active:scale-90 active:border-emerald sm:h-9 sm:w-9"
         aria-label={en ? "Menu" : "Meniu"}
         aria-expanded={open}
       >
@@ -101,9 +108,24 @@ export default function SiteNavMenu() {
         )}
       </button>
 
+      {/* Umbra care intuneca pagina cat timp meniul e deschis. Nu prinde clicuri:
+          handlerul de mousedown de mai sus inchide oricum meniul, iar un scrim
+          care ar inghiti primul tap ar face meniul sa para blocat.
+
+          Merge prin portal in <body> pentru ca antetul are `transition-transform`,
+          deci un `transform` calculat chiar si in repaus — masurat: `matrix(1,0,0,1,0,0)`.
+          Orice transform diferit de `none` face elementul bloc-container pentru
+          descendentii `fixed`, asa ca un scrim scris aici se intindea pe cei 57px
+          ai antetului, nu pe ecran. Sub z-50 al antetului, deci panoul ramane
+          deasupra si antetul ramane luminat. */}
+      {open && !reduced && createPortal(
+        <div className="vc-menu-scrim pointer-events-none fixed inset-0 z-40 bg-foreground/15" aria-hidden="true" />,
+        document.body
+      )}
+
       {open && (
         <div
-          className={`absolute right-0 top-[calc(100%+8px)] z-50 max-h-[calc(100vh-5rem)] w-60 overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-2 shadow-lg ${reduced ? "" : "vc-menu-panel"}`}
+          className={`absolute right-0 top-[calc(100%+8px)] z-50 max-h-[calc(100vh-5rem)] w-60 overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-2 shadow-2xl ${reduced ? "" : "vc-menu-panel"}`}
           role="menu"
         >
           {items.map((it, i) => (
@@ -112,16 +134,16 @@ export default function SiteNavMenu() {
               type="button"
               role="menuitem"
               onClick={() => go(it.path)}
-              style={reduced ? undefined : { animationDelay: `${0.04 + i * 0.03}s` }}
-              className={`group flex min-h-[44px] w-full items-center justify-between gap-3 rounded-xl px-3.5 text-left text-sm font-semibold text-foreground transition-colors duration-200 hover:bg-secondary hover:text-emerald active:scale-[0.985] ${reduced ? "" : "vc-menu-row"}`}
+              style={reduced ? undefined : { animationDelay: `${0.05 + i * 0.055}s` }}
+              className={`group flex min-h-[44px] w-full items-center justify-between gap-3 rounded-xl px-3.5 text-left text-sm font-semibold text-foreground transition-[transform,background-color,color] duration-200 ease-out hover:bg-secondary hover:text-emerald active:scale-[0.96] active:bg-secondary active:text-emerald ${reduced ? "" : "vc-menu-row"}`}
             >
               {/* Eticheta alunecă 2px la hover — atât cât să se simtă că rândul
                   răspunde, fără să miște rândurile de deasupra sau dedesubt. */}
-              <span className="transition-transform duration-200 ease-out group-hover:translate-x-0.5">
+              <span className="transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-active:translate-x-1">
                 {it.label}
               </span>
               {it.badge && (
-                <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-emerald px-1.5 text-[10px] font-bold leading-none text-primary-foreground transition-transform duration-200 group-hover:scale-110 tnum">
+                <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-emerald px-1.5 text-[10px] font-bold leading-none text-primary-foreground transition-transform duration-200 group-hover:scale-110 group-active:scale-110 tnum">
                   {it.badge}
                 </span>
               )}

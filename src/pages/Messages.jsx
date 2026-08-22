@@ -180,7 +180,7 @@ export default function Messages() {
             {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-[72px] rounded-2xl" />)}
           </div>
         ) : filteredConvs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
+          <div className="flex flex-col items-center justify-center gap-3 px-5 py-9 text-center sm:px-6 sm:py-16">
             <img
               src="/images/generated/icon-chat.png"
               alt=""

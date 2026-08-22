@@ -135,7 +135,7 @@ export default function MyProperties() {
 
   if (properties === null) {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <Skeleton className="h-9 w-56 rounded-full" />
         <div className="mt-6 space-y-3">
           {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-36 rounded-2xl" />)}
@@ -144,8 +144,10 @@ export default function MyProperties() {
     );
   }
 
+  const empty = properties.length === 0;
+
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-heading text-2xl font-semibold text-foreground sm:text-3xl">
@@ -156,22 +158,29 @@ export default function MyProperties() {
             {en ? "boosts available" : "boost-uri disponibile"}
           </p>
         </div>
-        <Button asChild className="min-h-[44px] rounded-full bg-emerald px-5 text-primary-foreground hover:bg-emerald/90">
-          <Link to="/post-property">{en ? "Add a listing" : "Adaugă anunț"}</Link>
-        </Button>
+        {!empty && (
+          <Button asChild className="min-h-[44px] rounded-full bg-emerald px-5 text-primary-foreground hover:bg-emerald/90">
+            <Link to="/post-property">{en ? "Add a listing" : "Adaugă anunț"}</Link>
+          </Button>
+        )}
       </div>
 
-      {properties.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-border bg-card px-6 py-16 text-center">
+      {empty ? (
+        <div className="mt-5 rounded-2xl border border-dashed border-border bg-card px-5 py-9 text-center sm:mt-8 sm:px-6 sm:py-14">
           <p className="font-heading text-lg font-semibold text-foreground sm:text-xl">
             {en ? "Nothing published yet." : "Nu ai adăugat niciun anunț încă."}
           </p>
-          <Button asChild className="mt-4 min-h-[44px] rounded-full bg-emerald px-5 text-primary-foreground hover:bg-emerald/90">
+          <p className="mx-auto mt-2 max-w-[34ch] text-sm leading-relaxed text-muted-foreground">
+            {en
+              ? "Five steps to publish. We verify the listing before it shows up in search."
+              : "Îl publici în cinci pași, iar noi îl verificăm înainte să apară în căutare."}
+          </p>
+          <Button asChild className="mt-5 min-h-[44px] rounded-full bg-emerald px-6 text-primary-foreground hover:bg-emerald/90">
             <Link to="/post-property">{en ? "Add a listing" : "Adaugă anunț"}</Link>
           </Button>
         </div>
       ) : (
-        <RevealGroup className="mt-8 space-y-3">
+        <RevealGroup className="mt-5 space-y-3 sm:mt-8">
           {properties.map((p) => {
             const boosted = p.boost_active;
             const boostUntil = p.boost_ends_date

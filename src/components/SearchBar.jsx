@@ -65,7 +65,7 @@ export default function SearchBar({ compact = false, onSubmitted }) {
         <div className="hidden h-8 w-px bg-border md:block" />
 
         <div className={inputCls}>
-          <select value={type} onChange={(e) => setType(e.target.value)} className="w-full cursor-pointer bg-transparent text-sm text-foreground outline-none">
+          <select value={type} onChange={(e) => setType(e.target.value)} className="vc-select vc-select-flush w-full cursor-pointer bg-transparent pr-6 text-sm text-foreground outline-none">
             {types.map((tp) => <option key={tp.value} value={tp.value}>{tp.label}</option>)}
           </select>
         </div>

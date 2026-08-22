@@ -70,22 +70,26 @@ function useInView({ once = true, disabled = false } = {}) {
   return [ref, !armed || shown];
 }
 
+// Cursa si durata sunt reglate pentru telefon, nu pentru monitor: pe un ecran de
+// 375px un salt de 18px pe 0.9s se citeste ca o estompare lenta, nu ca miscare.
+// Cursa mai lunga pe un timp mai scurt e ce face diferenta intre „se misca" si
+// „nu se intampla nimic". Scara e mica intentionat — cardul ajunge la locul lui,
+// nu sare in fata.
+const DUR = 0.72;
+
 function revealStyle(visible, y, delay) {
+  const transition = `opacity ${DUR}s ${EASE} ${delay}s, transform ${DUR}s ${EASE} ${delay}s`;
   if (visible) {
-    return {
-      opacity: 1,
-      transform: "none",
-      transition: `opacity 0.9s ${EASE} ${delay}s, transform 0.9s ${EASE} ${delay}s`,
-    };
+    return { opacity: 1, transform: "none", transition };
   }
   return {
     opacity: 0,
-    transform: `translateY(${y}px)`,
-    transition: `opacity 0.9s ${EASE} ${delay}s, transform 0.9s ${EASE} ${delay}s`,
+    transform: `translateY(${y}px) scale(0.975)`,
+    transition,
   };
 }
 
-export function Reveal({ children, className, delay = 0, y = 18, once = true, style, ...props }) {
+export function Reveal({ children, className, delay = 0, y = 28, once = true, style, ...props }) {
   const reduced = useReducedMotion();
   const [ref, visible] = useInView({ once, disabled: reduced });
 
@@ -127,7 +131,7 @@ export function RevealGroup({ children, className, stagger = 0.1, once = true, s
 
 // Children of a RevealGroup ride the group's own observer and only differ by
 // their transition-delay — one observer per row instead of one per card.
-export function RevealItem({ children, className, y = 14, style, ...props }) {
+export function RevealItem({ children, className, y = 24, style, ...props }) {
   const reduced = useReducedMotion();
   const group = useContext(StaggerContext);
   const ref = useRef(null);

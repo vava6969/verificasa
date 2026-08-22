@@ -368,19 +368,75 @@
      atinge opacitatea. Doar transform: în cel mai rău caz panoul e ușor micșorat
      și rândurile împinse 7px, adică vizibile. */
   @keyframes vc-menu-panel {
-    from { transform: translateY(-8px) scale(0.94); }
-    to   { transform: none; }
+    0%   { transform: translateY(-16px) scale(0.84); }
+    62%  { transform: translateY(3px) scale(1.025); }
+    100% { transform: none; }
   }
   @keyframes vc-menu-row {
-    from { transform: translateY(-7px); }
-    to   { transform: none; }
+    0%   { transform: translate3d(26px, -12px, 0) scale(0.92); }
+    68%  { transform: translate3d(-3px, 2px, 0) scale(1.015); }
+    100% { transform: none; }
+  }
+  /* Scrimul e singurul lucru de aici care are voie sa porneasca de la
+     `opacity: 0`, pentru ca e decor, nu continut: daca animatia nu apuca sa
+     ruleze, pagina din spate ramane pur si simplu neintunecata. */
+  @keyframes vc-menu-scrim {
+    from { opacity: 0; }
+    to   { opacity: 1; }
   }
   .vc-menu-panel {
-    animation: vc-menu-panel 0.26s var(--ease-house);
+    animation: vc-menu-panel 0.44s var(--ease-house);
     transform-origin: top right;
   }
   .vc-menu-row {
-    animation: vc-menu-row 0.3s var(--ease-house) backwards;
+    animation: vc-menu-row 0.46s var(--ease-house) backwards;
+  }
+  .vc-menu-scrim {
+    animation: vc-menu-scrim 0.3s ease-out;
+  }
+
+  /* ---- selectoare native ----
+     Sageata desenata de browser sta lipita de marginea din dreapta si nu poate
+     fi mutata din CSS: `padding-right` muta textul, nu sageata. Asa ca o
+     stingem si desenam noi una, la 14px de margine, ca sa nu mai atinga rotunjirea
+     pastilei. Culoarea vine din doua imagini, una pe tema, fiindca `currentColor`
+     nu se poate folosi intr-un `data:` URI. */
+  .vc-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23596369' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    background-size: 1rem 1rem;
+  }
+  .vc-select::-ms-expand { display: none; }
+  .dark .vc-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ABA69B' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  }
+  /* varianta compacta, pentru campurile de 12px din admin */
+  .vc-select-sm {
+    background-position: right 0.625rem center;
+    background-size: 0.875rem 0.875rem;
+  }
+  /* pentru selectoarele fara chenar propriu, asezate intr-un camp compus:
+     spatiul il da containerul, deci sageata sta lipita de marginea selectului */
+  .vc-select-flush {
+    background-position: right 0 center;
+  }
+
+  /* ---- banda de fotografii care se plimba (PhotoMarquee) ----
+     Pista contine lista de doua ori si se muta cu exact -50%: cand se termina
+     prima copie, a doua e fix unde era prima la inceput. Linear, nu ease-house:
+     o banda continua nu are voie sa accelereze si sa franeze la fiecare tura.
+     Doar transform, ca la meniu — daca animatia nu apuca sa ruleze, banda e o
+     fotografie oprita, nu o caseta goala. */
+  @keyframes vc-marquee {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(-50%, 0, 0); }
+  }
+  .vc-marquee {
+    animation: vc-marquee 42s linear infinite;
   }
 
   /* generated paper grain (SVG turbulence, no stock textures) */

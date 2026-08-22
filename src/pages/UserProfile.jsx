@@ -401,7 +401,7 @@ export default function UserProfile() {
           loadingProps ? (
             <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-emerald" /></div>
           ) : properties.length === 0 ? (
-            <div className="py-16 text-center text-sm text-muted-foreground">{t("up_no_listings")}</div>
+            <div className="py-9 text-center text-sm text-muted-foreground sm:py-16">{t("up_no_listings")}</div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {properties.map((p) => <PropertyCard key={p.id} property={p} coverMap={coverMap} />)}
@@ -413,7 +413,7 @@ export default function UserProfile() {
           loadingRatings ? (
             <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-emerald" /></div>
           ) : count === 0 ? (
-            <div className="py-16 text-center">
+            <div className="py-9 text-center sm:py-16">
               <div className="mx-auto flex justify-center"><RatingStars rating={1} size="lg" /></div>
               <p className="mt-3 text-sm text-muted-foreground">{t("up_no_reviews")}</p>
               {!isOwnProfile && user && (
