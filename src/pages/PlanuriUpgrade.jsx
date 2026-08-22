@@ -203,10 +203,27 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en, free = false, onTie
       onMouseLeave={leave}
       onFocus={enter}
       onBlur={leave}
-      className={`relative flex h-full flex-col overflow-visible border-neutral-200 transition-transform duration-300 ease-out dark:border-white/10 ${
-        popular ? "bg-emerald/5 ring-2 ring-emerald dark:bg-emerald/10" : "bg-white dark:bg-neutral-900"
+      className={`relative isolate flex h-full flex-col overflow-visible border-neutral-200 bg-white transition-transform duration-300 ease-out dark:border-white/10 dark:bg-neutral-900 ${
+        popular ? "ring-2 ring-emerald" : ""
       }`}
     >
+      {/* Cardul „Popular" era singurul TRANSPARENT: `bg-emerald/5` inseamna 5%
+          verde si 95% NIMIC, deci prin el se vedea pagina. Vecinii lui sunt
+          `bg-white`, opaci. Cat timp fundalul paginii e uniform nu se observa —
+          dar in clipa in care se aprinde fotografia treptei, ea razbate DOAR
+          prin cardul Pro. Acela se spala, isi pierde contrastul pe text si
+          arata ca o greseala langa trei carduri curate.
+          Cardul e acum opac ca toate celelalte, iar verdele e un strat pictat
+          INAUNTRUL lui. Nu poate sta pe aceeasi clasa: `cn()` din Card ruleaza
+          tailwind-merge, care vede `bg-white` si `bg-gradient-*` drept acelasi
+          lucru si o arunca pe prima — verificat, `bg-white` disparea din lista
+          de clase si fundalul redevenea transparent. */}
+      {popular && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit] bg-emerald/5 dark:bg-emerald/10"
+        />
+      )}
       {/* Insigna atarnata in colt exista doar de la sm in sus. Pe telefon se
           suprapunea peste pastila „Popular" — masurat, 30px de acoperire pe
           cardul Pro — si oricum dubla iconita planului, care e chiar langa
@@ -343,10 +360,17 @@ function BoostCard({ pack, cheapestUnit, onBuy, pending, en }) {
 
   return (
     <Card
-      className={`relative flex h-full flex-col overflow-visible border-neutral-200 dark:border-white/10 ${
-        pack.popular ? "bg-emerald/5 ring-2 ring-emerald dark:bg-emerald/10" : "bg-white dark:bg-neutral-900"
+      className={`relative isolate flex h-full flex-col overflow-visible border-neutral-200 bg-white dark:border-white/10 dark:bg-neutral-900 ${
+        pack.popular ? "ring-2 ring-emerald" : ""
       }`}
     >
+      {/* Acelasi strat opac ca pe cardul de plan „Popular". */}
+      {pack.popular && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit] bg-emerald/5 dark:bg-emerald/10"
+        />
+      )}
       {best && (
         <span className="absolute -top-3 left-4 z-20 rounded-full bg-gradient-to-t from-emerald to-emerald/80 px-3 py-1 text-xs font-semibold text-white shadow shadow-emerald/50">
           {en ? "Best rate" : "Cel mai bun preț"}
