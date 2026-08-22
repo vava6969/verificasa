@@ -23,31 +23,40 @@ export const EMPTY_FORM = {
   parking: false, pet_friendly: false, commission_free: false,
 };
 
+// `label` e ȘI text de interfață, ȘI valoarea salvată în `features` (vezi mai
+// jos, în buildPropertyPayload). Deci nu se traduce în loc: `label_en` e strict
+// pentru afișare, iar în bază intră mereu varianta românească. Altfel aceeași
+// dotare ar exista în două grafii și filtrele de căutare s-ar rupe.
 export const CHIP_OPTS = [
-  { key: "wifi", icon: Wifi, label: "Internet / Wi-Fi", feature: "Internet / Wi-Fi" },
-  { key: "noise", icon: VolumeX, label: "Zonă liniștită", feature: "Zonă liniștită" },
-  { key: "light", icon: Sun, label: "Orientare / Luminozitate", feature: "Orientare Sud" },
-  { key: "water", icon: Droplet, label: "Presiune apă verificată", feature: "Presiune apă OK" },
+  { key: "wifi", icon: Wifi, label: "Internet / Wi-Fi", label_en: "Internet / Wi-Fi", feature: "Internet / Wi-Fi" },
+  { key: "noise", icon: VolumeX, label: "Zonă liniștită", label_en: "Quiet area", feature: "Zonă liniștită" },
+  { key: "light", icon: Sun, label: "Orientare / Luminozitate", label_en: "Aspect / Daylight", feature: "Orientare Sud" },
+  { key: "water", icon: Droplet, label: "Presiune apă verificată", label_en: "Water pressure checked", feature: "Presiune apă OK" },
 ];
 
 export const FACILITY_OPTS = [
-  { key: "ac", icon: Snowflake, label: "Aer Condiționat" },
-  { key: "balcon", icon: Sunset, label: "Balcon" },
-  { key: "lift", icon: ArrowUpDown, label: "Lift" },
-  { key: "centrala", icon: Flame, label: "Centrală proprie" },
-  { key: "termopan", icon: Layers, label: "Geamuri Termopan" },
-  { key: "mobilat", icon: Armchair, label: "Mobilat complet" },
-  { key: "bucatarie", icon: ChefHat, label: "Bucătărie utilată" },
-  { key: "tv", icon: Tv, label: "Smart TV" },
-  { key: "masina_spalat", icon: Shirt, label: "Mașină de spălat" },
-  { key: "terasa", icon: Trees, label: "Terasă / Grădină" },
+  { key: "ac", icon: Snowflake, label: "Aer Condiționat", label_en: "Air conditioning" },
+  { key: "balcon", icon: Sunset, label: "Balcon", label_en: "Balcony" },
+  { key: "lift", icon: ArrowUpDown, label: "Lift", label_en: "Lift" },
+  { key: "centrala", icon: Flame, label: "Centrală proprie", label_en: "Own boiler" },
+  { key: "termopan", icon: Layers, label: "Geamuri Termopan", label_en: "Double glazing" },
+  { key: "mobilat", icon: Armchair, label: "Mobilat complet", label_en: "Fully furnished" },
+  { key: "bucatarie", icon: ChefHat, label: "Bucătărie utilată", label_en: "Fitted kitchen" },
+  { key: "tv", icon: Tv, label: "Smart TV", label_en: "Smart TV" },
+  { key: "masina_spalat", icon: Shirt, label: "Mașină de spălat", label_en: "Washing machine" },
+  { key: "terasa", icon: Trees, label: "Terasă / Grădină", label_en: "Terrace / Garden" },
 ];
 
 export const OPTION_OPTS = [
-  { key: "parking", icon: Car, label: "Parcare" },
-  { key: "pet_friendly", icon: PawPrint, label: "Pet Friendly" },
-  { key: "commission_free", icon: Tag, label: "Fără Comision" },
+  { key: "parking", icon: Car, label: "Parcare", label_en: "Parking" },
+  { key: "pet_friendly", icon: PawPrint, label: "Pet Friendly", label_en: "Pet friendly" },
+  { key: "commission_free", icon: Tag, label: "Fără Comision", label_en: "No commission" },
 ];
+
+/** Eticheta de AFIȘARE a unei opțiuni. Valoarea salvată rămâne `label`. */
+export function optLabel(opt, en) {
+  return (en && opt.label_en) || opt.label;
+}
 
 // Builds the Property entity payload from wizard/form state.
 export function buildPropertyPayload({ form, chips, facilities, country, user, isAdmin, property_code }) {

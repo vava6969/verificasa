@@ -1,6 +1,7 @@
 import React from "react";
 import { Chip } from "./wizardUi";
-import { CHIP_OPTS, FACILITY_OPTS, OPTION_OPTS } from "@/lib/propertyPayload";
+import { CHIP_OPTS, FACILITY_OPTS, OPTION_OPTS, optLabel } from "@/lib/propertyPayload";
+import { useWiz } from "./wizardCopy";
 
 const Group = ({ title, note, children }) => (
   <div>
@@ -11,23 +12,25 @@ const Group = ({ title, note, children }) => (
 );
 
 export default function StepFeatures({ form, set, chips, setChips, facilities, setFacilities }) {
+  const { w, en } = useWiz();
+
   return (
     <div className="space-y-6">
-      <Group title="Facilități verificate" note="Apar evidențiate în pagina anunțului.">
+      <Group title={w.f_verified} note={w.f_verified_note}>
         {CHIP_OPTS.map((c) => (
-          <Chip key={c.key} icon={c.icon} label={c.label} active={!!chips[c.key]} onClick={() => setChips((s) => ({ ...s, [c.key]: !s[c.key] }))} />
+          <Chip key={c.key} icon={c.icon} label={optLabel(c, en)} active={!!chips[c.key]} onClick={() => setChips((s) => ({ ...s, [c.key]: !s[c.key] }))} />
         ))}
       </Group>
 
-      <Group title="Dotări">
+      <Group title={w.f_amenities}>
         {FACILITY_OPTS.map((c) => (
-          <Chip key={c.key} icon={c.icon} label={c.label} active={!!facilities[c.key]} onClick={() => setFacilities((s) => ({ ...s, [c.key]: !s[c.key] }))} />
+          <Chip key={c.key} icon={c.icon} label={optLabel(c, en)} active={!!facilities[c.key]} onClick={() => setFacilities((s) => ({ ...s, [c.key]: !s[c.key] }))} />
         ))}
       </Group>
 
-      <Group title="Opțiuni" note="Apar automat în filtrele de căutare.">
+      <Group title={w.f_options} note={w.f_options_note}>
         {OPTION_OPTS.map((c) => (
-          <Chip key={c.key} icon={c.icon} label={c.label} active={!!form[c.key]} onClick={() => set({ [c.key]: !form[c.key] })} />
+          <Chip key={c.key} icon={c.icon} label={optLabel(c, en)} active={!!form[c.key]} onClick={() => set({ [c.key]: !form[c.key] })} />
         ))}
       </Group>
     </div>

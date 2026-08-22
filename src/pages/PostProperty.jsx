@@ -7,6 +7,7 @@ import PropertyWizard from "@/components/postproperty/PropertyWizard";
 import LanguageToggle from "@/components/LanguageToggle";
 import BoostDialog from "@/components/BoostDialog";
 import { useCountry } from "@/components/CountryContext";
+import { useWiz } from "@/components/postproperty/wizardCopy";
 import { useAuth } from "@/lib/AuthContext";
 import { fetchBoostBalance } from "@/lib/boosts";
 import { BOOST_DURATION_DAYS } from "@/lib/plans";
@@ -18,6 +19,7 @@ export default function PostProperty() {
   const [boosting, setBoosting] = useState(false);
   const { lang } = useCountry();
   const { user } = useAuth();
+  const { w } = useWiz();
   const en = lang === "en";
 
   // Soldul se citește după publicare, nu la intrarea în formular: până nu
@@ -49,11 +51,11 @@ export default function PostProperty() {
             <LanguageToggle />
             <Link
               to="/"
-              aria-label={en ? "Back to site" : "Înapoi la site"}
+              aria-label={w.back_to_site}
               className="flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted-foreground transition hover:bg-secondary hover:text-emerald"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">{en ? "Back to site" : "Înapoi la site"}</span>
+              <span className="hidden sm:inline">{w.back_to_site}</span>
             </Link>
           </div>
         </div>
@@ -68,9 +70,9 @@ export default function PostProperty() {
               aria-hidden="true"
               className="mx-auto h-16 w-16 object-contain"
             />
-            <h1 className="mt-4 font-heading text-2xl font-bold text-navy dark:text-foreground">{en ? "Listing sent for approval" : "Anunț trimis spre aprobare"}</h1>
+            <h1 className="mt-4 font-heading text-2xl font-bold text-navy dark:text-foreground">{w.ok_t}</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              {en ? "We check it, and it goes public once approved." : "Îl verificăm și apare public după aprobare."}
+              {w.ok_d}
             </p>
             {/* PROMOVARE — ultimul pas al fluxului de publicare.
                 Până acum nu exista nicăieri în „adaugă un anunț" un moment în
@@ -148,10 +150,10 @@ export default function PostProperty() {
           <>
             <div className="mb-4 mt-2">
               <h1 className="font-heading text-2xl font-bold text-navy dark:text-foreground sm:text-3xl">
-                Publică-ți proprietatea
+                {w.page_h}
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Durează ~3 minute. Te ghidăm pas cu pas.
+                {w.page_sub}
               </p>
             </div>
             <PropertyWizard

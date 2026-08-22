@@ -19,19 +19,16 @@ import StepLocation from "./StepLocation";
 import StepDetails from "./StepDetails";
 import StepFeatures from "./StepFeatures";
 import StepPhotos from "./StepPhotos";
+import { useWiz } from "./wizardCopy";
 
-const STEPS = [
-  { id: 0, title: "Ce publici",      sub: "Tipul anunțului și titlul" },
-  { id: 1, title: "Locație",         sub: "Unde se află proprietatea" },
-  { id: 2, title: "Detalii",         sub: "Preț, spațiu, descriere" },
-  { id: 3, title: "Facilități",      sub: "Ce oferă locuința" },
-  { id: 4, title: "Poze & contact",  sub: "Ultimul pas" },
-];
+const STEP_COUNT = 5;
 
 const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 
 export default function PropertyWizard({ onDone, onCancel }) {
-  const { country, lang } = useCountry();
+  const { country } = useCountry();
+  const { w } = useWiz();
+  const STEPS = w.steps;
   const reduced = useReducedMotion();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -61,13 +58,13 @@ export default function PropertyWizard({ onDone, onCancel }) {
       const existing = form.images ? form.images.split(",").filter(Boolean) : [];
       const remaining = Math.max(0, MAX_PHOTOS - existing.length);
       if (remaining === 0) {
-        toast({ title: `Ai atins maximul de ${MAX_PHOTOS} poze`, variant: "destructive" });
+        toast({ title: w.err_max_photos(MAX_PHOTOS), variant: "destructive" });
         return;
       }
       const urls = await uploadPhotos(files, remaining);
       set({ images: [...existing, ...urls].join(",") });
     } catch {
-      toast({ title: "Încărcarea pozelor a eșuat", variant: "destructive" });
+      toast({ title: w.err_upload, variant: "destructive" });
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -75,12 +72,12 @@ export default function PropertyWizard({ onDone, onCancel }) {
   };
 
   const validateStep = (s) => {
-    if (s === 0 && !form.title.trim()) return "Adaugă un titlu pentru anunț.";
-    if (s === 1 && !form.city) return "Alege orașul.";
+    if (s === 0 && !form.title.trim()) return w.err_title;
+    if (s === 1 && !form.city) return w.err_city;
     if (s === 2) {
-      if (!form.price_monthly) return "Completează prețul.";
-      if (!form.surface_sqm) return "Completează suprafața.";
-      if (!form.floor) return "Completează etajul.";
+      if (!form.price_monthly) return w.err_price;
+      if (!form.surface_sqm) return w.err_surface;
+      if (!form.floor) return w.err_floor;
     }
     return null;
   };
@@ -98,7 +95,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
   const next = () => {
     const err = validateStep(step);
     if (err) { toast({ title: err, variant: "destructive" }); return; }
-    setStep((s) => Math.min(STEPS.length - 1, s + 1));
+    setStep((s) => Math.min(STEP_COUNT - 1, s + 1));
     scrollTop();
   };
   const back = () => {
@@ -112,9 +109,9 @@ export default function PropertyWizard({ onDone, onCancel }) {
       const err = validateStep(s);
       if (err) { setStep(s); toast({ title: err, variant: "destructive" }); throw new Error(err); }
     }
-    if (imagesCount < MIN_PHOTOS) { toast({ title: `Încarcă cel puțin ${MIN_PHOTOS} poze`, variant: "destructive" }); throw new Error("photos"); }
-    if (!form.phone) { toast({ title: "Completează numărul de telefon", variant: "destructive" }); throw new Error("phone"); }
-    if (!agreed) { toast({ title: "Acceptă termenii pentru a publica", variant: "destructive" }); throw new Error("terms"); }
+    if (imagesCount < MIN_PHOTOS) { toast({ title: w.err_photos(MIN_PHOTOS), variant: "destructive" }); throw new Error("photos"); }
+    if (!form.phone) { toast({ title: w.err_phone, variant: "destructive" }); throw new Error("phone"); }
+    if (!agreed) { toast({ title: w.err_terms, variant: "destructive" }); throw new Error("terms"); }
 
     // Limitele planului se verifică server-side înainte de publicare — altfel
     // planurile vând „1 anunț activ" fără ca nimic să îl impună.
@@ -124,8 +121,8 @@ export default function PropertyWizard({ onDone, onCancel }) {
         const data = res?.data || res || {};
         if (data.allowed === false) {
           toast({
-            title: "Ai atins limita planului",
-            description: data.error || "Treci pe un plan superior ca să publici mai multe anunțuri.",
+            title: w.err_limit_t,
+            description: data.error || w.err_limit_d,
             variant: "destructive",
           });
           throw new Error("allowance");
@@ -148,8 +145,8 @@ export default function PropertyWizard({ onDone, onCancel }) {
     }
     callFnQuiet("ComputeTrustScore", { property_id: created.id });
     toast(isAdmin
-      ? { title: "Anunț publicat", description: "Este vizibil acum în lista publică." }
-      : { title: "Anunț trimis spre aprobare", description: "Un administrator îl va verifica în curând." });
+      ? { title: w.ok_admin_t, description: w.ok_admin_d }
+      : { title: w.ok_t, description: w.ok_d });
 
     // Confetti bursting from the publish button.
     const el = publishRef.current;
@@ -178,7 +175,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
         <div className="flex items-baseline justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs font-semibold text-emerald">
-              Pasul {step + 1} din {STEPS.length}
+              {w.step_of(step + 1, STEP_COUNT)}
             </p>
             <h2 className="truncate font-heading text-lg font-bold text-navy dark:text-foreground">{Current.title}</h2>
           </div>
@@ -189,7 +186,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
           className="relative mt-4 h-2 w-full overflow-hidden rounded-full bg-secondary"
           role="progressbar"
           aria-valuemin={1}
-          aria-valuemax={STEPS.length}
+          aria-valuemax={STEP_COUNT}
           aria-valuenow={step + 1}
         >
           <motion.div
@@ -215,7 +212,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
               >
                 {i < step ? <Check className="h-3 w-3" /> : i + 1}
               </span>
-              {i < STEPS.length - 1 && (
+              {i < STEP_COUNT - 1 && (
                 <span className={`mx-1 h-0.5 flex-1 rounded-full transition-colors duration-500 ${i < step ? "bg-emerald" : "bg-border"}`} />
               )}
             </React.Fragment>
@@ -240,9 +237,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
             {step === 4 && (
               <>
                 <p className="mb-4 rounded-xl bg-emerald-soft px-3.5 py-2.5 text-sm font-medium text-emerald">
-                  {lang === "en"
-                    ? "Real photos, taken on your phone. No renders."
-                    : "Poze reale, făcute cu telefonul. Fără randări."}
+                  {w.real_photos}
                 </p>
                 <StepPhotos form={form} set={set} uploading={uploading} onFiles={handleFile} agreed={agreed} setAgreed={setAgreed} />
               </>
@@ -259,27 +254,27 @@ export default function PropertyWizard({ onDone, onCancel }) {
           onClick={back}
           className="h-12 gap-1.5 rounded-full px-5"
         >
-          <ArrowLeft className="h-4 w-4" /> {step === 0 ? "Renunță" : "Înapoi"}
+          <ArrowLeft className="h-4 w-4" /> {step === 0 ? w.cancel : w.back}
         </Button>
-        {step < STEPS.length - 1 ? (
+        {step < STEP_COUNT - 1 ? (
           <Button
             type="button"
             onClick={next}
             className="h-12 flex-1 gap-1.5 rounded-full bg-emerald text-base text-white shadow-soft hover:bg-emerald/90"
           >
-            Continuă <ArrowRight className="h-4 w-4" />
+            {w.next} <ArrowRight className="h-4 w-4" />
           </Button>
         ) : (
           <span ref={publishRef} className="flex-1">
             <LoadingButton
               onAction={handlePublish}
               disabled={uploading}
-              pendingLabel="Se publică…"
-              successLabel="Publicat!"
-              errorLabel="Încearcă din nou"
+              pendingLabel={w.publishing}
+              successLabel={w.published}
+              errorLabel={w.retry}
               className="w-full rounded-full"
             >
-              Publică anunțul
+              {w.publish}
             </LoadingButton>
           </span>
         )}
