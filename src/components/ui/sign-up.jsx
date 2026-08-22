@@ -174,7 +174,7 @@ export function AuthComponent() {
 
       {error && <ErrorNote className="mt-3.5">{error}</ErrorNote>}
 
-      <form onSubmit={isSignup ? submitSignup : submitSignin} className="mt-3.5 space-y-2.5 sm:mt-5 sm:space-y-3.5">
+      <form onSubmit={isSignup ? submitSignup : submitSignin} className="mt-3 space-y-2 sm:mt-5 sm:space-y-3.5">
         <Field
           id="email"
           name="email"

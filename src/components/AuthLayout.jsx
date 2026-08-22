@@ -101,23 +101,29 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
         />
       </div>
 
-      {/* Comenzile de limbă și temă.
+      {/* Un singur rând sus: sigla în stânga, limba și tema în dreapta.
           Paginile de autentificare nu trec prin Layout, deci nu au Header — iar
           fără el nu exista niciun buton de limbă sau de zi/noapte pe primul
-          ecran pe care îl vede cineva. Stau sus-dreapta, peste fotografie,
-          deasupra cardului. */}
-      <div className="absolute right-3 top-3 z-20 flex items-center gap-2 sm:right-5 sm:top-5">
-        <LanguageToggle />
-        <ThemeToggle className="rounded-full" />
+          ecran pe care îl vede cineva.
+          Sigla stătea centrată deasupra cardului, în aceeași coloană cu el. Cât
+          timp formularul încăpea pe ecran, coloana îl centra și sigla rămânea
+          sub comenzi. Când nu încăpea — cont nou, pe un ecran scund — coloana
+          nu mai avea ce centra, sigla urca în rândul comenzilor și pastila de
+          limbă se așeza direct peste ea. Acum sunt în același rând, deci nu au
+          cum să se mai suprapună, iar coloana de dedesubt îi rezervă locul. */}
+      <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-4 py-2.5 sm:px-5 sm:py-4">
+        <Link to="/" className="tap-44 flex min-h-[32px] items-center">
+          <VerifiCasaLogo size={24} tone="light" tagline={false} />
+        </Link>
+        <div className="flex items-center gap-2">
+          <LanguageToggle />
+          <ThemeToggle className="rounded-full" />
+        </div>
       </div>
 
       {/* Card */}
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-4 sm:py-12">
-        <Link to="/" className="mb-3 tap-44 flex min-h-[32px] items-center sm:mb-6">
-          <VerifiCasaLogo size={26} tone="light" tagline={false} />
-        </Link>
-
-        <div className="dark w-full max-w-[21rem] rounded border border-white/15 bg-card/55 p-4 shadow-[0_26px_60px_-26px_rgba(0,0,0,0.8)] backdrop-blur-2xl backdrop-saturate-150 sm:max-w-[24rem] sm:p-7">
+      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 pb-[calc(var(--cookie-banner-h,0px)+1rem)] pt-[3.25rem] sm:pt-24">
+        <div className="dark w-full max-w-[21rem] rounded border border-white/15 bg-card/55 px-4 py-3.5 shadow-[0_26px_60px_-26px_rgba(0,0,0,0.8)] backdrop-blur-2xl backdrop-saturate-150 sm:max-w-[24rem] sm:p-7">
           <h1 className="font-heading text-lg font-extrabold tracking-tight text-foreground sm:text-2xl">
             {title}
           </h1>
@@ -125,7 +131,7 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
             <p className="mt-1 text-[13px] leading-snug text-muted-foreground sm:mt-1.5 sm:text-sm">{subtitle}</p>
           )}
 
-          <div className="mt-3.5 sm:mt-5">{children}</div>
+          <div className="mt-3 sm:mt-5">{children}</div>
         </div>
 
         {footer && <div className="mt-3 text-center text-[13px] text-white/85 sm:mt-5 sm:text-sm">{footer}</div>}

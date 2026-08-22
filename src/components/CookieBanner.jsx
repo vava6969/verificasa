@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Cookie, X, Check, ShieldCheck } from "lucide-react";
@@ -8,11 +8,33 @@ import { getConsent, setConsent } from "@/lib/cookieConsent";
 
 // GDPR cookie consent: banner with Accept-all / Reject / Preferences modal,
 // plus a floating "Cookie settings" button after consent is given.
+//
+// The banner is fixed to the bottom, so on any page that does not scroll it
+// simply lands on top of whatever is down there — on the sign up screen that
+// was the submit button, which made it unreachable, not just hidden. While it
+// is up it publishes its own height as --cookie-banner-h, and pages that have
+// to keep their last control clear of it pad by that much (see AuthLayout).
 export default function CookieBanner() {
   const { t } = useCountry();
   const [show, setShow] = useState(false);
   const [showPrefs, setShowPrefs] = useState(false);
   const [prefs, setPrefs] = useState({ functional: false, analytics: false });
+  const barRef = useRef(null);
+
+  // Measured, not guessed: the copy wraps to a different number of lines per
+  // language and the buttons drop to their own row under 640px.
+  useEffect(() => {
+    const root = document.documentElement;
+    const clear = () => root.style.setProperty("--cookie-banner-h", "0px");
+    if (!show) { clear(); return undefined; }
+    const bar = barRef.current;
+    if (!bar) return undefined;
+    const measure = () => root.style.setProperty("--cookie-banner-h", `${Math.ceil(bar.getBoundingClientRect().height)}px`);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(bar);
+    return () => { ro.disconnect(); clear(); };
+  }, [show]);
 
   useEffect(() => {
     const c = getConsent();
@@ -56,14 +78,15 @@ export default function CookieBanner() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 80, opacity: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 24 }}
-            className="fixed inset-x-0 bottom-0 z-50 px-4 pb-4 sm:pb-6"
+            ref={barRef}
+            className="fixed inset-x-0 bottom-0 z-50 px-3 pb-3 sm:px-4 sm:pb-6"
           >
-            <div className="mx-auto max-w-3xl rounded-2xl border border-emerald/30 bg-navy-deep/95 px-4 py-3.5 text-white shadow-soft sm:px-5">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald/20 text-emerald">
+            <div className="mx-auto max-w-3xl rounded-2xl border border-emerald/30 bg-navy-deep/95 px-3.5 py-2.5 text-white shadow-soft sm:px-5 sm:py-3.5">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-3">
+                <div className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald/20 text-emerald sm:flex">
                   <Cookie className="h-5 w-5" />
                 </div>
-                <p className="flex-1 text-xs leading-relaxed text-white/80 sm:text-sm">
+                <p className="flex-1 text-[11px] leading-snug text-white/80 sm:text-sm sm:leading-relaxed">
                   {t("cookie_msg")}{" "}
                   <Link to="/cookies" className="font-semibold text-emerald hover:underline">
                     {t("cookie_policy_link")}
@@ -73,14 +96,14 @@ export default function CookieBanner() {
                     {t("footer_privacy")}
                   </Link>.
                 </p>
-                <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
-                  <Button onClick={rejectAll} size="sm" variant="ghost" className="tap-44 h-10 flex-1 rounded-full text-white/70 sm:min-h-[44px] hover:bg-white/10 hover:text-white sm:flex-none">
+                <div className="flex w-full items-center gap-1.5 sm:w-auto sm:gap-2">
+                  <Button onClick={rejectAll} size="sm" variant="ghost" className="tap-44 h-9 flex-1 rounded-full text-xs text-white/70 hover:bg-white/10 hover:text-white sm:h-10 sm:min-h-[44px] sm:text-sm sm:flex-none">
                     {t("cookie_reject")}
                   </Button>
-                  <Button onClick={() => setShowPrefs(true)} size="sm" variant="outline" className="tap-44 h-10 flex-1 rounded-full border-white/20 sm:min-h-[44px] bg-transparent text-white hover:bg-white/10 hover:text-white sm:flex-none">
+                  <Button onClick={() => setShowPrefs(true)} size="sm" variant="outline" className="tap-44 h-9 flex-1 rounded-full border-white/20 bg-transparent text-xs text-white hover:bg-white/10 hover:text-white sm:h-10 sm:min-h-[44px] sm:text-sm sm:flex-none">
                     {t("cookie_prefs")}
                   </Button>
-                  <Button onClick={acceptAll} size="sm" className="tap-44 h-10 flex-1 rounded-full bg-emerald sm:min-h-[44px] font-bold text-primary-foreground hover:opacity-90 sm:flex-none">
+                  <Button onClick={acceptAll} size="sm" className="tap-44 h-9 flex-1 rounded-full bg-emerald text-xs font-bold text-primary-foreground hover:opacity-90 sm:h-10 sm:min-h-[44px] sm:text-sm sm:flex-none">
                     {t("cookie_accept")}
                   </Button>
                   <button onClick={rejectAll} className="tap-44 hidden h-9 w-9 items-center justify-center rounded-full text-white/50 hover:text-white sm:flex" aria-label="Close">
