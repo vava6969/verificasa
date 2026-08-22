@@ -30,7 +30,7 @@ export default function SearchFiltersDrawer({
   // `active:` pe langa `hover:`, ca pastila sa raspunda si sub deget: pe telefon
   // `(hover: none)` face starea de hover sa nu existe deloc.
   const chip = (active) =>
-    `flex min-h-[44px] items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition-[transform,background-color,border-color,color] duration-200 ease-out active:scale-[0.95] ${
+    `tap-44 flex min-h-[36px] items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition-[transform,background-color,border-color,color] duration-200 ease-out active:scale-[0.95] ${
       active ? "border-emerald bg-emerald text-white shadow-soft" : "border-border bg-background text-foreground/70 hover:border-emerald/50 dark:bg-card"
     }`;
 
@@ -68,10 +68,10 @@ export default function SearchFiltersDrawer({
       )}
 
       <Drawer open={open} onOpenChange={setOpen}>
-        <DrawerContent className="max-h-[88vh] rounded-t-3xl border-border px-4 pb-8">
+        <DrawerContent className="max-h-[88vh] rounded-t-3xl border-border px-4 pb-6 sm:pb-8">
           <DrawerTitle className="mt-4 px-1 font-heading text-base">{t("sr_advanced")}</DrawerTitle>
 
-          <div className="mt-4 space-y-5 overflow-y-auto px-1">
+          <div className="no-scrollbar mt-4 space-y-5 overflow-y-auto px-1">
             <div className="flex flex-wrap gap-2">
               {filters.map((f) => (
                 <button key={f.key} type="button" onClick={() => onToggle(f.key)} className={chip(activeFilters.has(f.key))}>

@@ -35,7 +35,7 @@ const inputCls =
 const lab = "text-xs font-semibold text-muted-foreground";
 const sectionCls = "mb-2 mt-5 font-heading text-sm font-bold text-navy dark:text-foreground";
 const checkCls =
-  "flex min-h-[44px] cursor-pointer items-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-medium text-foreground transition hover:border-emerald/50";
+  "tap-44 flex min-h-[36px] cursor-pointer items-center gap-2 rounded-full border border-border bg-card px-3.5 text-sm font-medium text-foreground transition hover:border-emerald/50";
 const boxCls = "h-4 w-4 shrink-0 rounded border-border accent-emerald";
 
 // Hoisted so it keeps a stable component identity between renders — declaring it
@@ -230,7 +230,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
               type="button"
               onClick={() => removeImage(i)}
               aria-label="Șterge poza"
-              className="absolute right-1 top-1 flex h-9 w-9 items-center justify-center rounded-full bg-navy-deep/75 text-white transition hover:bg-rose-600"
+              className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-navy-deep/75 text-white transition hover:bg-rose-600 sm:h-9 sm:w-9"
             >
               <Trash2 className="h-4 w-4" />
             </button>
@@ -271,7 +271,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
 
       {/* Specificații */}
       <p className={sectionCls}>Specificații</p>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Field label="Camere"><input type="number" value={form.rooms} onChange={(e) => upd("rooms", e.target.value)} className={inputCls} /></Field>
         <Field label="Suprafață (mp)"><input type="number" value={form.surface_sqm} onChange={(e) => upd("surface_sqm", e.target.value)} className={inputCls} /></Field>
         <Field label="Etaj"><input value={form.floor} onChange={(e) => upd("floor", e.target.value)} placeholder="ex: 2/4" className={inputCls} /></Field>

@@ -170,7 +170,7 @@ export function AuthComponent() {
 
       {error && <ErrorNote className="mt-5">{error}</ErrorNote>}
 
-      <form onSubmit={isSignup ? submitSignup : submitSignin} className="mt-5 space-y-4">
+      <form onSubmit={isSignup ? submitSignup : submitSignin} className="mt-4 space-y-3 sm:mt-5 sm:space-y-4">
         <Field
           id="email"
           name="email"
@@ -200,7 +200,7 @@ export function AuthComponent() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete={isSignup ? "new-password" : "current-password"}
-            className="h-12"
+            className="h-11 sm:h-12"
           />
           {isSignup && <p className="text-xs text-muted-foreground">{t("au_pw_hint")}</p>}
         </div>
@@ -253,7 +253,7 @@ export function AuthComponent() {
       </form>
 
       {/* Social comes after the form: the email path is the real one. */}
-      <div className="relative my-6">
+      <div className="relative my-4 sm:my-6">
         <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
         <div className="relative flex justify-center">
           <span className="bg-card px-3 text-xs text-muted-foreground">{t("au_or")}</span>
@@ -286,7 +286,7 @@ function Field({ id, name, label, hint, type = "text", value, onChange, autoComp
         onChange={(e) => onChange(e.target.value)}
         autoComplete={autoComplete}
         autoFocus={autoFocus}
-        className="h-12"
+        className="h-11 sm:h-12"
       />
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>

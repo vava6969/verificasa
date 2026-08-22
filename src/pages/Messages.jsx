@@ -142,7 +142,7 @@ export default function Messages() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition hover:bg-secondary"
+              className="tap-44 flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition hover:bg-secondary"
               aria-label={en ? "Options" : "Opțiuni"}
             >
               <MoreVertical className="h-5 w-5" />
@@ -242,7 +242,7 @@ export default function Messages() {
                   <button
                     onClick={(e) => deleteConversation(e, c)}
                     disabled={deletingId === c.id}
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground/50 transition hover:bg-destructive/10 hover:text-destructive"
+                    className="tap-44 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground/50 transition hover:bg-destructive/10 hover:text-destructive"
                     aria-label={en ? "Delete conversation" : "Șterge conversația"}
                   >
                     {deletingId === c.id ? (
@@ -257,7 +257,7 @@ export default function Messages() {
             {hasMore && (
               <button
                 onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-emerald-soft text-sm font-semibold text-emerald transition hover:bg-emerald/15"
+                className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-emerald-soft text-sm font-semibold text-emerald transition hover:bg-emerald/15 sm:h-12"
               >
                 <ChevronDown className="h-4 w-4" />
                 {en

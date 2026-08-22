@@ -75,7 +75,7 @@ export default function NotificationsPanel() {
         {unreadCount > 0 && (
           <button
             onClick={markAllRead}
-            className="-mr-2 flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-emerald transition-colors hover:bg-secondary"
+            className="-mr-2 tap-44 flex h-9 items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-emerald transition-colors hover:bg-secondary"
           >
             <CheckCheck className="h-4 w-4" /> {L("Marchează tot citit", "Mark all read")}
           </button>
@@ -83,13 +83,13 @@ export default function NotificationsPanel() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto px-5 pb-4">
+      <div className="no-scrollbar flex items-center gap-2 overflow-x-auto px-5 pb-4">
         {TAB_IDS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={cn(
-              "min-h-[44px] shrink-0 rounded-full border px-4 text-sm transition-colors",
+              "tap-44 h-9 shrink-0 rounded-full border px-4 text-sm transition-colors",
               activeTab === tab
                 ? "border-emerald bg-emerald font-semibold text-primary-foreground"
                 : "border-border bg-background font-medium text-muted-foreground hover:border-emerald/50 hover:text-foreground dark:bg-card"
@@ -107,7 +107,7 @@ export default function NotificationsPanel() {
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-emerald border-t-transparent" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="px-5 py-12 text-center">
+          <div className="px-5 py-7 text-center sm:py-12">
             <p className="text-sm text-muted-foreground">
               {activeTab === "marcate"
                 ? L("Nicio notificare marcată.", "Nothing starred.")
@@ -137,7 +137,7 @@ export default function NotificationsPanel() {
 
                 <button
                   onClick={(e) => toggleStar(n.id, e)}
-                  className="-mr-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-secondary"
+                  className="-mr-2 tap-44 flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-secondary"
                   aria-label={isStarred ? L("Scoate marcajul", "Remove star") : L("Marchează", "Star")}
                 >
                   <Star className={cn("h-4 w-4 transition-colors", isStarred ? "fill-emerald text-emerald" : "text-border hover:text-muted-foreground")} />

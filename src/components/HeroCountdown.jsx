@@ -96,7 +96,7 @@ export default function HeroCountdown({ className = "" }) {
 
           <Link
             to="/about"
-            className="flex h-12 shrink-0 items-center justify-center gap-1.5 rounded-full bg-emerald px-5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90 sm:h-11"
+            className="flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-emerald px-5 sm:h-11 text-sm font-semibold text-primary-foreground transition-colors hover:bg-emerald/90 sm:h-11"
           >
             {t("countdown_btn")}
             <span aria-hidden="true">→</span>

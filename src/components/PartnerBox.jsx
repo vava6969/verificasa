@@ -80,13 +80,13 @@ export default function PartnerBox({ partnerId = "residence-vertical", className
           </div>
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="inline-flex min-h-[44px] items-center rounded-full bg-emerald/10 px-4 text-sm font-bold tracking-wide text-emerald">
+            <span className="inline-flex min-h-[32px] items-center rounded-full bg-emerald/10 px-3.5 py-1 text-sm font-bold tracking-wide text-emerald">
               {partner.code}
             </span>
             <button
               type="button"
               onClick={copyCode}
-              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-border bg-background px-3.5 text-sm font-semibold text-foreground transition-colors hover:border-emerald hover:text-emerald"
+              className="tap-44 inline-flex min-h-[36px] items-center gap-1.5 rounded-full border border-border bg-background px-3.5 text-sm font-semibold text-foreground transition-colors hover:border-emerald hover:text-emerald"
             >
               {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               {copied ? (en ? "Copied" : "Copiat") : en ? "Copy" : "Copiază"}
@@ -111,7 +111,7 @@ export default function PartnerBox({ partnerId = "residence-vertical", className
 
           <Link
             to="/parteneri"
-            className="mt-1 flex min-h-[44px] items-center justify-center gap-1 text-xs font-semibold text-emerald transition-colors hover:text-foreground"
+            className="mt-1 tap-44 flex items-center justify-center gap-1 py-1 text-xs font-semibold text-emerald transition-colors hover:text-foreground"
           >
             {en ? "All partners" : "Toți partenerii"} <span aria-hidden="true">→</span>
           </Link>

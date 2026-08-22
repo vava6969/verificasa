@@ -72,7 +72,7 @@ export default function PropertyLogs({ properties = [], audit = [], comments = [
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Caută proprietate..." className="w-full rounded-full border border-border bg-white py-2 pl-9 pr-4 text-sm outline-none focus:border-emerald dark:bg-card" />
         </div>
-        <div className="max-h-[60vh] space-y-1 overflow-auto rounded border border-border bg-white p-1 dark:bg-card">
+        <div className="no-scrollbar max-h-[45vh] space-y-1 overflow-auto rounded border border-border bg-white p-1 dark:bg-card sm:max-h-[60vh]">
           {list.length === 0 ? (
             <p className="px-3 py-2 text-xs text-muted-foreground">Nicio proprietate.</p>
           ) : list.slice(0, listCount).map((p) => (
@@ -97,7 +97,7 @@ export default function PropertyLogs({ properties = [], audit = [], comments = [
             <p className="mt-1 text-xs text-muted-foreground/70">cine a aprobat/respins anunțul, cine a trimis cereri de închiriere, cine a comentat.</p>
           </div>
         ) : timeline.length === 0 ? (
-          <div className="py-12 text-center text-sm text-muted-foreground">Nicio acțiune înregistrată pentru „{property?.title}".</div>
+          <div className="py-7 text-center text-sm text-muted-foreground sm:py-12">Nicio acțiune înregistrată pentru „{property?.title}".</div>
         ) : (
           <>
             <div className="mb-3 flex flex-wrap items-center gap-2">

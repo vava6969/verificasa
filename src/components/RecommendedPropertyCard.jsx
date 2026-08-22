@@ -41,17 +41,18 @@ export default function RecommendedPropertyCard({ property, planId, coverMap }) 
             <span className="text-xs text-muted-foreground">{t("info_missing")}</span>
           </div>
         )}
+      </div>
+
+      <div className="flex min-w-0 flex-1 flex-col p-3">
+        {/* Insignele sub fotografie, nu peste ea — vezi PropertyCard. */}
         <PropertyBadgeRow
           property={p}
           planId={planId}
           size="sm"
           lang={lang}
-          className="absolute left-2 top-2 max-w-[calc(100%-1rem)]"
+          className="mb-1.5 max-w-full"
         />
-      </div>
-
-      <div className="flex min-w-0 flex-1 flex-col p-3">
-        <p className="text-lg font-bold leading-none text-foreground tnum">
+        <p className="text-base font-bold leading-none text-foreground tnum sm:text-lg">
           {primary}
           <span className="ml-0.5 text-[11px] font-semibold text-muted-foreground">
             {p.transaction_type === "SALE" ? "" : t("pc_permonth")}

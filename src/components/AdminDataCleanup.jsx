@@ -121,7 +121,7 @@ export default function AdminDataCleanup({ onDone }) {
           {preview.will_update?.length > 0 && (
             <div>
               <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">Se corectează</p>
-              <ul className="max-h-80 space-y-1.5 overflow-y-auto pr-2">
+              <ul className="no-scrollbar max-h-64 space-y-1.5 overflow-y-auto pr-2 sm:max-h-80">
                 {preview.will_update.map((u) => (
                   <li key={u.id} className="text-sm">
                     <span className="font-semibold text-foreground">{u.title || "(fără titlu)"}</span>

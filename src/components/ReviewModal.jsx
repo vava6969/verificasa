@@ -123,7 +123,7 @@ export default function ReviewModal({ targetUser, onClose }) {
         </div>
 
         {loadingExisting ? (
-          <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-emerald" /></div>
+          <div className="flex justify-center py-6 sm:py-8"><Loader2 className="h-6 w-6 animate-spin text-emerald" /></div>
         ) : (
           <form onSubmit={handleSubmit}>
             {/* Conversation requirement notice */}

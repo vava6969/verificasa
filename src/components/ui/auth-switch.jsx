@@ -26,7 +26,7 @@ export default function AuthSwitch({ mode, onChange, labels }) {
           onClick={() => onChange(item.key)}
           aria-pressed={mode === item.key}
           className={cn(
-            "relative z-10 min-h-[40px] flex-1 rounded-[calc(var(--radius)-0.375rem)] text-sm font-semibold transition-colors duration-300",
+            "relative z-10 tap-44 min-h-[36px] flex-1 rounded-[calc(var(--radius)-0.375rem)] text-sm font-semibold transition-colors duration-300",
             mode === item.key ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"
           )}
         >

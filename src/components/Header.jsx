@@ -60,10 +60,10 @@ export default function Header() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="group flex h-11 items-center gap-1.5 rounded-full border border-border bg-card pl-1.5 pr-3 text-foreground transition-colors hover:border-emerald sm:h-9"
+          className="tap-44 group flex h-9 items-center gap-1.5 rounded-full border border-border bg-card pl-1.5 pr-3 text-foreground transition-colors hover:border-emerald"
           aria-label={`${t("hdr_currency")} / ${t("hdr_language")}`}
         >
-          <FlagFor lang={lang} className="h-7 w-7 shrink-0 sm:h-6 sm:w-6" />
+          <FlagFor lang={lang} className="h-6 w-6 shrink-0" />
           <span className="text-xs font-bold tracking-wide">{currency}</span>
         </button>
       </DropdownMenuTrigger>
@@ -121,7 +121,7 @@ export default function Header() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between gap-2">
           <Link to="/" className="flex min-w-0 items-center rounded-full">
-            <VerifiCasaLogo size={38} tagline={false} />
+            <VerifiCasaLogo size={32} tagline={false} />
           </Link>
 
           {/* Pastila activă alunecă între secțiuni în loc să clipească. */}
@@ -153,7 +153,7 @@ export default function Header() {
           <div className="flex shrink-0 items-center gap-2">
             <div className="hidden md:block"><LangSwitch /></div>
             <div className="hidden md:block">
-              <ThemeToggle className="w-11 justify-center rounded-full px-0 sm:w-9" />
+              <ThemeToggle className="w-9 justify-center rounded-full px-0" />
             </div>
             <NotificationBell className="rounded-full" />
 
@@ -162,7 +162,7 @@ export default function Header() {
                 <Link
                   to="/post-property"
                   aria-label={t("hdr_add")}
-                  className="flex h-11 items-center justify-center gap-1 rounded-full bg-emerald px-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.04] sm:h-9 md:px-4"
+                  className="hidden h-9 items-center justify-center gap-1 rounded-full bg-emerald px-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.04] md:flex md:px-4"
                 >
                   <Plus className="h-4 w-4" />
                   <span className="hidden md:inline">{t("hdr_add")}</span>
@@ -173,7 +173,7 @@ export default function Header() {
               <>
                 <Link
                   to="/login"
-                  className="flex h-11 items-center gap-1.5 rounded-full bg-emerald px-4 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.04] sm:h-9"
+                  className="hidden h-9 items-center gap-1.5 rounded-full bg-emerald px-4 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.04] md:flex"
                 >
                   <User className="h-4 w-4" />
                   <span>{t("hdr_login")}</span>

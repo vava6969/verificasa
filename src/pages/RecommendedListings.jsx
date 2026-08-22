@@ -65,7 +65,7 @@ export default function RecommendedListings() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
-      <Link to="/" className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground transition hover:text-emerald">
+      <Link to="/" className="mb-3 inline-flex items-center gap-1.5 sm:mb-4 text-sm font-semibold text-muted-foreground transition hover:text-emerald">
         <ArrowLeft className="h-4 w-4" /> {en ? "Back to home" : "Înapoi acasă"}
       </Link>
 
@@ -74,21 +74,21 @@ export default function RecommendedListings() {
       </h1>
       <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">
         {en
-          ? "Ordered by the poster's plan first (Agent, then Pro, then Basic, then no plan), and by views within the same plan."
-          : "Ordonate întâi după planul celui care a postat (Agent, apoi Pro, apoi Basic, apoi fără plan), iar în interiorul aceluiași plan, după numărul de vizualizări."}
+          ? "Ordered by the poster's plan first, then by views within the same plan."
+          : "Ordonate întâi după planul celui care a postat, apoi după numărul de vizualizări."}
       </p>
 
       {loading ? (
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} className="h-56 rounded" />)}
+        <div className="mt-5 grid grid-cols-2 sm:mt-8 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          {Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} className="h-52 rounded" />)}
         </div>
       ) : sorted.length === 0 ? (
-        <div className="mt-8 rounded border border-dashed border-border py-9 text-center text-sm text-muted-foreground sm:py-16">
+        <div className="mt-5 rounded border border-dashed sm:mt-8 border-border py-9 text-center text-sm text-muted-foreground sm:py-16">
           {en ? "No listings yet." : "Niciun anunț momentan."}
         </div>
       ) : (
         <>
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="mt-5 grid grid-cols-2 sm:mt-8 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {visible.map((p, i) => {
               const prevPlan = i > 0 ? visible[i - 1]._plan : null;
               const showDivider = p._plan !== prevPlan;
@@ -107,7 +107,7 @@ export default function RecommendedListings() {
           </div>
 
           {visibleCount < sorted.length && (
-            <div className="mt-8 flex justify-center">
+            <div className="mt-5 flex justify-center sm:mt-8">
               <Button
                 variant="outline"
                 className="gap-1.5 rounded-full"

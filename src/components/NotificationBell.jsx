@@ -16,7 +16,7 @@ export default function NotificationBell({ className = "" }) {
     <Link
       to="/notificari"
       aria-label={`Notificări${unreadCount ? `, ${unreadCount} necitite` : ""}`}
-      className={`relative flex h-11 w-11 items-center justify-center rounded border border-border bg-card text-foreground transition-colors hover:border-emerald sm:h-9 sm:w-9 ${className}`}
+      className={`tap-44 relative flex h-9 w-9 items-center justify-center rounded border border-border bg-card text-foreground transition-colors hover:border-emerald ${className}`}
     >
       <Bell className="h-4 w-4" />
       {unreadCount > 0 && (

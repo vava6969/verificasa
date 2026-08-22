@@ -43,7 +43,7 @@ export function ChoiceCard({ active, onClick, icon: Icon, iconSrc, title, sub })
       whileTap={{ scale: 0.97 }}
       whileHover={{ y: -2 }}
       className={
-        "flex flex-col items-start gap-2 rounded border p-4 text-left transition-colors " +
+        "flex flex-col items-start gap-2 rounded border p-3 text-left transition-colors sm:p-4 " +
         (active
           ? "border-emerald bg-emerald-soft shadow-soft ring-2 ring-emerald/30"
           : "border-border bg-white hover:border-emerald/40 hover:shadow-soft dark:bg-card")

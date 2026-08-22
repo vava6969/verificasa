@@ -74,16 +74,16 @@ export default function CookieBanner() {
                   </Link>.
                 </p>
                 <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
-                  <Button onClick={rejectAll} size="sm" variant="ghost" className="min-h-[44px] flex-1 rounded-full text-white/70 hover:bg-white/10 hover:text-white sm:flex-none">
+                  <Button onClick={rejectAll} size="sm" variant="ghost" className="tap-44 h-10 flex-1 rounded-full text-white/70 sm:min-h-[44px] hover:bg-white/10 hover:text-white sm:flex-none">
                     {t("cookie_reject")}
                   </Button>
-                  <Button onClick={() => setShowPrefs(true)} size="sm" variant="outline" className="min-h-[44px] flex-1 rounded-full border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white sm:flex-none">
+                  <Button onClick={() => setShowPrefs(true)} size="sm" variant="outline" className="tap-44 h-10 flex-1 rounded-full border-white/20 sm:min-h-[44px] bg-transparent text-white hover:bg-white/10 hover:text-white sm:flex-none">
                     {t("cookie_prefs")}
                   </Button>
-                  <Button onClick={acceptAll} size="sm" className="min-h-[44px] flex-1 rounded-full bg-emerald font-bold text-primary-foreground hover:opacity-90 sm:flex-none">
+                  <Button onClick={acceptAll} size="sm" className="tap-44 h-10 flex-1 rounded-full bg-emerald sm:min-h-[44px] font-bold text-primary-foreground hover:opacity-90 sm:flex-none">
                     {t("cookie_accept")}
                   </Button>
-                  <button onClick={rejectAll} className="flex h-11 w-11 items-center justify-center rounded-full text-white/50 hover:text-white" aria-label="Close">
+                  <button onClick={rejectAll} className="tap-44 hidden h-9 w-9 items-center justify-center rounded-full text-white/50 hover:text-white sm:flex" aria-label="Close">
                     <X className="h-4 w-4" />
                   </button>
                 </div>

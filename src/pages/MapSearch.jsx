@@ -124,50 +124,115 @@ function useMapColors() {
   return colors;
 }
 
-// Grup de anunțuri = marcă de fascicul: pătrat, cu un al doilea contur, cifre
-// tabulare. Nu cerc, nu gradient — vezi .vc-bundle în index.css.
-function clusterIcon(count, isActive) {
-  const w = count >= 1000 ? 48 : count >= 100 ? 42 : 36;
-  return L.divIcon({
-    className: "vc-bundle-wrap",
-    html: `<span class="vc-bundle${isActive ? " vc-bundle--active" : ""}">${formatCount(count)}</span>`,
-    iconSize: [w, 26],
-    iconAnchor: [w / 2, 13],
-  });
+// Iconițele se ȚIN ÎN CACHE, nu se construiesc la fiecare randare.
+//
+// Aici era cauza baloanelor cu titlu rămase stivuite peste hartă. react-leaflet
+// compară `icon` prin IDENTITATE: un `L.divIcon` proaspăt la fiecare randare
+// înseamnă `marker.setIcon()` pe TOATE pinurile, la orice schimbare de stare —
+// inclusiv la simpla trecere cu mouse-ul peste unul singur. Leaflet șterge
+// atunci elementul de sub cursor și pune altul; cursorul nu mai poate ieși de pe
+// cel vechi, fiindcă nu mai există, deci `mouseout` nu se produce niciodată și
+// balonul rămâne deschis pentru totdeauna. Un balon în plus la fiecare pin
+// atins, exact ce se vedea în captură.
+//
+// Cheia conține tot ce se vede în iconiță; două stări identice primesc același
+// obiect, deci react-leaflet nu mai atinge DOM-ul degeaba.
+const iconCache = new Map();
+function cachedIcon(key, build) {
+  let icon = iconCache.get(key);
+  if (!icon) {
+    // Plafon: harta are câteva sute de combinații vizuale, nu mii. Dacă totuși
+    // se umple (multe prețuri distincte), o golim și se reconstruiește leneș.
+    if (iconCache.size > 1500) iconCache.clear();
+    icon = build();
+    iconCache.set(key, icon);
+  }
+  return icon;
 }
 
-// Anunț = ștampilă de preț. Bifa verde marchează verificarea, crestătura
-// marcaj marchează promovarea (plata e declarată, nu ascunsă), starea activă
-// se inversează pe verde. Toate culorile vin din tokenii temei.
-function propertyIcon(property, { isActive = false, isVisited = false } = {}) {
+// Grup de anunțuri = marcă de fascicul: pătrat, cu un al doilea contur, cifre
+// tabulare. Nu cerc, nu gradient — vezi .vc-bundle în index.css. Starea de sub
+// cursor o face CSS-ul (.vc-bundle:hover), nu React: dacă ar veni din stare,
+// iconița s-ar reconstrui chiar sub deget — vezi cachedIcon.
+// `iconSize: null` peste tot, intenționat: învelișul e un PUNCT fără dimensiune,
+// fixat pe coordonată, iar bula se așază față de el din CSS (translate -50%).
+// Înainte lățimea era ESTIMATĂ aici, ca Leaflet să poată pune ancora la mijloc,
+// iar estimarea greșea cu până la 9px — adică vârful bulei arăta pe lângă casă.
+// Acum nu mai există nicio formulă de ținut sincronizată cu foaia de stil.
+function clusterIcon(count) {
+  return cachedIcon(`bundle|${count}`, () =>
+    L.divIcon({
+      className: "vc-bundle-wrap",
+      html: `<span class="vc-bundle">${formatCount(count)}</span>`,
+      iconSize: null,
+      iconAnchor: [0, 0],
+    })
+  );
+}
+
+// Anunț = ștampilă de preț. Bifa verde marchează verificarea, iar un anunț
+// promovat poartă cuvântul scris — „Promovat" pe o pastilă aurie. Culoarea
+// singură nu spunea nimic cuiva care nu știe codul; clientul a cerut textul.
+// Starea activă (cardul din listă / din bandă peste care treci) se inversează
+// pe verde. Toate culorile vin din tokenii temei.
+function propertyIcon(property, { isActive = false, isVisited = false, en = false } = {}) {
   const verified =
     property.owner_verified ||
     property.verification_level === "field_certified" ||
     property.ai_tour_verified;
   const boosted = property.boost_active || property.featured;
-  const cls = [
-    "vc-pin",
-    isActive ? "vc-pin--active" : "",
-    !isActive && isVisited ? "vc-pin--visited" : "",
-    boosted ? "vc-pin--boosted" : "",
-  ].filter(Boolean).join(" ");
   const label = stampPrice(property);
-  const w = 24 + label.length * 7.2 + (verified ? 10 : 0);
-  return L.divIcon({
-    className: "vc-pin-wrap",
-    html: `<span class="${cls}">${esc(label)}${verified ? '<span class="vc-pin-tick">✓</span>' : ""}</span>`,
-    iconSize: [w, 24],
-    iconAnchor: [w / 2, 30],
-  });
+  // Același cuvânt ca pe insigna de pe card — vezi PropertyBadges.
+  const promo = boosted ? (en ? "Promoted" : "Promovat") : "";
+
+  return cachedIcon(
+    `pin|${label}|${verified ? 1 : 0}|${promo}|${isActive ? 1 : 0}|${isVisited ? 1 : 0}`,
+    () => {
+      const cls = [
+        "vc-pin",
+        isActive ? "vc-pin--active" : "",
+        !isActive && isVisited ? "vc-pin--visited" : "",
+        boosted ? "vc-pin--boosted" : "",
+      ].filter(Boolean).join(" ");
+      return L.divIcon({
+        className: "vc-pin-wrap",
+        html:
+          `<span class="${cls}">${esc(label)}` +
+          (verified ? '<span class="vc-pin-tick">✓</span>' : "") +
+          (promo ? `<span class="vc-pin-promo">${esc(promo)}</span>` : "") +
+          `</span>`,
+        iconSize: null,
+        iconAnchor: [0, 0],
+      });
+    }
+  );
 }
 
 function countyLabelIcon(name) {
-  return L.divIcon({
-    className: "vc-county-label",
-    html: `<span class="vc-maplabel">${esc(name)}</span>`,
-    iconSize: [0, 0],
-    iconAnchor: [0, 0],
-  });
+  return cachedIcon(`county|${name}`, () =>
+    L.divIcon({
+      className: "vc-county-label",
+      html: `<span class="vc-maplabel">${esc(name)}</span>`,
+      iconSize: [0, 0],
+      iconAnchor: [0, 0],
+    })
+  );
+}
+
+// Există cursor? Nu „e ecran mic?" — un laptop cu ecran îngust are cursor, o
+// tabletă lată nu are. Baloanele de pe hartă atârnă de asta.
+function useCanHover() {
+  const [can, setCan] = useState(
+    () => typeof window !== "undefined" && !!window.matchMedia?.("(hover: hover)").matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover)");
+    const on = () => setCan(mq.matches);
+    on();
+    mq.addEventListener?.("change", on);
+    return () => mq.removeEventListener?.("change", on);
+  }, []);
+  return can;
 }
 
 function pointInPolygon(lat, lng, polygon) {
@@ -212,6 +277,45 @@ function RomaniaLock() {
     apply();
     map.on("resize", apply);
     return () => map.off("resize", apply);
+  }, [map]);
+
+  return null;
+}
+
+// Cel mult UN balon deschis, oricând — plasa de siguranță sub cachedIcon.
+//
+// Leaflet nu impune asta singur: fiecare strat își deschide și își închide
+// propriul balon, iar dacă unul ratează `mouseout` rămâne pe hartă la nesfârșit.
+// Aici ținem minte cine e deschis, îl închidem când se deschide altul, și
+// închidem tot la prima mișcare a hărții.
+function TooltipGuard() {
+  const map = useMap();
+
+  useEffect(() => {
+    let openLayer = null;
+    const sourceOf = (e) => e.layer || e.tooltip?._source || null;
+
+    const onOpen = (e) => {
+      const src = sourceOf(e);
+      if (openLayer && openLayer !== src) openLayer.closeTooltip?.();
+      openLayer = src;
+    };
+    const onClose = (e) => {
+      if (openLayer && openLayer === sourceOf(e)) openLayer = null;
+    };
+    const closeOpen = () => {
+      openLayer?.closeTooltip?.();
+      openLayer = null;
+    };
+
+    map.on("tooltipopen", onOpen);
+    map.on("tooltipclose", onClose);
+    map.on("movestart zoomstart", closeOpen);
+    return () => {
+      map.off("tooltipopen", onOpen);
+      map.off("tooltipclose", onClose);
+      map.off("movestart zoomstart", closeOpen);
+    };
   }, [map]);
 
   return null;
@@ -339,7 +443,16 @@ export default function MapSearch() {
   const [bounds, setBounds] = useState(null);
   const [zoom, setZoom] = useState(6);
   const [flyTarget, setFlyTarget] = useState(null);
+  // DOUĂ stări de survolare, nu una, și diferența contează.
+  //
+  // `hoveredKey` vine din LISTĂ / din bandă și aprinde pinul de pe hartă — adică
+  // schimbă iconița. `pinHoverId` vine din HARTĂ și aprinde doar cardul din
+  // listă. Dacă și survolarea pinului ar trece prin iconiță, Leaflet ar
+  // reconstrui elementul chiar sub cursor și balonul cu titlu ar rămâne agățat
+  // (vezi cachedIcon). Pinul de sub cursor își face singur starea, din CSS.
   const [hoveredKey, setHoveredKey] = useState(null);
+  const [pinHoverId, setPinHoverId] = useState(null);
+  const canHover = useCanHover();
   const [showListMobile, setShowListMobile] = useState(false);
   // Pe telefon, anunțul ales nu mai deschide un panou peste hartă: aduce banda
   // de jos la cardul lui. Ținem doar id-ul.
@@ -734,34 +847,44 @@ export default function MapSearch() {
           {/* Cluster / property markers */}
           {clusters.map((c, i) => {
             const key = `${c.type}-${c.county || c.city || c.id}-${i}`;
-            const isActive = hoveredKey === key;
+            const isProp = c.type === "property";
+            // Doar survolarea din listă/bandă schimbă iconița. Cea de pe hartă
+            // merge în `pinHoverId` și nu atinge markerul — vezi comentariul de
+            // la cele două stări.
+            const lit = isProp && hoveredKey === c.id;
             return (
               <Marker
                 key={key}
                 position={[c.lat, c.lng]}
                 icon={
-                  c.type === "property"
-                    ? propertyIcon(c, { isActive: isActive || hoveredKey === c.id, isVisited: visitedIds.has(c.id) })
-                    : clusterIcon(c.count, isActive)
+                  isProp
+                    ? propertyIcon(c, { isActive: lit, isVisited: visitedIds.has(c.id), en })
+                    : clusterIcon(c.count)
                 }
-                zIndexOffset={c.type === "property" && (isActive || hoveredKey === c.id) ? 400 : 0}
+                zIndexOffset={lit ? 400 : 0}
                 eventHandlers={{
                   click: () => handleClusterClick(c),
-                  mouseover: () => setHoveredKey(c.type === "property" ? c.id : key),
-                  mouseout: () => setHoveredKey(null),
+                  mouseover: () => setPinHoverId(isProp ? c.id : null),
+                  mouseout: () => setPinHoverId(null),
                 }}
               >
-                <Tooltip direction="top" offset={[0, -12]}>
-                  {c.type === "county"
-                    ? `Județul ${c.county}`
-                    : c.type === "city"
-                    ? c.city
-                    : c.title}
-                </Tooltip>
+                {/* Balonul e o unealtă de cursor: pe ecranele fără cursor
+                    Leaflet îl deschide la atingere și rămâne peste hartă, iar
+                    acolo detaliile le dă oricum banda de carduri. */}
+                {canHover && (
+                  <Tooltip direction="top" offset={[0, -12]}>
+                    {c.type === "county"
+                      ? `Județul ${c.county}`
+                      : c.type === "city"
+                      ? c.city
+                      : `${c.title}${c.boost_active || c.featured ? ` · ${en ? "Promoted" : "Promovat"}` : ""}`}
+                  </Tooltip>
+                )}
               </Marker>
             );
           })}
 
+          <TooltipGuard />
           <RomaniaLock />
           <MapController
             onBoundsChange={setBounds}
@@ -1121,7 +1244,7 @@ export default function MapSearch() {
               <button
                 type="button"
                 onClick={resetFilters}
-                className="mt-4 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground sm:min-h-0"
+                className="mt-4 tap-44 inline-flex items-center text-sm font-bold text-emerald transition-colors hover:text-foreground"
               >
                 {t("sr_reset_filters")} <span aria-hidden="true">→</span>
               </button>
@@ -1136,7 +1259,7 @@ export default function MapSearch() {
                   onMouseEnter={() => setHoveredKey(p.id)}
                   onMouseLeave={() => setHoveredKey(null)}
                   onClick={() => markVisited(p.id)}
-                  className={hoveredKey === p.id ? "ring-1 ring-emerald" : undefined}
+                  className={hoveredKey === p.id || pinHoverId === p.id ? "ring-1 ring-emerald" : undefined}
                 >
                   <PropertyCard property={p} coverMap={coverMap} />
                 </div>

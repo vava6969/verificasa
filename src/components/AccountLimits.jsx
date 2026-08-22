@@ -193,7 +193,7 @@ export default function AccountLimits({ className = "" }) {
 
         <Link
           to="/upgrade"
-          className="mt-3 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-colors hover:text-foreground"
+          className="mt-3 tap-44 inline-flex items-center text-sm font-bold text-emerald transition-colors hover:text-foreground"
         >
           {en ? "Buy boosts" : "Cumpără boost-uri"} <span aria-hidden="true" className="ml-1">→</span>
         </Link>

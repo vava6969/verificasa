@@ -147,6 +147,22 @@
 
   .tnum { font-variant-numeric: tabular-nums; }
 
+  /* Ținta de atingere de 44px NU se obține umflând butonul.
+     Antetul ajunsese să aibă pe telefon controale de 44px care pe desktop erau
+     de 36px — adică telefonul primea versiunea CEA MAI groasă a interfeței, iar
+     ecranul mare pe cea fină. Exact invers. Butonul se vede acum la 36px peste
+     tot, iar suprafața de atins rămâne 44x44 printr-un pseudo-element. */
+  .tap-44 { position: relative; }
+  .tap-44::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+
   /* ---- flattened legacy effects (names kept so old consumers compile;
           every gradient/glass/glow is now a flat registry surface) ---- */
   .gradient-navy { background-image: none; background-color: hsl(var(--navy-deep)); }
@@ -249,44 +265,76 @@
      divIcon markup lives outside React, so the pins are classed here and read
      the same tokens as the rest of the app (both themes for free). Bule
      rotunjite, nu stampile patrate: harta e partea in care oamenii se joaca,
-     iar rama de fisa tehnica o facea sa para un formular. */
+     iar rama de fisa tehnica o facea sa para un formular.
+
+     DIMENSIUNE: bulele sunt MICI si dese, ca pe portalurile de imobiliare.
+     Erau la 12.5px cu 4/10px padding — pe un cartier intreg se acopereau una
+     pe alta si harta disparea sub ele. Pretul se citeste la 10.5px fara efort;
+     ce se castiga e cate strazi mai vezi in spate.
+
+     ASEZARE: invelisul markerului (.vc-pin-wrap) e un PUNCT fara dimensiune,
+     pus de Leaflet exact pe coordonata; bula se aseaza fata de el de aici, cu
+     translate. Asa, marimea de mai sus se poate schimba oricand fara sa mai
+     existe o formula de latime de tinut sincronizata in JS. */
+  /* Invelisurile sunt puncte: Leaflet le pune pe coordonata, atat. */
+  .vc-pin-wrap,
+  .vc-bundle-wrap,
+  .vc-county-label { width: 0; height: 0; }
+
+  /* Bula sta DEASUPRA punctului, centrata pe el, cu varful in coordonata.
+     `-3px` e cat coboara varful rotit sub marginea bulei. */
+  .vc-pin-wrap > .vc-pin {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: bottom center;
+    transform: translate(-50%, calc(-100% - 3px));
+  }
+  .vc-bundle-wrap > .vc-bundle,
+  .vc-county-label > .vc-maplabel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: center;
+    transform: translate(-50%, -50%);
+  }
+
   .vc-pin {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
     background: hsl(var(--card));
     color: hsl(var(--foreground));
-    border: 1.5px solid hsl(var(--card));
+    border: 1.25px solid hsl(var(--card));
     border-radius: 999px;
-    padding: 4px 10px;
+    padding: 2px 6px;
     font-family: var(--font-body);
     font-weight: 700;
-    font-size: 12.5px;
+    font-size: 10.5px;
     line-height: 1.2;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-    position: relative;
-    box-shadow: 0 2px 6px rgb(0 0 0 / 0.28);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.26);
     transition: transform 0.18s ease, background-color 0.18s ease;
   }
   .vc-pin::after {
     content: "";
     position: absolute;
     left: 50%;
-    bottom: -3px;
-    width: 8px;
-    height: 8px;
+    bottom: -2px;
+    width: 6px;
+    height: 6px;
     background: inherit;
     transform: translateX(-50%) rotate(45deg);
   }
-  .vc-pin:hover { transform: scale(1.08); z-index: 40; }
   .vc-pin .vc-pin-tick { color: hsl(var(--primary)); font-weight: 900; }
-  .vc-pin--active {
+  /* Marirea se COMPUNE cu centrarea, nu o inlocuieste: `transform` e o singura
+     proprietate, iar un `scale()` singur ar arunca bula de pe coordonata ei. */
+  .vc-pin-wrap > .vc-pin--active {
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
     border-color: hsl(var(--primary));
-    transform: scale(1.1);
-    z-index: 30;
+    transform: translate(-50%, calc(-100% - 3px)) scale(1.12);
   }
   .vc-pin--active .vc-pin-tick { color: hsl(var(--primary-foreground)); }
   .vc-pin--visited {
@@ -301,25 +349,69 @@
     border-color: #1e1608;
   }
   .vc-pin--boosted .vc-pin-tick { color: #f5ce7c; }
+  /* Cuvantul scris, nu doar culoarea: pastila aurie din bula intunecata spune
+     „Promovat" / „Promoted". Culoarea singura nu inseamna nimic pentru cine nu
+     stie codul, iar plata trebuie declarata, nu sugerata. */
+  .vc-pin-promo {
+    display: inline-block;
+    padding: 1.5px 4px;
+    border-radius: 4px;
+    background: #f5ce7c;
+    color: #1e1608;
+    font-size: 7px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* Starea de sub cursor se face AICI, nu din React.
+     Daca survolarea ar trece prin stare, iconita s-ar reconstrui sub cursor,
+     `mouseout` nu s-ar mai produce si balonul cu titlu ar ramane agatat de
+     harta — vezi cachedIcon in MapSearch.jsx. Sub `(hover: hover)` ca sa nu se
+     lipeasca starea dupa o atingere pe telefon. */
+  @media (hover: hover) {
+    .vc-pin-wrap > .vc-pin:hover { transform: translate(-50%, calc(-100% - 3px)) scale(1.12); }
+    .vc-pin:not(.vc-pin--boosted):hover {
+      background: hsl(var(--primary));
+      color: hsl(var(--primary-foreground));
+      border-color: hsl(var(--primary));
+    }
+    .vc-pin:not(.vc-pin--boosted):hover .vc-pin-tick { color: hsl(var(--primary-foreground)); }
+    /* Bula promovata isi pastreaza aurul si sub cursor — altfel exact semnalul
+       pentru care s-a platit dispare cand te uiti la el. */
+    .vc-bundle-wrap > .vc-bundle:hover {
+      transform: translate(-50%, -50%) scale(1.1);
+      background: hsl(var(--foreground));
+      color: hsl(var(--background));
+    }
+    /* Ridicarea peste vecini se face pe INVELISUL markerului: Leaflet scrie
+       z-index inline pe .leaflet-marker-icon, iar un z-index pe <span>-ul din
+       interior nu iese din contextul lui de stivuire. */
+    .leaflet-marker-icon.vc-pin-wrap:hover,
+    .leaflet-marker-icon.vc-bundle-wrap:hover { z-index: 500 !important; }
+  }
   .vc-bundle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
-    border: 2.5px solid hsl(var(--primary-foreground) / 0.85);
+    border: 2px solid hsl(var(--primary-foreground) / 0.85);
     border-radius: 999px;
-    padding: 6px 11px;
+    padding: 3.5px 7px;
     font-family: var(--font-body);
     font-weight: 800;
-    font-size: 12.5px;
+    font-size: 10.5px;
+    line-height: 1.2;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 0.3);
+    box-shadow: 0 1px 5px rgb(0 0 0 / 0.28);
     transition: transform 0.18s ease;
   }
-  .vc-bundle:hover { transform: scale(1.08); }
-  .vc-bundle--active { background: hsl(var(--foreground)); color: hsl(var(--background)); }
+  /* .vc-bundle:hover — culoarea si ridicarea stau in blocul @media (hover: hover)
+     de mai sus, impreuna cu cele ale bulei de pret. Nu mai exista o clasa
+     `--active` pusa din React: starea de sub cursor e treaba CSS-ului. */
   .vc-maplabel {
     font-family: var(--f-body, var(--font-body));
     font-size: 10px;

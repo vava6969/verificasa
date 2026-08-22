@@ -119,7 +119,7 @@ export default function PropertyGoogleMap({ lat, lng, title, landmark, zone, cit
   }, [lat, lng, query, title, landmark, useGeocode]);
 
   return (
-    <div className="relative h-72 w-full">
+    <div className="relative h-56 w-full sm:h-72">
       <div ref={containerRef} className="h-full w-full" />
       {status === "loading" && (
         <div className="absolute inset-0 flex items-center justify-center bg-secondary/60 text-sm text-muted-foreground">

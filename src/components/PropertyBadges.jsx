@@ -37,6 +37,10 @@ const KINDS = {
 };
 
 const SIZES = {
+  // „xs" e insigna de miniatură: doar iconița, într-un cerc. Pe un thumbnail de
+  // 92 px o pastilă cu text ocupă 78% din lățime — nu mai e o insignă pe o
+  // fotografie, e o etichetă cu o fotografie în spate. Numele rămâne în `title`.
+  xs: { chip: "h-5 w-5 justify-center p-0", img: "h-3.5 w-3.5" },
   sm: { chip: "h-6 gap-1 pl-1 pr-2.5 text-[11px]", img: "h-4 w-4" },
   md: { chip: "h-7 gap-1.5 pl-1 pr-3 text-xs", img: "h-5 w-5" },
   lg: { chip: "h-8 gap-1.5 pl-1.5 pr-3.5 text-[13px]", img: "h-6 w-6" },
@@ -46,8 +50,10 @@ export function PropertyBadge({ kind, size = "md", lang = "ro", className, child
   const meta = KINDS[kind];
   if (!meta) return null;
   const s = SIZES[size] || SIZES.md;
+  const label = lang === "en" ? meta.label.en : meta.label.ro;
   return (
     <span
+      title={size === "xs" ? label : undefined}
       className={cn(
         "inline-flex items-center rounded-full font-bold leading-none",
         s.chip,
@@ -57,19 +63,31 @@ export function PropertyBadge({ kind, size = "md", lang = "ro", className, child
     >
       <img
         src={meta.img}
-        alt=""
-        aria-hidden="true"
+        alt={size === "xs" ? label : ""}
+        aria-hidden={size === "xs" ? undefined : "true"}
         className={cn("shrink-0 object-contain", s.img)}
         loading="lazy"
       />
-      {children || (lang === "en" ? meta.label.en : meta.label.ro)}
+      {size === "xs" ? null : children || label}
     </span>
   );
 }
 
 /**
- * Rândul standard de insigne pentru un card: promovarea întâi (e plătită și
- * trebuie declarată), apoi cine a postat, apoi verificarea.
+ * Rândul standard de insigne pentru un card.
+ *
+ * O SINGURĂ ordine, pe toate suprafețele: promovarea întâi (e plătită și
+ * trebuie declarată), apoi verificarea (motivul pentru care există aplicația),
+ * apoi cine a postat. Insigna de identitate („Agent") poate veni din două
+ * locuri — `seller_role` sau planul postatorului — și înainte cele două intrau
+ * în rând în poziții diferite. De aceea două carduri alăturate arătau „Agent,
+ * Verificat" și „Verificat, Agent". Acum ambele ocupă același loc în listă.
+ *
+ * Rândul NU se rupe pe două linii. Pe un card de 164 px (două pe un ecran de
+ * 375 px) două pastile măsurau 145 px — 88% din lățimea cardului, iar în
+ * engleză treceau pe al doilea rând și acopereau fotografia. Pe cardurile mici
+ * se afișează exact o pastilă, cea mai puternică; pe cele mari, cel mult două.
+ * `max` poate forța altceva acolo unde chiar e loc.
  *
  * Verificarea se citește DOAR din `verification_level`, niciodată din
  * `trust_score`. Scorul e de acum un scor de completitudine (v3): un anunț bine
@@ -78,7 +96,7 @@ export function PropertyBadge({ kind, size = "md", lang = "ro", className, child
  * singur insigna „Verificat" — exact minciuna pe care listingSanity a fost
  * scris să o oprească.
  */
-export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", className }) {
+export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", className, max }) {
   const boosted = property?.boost_active || property?.featured;
   const isAgent = property?.seller_role === "Agent";
   // Un anunț implauzibil (preț de sute de mii, o cameră pe 345 mp) nu are voie
@@ -89,14 +107,20 @@ export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", c
     property.verification_level !== "unverified";
   const plan = planId && KINDS[planId] ? planId : null;
 
-  if (!boosted && !verified && !isAgent && !plan) return null;
+  const kinds = [];
+  if (boosted) kinds.push("promovat");
+  if (verified) kinds.push("verificat");
+  if (isAgent) kinds.push("agent");
+  else if (plan && !boosted) kinds.push(plan);
+
+  const shown = kinds.slice(0, max ?? (size === "xs" ? 2 : size === "sm" ? 1 : 2));
+  if (!shown.length) return null;
 
   return (
-    <div className={cn("pointer-events-none flex flex-wrap items-center gap-1.5", className)}>
-      {boosted && <PropertyBadge kind="promovat" size={size} lang={lang} />}
-      {isAgent && <PropertyBadge kind="agent" size={size} lang={lang} />}
-      {verified && <PropertyBadge kind="verificat" size={size} lang={lang} />}
-      {plan && !boosted && !isAgent && <PropertyBadge kind={plan} size={size} lang={lang} />}
+    <div className={cn("pointer-events-none flex flex-nowrap items-center gap-1.5", className)}>
+      {shown.map((kind) => (
+        <PropertyBadge key={kind} kind={kind} size={size} lang={lang} />
+      ))}
     </div>
   );
 }

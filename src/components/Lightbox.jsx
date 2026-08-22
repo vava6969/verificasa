@@ -170,7 +170,7 @@ export default function Lightbox({ images, index, onClose, onIndex, saved = fals
 
       {/* Thumbnails */}
       {total > 1 && (
-        <div className="flex justify-center gap-2 overflow-x-auto px-4 py-4 sm:px-6">
+        <div className="no-scrollbar flex justify-start gap-2 overflow-x-auto px-4 py-4 sm:justify-center sm:px-6">
           {images.map((img, i) => (
             <button
               key={i}

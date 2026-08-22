@@ -20,7 +20,7 @@ export default function StepPhotos({ form, set, uploading, onFiles, agreed, setA
   return (
     <div className="space-y-5">
       <div>
-        <label className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded border-2 border-dashed border-border bg-secondary/20 px-4 py-8 text-center transition hover:border-emerald hover:bg-emerald-soft/30">
+        <label className="flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded border-2 border-dashed border-border bg-secondary/20 px-4 py-6 text-center sm:py-8 transition hover:border-emerald hover:bg-emerald-soft/30">
           {uploading ? <Loader2 className="h-6 w-6 animate-spin text-emerald" /> : <Upload className="h-6 w-6 text-emerald" />}
           <span className="text-sm font-semibold text-navy dark:text-foreground">
             {uploading ? w.p_uploading : w.p_upload}
@@ -80,7 +80,7 @@ export default function StepPhotos({ form, set, uploading, onFiles, agreed, setA
         ) : (
           <span
             title={w.p_tour_soon}
-            className="inline-flex min-h-[44px] shrink-0 cursor-default items-center gap-1.5 rounded-full border border-border px-5 text-sm font-bold text-muted-foreground opacity-60"
+            className="inline-flex min-h-[32px] shrink-0 cursor-default items-center gap-1.5 rounded-full border border-border px-5 text-sm font-bold text-muted-foreground opacity-60"
           >
             {w.p_tour_open}
             <ArrowUpRight className="h-4 w-4" />

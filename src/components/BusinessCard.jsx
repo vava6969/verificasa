@@ -64,7 +64,7 @@ export default function BusinessCard({ user: profile, ratings = [], average = 0,
   ].filter(Boolean);
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-end justify-center bg-black/80 p-4 sm:items-center" onClick={onClose}>
+    <div className="fixed inset-0 z-[200] flex items-end justify-center bg-black/80 p-0 sm:items-center sm:p-4" onClick={onClose}>
       <div className="w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
         {/* The card itself — dark theme. relative so the avatar can overlap
             the cover/body boundary with an explicit z-index. */}

@@ -209,7 +209,7 @@ export default function Conversation() {
       >
         <button
           onClick={() => navigate("/messages")}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition hover:bg-secondary"
+          className="tap-44 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition hover:bg-secondary"
           aria-label={en ? "Back to inbox" : "Înapoi la inbox"}
         >
           <ArrowLeft className="h-5 w-5" />
@@ -241,7 +241,7 @@ export default function Conversation() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground transition hover:bg-secondary"
+              className="tap-44 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition hover:bg-secondary"
               aria-label={en ? "Conversation options" : "Opțiuni conversație"}
             >
               <MoreVertical className="h-5 w-5" />
@@ -266,7 +266,7 @@ export default function Conversation() {
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-emerald border-t-transparent" />
           </div>
         ) : messages.length === 0 ? (
-          <div className="py-12 text-center text-sm text-muted-foreground">
+          <div className="py-7 text-center text-sm text-muted-foreground sm:py-12">
             {en ? "No messages yet. Be the first to write." : "Niciun mesaj. Fii primul care scrie!"}
           </div>
         ) : (
@@ -284,7 +284,7 @@ export default function Conversation() {
                     {otherUser && (
                       <button
                         onClick={() => setShowReviewModal(true)}
-                        className="mt-1 flex h-11 items-center gap-1.5 rounded-full bg-emerald px-5 text-xs font-bold text-primary-foreground shadow-sm transition hover:bg-emerald/90"
+                        className="mt-1 tap-44 flex h-9 items-center gap-1.5 rounded-full bg-emerald px-4 text-xs font-bold text-primary-foreground shadow-sm transition hover:bg-emerald/90"
                       >
                         <Star className="h-3.5 w-3.5 fill-current" /> {en ? "Leave a review" : "Lasă o recenzie"}
                       </button>

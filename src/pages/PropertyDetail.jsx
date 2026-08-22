@@ -91,12 +91,12 @@ export default function PropertyDetail() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
         <Skeleton className="h-8 w-32 rounded-full" />
-        <Skeleton className="mt-4 h-[420px] rounded-2xl" />
+        <Skeleton className="mt-4 h-[220px] rounded-2xl sm:h-[420px]" />
         <div className="mt-6 grid gap-6 lg:grid-cols-3">
-          <Skeleton className="h-96 rounded-2xl lg:col-span-2" />
-          <Skeleton className="h-96 rounded-2xl" />
+          <Skeleton className="h-64 rounded-2xl sm:h-96 lg:col-span-2" />
+          <Skeleton className="h-64 rounded-2xl sm:h-96" />
         </div>
       </div>
     );
@@ -105,7 +105,7 @@ export default function PropertyDetail() {
   if (!property) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-10 text-center sm:px-6 sm:py-20 lg:px-8">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-secondary sm:h-16 sm:w-16">
           <MapPin className="h-8 w-8 text-muted-foreground/50" />
         </div>
         <p className="mt-4 font-heading text-2xl font-bold text-navy dark:text-foreground">{t("not_found")}</p>
@@ -199,7 +199,7 @@ export default function PropertyDetail() {
   // Tab-urile galeriei (Galerie/Prezentare/Tur 3D) — pastile rotunde, verde
   // pentru cel activ, așezate într-un rând normal deasupra fotografiei.
   const tabPill = (active) =>
-    `inline-flex min-h-[44px] items-center rounded-full px-4 text-sm font-semibold transition-colors ${
+    `tap-44 inline-flex h-9 items-center rounded-full px-4 text-sm font-semibold transition-colors ${
       active ? "bg-emerald text-white" : "border border-border bg-card text-muted-foreground hover:text-foreground"
     }`;
 
@@ -258,7 +258,7 @@ export default function PropertyDetail() {
               type="button"
               onClick={() => navigate("/search")}
               aria-label={t("back_results")}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:border-emerald hover:text-emerald"
+              className="tap-44 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:border-emerald hover:text-emerald"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -322,13 +322,6 @@ export default function PropertyDetail() {
                   </div>
                 )}
 
-                <PropertyBadgeRow
-                  property={p}
-                  size="md"
-                  lang={lang}
-                  className="absolute left-3 top-3 z-10 max-w-[calc(100%-5rem)]"
-                />
-
                 {/* Preîncărcăm pozele vecine (stânga/dreapta) la aceeași dimensiune ca poza
                     principală, ca navigarea next/prev să pară instantă în loc să
                     reîncarce vizibil de fiecare dată. */}
@@ -374,8 +367,18 @@ export default function PropertyDetail() {
                 </button>
               </div>
 
+              {/* Insignele SUB galerie, nu peste fotografia principală: pe fișa
+                  unui anunț fotografia e argumentul, iar două pastile în colțul
+                  ei acopereau exact ce venise omul să vadă. */}
+              <PropertyBadgeRow
+                property={p}
+                size="md"
+                lang={lang}
+                className="mt-3 max-w-full"
+              />
+
               {images.length > 1 && (
-                <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+                <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto pb-1">
                   {images.map((img, i) => (
                     <button
                       key={i}
@@ -441,18 +444,18 @@ export default function PropertyDetail() {
               )}
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <Button size="sm" onClick={handleMessage} className="min-h-[44px] gap-1.5 rounded-full bg-emerald px-5 text-primary-foreground hover:bg-emerald/90">
+                <Button size="sm" onClick={handleMessage} className="tap-44 h-9 gap-1.5 rounded-full bg-emerald px-5 text-primary-foreground hover:bg-emerald/90">
                   <MessageCircle className="h-4 w-4" /> {t("pd_msg_btn")}
                 </Button>
-                <Button variant="outline" size="sm" onClick={toggleSave} className="min-h-[44px] gap-1.5 rounded-full border-border px-4 text-foreground hover:border-emerald hover:text-emerald">
+                <Button variant="outline" size="sm" onClick={toggleSave} className="tap-44 h-9 gap-1.5 rounded-full border-border px-4 text-foreground hover:border-emerald hover:text-emerald">
                   <Heart className={`h-4 w-4 ${saved ? "fill-rose-500 text-rose-500" : ""}`} /> {saved ? t("pd_saved") : t("pd_save")}
                 </Button>
                 {canEdit && (
-                  <Button variant="outline" size="sm" onClick={() => setEditing(true)} className="min-h-[44px] gap-1.5 rounded-full border-border px-4 text-foreground hover:border-emerald hover:text-emerald">
+                  <Button variant="outline" size="sm" onClick={() => setEditing(true)} className="tap-44 h-9 gap-1.5 rounded-full border-border px-4 text-foreground hover:border-emerald hover:text-emerald">
                     <Pencil className="h-4 w-4" /> {t("pd_edit")}
                   </Button>
                 )}
-                <ReportModal targetType="property" targetId={p.id} targetTitle={p.title} variant="outline" size="sm" className="min-h-[44px] rounded-full border-border px-4" />
+                <ReportModal targetType="property" targetId={p.id} targetTitle={p.title} variant="outline" size="sm" className="tap-44 h-9 rounded-full border-border px-4" />
               </div>
 
               {/* Cine a postat și când — o singură linie liniștită */}

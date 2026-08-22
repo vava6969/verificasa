@@ -57,7 +57,7 @@ export default function OwnerCharts({ ownerId, lang }) {
 
   if (loading) {
     return (
-      <div className="mt-8 grid gap-4 lg:grid-cols-2">
+      <div className="mt-5 grid gap-4 sm:mt-8 lg:grid-cols-2">
         {Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-72 rounded-2xl" />)}
       </div>
     );
@@ -88,7 +88,7 @@ export default function OwnerCharts({ ownerId, lang }) {
   };
 
   return (
-    <div className="mt-8">
+    <div className="mt-5 sm:mt-8">
       <h2 className="mb-3 font-heading text-xl font-bold text-navy dark:text-foreground">
         {isEn ? "Performance analytics" : "Analiză performanță"}
       </h2>

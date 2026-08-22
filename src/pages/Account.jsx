@@ -176,14 +176,14 @@ export default function Account() {
   ];
 
   const pickerCls = (active) =>
-    `flex min-h-[44px] items-center justify-center gap-2 rounded-full border px-3 text-sm font-semibold transition-colors ${
+    `tap-44 flex h-9 items-center justify-center gap-2 rounded-full border px-3 text-sm font-semibold transition-colors ${
       active ? "border-emerald bg-emerald text-white" : "border-border bg-background text-foreground hover:border-emerald"
     }`;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
       <header className="mb-6">
-        <h1 className="truncate font-heading text-3xl font-semibold text-foreground">{greeting}</h1>
+        <h1 className="truncate font-heading text-2xl font-semibold sm:text-3xl text-foreground">{greeting}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("hdr_myaccount")}</p>
       </header>
 
@@ -268,7 +268,7 @@ export default function Account() {
             </p>
             <button
               onClick={() => window.dispatchEvent(new Event("vc-open-cookie-prefs"))}
-              className="flex min-h-[44px] w-full items-center justify-center rounded-full border border-border bg-background px-3 text-sm font-semibold text-foreground transition-colors hover:border-emerald hover:text-emerald"
+              className="tap-44 flex h-9 w-full items-center justify-center rounded-full border border-border bg-background px-3 text-sm font-semibold text-foreground transition-colors hover:border-emerald hover:text-emerald"
             >
               {en ? "Manage cookie preferences" : "Gestionează preferințele cookies"}
             </button>

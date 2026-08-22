@@ -305,7 +305,7 @@ export default function Tur3D() {
             <img
               src="/images/tur3d/tur3d-hero-scan-v1.webp"
               alt={c.hero_alt}
-              className="h-[46vw] max-h-[300px] min-h-[210px] w-full object-cover"
+              className="h-[46vw] max-h-[300px] min-h-[170px] w-full object-cover"
             />
             <div className="hero-fade absolute inset-x-0 bottom-0 h-20" />
           </div>
@@ -353,7 +353,7 @@ export default function Tur3D() {
       {/* ——— CUM FUNCȚIONEAZĂ ———
           Telefon: listă verticală, numerele legate printr-o linie subțire.
           Desktop: patru coloane, numărul deasupra iconiței. */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-16 lg:px-8">
         <Reveal>
           <h2 className="font-heading text-2xl font-bold text-foreground sm:text-3xl">{c.steps_h}</h2>
           <p className="mt-2 max-w-[52ch] text-sm text-muted-foreground sm:text-base">{c.steps_p}</p>
@@ -388,7 +388,7 @@ export default function Tur3D() {
           Fără procente. Nu avem date reale de folosire, iar o cifră inventată
           pe pagina care vinde încrederea e exact lucrul pe care nu ni-l putem
           permite. Când clientul are numere, aici intră banda de statistici. */}
-      <section className="border-y border-border/60 bg-secondary/25 py-12 sm:py-16">
+      <section className="border-y border-border/60 bg-secondary/25 py-7 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal>
             <h2 className="font-heading text-2xl font-bold text-foreground sm:text-3xl">{c.why_h}</h2>
@@ -432,7 +432,7 @@ export default function Tur3D() {
       </section>
 
       {/* ——— PLANURI ȘI TURURI 3D ——— */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-16 lg:px-8">
         <Reveal>
           <h2 className="font-heading text-2xl font-bold text-foreground sm:text-3xl">{c.plans_h}</h2>
           <p className="mt-2 max-w-[56ch] text-sm text-muted-foreground sm:text-base">{c.plans_p}</p>
@@ -568,7 +568,7 @@ export default function Tur3D() {
           </ul>
           <Link
             to="/upgrade"
-            className="mt-4 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-bold text-emerald underline-offset-4 hover:underline"
+            className="mt-4 tap-44 inline-flex items-center gap-1.5 py-1 text-sm font-bold text-emerald underline-offset-4 hover:underline"
           >
             {c.plans_cta}
             <ArrowRight className="h-4 w-4" />
@@ -581,7 +581,7 @@ export default function Tur3D() {
           interactivă: niciun `input`, niciun buton. Un câmp dezactivat tot ar
           apărea în arborele de accesibilitate al unei pagini de prezentare,
           fără să facă nimic. Aici sunt div-uri care arată ca un formular. */}
-      <section className="border-t border-border/60 bg-secondary/25 py-12 sm:py-16">
+      <section className="border-t border-border/60 bg-secondary/25 py-7 sm:py-16">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-12 lg:px-8">
           <Reveal>
             <h2 className="font-heading text-2xl font-bold text-foreground sm:text-3xl">{c.field_h}</h2>
@@ -653,7 +653,7 @@ export default function Tur3D() {
       </section>
 
       {/* ——— CTA FINAL ——— */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-16 lg:px-8">
         <Reveal className="relative overflow-hidden rounded-2xl">
           <img
             src="/images/tur3d/tur3d-interior-hotspot-v1.webp"

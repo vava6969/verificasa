@@ -136,13 +136,6 @@ export default function PropertyCard({ property, hot = false, coverMap }) {
           </div>
         )}
 
-        <PropertyBadgeRow
-          property={{ ...p, boost_active: boosted }}
-          size="md"
-          lang={lang}
-          className="absolute left-2.5 top-2.5 max-w-[calc(100%-4rem)]"
-        />
-
         <button
           type="button"
           onClick={toggleSave}
@@ -184,6 +177,17 @@ export default function PropertyCard({ property, hot = false, coverMap }) {
       </div>
 
       <div onClick={toDetail} className="flex min-w-0 flex-1 cursor-pointer flex-col p-3.5 sm:p-4">
+        {/* Insignele stau SUB fotografie, nu peste ea.
+            Fotografia e argumentul de vânzare al anunțului; două pastile în
+            colțul ei acopereau exact partea pe care o priveşte omul. Aici spun
+            acelaşi lucru, în banda de text unde stau oricum faptele. */}
+        <PropertyBadgeRow
+          property={{ ...p, boost_active: boosted }}
+          size="sm"
+          lang={lang}
+          className="mb-2 max-w-full"
+        />
+
         <p className="text-[1.35rem] font-bold leading-none text-foreground tnum sm:text-2xl">
           {primary}
           <span className="ml-1 text-sm font-semibold text-muted-foreground">
@@ -202,7 +206,11 @@ export default function PropertyCard({ property, hot = false, coverMap }) {
         </h3>
       </div>
 
-      <div className="flex items-center gap-2.5 border-t border-border px-3.5 py-2.5 sm:px-4">
+      {/* Rândul cu cine a postat + butoanele de sunat/mesaj NU apar pe telefon.
+          Adăugau 61px fiecărui card și puneau două butoane rotunde pe fiecare
+          anunț dintr-o listă — douăsprezece pe un ecran. Identitatea și ambele
+          contacte sunt la o atingere distanță, în pagina anunțului. */}
+      <div className="hidden items-center gap-2.5 border-t border-border px-3.5 py-2.5 sm:flex sm:px-4">
         <Link
           to={p.created_by_id ? `/profile/${p.created_by_id}` : "#"}
           onClick={(e) => e.stopPropagation()}

@@ -120,8 +120,8 @@ export default function ValueProps() {
       <div
         className="relative mt-4 sm:mt-6"
         style={{
-          maskImage: "linear-gradient(to right, transparent, #000 4.5rem, #000 calc(100% - 4.5rem), transparent)",
-          WebkitMaskImage: "linear-gradient(to right, transparent, #000 4.5rem, #000 calc(100% - 4.5rem), transparent)",
+          maskImage: "linear-gradient(to right, transparent, #000 clamp(1.25rem, 6vw, 4.5rem), #000 calc(100% - clamp(1.25rem, 6vw, 4.5rem)), transparent)",
+          WebkitMaskImage: "linear-gradient(to right, transparent, #000 clamp(1.25rem, 6vw, 4.5rem), #000 calc(100% - clamp(1.25rem, 6vw, 4.5rem)), transparent)",
         }}
       >
         <div

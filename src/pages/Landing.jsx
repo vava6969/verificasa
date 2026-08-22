@@ -101,13 +101,13 @@ export default function Landing() {
       <ValueProps />
 
       {/* HARTA */}
-      <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8">
         <Reveal>
           <MapSearchCTA />
         </Reveal>
       </section>
 
-      <HeroCountdown className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8" />
+      <HeroCountdown className="mx-auto max-w-7xl px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8" />
 
       {/* DESPRE */}
       <AboutVerifiCasa />

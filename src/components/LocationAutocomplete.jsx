@@ -109,7 +109,7 @@ export default function LocationAutocomplete({
       <PopoverContent
         align="start"
         sideOffset={6}
-        className="max-h-80 w-[min(22rem,90vw)] overflow-y-auto p-1.5"
+        className="no-scrollbar max-h-80 w-[min(22rem,90vw)] overflow-y-auto p-1.5"
         onOpenAutoFocus={(e) => e.preventDefault()}
         onCloseAutoFocus={(e) => e.preventDefault()}
       >

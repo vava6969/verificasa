@@ -56,15 +56,16 @@ function RailCard({ property, coverMap, lang, active }) {
             {t("info_missing")}
           </span>
         )}
+      </div>
+
+      <div className="min-w-0 flex-1 pr-1">
+        {/* Insignele lângă fapte, nu peste fotografie — vezi PropertyCard. */}
         <PropertyBadgeRow
           property={p}
           size="sm"
           lang={lang}
-          className="absolute left-1 top-1 max-w-[calc(100%-0.5rem)]"
+          className="mb-1.5 max-w-full"
         />
-      </div>
-
-      <div className="min-w-0 flex-1 pr-1">
         <p className="text-base font-bold leading-none text-foreground tnum">
           {primary}
           <span className="ml-0.5 text-[11px] font-semibold text-muted-foreground">

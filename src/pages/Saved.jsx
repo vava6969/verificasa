@@ -73,7 +73,7 @@ export default function Saved() {
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
       <div className="mb-5">
         <h1 className="font-heading text-2xl font-bold text-navy dark:text-foreground sm:text-3xl">Salvate</h1>
         <p className="mt-1 text-sm text-muted-foreground">Anunțurile și profilurile pe care le-ai păstrat.</p>
@@ -84,7 +84,7 @@ export default function Saved() {
         <button
           onClick={() => setTab("properties")}
           aria-pressed={tab === "properties"}
-          className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold transition sm:flex-none ${tab === "properties" ? "bg-card text-emerald shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
+          className={`tap-44 flex h-9 flex-1 items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold transition sm:flex-none ${tab === "properties" ? "bg-card text-emerald shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
         >
           Anunțuri
           {properties && properties.length > 0 && <span className="text-xs">({properties.length})</span>}
@@ -92,7 +92,7 @@ export default function Saved() {
         <button
           onClick={() => setTab("profiles")}
           aria-pressed={tab === "profiles"}
-          className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold transition sm:flex-none ${tab === "profiles" ? "bg-card text-emerald shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
+          className={`tap-44 flex h-9 flex-1 items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold transition sm:flex-none ${tab === "profiles" ? "bg-card text-emerald shadow-soft" : "text-muted-foreground hover:text-foreground"}`}
         >
           Profiluri
           {profileUsers && profileUsers.length > 0 && <span className="text-xs">({profileUsers.length})</span>}

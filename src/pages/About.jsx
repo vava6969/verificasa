@@ -128,7 +128,7 @@ export default function About() {
           className="absolute inset-0 h-full w-full object-cover opacity-50"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/75 via-navy-deep/65 to-navy-deep/95" />
-        <div className="relative mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 sm:py-24 lg:px-8">
+        <div className="relative mx-auto max-w-3xl px-4 py-10 text-center sm:px-6 sm:py-24 lg:px-8">
           <motion.span
             {...heroIn}
             className="inline-flex items-center rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold text-gold"
@@ -171,7 +171,7 @@ export default function About() {
       </section>
 
       {/* PILLARS */}
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-16 lg:px-8">
         <Reveal>
           <h2 className="text-center font-heading text-2xl font-bold text-navy dark:text-foreground sm:text-3xl">
             {c.pillars_h}
@@ -181,7 +181,7 @@ export default function About() {
           {c.pillars.map((p) => (
             <RevealItem
               key={p.title}
-              className="rounded-2xl border border-border bg-card p-6 shadow-soft transition-shadow hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)]"
+              className="rounded-2xl border border-border bg-card p-5 shadow-soft transition-shadow hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] sm:p-6"
             >
               <Glyph src={p.icon} />
               <h3 className="mt-4 font-heading text-lg font-bold text-navy dark:text-foreground">{p.title}</h3>
@@ -192,14 +192,14 @@ export default function About() {
       </section>
 
       {/* STORY — photos carry it, two lines of copy */}
-      <section className="mx-auto max-w-6xl px-4 pb-14 sm:px-6 sm:pb-16 lg:px-8">
+      <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6 sm:pb-16 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-2 lg:items-center">
           <Reveal className="space-y-3">
             <div className="overflow-hidden rounded-2xl shadow-soft">
               <img
                 src="/images/generated/about-story.png"
                 alt=""
-                className="h-64 w-full object-cover sm:h-80 lg:h-[26rem]"
+                className="h-48 w-full object-cover sm:h-80 lg:h-[26rem]"
                 loading="lazy"
               />
             </div>
@@ -236,7 +236,7 @@ export default function About() {
       </section>
 
       {/* STEPS */}
-      <section className="mx-auto max-w-7xl px-4 pb-14 sm:px-6 sm:pb-16 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 sm:pb-16 lg:px-8">
         <Reveal>
           <h2 className="text-center font-heading text-2xl font-bold text-navy dark:text-foreground sm:text-3xl">
             {c.steps_h}
@@ -246,7 +246,7 @@ export default function About() {
           {c.steps.map((s) => (
             <RevealItem
               key={s.title}
-              className="rounded-2xl border border-border bg-card p-6 shadow-soft transition-shadow hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)]"
+              className="rounded-2xl border border-border bg-card p-5 shadow-soft transition-shadow hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)] sm:p-6"
             >
               {/* Fără număr pe card. Cardurile stau oricum în ordine, de la stânga la
                   dreapta — cifra nu spunea nimic ce nu spunea deja poziția. */}
@@ -259,7 +259,7 @@ export default function About() {
       </section>
 
       {/* TRUST BAR */}
-      <section className="mx-auto max-w-7xl px-4 pb-14 sm:px-6 sm:pb-16 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6 sm:pb-16 lg:px-8">
         <Reveal className="rounded-2xl bg-navy-deep p-6 shadow-[0_30px_70px_-30px_rgba(16,24,40,0.5)] sm:p-8">
           <div className="grid gap-5 sm:grid-cols-3">
             {c.trust.map((b) => (
@@ -276,7 +276,7 @@ export default function About() {
       </section>
 
       {/* FAQ */}
-      <section className="bg-navy-deep py-14 text-white sm:py-20">
+      <section className="bg-navy-deep py-8 text-white sm:py-20">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <Reveal>
             <h2 className="text-center font-heading text-2xl font-bold sm:text-3xl">{c.faq_h}</h2>

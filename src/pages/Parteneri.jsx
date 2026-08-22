@@ -48,7 +48,7 @@ function PartnerCard({ partner, en }) {
   return (
     <article className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
       {/* Logo, pe o tentă verde moale */}
-      <div className="flex items-center justify-center bg-emerald/10 px-5 py-8 dark:bg-emerald/15">
+      <div className="flex items-center justify-center bg-emerald/10 px-5 py-6 dark:bg-emerald/15 sm:py-8">
         {/* PNG transparent, tuș verde-închis — nu are nevoie de casetă albă. */}
         <img
           src={partner.logo}
@@ -88,13 +88,13 @@ function PartnerCard({ partner, en }) {
 
         {/* Codul + copiere */}
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="inline-flex min-h-[44px] items-center rounded-full bg-emerald/10 px-5 text-base font-bold tracking-wide text-emerald">
+          <span className="inline-flex min-h-[32px] items-center rounded-full bg-emerald/10 px-4 py-1 text-base font-bold tracking-wide text-emerald">
             {partner.code}
           </span>
           <button
             type="button"
             onClick={copyCode}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-border bg-background px-4 text-sm font-semibold text-foreground transition-colors hover:border-emerald hover:text-emerald"
+            className="tap-44 inline-flex min-h-[36px] items-center gap-2 rounded-full border border-border bg-background px-4 text-sm font-semibold text-foreground transition-colors hover:border-emerald hover:text-emerald"
           >
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             {copied ? (en ? "Copied" : "Copiat") : en ? "Copy" : "Copiază"}

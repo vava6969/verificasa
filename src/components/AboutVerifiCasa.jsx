@@ -138,7 +138,7 @@ export default function AboutVerifiCasa() {
         </h2>
         <Link
           to="/about"
-          className="mt-3 inline-flex min-h-[44px] items-center text-sm font-bold text-emerald transition-transform hover:translate-x-0.5"
+          className="mt-3 tap-44 inline-flex items-center text-sm font-bold text-emerald transition-transform hover:translate-x-0.5"
         >
           {en ? "How it works" : "Cum funcționează"}
           <span className="ml-1" aria-hidden="true">→</span>
@@ -150,8 +150,8 @@ export default function AboutVerifiCasa() {
       <div
         className="relative mt-5 sm:mt-7"
         style={{
-          maskImage: "linear-gradient(to right, transparent, #000 4.5rem, #000 calc(100% - 4.5rem), transparent)",
-          WebkitMaskImage: "linear-gradient(to right, transparent, #000 4.5rem, #000 calc(100% - 4.5rem), transparent)",
+          maskImage: "linear-gradient(to right, transparent, #000 clamp(1.25rem, 6vw, 4.5rem), #000 calc(100% - clamp(1.25rem, 6vw, 4.5rem)), transparent)",
+          WebkitMaskImage: "linear-gradient(to right, transparent, #000 clamp(1.25rem, 6vw, 4.5rem), #000 calc(100% - clamp(1.25rem, 6vw, 4.5rem)), transparent)",
         }}
       >
         <div

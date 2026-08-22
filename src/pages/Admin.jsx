@@ -256,7 +256,7 @@ export default function Admin() {
     return (
       <div className="mx-auto max-w-3xl px-4 py-10 text-center sm:py-20">
         <ShieldAlert className="mx-auto h-10 w-10 text-destructive" />
-        <h1 className="mt-3 font-heading text-2xl font-bold text-navy dark:text-foreground">Acces restrictionat</h1>
+        <h1 className="mt-3 font-heading text-xl font-bold sm:text-2xl text-navy dark:text-foreground">Acces restrictionat</h1>
         <p className="mt-1 text-sm text-muted-foreground">Doar administratorii pot accesa acest panou.</p>
         <Button asChild className="mt-4 bg-emerald text-white"><Link to="/">Inapoi acasa</Link></Button>
       </div>

@@ -105,7 +105,7 @@ export default function PropertyPresentation({ images, title }) {
         </AnimatePresence>
       </motion.div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/45 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/45 to-transparent sm:h-28" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/25 to-transparent" />
 
       <span className="pointer-events-none absolute left-4 top-4 flex items-center gap-1.5 rounded bg-black/35 px-3 py-1.5 text-[11px] font-semibold text-white">

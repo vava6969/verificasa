@@ -101,7 +101,7 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
       </Link>
 
       {/* Primary CTA */}
-      <Button onClick={onMessage} className="mt-4 min-h-[52px] w-full gap-2 rounded-full bg-emerald text-primary-foreground transition-colors hover:bg-emerald/90" size="lg">
+      <Button onClick={onMessage} className="mt-4 min-h-[48px] w-full gap-2 rounded-full bg-emerald text-primary-foreground transition-colors hover:bg-emerald/90" size="lg">
         <MessageCircle className="h-5 w-5" /> {t("pd_msg_btn")}
       </Button>
 
@@ -142,7 +142,7 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
       {user && targetUserId && user.id !== targetUserId && ownerUser && (
         <button
           onClick={() => setShowReviewModal(true)}
-          className="mt-3 flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-full border border-border text-xs font-semibold text-emerald transition-colors hover:border-emerald hover:bg-secondary"
+          className="mt-3 tap-44 flex min-h-[36px] w-full items-center justify-center gap-1.5 rounded-full border border-border text-xs font-semibold text-emerald transition-colors hover:border-emerald hover:bg-secondary"
         >
           <Star className="h-3.5 w-3.5" /> {t("up_leave_review")}
         </button>

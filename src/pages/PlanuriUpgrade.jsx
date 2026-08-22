@@ -385,7 +385,7 @@ function BoostCard({ pack, cheapestUnit, onBuy, pending, en }) {
         />
       )}
       {best && (
-        <span className="absolute -top-3 left-4 z-20 rounded-full bg-gradient-to-t from-emerald to-emerald/80 px-3 py-1 text-xs font-semibold text-white shadow shadow-emerald/50">
+        <span className="absolute -top-2.5 left-3 z-20 rounded-full bg-gradient-to-t from-emerald to-emerald/80 px-2 py-0.5 text-[10px] font-semibold text-white shadow shadow-emerald/50 sm:-top-3 sm:left-4 sm:px-3 sm:py-1 sm:text-xs">
           {en ? "Best rate" : "Cel mai bun preț"}
         </span>
       )}

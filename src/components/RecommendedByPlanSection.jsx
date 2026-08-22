@@ -93,7 +93,7 @@ function PlanRow({ row, en, coverMap }) {
         <h2 className="text-base font-bold text-foreground sm:text-xl">{row.shortName || row.name}</h2>
         <Link
           to="/anunturi-recomandate"
-          className="ml-auto flex min-h-[44px] shrink-0 items-center text-sm font-bold text-emerald transition-transform hover:translate-x-0.5"
+          className="ml-auto tap-44 flex shrink-0 items-center text-sm font-bold text-emerald transition-transform hover:translate-x-0.5"
         >
           {en ? "See all" : "Vezi tot"} <span aria-hidden="true">→</span>
         </Link>
@@ -101,7 +101,7 @@ function PlanRow({ row, en, coverMap }) {
 
       {/* Carduri late pe telefon: un rând de defilare cu o carte și un pic din
           următoarea, nu cinci miniaturi de 168px. */}
-      <div className="-mx-4 flex snap-x snap-mandatory items-start gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:gap-4 sm:px-0">
+      <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory items-start gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:gap-4 sm:px-0">
         {visible.map((p) => (
           <div
             key={p.id}

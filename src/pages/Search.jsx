@@ -231,10 +231,10 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <Reveal className="mb-6 flex flex-wrap items-end justify-between gap-3" y={16}>
-        <div>
-          <h1 className="font-heading text-3xl font-semibold text-foreground">
+    <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
+      <Reveal className="mb-4 flex flex-wrap items-end justify-between gap-3 sm:mb-6" y={16}>
+        <div className="min-w-0">
+          <h1 className="font-heading text-2xl font-semibold text-foreground sm:text-3xl">
             {cityParam || zoneParam || typeParam || qParam ? t("sr_results") : t("sr_all")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -245,22 +245,37 @@ export default function SearchPage() {
             {found === 1 ? t("sr_found_one", { n: found }) : t("sr_found_many", { n: found })}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button onClick={resetFilters} variant="outline" className="min-h-[44px] gap-1.5 rounded-full border-border text-foreground hover:border-emerald hover:text-emerald">
-            <RotateCcw className="h-4 w-4" /> {t("sr_reset_filters")}
+        {/* Pe telefon golirea filtrelor și salvarea căutării sunt acțiuni
+            secundare: rămân doar iconițe și urcă pe rândul titlului, în loc să
+            ceară un rând întreg de 44px deasupra rezultatelor. */}
+        <div className="flex shrink-0 items-center gap-2">
+          <Button
+            onClick={resetFilters}
+            variant="outline"
+            aria-label={t("sr_reset_filters")}
+            className="tap-44 h-9 w-9 shrink-0 gap-1.5 rounded-full border-border p-0 text-foreground hover:border-emerald hover:text-emerald sm:h-11 sm:w-auto sm:px-4"
+          >
+            <RotateCcw className="h-4 w-4" /> <span className="hidden sm:inline">{t("sr_reset_filters")}</span>
           </Button>
-          <Button onClick={saveSearch} variant="outline" className="min-h-[44px] gap-1.5 rounded-full border-border text-foreground hover:border-emerald hover:text-emerald">
-            <BookmarkPlus className="h-4 w-4" /> {t("sr_save_search")}
+          <Button
+            onClick={saveSearch}
+            variant="outline"
+            aria-label={t("sr_save_search")}
+            className="tap-44 h-9 w-9 shrink-0 gap-1.5 rounded-full border-border p-0 text-foreground hover:border-emerald hover:text-emerald sm:h-11 sm:w-auto sm:px-4"
+          >
+            <BookmarkPlus className="h-4 w-4" /> <span className="hidden sm:inline">{t("sr_save_search")}</span>
           </Button>
         </div>
       </Reveal>
 
-      {/* City / zone selectors */}
-      <div className="mb-5 flex flex-wrap items-center gap-3">
+      {/* Pe telefon filtrele nu mai ocupă patru rânduri: căutarea liberă sus pe
+          tot rândul (e acțiunea principală), oraș și zonă alături dedesubt, apoi
+          paginarea și filtrele avansate. Pe ecran mare rămâne rândul de dinainte. */}
+      <div className="mb-4 grid grid-cols-2 items-center gap-2 sm:mb-5 sm:flex sm:flex-wrap sm:gap-3">
         <select
           value={cityFilter}
           onChange={(e) => updateCity(e.target.value)}
-          className="vc-select min-h-[44px] rounded-full border border-border bg-background py-2.5 pl-4 pr-10 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
+          className="vc-select order-2 tap-44 h-10 w-full min-w-0 rounded-full border border-border bg-background py-0 pl-4 pr-9 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card sm:order-none sm:h-auto sm:min-h-[44px] sm:w-auto sm:py-2.5 sm:pr-10"
         >
           <option value="">{t("sr_city_select")}</option>
           {cities.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -269,7 +284,7 @@ export default function SearchPage() {
           value={zoneFilter}
           onChange={(e) => updateZone(e.target.value)}
           disabled={!cityFilter}
-          className="vc-select min-h-[44px] rounded-full border border-border bg-background py-2.5 pl-4 pr-10 text-sm font-medium text-foreground outline-none focus:border-emerald disabled:opacity-50 dark:bg-card"
+          className="vc-select order-3 tap-44 h-10 w-full min-w-0 rounded-full border border-border bg-background py-0 pl-4 pr-9 text-sm font-medium text-foreground outline-none focus:border-emerald disabled:opacity-50 dark:bg-card sm:order-none sm:h-auto sm:min-h-[44px] sm:w-auto sm:py-2.5 sm:pr-10"
         >
           <option value="">{t("sr_zone_select")}</option>
           {zones.map((z) => <option key={z} value={z}>{z}</option>)}
@@ -278,45 +293,46 @@ export default function SearchPage() {
           value={perPage}
           onChange={(e) => updatePer(e.target.value)}
           aria-label={t("sr_per_page")}
-          className="vc-select min-h-[44px] rounded-full border border-border bg-background py-2.5 pl-4 pr-10 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card"
+          className="vc-select order-4 tap-44 h-10 w-full min-w-0 rounded-full border border-border bg-background py-0 pl-4 pr-9 text-sm font-medium text-foreground outline-none focus:border-emerald dark:bg-card sm:order-none sm:h-auto sm:min-h-[44px] sm:w-auto sm:py-2.5 sm:pr-10"
         >
           {PER_PAGE_OPTIONS.map((n) => (
             <option key={n} value={n}>{t("sr_per_page_n", { n })}</option>
           ))}
         </select>
-        <div className="relative min-w-[200px] flex-1">
+        <div className="relative order-1 col-span-2 sm:order-none sm:col-auto sm:min-w-[200px] sm:flex-1">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={qParam}
             onChange={(e) => setQ(e.target.value)}
             placeholder={t("sr_search_placeholder")}
-            className="min-h-[44px] w-full rounded-full border border-border bg-background py-2 pl-11 pr-4 text-sm text-foreground outline-none focus:border-emerald dark:bg-card"
+            className="h-10 w-full rounded-full border border-border bg-background py-0 pl-11 pr-4 text-sm text-foreground outline-none focus:border-emerald dark:bg-card sm:h-auto sm:min-h-[44px] sm:py-2"
+          />
+        </div>
+
+        {/* Filtrele avansate stau în același bloc, nu pe un rând propriu. */}
+        <div className="order-5 flex items-center sm:order-none">
+          <SearchFiltersDrawer
+            t={t}
+            filters={VERIF_FILTERS}
+            activeFilters={activeFilters}
+            onToggle={toggle}
+            planOptions={PLAN_FILTER_OPTIONS}
+            planFilters={planFilters}
+            onTogglePlan={togglePlan}
+            budget={budget} setBudget={setBudget}
+            roomsMin={roomsMin} setRoomsMin={setRoomsMin}
+            surfaceMin={surfaceMin} setSurfaceMin={setSurfaceMin}
+            fairness={fairness} setFairness={setFairness}
+            fairnessOptions={makeFairness(t)}
+            furnished={furnished} setFurnished={setFurnished}
+            swap={swap} setSwap={setSwap}
+            sort={sort} setSort={setSort}
+            sortOptions={makeSort(t)}
+            onReset={resetFilters}
           />
         </div>
       </div>
 
-      {/* Single filters entry point → slide-up sheet */}
-      <div className="mb-6 flex flex-wrap items-center gap-2">
-        <SearchFiltersDrawer
-          t={t}
-          filters={VERIF_FILTERS}
-          activeFilters={activeFilters}
-          onToggle={toggle}
-          planOptions={PLAN_FILTER_OPTIONS}
-          planFilters={planFilters}
-          onTogglePlan={togglePlan}
-          budget={budget} setBudget={setBudget}
-          roomsMin={roomsMin} setRoomsMin={setRoomsMin}
-          surfaceMin={surfaceMin} setSurfaceMin={setSurfaceMin}
-          fairness={fairness} setFairness={setFairness}
-          fairnessOptions={makeFairness(t)}
-          furnished={furnished} setFurnished={setFurnished}
-          swap={swap} setSwap={setSwap}
-          sort={sort} setSort={setSort}
-          sortOptions={makeSort(t)}
-          onReset={resetFilters}
-        />
-      </div>
 
       {properties === null ? (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -357,20 +373,20 @@ export default function SearchPage() {
                 </p>
                 <div className="flex items-center gap-1.5">
                   <button onClick={() => goPage(Math.max(1, safePage - 1))} disabled={safePage === 1} aria-label={lang === "en" ? "Previous page" : "Pagina anterioară"}
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-card text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-40">
+                    className="tap-44 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-card text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-40">
                     <ChevronLeft className="h-4 w-4" />
                   </button>
                   {start > 1 && <span className="px-1 text-muted-foreground">…</span>}
                   {pages.map((pn) => (
                     <button key={pn} onClick={() => goPage(pn)}
-                      className={"h-11 min-w-[40px] rounded-full px-2 text-sm font-semibold tnum transition-colors " +
+                      className={"tap-44 h-9 min-w-[36px] rounded-full px-2 text-sm font-semibold tnum transition-colors " +
                         (pn === safePage ? "bg-emerald text-primary-foreground" : "border border-border bg-card text-foreground hover:bg-secondary")}>
                       {pn}
                     </button>
                   ))}
                   {end < totalPages && <span className="px-1 text-muted-foreground">…</span>}
                   <button onClick={() => goPage(Math.min(totalPages, safePage + 1))} disabled={safePage === totalPages} aria-label={lang === "en" ? "Next page" : "Pagina următoare"}
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-card text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-40">
+                    className="tap-44 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-card text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-40">
                     <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>

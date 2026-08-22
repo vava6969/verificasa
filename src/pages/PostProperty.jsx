@@ -63,14 +63,14 @@ export default function PostProperty() {
 
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
         {submitted ? (
-          <div className="surface-card mt-8 rounded-2xl p-8 text-center">
+          <div className="surface-card mt-5 rounded-2xl p-5 text-center sm:mt-8 sm:p-8">
             <img
               src="/images/generated/icon-document-check.png"
               alt=""
               aria-hidden="true"
               className="mx-auto h-16 w-16 object-contain"
             />
-            <h1 className="mt-4 font-heading text-2xl font-bold text-navy dark:text-foreground">{w.ok_t}</h1>
+            <h1 className="mt-4 font-heading text-xl font-bold sm:text-2xl text-navy dark:text-foreground">{w.ok_t}</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               {w.ok_d}
             </p>
@@ -130,10 +130,10 @@ export default function PostProperty() {
             </div>
 
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Button variant="outline" onClick={() => { setSubmitted(false); setCreated(null); }} className="h-12 gap-1.5 rounded-full px-5">
+              <Button variant="outline" onClick={() => { setSubmitted(false); setCreated(null); }} className="h-11 gap-1.5 rounded-full px-5 sm:h-12">
                 <Plus className="h-4 w-4" /> {en ? "Add another listing" : "Adaugă alt anunț"}
               </Button>
-              <Button asChild className="h-12 rounded-full bg-emerald px-6 text-white hover:bg-emerald/90">
+              <Button asChild className="h-11 rounded-full bg-emerald px-6 text-white hover:bg-emerald/90 sm:h-12">
                 <Link to="/">{en ? "Back to site" : "Vezi site-ul"}</Link>
               </Button>
             </div>

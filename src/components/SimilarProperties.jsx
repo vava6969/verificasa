@@ -91,7 +91,7 @@ export default function SimilarProperties({ property }) {
         {/* Card final — Vezi toate */}
         <Link
           to={`/search?city=${encodeURIComponent(property.city || "")}`}
-          className="group flex w-36 shrink-0 flex-col items-center justify-center gap-3 rounded border-2 border-dashed border-emerald/40 bg-emerald-soft/40 p-6 text-center transition hover:border-emerald hover:bg-emerald-soft sm:w-48"
+          className="group flex w-36 shrink-0 flex-col items-center justify-center gap-2 rounded border-2 border-dashed border-emerald/40 bg-emerald-soft/40 p-4 text-center sm:gap-3 sm:p-6 transition hover:border-emerald hover:bg-emerald-soft sm:w-48"
           style={{ scrollSnapAlign: "start" }}
         >
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald text-white shadow-soft transition group-">

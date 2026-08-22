@@ -117,7 +117,7 @@ export default function InspectieModal({ open, onClose }) {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-4">
       <div className="absolute inset-0 bg-navy-deep/70" onClick={onClose} />
       <div className="relative z-10 flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-2xl dark:bg-card">
         {/* Header — poză de fundal generată cu Higgsfield + scrim de lizibilitate */}
@@ -127,14 +127,14 @@ export default function InspectieModal({ open, onClose }) {
           <button onClick={onClose} aria-label={t("ins_close")} className="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/20 text-white transition hover:bg-white/35">
             <X className="h-5 w-5" />
           </button>
-          <div className="relative flex min-h-[136px] flex-col justify-end p-6 text-white">
+          <div className="relative flex min-h-[104px] flex-col justify-end p-5 text-white sm:min-h-[136px] sm:p-6">
             <h3 className="font-heading text-xl font-bold">{t("ins_title")}</h3>
             <p className="text-sm text-white/80">{t("ins_sub")}</p>
           </div>
         </div>
 
         {needsAuth ? (
-          <div className="flex flex-col items-center justify-center gap-4 px-6 py-12 text-center">
+          <div className="flex flex-col items-center justify-center gap-4 px-5 py-7 text-center sm:px-6 sm:py-12">
             <img src="/images/generated/icon-lock.png" alt="" className="h-14 w-14 object-contain" />
             <div>
               <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">
@@ -153,7 +153,7 @@ export default function InspectieModal({ open, onClose }) {
                 <Link to="/register">{L("Creează cont", "Create account")}</Link>
               </Button>
             </div>
-            <button onClick={onClose} className="mt-1 min-h-[44px] text-xs text-muted-foreground hover:underline">
+            <button onClick={onClose} className="mt-1 tap-44 text-xs text-muted-foreground hover:underline">
               {L("Anulează", "Cancel")}
             </button>
           </div>
@@ -187,7 +187,7 @@ export default function InspectieModal({ open, onClose }) {
           }}
           className="flex min-h-0 flex-1 flex-col"
         >
-          <div className="flex-1 overflow-y-auto px-5 py-5">
+          <div className="no-scrollbar flex-1 overflow-y-auto px-5 py-5">
             {/* Step 0 — Rol & Contact */}
             {step === 0 && (
               <div className="space-y-4">

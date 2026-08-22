@@ -39,15 +39,16 @@ function MiniPropertyCard({ property, coverMap, lang }) {
             {t("info_missing")}
           </span>
         )}
+      </div>
+
+      <div className="min-w-0 flex-1 pr-1">
+        {/* Insignele lângă fapte, nu peste fotografie — vezi PropertyCard. */}
         <PropertyBadgeRow
           property={p}
           size="sm"
           lang={lang}
-          className="absolute left-1.5 top-1.5 max-w-[calc(100%-0.75rem)]"
+          className="mb-1.5 max-w-full"
         />
-      </div>
-
-      <div className="min-w-0 flex-1 pr-1">
         <p className="text-base font-bold leading-none text-foreground tnum">
           {primary}
           <span className="ml-0.5 text-[11px] font-semibold text-muted-foreground">

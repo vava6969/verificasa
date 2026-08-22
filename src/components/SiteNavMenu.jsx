@@ -80,7 +80,7 @@ export default function SiteNavMenu() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="relative flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground transition-[transform,border-color,background-color] duration-200 ease-out hover:border-emerald active:scale-90 active:border-emerald sm:h-9 sm:w-9"
+        className="tap-44 relative flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-foreground transition-[transform,border-color,background-color] duration-200 ease-out hover:border-emerald active:scale-90 active:border-emerald"
         aria-label={en ? "Menu" : "Meniu"}
         aria-expanded={open}
       >

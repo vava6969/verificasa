@@ -230,7 +230,7 @@ export default function UserProfile() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
         <Skeleton className="h-40 w-full rounded-2xl" />
         <Skeleton className="mt-4 h-12 w-64 rounded-full" />
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -242,7 +242,7 @@ export default function UserProfile() {
 
   if (!profile) {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-24 text-center sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 py-12 text-center sm:px-6 sm:py-24 lg:px-8">
         <p className="font-heading text-2xl font-bold text-navy dark:text-foreground">{t("not_found")}</p>
         <Button asChild className="mt-4 h-11 rounded-full bg-emerald px-6 text-primary-foreground hover:bg-emerald/90"><Link to="/">{t("back_home")}</Link></Button>
       </div>
@@ -326,7 +326,7 @@ export default function UserProfile() {
                   onClick={toggleSaveProfile}
                   disabled={savingProfile}
                   variant="outline"
-                  className={`h-11 w-11 gap-2 rounded-full p-0 sm:w-auto sm:px-5 ${profileSaved ? "border-emerald bg-emerald-soft text-emerald" : "border-border text-muted-foreground hover:border-emerald/50"}`}
+                  className={`tap-44 h-9 w-9 gap-2 rounded-full p-0 sm:h-11 sm:w-auto sm:px-5 ${profileSaved ? "border-emerald bg-emerald-soft text-emerald" : "border-border text-muted-foreground hover:border-emerald/50"}`}
                   aria-label={profileSaved ? (en ? "Saved" : "Salvat") : (en ? "Save" : "Salvează")}
                 >
                   {profileSaved ? <Check className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
@@ -336,7 +336,7 @@ export default function UserProfile() {
               <Button
                 onClick={shareProfile}
                 variant="outline"
-                className="h-11 w-11 gap-2 rounded-full border-border p-0 text-muted-foreground hover:border-emerald/50 hover:text-emerald sm:w-auto sm:px-5"
+                className="tap-44 h-9 w-9 gap-2 rounded-full border-border p-0 text-muted-foreground hover:border-emerald/50 hover:text-emerald sm:h-11 sm:w-auto sm:px-5"
                 aria-label={en ? "Share" : "Distribuie"}
               >
                 {shared ? <Check className="h-4 w-4 text-emerald" /> : <Share2 className="h-4 w-4" />}
@@ -345,7 +345,7 @@ export default function UserProfile() {
               <Button
                 onClick={() => setShowBusinessCard(true)}
                 variant="outline"
-                className="h-11 w-11 gap-2 rounded-full border-border p-0 text-muted-foreground hover:border-emerald/50 hover:text-emerald sm:w-auto sm:px-5"
+                className="tap-44 h-9 w-9 gap-2 rounded-full border-border p-0 text-muted-foreground hover:border-emerald/50 hover:text-emerald sm:h-11 sm:w-auto sm:px-5"
                 aria-label={en ? "Business card" : "Card de vizită"}
               >
                 <CreditCard className="h-4 w-4" />
@@ -379,7 +379,7 @@ export default function UserProfile() {
       <div className="mt-5 flex gap-2 border-b border-border">
         <button
           onClick={() => setTab("listings")}
-          className={`relative h-12 px-4 text-sm font-semibold transition ${tab === "listings" ? "text-emerald" : "text-muted-foreground hover:text-foreground"}`}
+          className={`tap-44 relative h-10 px-4 text-sm font-semibold transition ${tab === "listings" ? "text-emerald" : "text-muted-foreground hover:text-foreground"}`}
         >
           {t("up_tab_listings")}
           {properties.length > 0 && <span className="ml-1.5 text-xs">({properties.length})</span>}
@@ -387,7 +387,7 @@ export default function UserProfile() {
         </button>
         <button
           onClick={() => setTab("reviews")}
-          className={`relative h-12 px-4 text-sm font-semibold transition ${tab === "reviews" ? "text-emerald" : "text-muted-foreground hover:text-foreground"}`}
+          className={`tap-44 relative h-10 px-4 text-sm font-semibold transition ${tab === "reviews" ? "text-emerald" : "text-muted-foreground hover:text-foreground"}`}
         >
           {t("up_tab_reviews")}
           {count > 0 && <span className="ml-1.5 text-xs">({count})</span>}
@@ -399,7 +399,7 @@ export default function UserProfile() {
       <div className="mt-5">
         {tab === "listings" && (
           loadingProps ? (
-            <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-emerald" /></div>
+            <div className="flex justify-center py-7 sm:py-12"><Loader2 className="h-6 w-6 animate-spin text-emerald" /></div>
           ) : properties.length === 0 ? (
             <div className="py-9 text-center text-sm text-muted-foreground sm:py-16">{t("up_no_listings")}</div>
           ) : (
@@ -411,7 +411,7 @@ export default function UserProfile() {
 
         {tab === "reviews" && (
           loadingRatings ? (
-            <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-emerald" /></div>
+            <div className="flex justify-center py-7 sm:py-12"><Loader2 className="h-6 w-6 animate-spin text-emerald" /></div>
           ) : count === 0 ? (
             <div className="py-9 text-center sm:py-16">
               <div className="mx-auto flex justify-center"><RatingStars rating={1} size="lg" /></div>
@@ -428,7 +428,7 @@ export default function UserProfile() {
               <div className="lg:col-span-1">
                 <div className="sticky top-20 rounded-2xl border border-border bg-card p-5 shadow-soft">
                   <div className="flex items-center gap-3">
-                    <span className="font-heading text-4xl font-bold text-navy dark:text-foreground">{average.toFixed(1)}</span>
+                    <span className="font-heading text-3xl font-bold text-navy dark:text-foreground sm:text-4xl">{average.toFixed(1)}</span>
                     <div>
                       <RatingStars rating={average} size="sm" />
                       <p className="mt-0.5 text-xs text-muted-foreground">
