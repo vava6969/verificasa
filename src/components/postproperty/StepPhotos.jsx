@@ -16,7 +16,7 @@ import { tourReasonText } from "@/lib/tours";
 export default function StepPhotos({
   form, set, uploading, onFiles, agreed, setAgreed,
   boostQty, setBoostQty, boostBalance, onBuyBoosts,
-  tourStatus, tourUrl, setTourUrl,
+  tourStatus, tourUrl, setTourUrl, onSeePlans,
 }) {
   const { w, en } = useWiz();
   const urls = form.images ? form.images.split(",").filter(Boolean) : [];
@@ -83,15 +83,13 @@ export default function StepPhotos({
                 ? tourStatus.planId.charAt(0).toUpperCase() + tourStatus.planId.slice(1)
                 : w.p_plan_none}
             </span>
-            <a
-              href="/upgrade"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onSeePlans?.(); }}
               className="text-xs font-semibold text-emerald underline-offset-2 hover:underline"
             >
               {w.p_plan_see}
-            </a>
+            </button>
           </span>
         </button>
 

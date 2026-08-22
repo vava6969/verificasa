@@ -7,6 +7,7 @@ import PropertyWizard from "@/components/postproperty/PropertyWizard";
 import LanguageToggle from "@/components/LanguageToggle";
 import BoostDialog from "@/components/BoostDialog";
 import BoostCheckoutModal from "@/components/BoostCheckoutModal";
+import PlanCheckoutModal from "@/components/PlanCheckoutModal";
 import { useCountry } from "@/components/CountryContext";
 import { useWiz } from "@/components/postproperty/wizardCopy";
 import { useAuth } from "@/lib/AuthContext";
@@ -25,6 +26,7 @@ export default function PostProperty() {
   // Cumpărarea de boost-uri se face AICI, în pagină (cererea clientului) —
   // dialogul de mai jos; /upgrade rămâne doar pentru cine vrea pagina întreagă.
   const [buyOpen, setBuyOpen] = useState(false);
+  const [plansOpen, setPlansOpen] = useState(false);
   // Câte promovări pune pe anunțul ăsta. Boost-urile se adună și nu expiră,
   // deci numărul chiar înseamnă ceva: fiecare îl urcă mai sus.
   const [qty, setQty] = useState(1);
@@ -46,7 +48,7 @@ export default function PostProperty() {
     if (!user?.id) return;
     if (isAdmin) { setGate(null); return; }
     let cancelled = false;
-    (async () => {
+    const check = async () => {
       try {
         const [sub, count] = await Promise.all([
           fetchMyActiveSubscription(user.id),
@@ -60,8 +62,11 @@ export default function PostProperty() {
         // O eroare de rețea nu ține omul afară — limita reală e la publicare.
         if (!cancelled) setGate(null);
       }
-    })();
-    return () => { cancelled = true; };
+    };
+    check();
+    // Planul se cumpără în filă nouă; la întoarcere, poarta se ridică singură.
+    window.addEventListener("focus", check);
+    return () => { cancelled = true; window.removeEventListener("focus", check); };
   }, [user?.id, isAdmin]);
 
   // Soldul se citește după publicare, nu la intrarea în formular: până nu
@@ -287,8 +292,8 @@ export default function PostProperty() {
               {w.err_limit_d}
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild className="h-11 rounded-full bg-emerald px-6 text-white hover:bg-emerald/90 sm:h-12">
-                <Link to="/upgrade">{en ? "See the plans" : "Vezi planurile"}</Link>
+              <Button onClick={() => setPlansOpen(true)} className="h-11 rounded-full bg-emerald px-6 text-white hover:bg-emerald/90 sm:h-12">
+                {en ? "See the plans" : "Vezi planurile"}
               </Button>
               <Button asChild variant="outline" className="h-11 gap-1.5 rounded-full px-5 sm:h-12">
                 <Link to="/my-properties">
@@ -296,6 +301,7 @@ export default function PostProperty() {
                 </Link>
               </Button>
             </div>
+            <PlanCheckoutModal open={plansOpen} onOpenChange={setPlansOpen} />
           </div>
         ) : (
           <>

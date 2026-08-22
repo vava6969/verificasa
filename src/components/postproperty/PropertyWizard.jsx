@@ -22,6 +22,7 @@ import StepLocation from "./StepLocation";
 import StepDetails from "./StepDetails";
 import StepFeatures, { countFeatures } from "./StepFeatures";
 import BoostCheckoutModal from "@/components/BoostCheckoutModal";
+import PlanCheckoutModal from "@/components/PlanCheckoutModal";
 import StepPhotos from "./StepPhotos";
 import { useWiz } from "./wizardCopy";
 
@@ -57,6 +58,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
   const [boostQty, setBoostQty] = useState(0);
   const [boostBalance, setBoostBalance] = useState(0);
   const [buyOpen, setBuyOpen] = useState(false);
+  const [plansOpen, setPlansOpen] = useState(false);
   // Bannerul de plan de pe ultimul pas (cererea clientului, 23.08): planul,
   // boost-urile rămase, tururile 3D disponibile și — dacă are voie — chiar
   // câmpul de link. O singură citire acoperă plan + tururi.
@@ -339,6 +341,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
                   agreed={agreed} setAgreed={setAgreed}
                   boostQty={boostQty} setBoostQty={setBoostQty} boostBalance={boostBalance}
                   onBuyBoosts={() => setBuyOpen(true)}
+                  onSeePlans={() => setPlansOpen(true)}
                   tourStatus={tourStatus} tourUrl={wizTourUrl} setTourUrl={setWizTourUrl}
                 />
               </>
@@ -390,6 +393,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
           if (typeof newBalance === "number") setBoostBalance(newBalance);
         }}
       />
+      <PlanCheckoutModal open={plansOpen} onOpenChange={setPlansOpen} />
     </div>
   );
 }
