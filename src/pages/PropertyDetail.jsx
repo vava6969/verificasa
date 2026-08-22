@@ -1,3 +1,4 @@
+import { boostCount } from "@/lib/plans";
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
@@ -487,6 +488,17 @@ export default function PropertyDetail() {
               <p className="mt-1 text-[11px] text-muted-foreground/60">
                 {t("pd_code_label")} <span className="select-all">{p.property_code || p.id}</span>
               </p>
+
+              {/* Câte promovări poartă anunțul. Boost-urile se adună și nu expiră,
+                  deci numărul e o informație, nu un cronometru — stă exact
+                  înaintea datelor despre locuință, cum a cerut clientul. */}
+              {boostCount(p) > 0 && (
+                <p className="mt-1 text-[11px] font-semibold text-muted-foreground/80">
+                  {lang === "en"
+                    ? `Promoted · ${boostCount(p)} ${boostCount(p) === 1 ? "boost" : "boosts"} on this listing`
+                    : `Promovat · ${boostCount(p)} boost${boostCount(p) === 1 ? "" : "-uri"} pe acest anunț`}
+                </p>
+              )}
 
               {/* MĂSURĂTORI — carduri moi, nu un registru cu linii */}
               {(p.internet_speed_mbps || p.noise_db != null || p.light_orientation || p.water_pressure_ok || p.maintenance_fee || p.monthly_utilities_estimate) && measured.length > 0 && (

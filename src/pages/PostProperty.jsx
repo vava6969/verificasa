@@ -2,23 +2,29 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import VerifiCasaLogo from "@/components/VerifiCasaLogo";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, Minus, Loader2 } from "lucide-react";
 import PropertyWizard from "@/components/postproperty/PropertyWizard";
 import LanguageToggle from "@/components/LanguageToggle";
 import BoostDialog from "@/components/BoostDialog";
 import { useCountry } from "@/components/CountryContext";
 import { useWiz } from "@/components/postproperty/wizardCopy";
 import { useAuth } from "@/lib/AuthContext";
-import { fetchBoostBalance } from "@/lib/boosts";
+import { fetchBoostBalance, applyBoost } from "@/lib/boosts";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function PostProperty() {
   const [submitted, setSubmitted] = useState(false);
   const [created, setCreated] = useState(null);
   const [balance, setBalance] = useState(0);
   const [boosting, setBoosting] = useState(false);
+  // Câte promovări pune pe anunțul ăsta. Boost-urile se adună și nu expiră,
+  // deci numărul chiar înseamnă ceva: fiecare îl urcă mai sus.
+  const [qty, setQty] = useState(1);
+  const [applying, setApplying] = useState(false);
   const { lang } = useCountry();
   const { user } = useAuth();
   const { w } = useWiz();
+  const { toast } = useToast();
   const en = lang === "en";
 
   // Soldul se citește după publicare, nu la intrarea în formular: până nu
@@ -35,6 +41,29 @@ export default function PostProperty() {
   // acum". Ecranul spune adevărul: promovarea pornește după aprobare. Pentru
   // admini, care publică direct aprobat, butonul chiar promovează pe loc.
   const approved = created?.approval_status === "APPROVED";
+  const maxQty = Math.max(1, balance);
+
+  const promote = async () => {
+    if (!created?.id || applying) return;
+    setApplying(true);
+    try {
+      const res = await applyBoost(created.id, qty);
+      if (res.error) {
+        toast({ title: en ? "Could not promote" : "Nu am putut promova", description: res.error, variant: "destructive" });
+      } else {
+        setBalance(res.balance ?? Math.max(0, balance - qty));
+        setCreated((c) => (c ? { ...c, boost_active: true, boost_count: res.boost_count ?? qty } : c));
+        toast({
+          title: en ? "Listing promoted" : "Anunț promovat",
+          description: en
+            ? `${qty} ${qty === 1 ? "boost" : "boosts"} on this listing.`
+            : `${qty} boost${qty === 1 ? "" : "-uri"} pe acest anunț.`,
+        });
+      }
+    } finally {
+      setApplying(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-secondary/40 dark:bg-background">
@@ -106,12 +135,50 @@ export default function PostProperty() {
                 </div>
               </div>
 
+              {/* Contorul cerut de client: câte promovări ai și câte pui pe
+                  anunțul ăsta, chiar aici, la finalul publicării. */}
+              {approved && balance >= 1 && (
+                <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-foreground">
+                      {en ? "Promote this listing" : "Promovează anunțul"}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {en ? `you have ${balance}` : `ai ${balance} promovări`}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setQty((n) => Math.max(1, n - 1))}
+                      disabled={qty <= 1 || applying}
+                      aria-label={en ? "One fewer" : "Una mai puțin"}
+                      className="tap-44 flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-emerald disabled:opacity-40"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </button>
+                    <span className="w-7 text-center text-base font-bold tnum text-foreground">{qty}</span>
+                    <button
+                      type="button"
+                      onClick={() => setQty((n) => Math.min(maxQty, n + 1))}
+                      disabled={qty >= maxQty || applying}
+                      aria-label={en ? "One more" : "Încă una"}
+                      className="tap-44 flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-emerald disabled:opacity-40"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="mt-4 flex flex-wrap gap-2">
                 {approved && balance >= 1 ? (
                   <Button
-                    onClick={() => setBoosting(true)}
-                    className="h-11 rounded-full bg-emerald px-5 text-sm text-white hover:bg-emerald/90"
+                    onClick={promote}
+                    disabled={applying}
+                    className="h-11 gap-2 rounded-full bg-emerald px-5 text-sm text-white hover:bg-emerald/90"
                   >
+                    {applying && <Loader2 className="h-4 w-4 animate-spin" />}
                     {en ? "Promote now" : "Promovează acum"}
                   </Button>
                 ) : (
@@ -121,6 +188,11 @@ export default function PostProperty() {
                         ? (en ? `You have ${balance} boosts` : `Ai ${balance} boost-uri`)
                         : (en ? "Buy boosts" : "Cumpără boost-uri")}
                     </Link>
+                  </Button>
+                )}
+                {approved && balance >= 1 && (
+                  <Button asChild variant="outline" className="h-11 rounded-full px-5 text-sm">
+                    <Link to="/upgrade">{en ? "Buy more" : "Cumpără mai multe"}</Link>
                   </Button>
                 )}
                 <Button asChild variant="outline" className="h-11 gap-1.5 rounded-full px-5 text-sm">

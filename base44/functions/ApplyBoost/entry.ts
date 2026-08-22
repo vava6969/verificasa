@@ -14,6 +14,9 @@ export default async function (req: Request): Promise<Response> {
     try { body = await req.json(); } catch (_) { body = {}; }
     const propertyId = body?.property_id;
     if (!propertyId) return Response.json({ error: "property_id este necesar." });
+    // Câte boost-uri deodată. Un anunț poate primi oricâte — fiecare îl urcă
+    // mai sus și niciunul nu expiră.
+    const want = Math.max(1, Math.min(50, Math.floor(Number(body?.count) || 1)));
 
     const svc = base44.asServiceRole;
     const p: any = await svc.entities.Property.get(propertyId);
@@ -29,15 +32,18 @@ export default async function (req: Request): Promise<Response> {
     }
 
     const balance = await getBalance(svc, me.id);
-    if (balance < 1) {
-      return Response.json({ error: "Nu ai boost-uri disponibile.", balance: 0 });
+    if (balance < want) {
+      return Response.json({
+        error: want === 1 ? "Nu ai boost-uri disponibile." : `Ai doar ${balance} boost-uri disponibile.`,
+        balance,
+      });
     }
 
     // Boost-urile se adună pe același anunț și nu expiră: al doilea nu
     // prelungește nimic, urcă anunțul mai sus. Vezi compareByBoostThenViews.
     const now = Date.now();
     const endsDate = BOOST_NEVER_ENDS;
-    const nextCount = (Number(p.boost_count) || 0) + 1;
+    const nextCount = (Number(p.boost_count) || 0) + want;
 
     // ORDINEA CONTEAZĂ. Înainte, anunțul se promova întâi și creditul se scădea
     // după — fără tranzacție și fără revenire. Dacă scăderea eșua (registrul
@@ -47,7 +53,7 @@ export default async function (req: Request): Promise<Response> {
     // Acum creditul se REZERVĂ întâi. Dacă aplicarea eșuează după aceea, îl dăm
     // înapoi cu un rând de „refund", ca soldul să nu se piardă în tăcere.
     const after = await addCredits(svc, {
-      userId: me.id, delta: -1, reason: "spend", sourceId: propertyId, note: p.title || "",
+      userId: me.id, delta: -want, reason: "spend", sourceId: propertyId, note: p.title || "",
     });
 
     try {
@@ -57,7 +63,7 @@ export default async function (req: Request): Promise<Response> {
         starts_date: new Date(now).toISOString(),
         ends_date: endsDate,
         status: "active",
-        credits_spent: 1,
+        credits_spent: want,
       });
 
       // Câmpuri denormalizate: sortarea și ștampila „Promovat" le citesc direct
@@ -69,7 +75,7 @@ export default async function (req: Request): Promise<Response> {
       });
     } catch (applyErr: any) {
       const restored = await addCredits(svc, {
-        userId: me.id, delta: 1, reason: "refund", sourceId: propertyId,
+        userId: me.id, delta: want, reason: "refund", sourceId: propertyId,
         note: "Promovare eșuată — credit returnat",
       }).catch(() => null);
       return Response.json({

@@ -44,9 +44,10 @@ function unwrap(res) {
   return { ok: !!data.ok, error: data.error || null, ...data };
 }
 
-export async function applyBoost(propertyId) {
+// `count` — câte boost-uri deodată pe același anunț. Se adună, nu expiră.
+export async function applyBoost(propertyId, count = 1) {
   try {
-    return unwrap(await base44.functions.invoke("ApplyBoost", { property_id: propertyId }));
+    return unwrap(await base44.functions.invoke("ApplyBoost", { property_id: propertyId, count }));
   } catch (e) {
     return { ok: false, error: "Nu am putut promova anunțul. Încearcă din nou." };
   }
