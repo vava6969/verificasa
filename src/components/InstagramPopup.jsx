@@ -1,15 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Instagram, X } from "lucide-react";
 
-// Instagram pop-up: appears every 5 minutes (300s) of site navigation,
-// stays on screen 5s then auto-closes. Timer resets on any close (manual X,
-// overlay click, or auto). A slim progress bar shows the 5s countdown.
+// Instagram pop-up: PRIMA PAGINĂ ȘI ATÂT.
+//
+// E montat în Layout, care înfășoară fiecare rută, iar temporizatorul nu știa
+// nimic despre unde se află omul — așa că sărea peste orice pagină, la fiecare
+// cinci minute. Inclusiv peste pachetele de boost, cu un strat negru și un
+// buton „Dă Follow" fix peste butonul de cumpărare. Ca reclamă e enervant; în
+// mijlocul unei plăți e o pierdere de bani.
+//
+// Deci: se programează doar pe „/", se închide singur dacă omul pleacă de pe
+// prima pagină cât e deschis, și nu se reprogramează decât tot pe „/".
+//
+// Apare la 5 minute de navigare, stă 5 secunde, apoi se închide singur. Orice
+// închidere (X, click pe fundal, automat) repornește numărătoarea.
 const SHOW_INTERVAL = 5 * 60 * 1000; // 5 minutes between appearances
 const HOLD_MS = 5000; // 5 seconds on screen
 const HANDLE = "verificasaro";
 const URL = "https://www.instagram.com/verificasaro";
 
 export default function InstagramPopup() {
+  const { pathname } = useLocation();
+  const onHome = pathname === "/";
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState(100);
   const showTimer = useRef(null);
@@ -48,23 +61,32 @@ export default function InstagramPopup() {
      
   }, [open]);
 
-  // Start the first cycle + reschedule after each close.
+  // Ceasul pornește doar pe prima pagină. Dacă omul pleacă de acolo, se oprește
+  // numărătoarea ȘI se închide ce e pe ecran — altfel pop-up-ul programat pe „/"
+  // ar apărea peste orice pagină pe care s-a dus între timp.
   useEffect(() => {
+    if (!onHome) {
+      if (showTimer.current) clearTimeout(showTimer.current);
+      showTimer.current = null;
+      clearHold();
+      setOpen(false);
+      return undefined;
+    }
     scheduleNext();
     return () => {
       if (showTimer.current) clearTimeout(showTimer.current);
       clearHold();
     };
-     
-  }, []);
+
+  }, [onHome]);
 
   const close = () => {
     clearHold();
     setOpen(false);
-    scheduleNext(); // reappear in another 5 minutes
+    if (onHome) scheduleNext(); // revine peste încă cinci minute, tot pe „/"
   };
 
-  if (!open) return null;
+  if (!open || !onHome) return null;
 
   return (
     <div

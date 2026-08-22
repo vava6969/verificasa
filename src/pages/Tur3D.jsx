@@ -269,20 +269,12 @@ export default function Tur3D() {
 
         {/* telefon */}
         <RevealGroup className="mt-7 sm:hidden">
-          {c.steps.map((s, i) => (
-            <RevealItem key={s.t} className="relative flex gap-4 pb-6 last:pb-0">
-              {i < c.steps.length - 1 && (
-                <span aria-hidden="true" className="absolute bottom-0 left-[19px] top-11 w-px bg-border" />
-              )}
-              <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-emerald bg-background text-sm font-extrabold text-emerald tnum">
-                {i + 1}
-              </span>
+          {c.steps.map((s) => (
+            <RevealItem key={s.t} className="flex gap-3.5 border-b border-border py-4 first:pt-0 last:border-0 last:pb-0">
+              <Glyph src={s.icon} className="h-11 w-11" />
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-3">
-                  <Glyph src={s.icon} className="h-10 w-10" />
-                  <h3 className="font-heading text-base font-bold text-foreground">{s.t}</h3>
-                </div>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{s.d}</p>
+                <h3 className="font-heading text-base font-bold text-foreground">{s.t}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{s.d}</p>
               </div>
             </RevealItem>
           ))}
@@ -290,14 +282,9 @@ export default function Tur3D() {
 
         {/* desktop */}
         <RevealGroup className="mt-9 hidden gap-8 sm:grid sm:grid-cols-2 lg:grid-cols-4">
-          {c.steps.map((s, i) => (
+          {c.steps.map((s) => (
             <RevealItem key={s.t} className="border-t border-border pt-5">
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-extrabold text-emerald tnum">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <Glyph src={s.icon} className="h-12 w-12" />
-              </div>
+              <Glyph src={s.icon} className="h-12 w-12" />
               <h3 className="mt-3 font-heading text-lg font-bold text-foreground">{s.t}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{s.d}</p>
             </RevealItem>

@@ -18,10 +18,17 @@ export default function Layout() {
     const lang = (typeof localStorage !== "undefined" && localStorage.getItem("vc_lang")) || "ro";
     document.title = titleForPath(pathname, lang);
   }, [pathname]);
-  // Footerul e o secțiune de marketing/legal — îl arătăm doar pe paginile unde
-  // are sens (homepage, contact și paginile legale), nu în restul aplicației.
-  const FOOTER_PATHS = ["/", "/tur-3d", "/contact", "/terms", "/privacy", "/data-deletion", "/cookies"];
-  const showFooter = FOOTER_PATHS.includes(pathname);
+  // Subsolul apare pe TOATE paginile din acest layout. Era limitat la o listă
+  // de șapte rute, ceea ce însemna că de pe căutare, hartă, un anunț, planuri
+  // sau contul tău nu aveai niciun drum către Termeni, Confidențialitate,
+  // Cookies, Ștergerea datelor sau pastilele ANPC/SAL/ODR. Alea nu sunt
+  // decor de marketing: sunt obligatorii și trebuie să fie la un tap distanță
+  // de oriunde. În plus, o listă albă înseamnă că fiecare pagină nouă se naște
+  // fără subsol până își aduce cineva aminte să o adauge — exact ce s-a
+  // întâmplat.
+  //
+  // /post-property și conversațiile nu sunt în acest layout, deci își păstrează
+  // cromul propriu; nu le atinge asta.
   const hideBottomNav = false;
 
   // No CountryProvider and no ScrollToTop here: App.jsx already mounts both
@@ -35,7 +42,7 @@ export default function Layout() {
         <main className="flex-1 overflow-x-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
           <Outlet />
         </main>
-        {showFooter && <Footer />}
+        <Footer />
       </div>
       {/* Cromul fix stă ÎN AFARA containerului cu overflow-x-clip: `clip`
           decupează și descendenții position:fixed, motiv pentru care bara de

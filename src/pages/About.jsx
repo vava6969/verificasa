@@ -243,18 +243,13 @@ export default function About() {
           </h2>
         </Reveal>
         <RevealGroup className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {c.steps.map((s, i) => (
+          {c.steps.map((s) => (
             <RevealItem
               key={s.title}
-              className="relative rounded-2xl border border-border bg-card p-6 shadow-soft transition-shadow hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)]"
+              className="rounded-2xl border border-border bg-card p-6 shadow-soft transition-shadow hover:shadow-[0_20px_45px_-15px_rgba(16,24,40,0.28)]"
             >
-              {/* The step number is pinned to the card, not parked next to the
-                  glyph. Sitting beside it, the gap read differently on every
-                  card, because the glyphs do not fill their box the same way —
-                  a magnifier is a thin diagonal, a handshake fills the square. */}
-              <span className="absolute right-5 top-5 font-heading text-2xl font-bold leading-none text-emerald/25">
-                {i + 1}
-              </span>
+              {/* Fără număr pe card. Cardurile stau oricum în ordine, de la stânga la
+                  dreapta — cifra nu spunea nimic ce nu spunea deja poziția. */}
               <Glyph src={s.icon} className="h-11 w-11" />
               <h3 className="mt-4 font-heading text-base font-bold text-navy dark:text-foreground">{s.title}</h3>
               <p className="mt-1.5 text-sm text-muted-foreground">{s.desc}</p>

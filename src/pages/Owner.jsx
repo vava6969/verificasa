@@ -9,6 +9,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Eye, Plus, Download } from "lucide-react";
 import OwnerCharts from "@/components/OwnerCharts";
 import PropertyWizard from "@/components/postproperty/PropertyWizard";
+import BoostDialog from "@/components/BoostDialog";
+import { PropertyBadge } from "@/components/PropertyBadges";
+import { fetchBoostBalance } from "@/lib/boosts";
+import { isBoosted } from "@/lib/plans";
 
 // Sanitizează intrările telefon la doar cifre (opțional "+" la început pentru internațional).
 const onlyPhoneDigits = (v) => {
@@ -28,6 +32,11 @@ export default function Owner() {
   const [properties, setProperties] = useState(null);
   const [inquiries, setInquiries] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  // Promovarea sta si aici, nu doar in /my-properties. Proprietarul aterizeaza
+  // pe pagina asta din subsol si din meniu; daca butonul exista doar pe cealalta
+  // lista de anunturi, concluzia lui e ca functia nu exista.
+  const [balance, setBalance] = useState(0);
+  const [boostTarget, setBoostTarget] = useState(null);
   const formRef = useRef(null);
 
   // Auto-open the form when the user came from a "Adaugă Anunț" link with ?nou=1
@@ -46,12 +55,14 @@ export default function Owner() {
   const load = async () => {
     if (!user?.id) return;
     try {
-      const [ps, inq] = await Promise.all([
+      const [ps, inq, bal] = await Promise.all([
         base44.entities.Property.filter({ created_by_id: user.id }, "-created_date", 50),
         base44.entities.Inquiry.list("-created_date", 50),
+        fetchBoostBalance(user.id),
       ]);
       setProperties(ps);
       setInquiries(inq);
+      setBalance(bal);
     } catch (e) {
       setProperties([]);
     }
@@ -125,7 +136,10 @@ export default function Owner() {
             </div>
           ) : (
             <div className="mt-4 space-y-3">
-              {properties.map((p) => (
+              {properties.map((p) => {
+                const boosted = isBoosted(p);
+                const approved = p.approval_status === "APPROVED";
+                return (
                 <div key={p.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-soft sm:gap-4 sm:p-4">
                   <div className="h-16 w-24 shrink-0 overflow-hidden rounded-xl bg-secondary">
                     {p.images?.[0] ? <UIImage src={p.images[0]} fittingType="fill" className="h-full w-full" /> : null}
@@ -140,12 +154,24 @@ export default function Owner() {
                       {p.approval_status === "APPROVED" ? (en ? "Approved" : "Aprobat") : (en ? "Pending" : "În așteptare")}
                     </span>
                     <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${p.status === "Activ" ? "bg-emerald-soft text-emerald" : "bg-secondary text-muted-foreground"}`}>{p.status}</span>
+                    {boosted && <PropertyBadge kind="promovat" size="sm" lang={lang} />}
                   </div>
-                  <Button variant="outline" className="h-11 shrink-0 gap-1.5 rounded-full px-4 text-xs">
-                    <Download className="h-3.5 w-3.5" /> {t("contract_pdf")}
-                  </Button>
+                  <div className="flex w-full shrink-0 gap-2 sm:w-auto">
+                    <Button
+                      onClick={() => setBoostTarget(p)}
+                      disabled={!approved}
+                      title={!approved ? (en ? "Approve the listing first" : "Anunțul trebuie aprobat întâi") : undefined}
+                      className="h-11 flex-1 rounded-full bg-emerald px-4 text-xs text-primary-foreground hover:bg-emerald/90 disabled:opacity-50 sm:flex-none"
+                    >
+                      {boosted ? (en ? "Extend" : "Prelungește") : (en ? "Promote" : "Promovează")}
+                    </Button>
+                    <Button variant="outline" className="h-11 flex-1 gap-1.5 rounded-full px-4 text-xs sm:flex-none">
+                      <Download className="h-3.5 w-3.5" /> {t("contract_pdf")}
+                    </Button>
+                  </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -177,6 +203,14 @@ export default function Owner() {
           </div>
         )}
       </div>
+
+      <BoostDialog
+        open={!!boostTarget}
+        onOpenChange={(v) => !v && setBoostTarget(null)}
+        property={boostTarget}
+        balance={balance}
+        onDone={(res) => { setBalance(res.balance ?? balance - 1); load(); }}
+      />
     </div>
   );
 }
