@@ -10,7 +10,7 @@ export default function AuthSwitch({ mode, onChange, labels }) {
   ];
 
   return (
-    <div className="relative flex w-full rounded border border-border bg-secondary/60 p-1">
+    <div className="relative flex w-full rounded border border-white/10 bg-white/[0.06] p-1">
       <div
         className={cn(
           "absolute bottom-1 left-1 top-1 w-[calc(50%-4px)] rounded-[calc(var(--radius)-0.375rem)] bg-primary transition-transform duration-300",
@@ -27,7 +27,7 @@ export default function AuthSwitch({ mode, onChange, labels }) {
           aria-pressed={mode === item.key}
           className={cn(
             "relative z-10 tap-44 min-h-[34px] flex-1 rounded-[calc(var(--radius)-0.375rem)] text-[13px] font-semibold transition-colors duration-300 sm:min-h-[38px] sm:text-sm",
-            mode === item.key ? "text-primary-foreground" : "text-foreground/70 hover:text-foreground"
+            mode === item.key ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"
           )}
         >
           {item.label}

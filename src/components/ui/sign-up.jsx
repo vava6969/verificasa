@@ -124,7 +124,7 @@ export function AuthComponent() {
   if (done) {
     return (
       <AuthLayout title={t("au_done_title")} subtitle={t("au_done_sub")}>
-        <div className="flex items-center gap-2 text-sm text-foreground/80">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin text-primary" aria-hidden="true" />
           {t("au_signing_in")}
         </div>
@@ -153,7 +153,7 @@ export function AuthComponent() {
           {t("au_otp_verify")}
         </SubmitButton>
 
-        <p className="mt-3.5 text-center text-[13px] text-foreground/80 sm:text-sm">
+        <p className="mt-3.5 text-center text-[13px] text-muted-foreground sm:text-sm">
           {t("au_otp_missing")}{" "}
           <button type="button" onClick={resendOtp} className="font-semibold text-primary hover:underline">
             {t("au_otp_resend")}
@@ -192,7 +192,7 @@ export function AuthComponent() {
               {t("au_password")}
             </label>
             {isSignup ? (
-              <span className="text-[11px] leading-none text-foreground/80">{t("au_pw_hint")}</span>
+              <span className="text-[11px] leading-none text-muted-foreground">{t("au_pw_hint")}</span>
             ) : (
               <Link to="/forgot-password" className="text-xs font-medium text-primary hover:underline">
                 {t("au_forgot")}
@@ -206,7 +206,7 @@ export function AuthComponent() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete={isSignup ? "new-password" : "current-password"}
-            className="h-10 sm:h-11"
+            className="h-10 border-white/15 bg-white/[0.06] sm:h-11"
           />
         </div>
 
@@ -230,7 +230,7 @@ export function AuthComponent() {
               onChange={setFullName}
               autoComplete="name"
             />
-            <label className="flex items-start gap-2.5 text-[13px] leading-snug text-foreground/80 sm:text-sm">
+            <label className="flex items-start gap-2.5 text-[13px] leading-snug text-muted-foreground sm:text-sm">
               <input
                 type="checkbox"
                 checked={agreed}
@@ -260,7 +260,7 @@ export function AuthComponent() {
       {/* Social comes after the form: the email path is the real one. */}
       <div className="my-3.5 flex items-center gap-3 sm:my-5">
         <div className="h-px flex-1 bg-border" />
-        <span className="text-[11px] text-foreground/80 sm:text-xs">{t("au_or")}</span>
+        <span className="text-[11px] text-muted-foreground sm:text-xs">{t("au_or")}</span>
         <div className="h-px flex-1 bg-border" />
       </div>
 
@@ -290,9 +290,9 @@ function Field({ id, name, label, hint, type = "text", value, onChange, autoComp
         onChange={(e) => onChange(e.target.value)}
         autoComplete={autoComplete}
         autoFocus={autoFocus}
-        className="h-10 sm:h-11"
+        className="h-10 border-white/15 bg-white/[0.06] sm:h-11"
       />
-      {hint && <p className="text-[10.5px] leading-tight text-foreground/80 sm:text-xs">{hint}</p>}
+      {hint && <p className="text-[10.5px] leading-tight text-muted-foreground sm:text-xs">{hint}</p>}
     </div>
   );
 }
@@ -320,7 +320,7 @@ function SocialButton({ children, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="flex h-10 items-center justify-center gap-2 rounded border border-border bg-card/50 text-[13px] font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-secondary/40 sm:h-11 sm:text-sm"
+      className="flex h-10 items-center justify-center gap-2 rounded border border-white/15 bg-white/[0.06] text-[13px] font-medium text-foreground transition-colors hover:border-primary/60 hover:bg-white/[0.12] sm:h-11 sm:text-sm"
     >
       {children}
     </button>

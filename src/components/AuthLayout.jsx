@@ -8,16 +8,23 @@ import ThemeToggle from "@/components/ThemeToggle";
 // password and OAuth consent. One architecture, so the page does not change
 // shape when a user clicks through from sign in to "Ai uitat parola?".
 //
-// A full-bleed photograph sits behind an ink scrim and a card at 60% opacity.
+// A full-bleed photograph sits behind an ink scrim and a pane of dark glass.
 // The photos are viewings across the country, and each one names where it is in
 // mono at the foot of the frame — the background states the claim the product
 // makes, instead of just setting a mood, so the card lets it through instead of
 // covering it.
 //
+// The glass is DARK, and that is the whole trick. The card was tried at 60% of
+// the cream surface and it composited to mud: cream over a navy scrim lands on
+// a flat grey around #AEABA7, where the fields, the idle tab and the card all
+// sit within a few points of each other and the whole form reads as disabled.
+// Carrying `dark` on the card re-points every token underneath it — ink becomes
+// cream, the surfaces go night — so one class buys a translucent pane that the
+// photograph shows through and that every child still styles itself against.
+//
 // The card is sized for a phone, not for a laptop window shrunk down: measured
-// at 375x812, the sign-in screen lands around 470px tall and never scrolls.
-// Secondary text on the card is foreground/70, not muted-foreground — muted ink
-// over a 60% card on a dark photograph drops under the contrast floor.
+// at 375x812, sign in lands around 460px tall and sign up around 680px, both
+// inside the 691px a phone actually shows.
 //
 // NOTE: the `icon` prop is still accepted by callers but no longer rendered;
 // the wordmark carries the branding instead of a decorative lucide medallion.
@@ -89,7 +96,7 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, hsl(var(--navy-deep) / 0.58) 0%, hsl(var(--navy-deep) / 0.74) 100%)",
+              "linear-gradient(180deg, hsl(var(--navy-deep) / 0.48) 0%, hsl(var(--navy-deep) / 0.68) 100%)",
           }}
         />
       </div>
@@ -110,12 +117,12 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
           <VerifiCasaLogo size={26} tone="light" tagline={false} />
         </Link>
 
-        <div className="w-full max-w-[21rem] rounded border border-white/25 bg-card/60 p-4 shadow-[0_18px_44px_-20px_rgba(0,0,0,0.55)] backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 sm:max-w-[24rem] sm:p-7">
+        <div className="dark w-full max-w-[21rem] rounded border border-white/15 bg-card/55 p-4 shadow-[0_26px_60px_-26px_rgba(0,0,0,0.8)] backdrop-blur-2xl backdrop-saturate-150 sm:max-w-[24rem] sm:p-7">
           <h1 className="font-heading text-lg font-extrabold tracking-tight text-foreground sm:text-2xl">
             {title}
           </h1>
           {subtitle && (
-            <p className="mt-1 text-[13px] leading-snug text-foreground/80 sm:mt-1.5 sm:text-sm">{subtitle}</p>
+            <p className="mt-1 text-[13px] leading-snug text-muted-foreground sm:mt-1.5 sm:text-sm">{subtitle}</p>
           )}
 
           <div className="mt-3.5 sm:mt-5">{children}</div>

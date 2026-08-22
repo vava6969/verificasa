@@ -137,7 +137,7 @@ export default function OAuthConsent() {
   if (checking) {
     return (
       <AuthLayout icon={ShieldCheck} title="Authorize access">
-        <div className="flex items-center justify-center py-6 text-foreground/80">
+        <div className="flex items-center justify-center py-6 text-muted-foreground">
           <Loader2 className="w-5 h-5 mr-2 animate-spin" aria-hidden="true" />
           Loading…
         </div>
@@ -209,7 +209,7 @@ export default function OAuthConsent() {
                 {tool.title || tool.name}
               </span>
               {tool.description && (
-                <span className="text-foreground/80">{tool.description}</span>
+                <span className="text-muted-foreground">{tool.description}</span>
               )}
             </li>
           ))}
