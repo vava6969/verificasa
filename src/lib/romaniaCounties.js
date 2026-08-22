@@ -46,7 +46,11 @@ export const ROMANIA_COUNTIES = [
 ];
 
 export const ROMANIA_CENTER = [45.94, 24.97];
-export const ROMANIA_MAX_BOUNDS = [[43.2, 19.5], [48.8, 30.5]];
+
+// Cutia hărții s-a mutat în `romaniaOutline.js`, lângă conturul din care e
+// derivată — cea de aici era desenată cu ochiul, cu ~30 km de joc pe fiecare
+// latură, iar la zoom mic lăsa jumătate de Europă în cadru.
+// Vezi ROMANIA_BOUNDS / ROMANIA_MAX_BOUNDS acolo.
 
 export function getCountyCenter(name) {
   const c = ROMANIA_COUNTIES.find((c) => c.name === name);

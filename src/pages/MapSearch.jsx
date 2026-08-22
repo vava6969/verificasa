@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -12,17 +12,19 @@ import { useAuth } from "@/lib/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import PropertyCard from "@/components/PropertyCard";
 import { buildCoverMap } from "@/lib/covers";
-import MapPropertySheet from "@/components/MapPropertySheet";
+import MapCardRail from "@/components/MapCardRail";
 import MapInfoCards from "@/components/MapInfoCards";
 import SearchFiltersDrawer from "@/components/SearchFiltersDrawer";
 import { getCounty } from "@/components/locations";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  MapPin, Heart, X, ArrowLeft, Plus, Minus, PenLine, Trash2, Check, Loader2,
+  MapPin, Heart, X, ArrowLeft, Plus, Minus, PenLine, Trash2, Check,
   Search, Home, Sparkles, ShieldCheck, PawPrint, BadgePercent, RotateCcw,
+  ChevronLeft, Layers, List,
 } from "lucide-react";
-import { ROMANIA_COUNTIES, ROMANIA_CENTER, ROMANIA_MAX_BOUNDS } from "@/lib/romaniaCounties";
+import { ROMANIA_COUNTIES } from "@/lib/romaniaCounties";
+import { ROMANIA_OUTLINE, ROMANIA_BOUNDS, ROMANIA_MAX_BOUNDS, MASK_RING } from "@/lib/romaniaOutline";
 import { resolvePropertyPlan, PLAN_FILTER_OPTIONS, compareByBoostThenViews } from "@/lib/plans";
 import { fetchActivePlanMap } from "@/lib/subscriptions";
 
@@ -52,6 +54,12 @@ const makeSort = (t) => [
 const norm = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 
 const PAGE_SIZE = 5;
+// Câte carduri intră în banda de pe telefon. Peste atât, se trece la listă —
+// nimeni nu trage prin 200 de carduri cu degetul.
+const RAIL_MAX = 24;
+// Podeaua de la care RomaniaLock remăsoară zoom-ul minim la fiecare
+// redimensionare. Nu se vede niciodată: limita reală o pune tot el, imediat.
+const FLOOR_ZOOM = 3;
 
 function formatCount(n) {
   if (n >= 1000) {
@@ -79,6 +87,41 @@ function tokenColor(name, fallback) {
   if (typeof window === "undefined") return fallback;
   const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   return v ? `hsl(${v})` : fallback;
+}
+
+function readMapColors() {
+  return {
+    draw: tokenColor("--primary", "#1F7048"),
+    // Masca ia culoarea hârtiei paginii, nu un gri oarecare: afară de graniță
+    // nu e „hartă întunecată”, e pagină goală.
+    mask: tokenColor("--background", "#FAF8F3"),
+    border: tokenColor("--primary", "#1F7048"),
+  };
+}
+
+// Culorile hărții, recitite când comută tema.
+//
+// Prima variantă asculta `resolvedTheme` de la next-themes și rămânea cu o
+// comutare în urmă: ThemeProvider e strămoș, deci efectul LUI (cel care pune
+// clasa `dark` pe <html>) rulează DUPĂ efectul paginii, așa că citeam tokenii
+// vechi. Aici ne uităm direct la ce s-a scris pe <html> — nu depinde de
+// ordinea efectelor și prinde orice cale prin care se schimbă tema.
+function useMapColors() {
+  const [colors, setColors] = useState(readMapColors);
+
+  useEffect(() => {
+    const sync = () => setColors((prev) => {
+      const next = readMapColors();
+      const same = next.draw === prev.draw && next.mask === prev.mask && next.border === prev.border;
+      return same ? prev : next;
+    });
+    sync();
+    const obs = new MutationObserver(sync);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style", "data-theme"] });
+    return () => obs.disconnect();
+  }, []);
+
+  return colors;
 }
 
 // Grup de anunțuri = marcă de fascicul: pătrat, cu un al doilea contur, cifre
@@ -136,6 +179,42 @@ function pointInPolygon(lat, lng, polygon) {
     if (intersect) inside = !inside;
   }
   return inside;
+}
+
+// Harta e a României, deci nu se poate ieși din România.
+//
+// `maxBounds` singur nu ajungea: el ține CENTRUL în cutie, iar la zoom mic un
+// ecran lat încape jumătate de Europă în jurul ei — exact ce se vedea în
+// captura clientului. Aici calculăm zoom-ul la care țara umple cadrul și îl
+// facem zoom MINIM, recalculat la fiecare redimensionare (rotirea telefonului,
+// deschiderea listei pe desktop). Restul — fâșiile rămase pe laturi când
+// raportul ecranului nu se potrivește cu al țării — le stinge masca.
+function RomaniaLock() {
+  const map = useMap();
+
+  useEffect(() => {
+    const bounds = L.latLngBounds(ROMANIA_BOUNDS);
+    const apply = () => {
+      // `getBoundsZoom` își taie singur rezultatul la zoom-ul minim CURENT, deci
+      // dacă măsurăm fără să-l coborâm întâi, limita nu poate decât să urce:
+      // rotești telefonul într-un cadru mai mic, iar harta rămâne blocată la
+      // zoom-ul cadrului mare. Coborâm limita, măsurăm, apoi o punem la loc.
+      map.setMinZoom(FLOOR_ZOOM);
+      // `inside: false` = "toată țara să încapă în cadru". Cu `true` ar cere ca
+      // tot cadrul să fie în interiorul cutiei, iar pe un ecran de telefon
+      // (înalt și îngust) asta ar însemna că țara nu se poate vedea întreagă
+      // niciodată.
+      const fit = map.getBoundsZoom(bounds, false);
+      if (!Number.isFinite(fit)) return;
+      map.setMinZoom(fit);
+      if (map.getZoom() < fit) map.setZoom(fit);
+    };
+    apply();
+    map.on("resize", apply);
+    return () => map.off("resize", apply);
+  }, [map]);
+
+  return null;
 }
 
 function MapController({ onBoundsChange, onZoomChange, flyTarget, onFlyDone, onReady }) {
@@ -262,7 +341,10 @@ export default function MapSearch() {
   const [flyTarget, setFlyTarget] = useState(null);
   const [hoveredKey, setHoveredKey] = useState(null);
   const [showListMobile, setShowListMobile] = useState(false);
-  const [selectedProperty, setSelectedProperty] = useState(null);
+  // Pe telefon, anunțul ales nu mai deschide un panou peste hartă: aduce banda
+  // de jos la cardul lui. Ținem doar id-ul.
+  const [selectedId, setSelectedId] = useState(null);
+  const [railOpen, setRailOpen] = useState(true);
   const [mapInstance, setMapInstance] = useState(null);
   const [drawMode, setDrawMode] = useState(false);
   const [polygonPoints, setPolygonPoints] = useState([]);
@@ -275,7 +357,10 @@ export default function MapSearch() {
     try { return new Set(JSON.parse(localStorage.getItem("vc_visited_props") || "[]")); }
     catch { return new Set(); }
   });
-  const drawColor = tokenColor("--primary", "#1F7048");
+
+  // Leaflet primește culori concrete, nu tokeni CSS — vezi useMapColors.
+  const mapColors = useMapColors();
+  const drawColor = mapColors.draw;
 
   const markVisited = useCallback((id) => {
     if (!id) return;
@@ -445,6 +530,43 @@ export default function MapSearch() {
   // 99+ format for badge
   const badgeCount = visibleProperties.length > 99 ? "99+" : String(visibleProperties.length);
 
+  // ---- banda de carduri de pe telefon --------------------------------------
+  // Conținutul ei vine din aceleași rezultate ca lista, dar se ÎNGHEAȚĂ cât
+  // timp e trasă cu degetul: altfel selectarea unui card mută harta, mutarea
+  // hărții schimbă rezultatele, iar cardul de sub deget dispare.
+  const [railBusy, setRailBusy] = useState(false);
+  const [railItems, setRailItems] = useState([]);
+  const railBusyTimer = useRef(null);
+
+  useEffect(() => {
+    const next = visibleProperties.slice(0, RAIL_MAX);
+    if (!railBusy) { setRailItems(next); return; }
+    const id = setTimeout(() => setRailItems(next), 900);
+    return () => clearTimeout(id);
+  }, [visibleProperties, railBusy]);
+
+  const holdRail = useCallback(() => {
+    setRailBusy(true);
+    clearTimeout(railBusyTimer.current);
+    railBusyTimer.current = setTimeout(() => setRailBusy(false), 900);
+  }, []);
+  useEffect(() => () => clearTimeout(railBusyTimer.current), []);
+
+  // Cardul ajuns în centrul benzii aprinde pinul lui. Harta se mută DOAR dacă
+  // pinul a ieșit din cadru — panoramarea la fiecare card ar rescrie lista sub
+  // deget fără motiv.
+  const handleRailSelect = useCallback((id) => {
+    holdRail();
+    setSelectedId(id);
+    setHoveredKey(id);
+    const p = railItems.find((x) => String(x.id) === String(id));
+    if (!p || !mapInstance) return;
+    const ll = L.latLng(p.latitude, p.longitude);
+    if (!mapInstance.getBounds().pad(-0.15).contains(ll)) {
+      mapInstance.panTo(ll, { animate: true, duration: 0.5 });
+    }
+  }, [holdRail, railItems, mapInstance]);
+
   const handleClusterClick = useCallback(
     (cluster) => {
       if (cluster.type === "county") {
@@ -454,13 +576,18 @@ export default function MapSearch() {
       } else if (cluster.type === "property") {
         const isMobile = window.matchMedia("(max-width: 767px)").matches;
         if (isMobile) {
-          setSelectedProperty(cluster);
+          // Telefon: atingi pinul → banda de jos se aduce la cardul lui. Nimic
+          // nu mai urcă peste hartă.
+          holdRail();
+          setRailOpen(true);
+          setSelectedId(cluster.id);
+          setHoveredKey(cluster.id);
         } else {
           navigate(`/property/${cluster.id}`);
         }
       }
     },
-    [navigate]
+    [navigate, holdRail]
   );
 
   const saveSearch = async () => {
@@ -499,15 +626,21 @@ export default function MapSearch() {
 
   return (
     <div className="flex flex-col md:flex-row md:h-[calc(100dvh-3.5rem)]">
-      {/* MAP PANE — z-0 contains all inner z-indexes below the header/dropdown */}
-      <div className="relative z-0 h-[55vh] md:h-full md:flex-1">
+      {/* MAP PANE — z-0 contains all inner z-indexes below the header/dropdown.
+          Pe telefon harta ține tot ecranul dintre antet și bara de jos: e o
+          hartă, nu o ilustrație pusă deasupra unei pagini care se derulează.
+          Subsolul rămâne dedesubt, în firul paginii. */}
+      <div className="relative z-0 h-[calc(100dvh-3.5rem-4rem-env(safe-area-inset-bottom))] md:h-full md:flex-1">
         <MapContainer
-          center={ROMANIA_CENTER}
-          zoom={6}
-          minZoom={6}
+          bounds={ROMANIA_BOUNDS}
           maxZoom={18}
           maxBounds={ROMANIA_MAX_BOUNDS}
-          maxBoundsViscosity={0.8}
+          maxBoundsViscosity={1}
+          // Zoom în sferturi. Cu pasul întreg, „încape toată țara" se rotunjea
+          // în jos cu până la un nivel complet — pe telefon România ieșea la
+          // jumătate de ecran, cu restul cadrului gri degeaba. Butoanele de
+          // zoom rămân pe pas întreg (`zoomDelta` implicit).
+          zoomSnap={0.25}
           zoomControl={false}
           scrollWheelZoom
           className="h-full w-full"
@@ -532,6 +665,43 @@ export default function MapSearch() {
               attribution='&copy; Esri, Maxar, Earthstar Geographics'
             />
           )}
+
+          {/* MASCA DE ȚARĂ.
+              Un singur poligon: inelul exterior acoperă tot ce poate intra în
+              cadru, iar conturul României e decupat din el. Leaflet umple
+              căile cu `fill-rule: evenodd`, deci gaura se face fără să conteze
+              sensul inelelor. Stă în overlayPane, sub markerPane — un anunț
+              lipit de graniță rămâne la fel de vizibil, doar peticul de hartă
+              de lângă el se stinge. `interactive: false` ca masca să nu
+              înghită click-urile de desenare a parcelei. */}
+          <Polygon
+            positions={[MASK_RING, ROMANIA_OUTLINE]}
+            interactive={false}
+            /* `className` merge ca prop de sine stătător, nu în `pathOptions`:
+               react-leaflet trimite pathOptions prin `setStyle`, iar acela nu
+               atinge clasa — ea se citește o singură dată, la construirea căii. */
+            className="vc-map-mask"
+            pathOptions={{
+              stroke: false,
+              fill: true,
+              fillColor: mapColors.mask,
+              fillOpacity: 0.94,
+              fillRule: "evenodd",
+            }}
+          />
+          {/* Granița desenată peste mască: fără ea, marginea măștii pare o
+              eroare de randare, nu o linie de hotar. */}
+          <Polygon
+            positions={ROMANIA_OUTLINE}
+            interactive={false}
+            className="vc-map-border"
+            pathOptions={{
+              color: mapColors.border,
+              weight: 1.25,
+              opacity: 0.55,
+              fill: false,
+            }}
+          />
 
           {/* County labels at low zoom */}
           {zoom < 8 &&
@@ -592,6 +762,7 @@ export default function MapSearch() {
             );
           })}
 
+          <RomaniaLock />
           <MapController
             onBoundsChange={setBounds}
             onZoomChange={setZoom}
@@ -603,16 +774,20 @@ export default function MapSearch() {
         </MapContainer>
 
 
+        {/* ================= CROMUL DE DESKTOP =================
+            Pastile cu text, pe patru colțuri. Rămâne cum era — pe un ecran lat
+            harta nu duce lipsă de spațiu, iar clientul nu a reclamat-o. */}
+
         {/* Înapoi */}
         <button
           onClick={() => navigate("/")}
-          className="absolute left-3 top-4 z-[1000] flex min-h-[40px] items-center gap-1.5 rounded-full border border-border bg-background px-4 text-sm font-semibold text-foreground shadow-md transition-colors hover:border-emerald"
+          className="absolute left-3 top-4 z-[1000] hidden min-h-[40px] items-center gap-1.5 rounded-full border border-border bg-background px-4 text-sm font-semibold text-foreground shadow-md transition-colors hover:border-emerald md:flex"
         >
           <ArrowLeft className="h-4 w-4" /> {en ? "Back" : "Înapoi"}
         </button>
 
         {/* Zoom */}
-        <div className="absolute left-3 top-16 z-[1000] hidden flex-col divide-y divide-border overflow-hidden rounded-full border border-border bg-background shadow-md sm:flex">
+        <div className="absolute left-3 top-16 z-[1000] hidden flex-col divide-y divide-border overflow-hidden rounded-full border border-border bg-background shadow-md md:flex">
           <button
             onClick={() => mapInstance?.zoomIn()}
             className="flex h-9 w-9 items-center justify-center text-foreground transition-colors hover:bg-secondary"
@@ -630,7 +805,7 @@ export default function MapSearch() {
         </div>
 
         {/* PLAN / SATELIT — file ștampilate */}
-        <div className="absolute right-3 top-4 z-[1000] flex divide-x divide-border overflow-hidden rounded-full border border-border bg-background shadow-md">
+        <div className="absolute right-3 top-4 z-[1000] hidden divide-x divide-border overflow-hidden rounded-full border border-border bg-background shadow-md md:flex">
           {[
             { id: "plan", label: "PLAN" },
             { id: "satelit", label: "SATELIT" },
@@ -649,7 +824,7 @@ export default function MapSearch() {
         </div>
 
         {/* Salvează căutarea + desenare zonă */}
-        <div className="absolute right-3 top-16 z-[1000] flex flex-col items-end gap-1.5">
+        <div className="absolute right-3 top-16 z-[1000] hidden flex-col items-end gap-1.5 md:flex">
           <button
             onClick={saveSearch}
             className="flex min-h-[40px] items-center gap-1.5 rounded-full border border-border bg-background px-4 text-sm font-semibold text-foreground shadow-md transition-colors hover:border-emerald"
@@ -690,34 +865,168 @@ export default function MapSearch() {
           )}
         </div>
 
+        {/* ================= CROMUL DE TELEFON =================
+            Reclamația clientului era că harta nu se vede de butoane. Pe telefon
+            nu mai există pastile cu text peste hartă: un singur rând sus (înapoi
+            / căutare / filtre) și o capsulă de unelte pe dreapta, toate rotunde
+            și de 44px. Rezultatele s-au mutat într-o bandă care se trage cu
+            degetul, jos — modelul DayUse. */}
+
+        {/* Rândul de sus */}
+        <div className="pointer-events-none absolute inset-x-2.5 top-2.5 z-[1000] flex items-center gap-2 md:hidden">
+          <button
+            onClick={() => navigate("/")}
+            aria-label={en ? "Back" : "Înapoi"}
+            className="pointer-events-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md transition-transform active:scale-[0.95]"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+
+          {/* Câmpul de căutare deschide lista, unde stau deja autocomplete-ul
+              de localitate, căutarea liberă și filtrele. O singură suprafață de
+              căutare, nu două. */}
+          <button
+            onClick={() => setShowListMobile(true)}
+            className="pointer-events-auto flex h-11 min-w-0 flex-1 items-center gap-2 rounded-full border border-border bg-background px-4 text-left shadow-md transition-transform active:scale-[0.99]"
+          >
+            <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <span className="truncate text-sm font-semibold text-foreground">
+              {cityParam || zoneParam || countyParam || qParam || (en ? "Where to?" : "Unde cauți?")}
+            </span>
+          </button>
+
+          <div className="pointer-events-auto">
+            <SearchFiltersDrawer
+              compact
+              t={t}
+              filters={VERIF_FILTERS}
+              activeFilters={activeFilters}
+              onToggle={toggleFilter}
+              planOptions={PLAN_FILTER_OPTIONS}
+              planFilters={planFilters}
+              onTogglePlan={togglePlan}
+              budget={budget} setBudget={setBudget}
+              roomsMin={roomsMin} setRoomsMin={setRoomsMin}
+              surfaceMin={surfaceMin} setSurfaceMin={setSurfaceMin}
+              fairness={fairness} setFairness={setFairness}
+              fairnessOptions={makeFairness(t)}
+              furnished={furnished} setFurnished={setFurnished}
+              swap={swap} setSwap={setSwap}
+              sort={sort} setSort={setSort}
+              sortOptions={makeSort(t)}
+              onReset={resetFilters}
+            />
+          </div>
+        </div>
+
+        {/* Capsula de unelte, dreapta */}
+        <div className="absolute right-2.5 top-[3.75rem] z-[1000] flex flex-col divide-y divide-border overflow-hidden rounded-2xl border border-border bg-background shadow-md md:hidden">
+          <button
+            onClick={() => setBasemap((b) => (b === "plan" ? "satelit" : "plan"))}
+            aria-label={basemap === "plan" ? "SATELIT" : "PLAN"}
+            className={`flex h-11 w-11 items-center justify-center transition-colors ${
+              basemap === "satelit" ? "bg-emerald text-primary-foreground" : "text-foreground"
+            }`}
+          >
+            <Layers className="h-[18px] w-[18px]" />
+          </button>
+          <button
+            onClick={saveSearch}
+            aria-label={en ? "Save search" : "Salvează căutarea"}
+            className="flex h-11 w-11 items-center justify-center text-foreground transition-colors active:bg-secondary"
+          >
+            <Heart className="h-[18px] w-[18px]" />
+          </button>
+          <button
+            onClick={() => setDrawMode((v) => !v)}
+            aria-label={en ? "Draw an area" : "Desenează o zonă"}
+            aria-pressed={drawMode}
+            className={`flex h-11 w-11 items-center justify-center transition-colors ${
+              drawMode ? "bg-emerald text-primary-foreground" : "text-foreground"
+            }`}
+          >
+            <PenLine className="h-[18px] w-[18px]" />
+          </button>
+          {polygonPoints.length >= 3 && !drawMode && (
+            <button
+              onClick={clearPolygon}
+              aria-label={en ? "Clear parcel" : "Șterge parcela"}
+              className="flex h-11 w-11 items-center justify-center text-destructive transition-colors active:bg-secondary"
+            >
+              <Trash2 className="h-[18px] w-[18px]" />
+            </button>
+          )}
+        </div>
+
         {/* Instrucțiune desenare */}
         {drawMode && (
-          <div className="absolute left-1/2 top-28 z-[1000] -translate-x-1/2 rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold text-foreground shadow-md">
+          <div className="absolute left-1/2 top-[3.9rem] z-[1000] -translate-x-1/2 rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold text-foreground shadow-md md:top-28">
             {en ? "Tap the map to add points" : "Apasă pe hartă pentru a adăuga puncte"}
           </div>
         )}
 
-        {/* Mobil: numărul de înregistrări → deschide lista */}
-        <button
-          onClick={() => setShowListMobile(true)}
-          className="absolute bottom-6 left-1/2 z-[1000] flex min-h-[48px] -translate-x-1/2 items-center gap-2 rounded-full bg-foreground px-6 text-sm font-bold text-background shadow-xl md:hidden"
-        >
-          <MapPin className="h-4 w-4" /> {badgeCount} {en ? "properties" : "proprietăți"}
-        </button>
+        {/* Jos, pe telefon: fie confirmarea parcelei, fie banda de rezultate.
+            Banda nu e o placă opacă peste hartă: fâșiile goale dintre butoane
+            lasă degetul să ajungă la hartă (`pointer-events-none` pe containere,
+            `auto` doar pe ce e de apăsat). */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1000] md:hidden">
+          {drawMode ? (
+            <div className="pointer-events-auto flex items-center justify-center gap-2 px-3 pb-3">
+              <button
+                onClick={cancelDraw}
+                className="flex min-h-[48px] flex-1 items-center justify-center gap-1.5 rounded-full border border-border bg-background text-sm font-semibold text-foreground shadow-lg"
+              >
+                <X className="h-4 w-4" /> {en ? "Cancel" : "Anulează"}
+              </button>
+              <button
+                onClick={finishDraw}
+                className="flex min-h-[48px] flex-1 items-center justify-center gap-1.5 rounded-full bg-emerald text-sm font-bold text-primary-foreground shadow-lg"
+              >
+                <Check className="h-4 w-4" /> {en ? "Finish" : "Finalizează"}
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Rândul de comandă al benzii: câte anunțuri sunt în cadru, un
+                  drum către lista întreagă și un buton care ascunde banda, ca
+                  harta să poată fi văzută goală. */}
+              <div className="flex items-center justify-between gap-2 px-3">
+                <button
+                  onClick={() => setShowListMobile(true)}
+                  className="pointer-events-auto flex min-h-[40px] items-center gap-2 rounded-full bg-foreground px-4 text-sm font-bold text-background shadow-lg"
+                >
+                  <List className="h-4 w-4" /> {badgeCount} {en ? "properties" : "proprietăți"}
+                </button>
+                {railItems.length > 0 && (
+                  <button
+                    onClick={() => setRailOpen((v) => !v)}
+                    aria-pressed={railOpen}
+                    aria-label={
+                      railOpen
+                        ? en ? "Hide cards" : "Ascunde cardurile"
+                        : en ? "Show cards" : "Arată cardurile"
+                    }
+                    className="pointer-events-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-lg"
+                  >
+                    {railOpen ? <X className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
+                  </button>
+                )}
+              </div>
 
-        {/* Mobile bottom sheet */}
-        <MapPropertySheet property={selectedProperty} onClose={() => setSelectedProperty(null)} lang={lang} />
-      </div>
-
-      {/* INFO CARDS (mobile only — fill space below map) */}
-      <div className="space-y-3 p-4 pb-24 md:hidden">
-        {properties === null ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-emerald" />
-          </div>
-        ) : (
-          <MapInfoCards properties={properties} lang={lang} />
-        )}
+              {railOpen && (
+                <div className="pointer-events-auto">
+                  <MapCardRail
+                    properties={railItems}
+                    coverMap={coverMap}
+                    lang={lang}
+                    selectedId={selectedId}
+                    onSelect={handleRailSelect}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       {/* LIST PANE */}
@@ -802,7 +1111,7 @@ export default function MapSearch() {
           {properties === null ? (
             Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-48 rounded-sm" />)
           ) : visibleProperties.length === 0 ? (
-            <div className="border border-dashed border-border px-4 py-16 text-center">
+            <div className="border border-dashed border-border px-4 py-9 text-center sm:py-16">
               <p className="text-sm font-semibold text-foreground">
                 {en ? "No properties in this frame" : "Nicio proprietate în acest cadru"}
               </p>
@@ -841,6 +1150,15 @@ export default function MapSearch() {
                 </button>
               )}
             </>
+          )}
+
+          {/* Cifrele hărții — pe telefon, la coada listei. Stăteau sub hartă,
+              unde tăiau din ea; aici sunt tot la un tap, dar numai când omul a
+              cerut lista. */}
+          {properties !== null && (
+            <div className="space-y-3 pb-24 pt-2 md:hidden">
+              <MapInfoCards properties={properties} lang={lang} />
+            </div>
           )}
         </div>
       </div>
