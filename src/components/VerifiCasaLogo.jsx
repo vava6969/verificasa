@@ -21,6 +21,22 @@ const MARK_LIGHT = "/images/brand/verificasa-mark-white.svg";
 // lățime / înălțime, din viewBox-ul de mai sus
 const MARK_RATIO = 345 / 230.2;
 
+// Sigla trebuie să urmeze TEMA, nu un prop scris de mână.
+//
+// Antetul are `bg-background`, care în modul întunecat e aproape negru. Cu
+// varianta neagră fixată acolo, sigla dispărea în bară — negru pe negru — în
+// timp ce cuvântul de lângă ea se albea singur, pentru că textul folosește
+// `text-foreground`. De aceea clientul a trimis DOUĂ fișiere.
+//
+// Schimbarea se face din CSS, cu `dark:`, nu citind tema din JS: amândouă
+// imaginile stau în pagină și una e ascunsă. Așa nu există niciun cadru în care
+// se vede sigla greșită cât timp se hidratează tema, iar `next-themes` pune deja
+// clasa `dark` pe <html> (tailwind.config.js: darkMode: ["class"]).
+//
+// `tone="light"` rămâne o alegere fermă: alb mereu, indiferent de temă — pentru
+// subsolul pe tuș și pentru siglele așezate peste fotografii, unde fundalul e
+// închis în ambele teme.
+
 export default function VerifiCasaLogo({
   size = 40,
   withWordmark = true,
@@ -30,24 +46,36 @@ export default function VerifiCasaLogo({
   className = "",
 }) {
   const showWordmark = wordmark === false ? false : withWordmark;
-  const src = tone === "light" ? MARK_LIGHT : MARK_DARK;
 
   // Sigla e lată (3:2), deci înălțimea o dă `size`, nu lățimea — altfel ar
   // crește peste rândul în care stă.
   const markH = Math.round(size * 0.62);
   const markW = Math.round(markH * MARK_RATIO);
+  const box = { width: markW, height: markH };
 
-  const Mark = (
+  const markImg = (src, extra) => (
     <img
       src={src}
       alt=""
       aria-hidden="true"
       width={markW}
       height={markH}
-      className="shrink-0 object-contain"
-      style={{ width: markW, height: markH }}
+      className={`shrink-0 object-contain ${extra}`}
+      style={box}
     />
   );
+
+  const Mark =
+    tone === "light" ? (
+      markImg(MARK_LIGHT, "")
+    ) : (
+      // Negru pe hârtie, alb pe noapte. Clasele sunt literale, ca Tailwind să
+      // nu le curețe la build.
+      <>
+        {markImg(MARK_DARK, "dark:hidden")}
+        {markImg(MARK_LIGHT, "hidden dark:block")}
+      </>
+    );
 
   // Doar sigla — acolo unde spațiul e strâns (avatarul din conversații).
   if (!showWordmark) {
