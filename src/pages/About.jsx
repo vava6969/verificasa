@@ -6,19 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useCountry } from "@/components/CountryContext";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-
-// Glossy in-house PNG glyphs (224x224, equal optical size) — rendered in a fixed
-// square box so every icon lands on the same footprint.
-function Glyph({ src, className = "h-12 w-12" }) {
-  return (
-    <img
-      src={src}
-      alt=""
-      aria-hidden="true"
-      className={`${className} shrink-0 object-contain drop-shadow-[0_4px_10px_rgba(16,24,40,0.16)]`}
-    />
-  );
-}
+import Glyph from "@/components/Glyph";
 
 // Real photographs, not renders. Used as the supporting strip in the story block.
 const STORY_SHOTS = [

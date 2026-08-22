@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import StoreBadges from "@/components/StoreBadges";
+import Glyph from "@/components/Glyph";
 import { PLANS, BOOST_PACKS, BOOST_DURATION_DAYS } from "@/lib/plans";
 import { TOUR_3D_LINK_SAMPLE, hasStoreLinks } from "@/lib/appLinks";
 
@@ -193,18 +194,6 @@ const HOUSES = [
   "/images/tur3d/tur3d-house-2-v1.webp",
   "/images/tur3d/tur3d-house-3-v1.webp",
 ];
-
-// Aceeași iconiță lucioasă, pe aceeași amprentă optică, oriunde apare.
-function Glyph({ src, className = "h-14 w-14" }) {
-  return (
-    <img
-      src={src}
-      alt=""
-      aria-hidden="true"
-      className={`${className} shrink-0 object-contain drop-shadow-[0_4px_10px_rgba(16,24,40,0.16)]`}
-    />
-  );
-}
 
 export default function Tur3D() {
   const { lang } = useCountry();

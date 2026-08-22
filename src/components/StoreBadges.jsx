@@ -17,8 +17,8 @@ import { cn } from "@/lib/utils";
 // arată insigna adevărată, în locul formei de mai jos.
 
 const STORES = [
-  { key: "apple", href: APP_STORE_URL, Icon: AppleIcon, top: "Descarcă din", name: "App Store", topEn: "Download on the", art: "/images/stores/app-store-badge.svg" },
-  { key: "play", href: PLAY_STORE_URL, Icon: GooglePlayIcon, top: "Disponibil pe", name: "Google Play", topEn: "Get it on", art: "/images/stores/google-play-badge.png" },
+  { key: "apple", href: APP_STORE_URL, Icon: AppleIcon, top: "Descarcă din", name: "App Store", topEn: "Download on the" },
+  { key: "play", href: PLAY_STORE_URL, Icon: GooglePlayIcon, top: "Disponibil pe", name: "Google Play", topEn: "Get it on" },
 ];
 
 function Shell({ store, en, tone, soon, asLink }) {
