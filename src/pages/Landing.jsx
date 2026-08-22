@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { useCountry } from "@/components/CountryContext";
 import HeroSearch from "@/components/HeroSearch";
 import HeroPhoto from "@/components/HeroPhoto";
 import LoopVideo from "@/components/LoopVideo";
-import InspectieModal from "@/components/InspectieModal";
 import MapSearchCTA from "@/components/MapSearchCTA";
 import ActionCards from "@/components/ActionCards";
 import ValueProps from "@/components/ValueProps";
@@ -12,6 +11,7 @@ import BetaBanner from "@/components/BetaBanner";
 import AboutVerifiCasa from "@/components/AboutVerifiCasa";
 import RecommendedByPlanSection from "@/components/RecommendedByPlanSection";
 import { Reveal } from "@/components/ui/reveal";
+import { PARTNERS } from "@/lib/partners";
 
 // Prima pagină, în forma cerută de client: fotografia ocupă ecranul, titlul e
 // scurt, căutarea stă imediat sub deget. Fără dateline, fără paragraf de
@@ -19,7 +19,10 @@ import { Reveal } from "@/components/ui/reveal";
 export default function Landing() {
   const { t, lang } = useCountry();
   const en = lang === "en";
-  const [showInspectie, setShowInspectie] = useState(false);
+  // Blocul pentru proprietari promite "verificare" — verificarea independentă
+  // e facuta de partener, deci sigla lui sta aici, nu doar pe /parteneri.
+  const partner = PARTNERS.find((p) => p.id === "residence-vertical");
+  const partnerPct = /(\d+)\s*%/.exec(partner?.discount || "");
 
   return (
     <div>
@@ -61,13 +64,16 @@ export default function Landing() {
               >
                 {t("hdr_add")}
               </Link>
-              <button
-                type="button"
-                onClick={() => setShowInspectie(true)}
+              {/* Verificarea o face partenerul, nu noi. Butonul duce la pagina
+                  lui, ca al treilea card din ActionCards — nu deschide un
+                  formular cu marca VerifiCasa pentru un serviciu care nu e al
+                  nostru. */}
+              <Link
+                to="/parteneri"
                 className="inline-flex min-h-[44px] items-center rounded-full border border-white/50 px-5 text-[13px] font-bold text-white backdrop-brightness-90 transition-colors hover:bg-white/15 sm:min-h-[48px] sm:px-6 sm:text-sm"
               >
                 {en ? "Request a check" : "Cere o verificare"}
-              </button>
+              </Link>
             </Reveal>
           </div>
         </div>
@@ -131,13 +137,12 @@ export default function Landing() {
             <h2 className="text-2xl font-bold leading-tight text-white sm:text-4xl">{t("owner_h")}</h2>
 
             <div className="mt-5 flex flex-wrap gap-3 sm:mt-7">
-              <button
-                type="button"
-                onClick={() => setShowInspectie(true)}
-                className="min-h-[48px] rounded-full bg-emerald px-6 text-sm font-bold text-primary-foreground transition-transform hover:scale-[1.03]"
+              <Link
+                to="/parteneri"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-emerald px-6 text-sm font-bold text-primary-foreground transition-transform hover:scale-[1.03]"
               >
                 {t("owner_btn_inspectie")}
-              </button>
+              </Link>
               <Link
                 to="/post-property"
                 className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/50 px-6 text-sm font-bold text-white transition-colors hover:bg-white/15"
@@ -153,11 +158,34 @@ export default function Landing() {
                 </li>
               ))}
             </ul>
+
+            {/* Cele patru bife de mai sus sunt serviciul partenerului. Sigla lui
+                sta sub ele, ca sa nu para ca le facem noi. Varianta alba, direct
+                pe navy — fara caseta. */}
+            {partner && (
+              <Link
+                to="/parteneri"
+                className="tap-44 mt-4 inline-flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-xl border border-white/20 bg-white/5 px-3.5 py-2.5 transition-colors hover:border-white/40 hover:bg-white/10 sm:mt-5"
+              >
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-white/60">
+                  {en ? "Verified by" : "Verificat de"}
+                </span>
+                <img
+                  src={partner.logoLight || partner.logo}
+                  alt={partner.name}
+                  className="h-6 w-auto max-w-[128px] object-contain"
+                  loading="lazy"
+                />
+                {partnerPct && (
+                  <span className="rounded-full bg-emerald/25 px-2.5 py-0.5 text-[11px] font-bold text-white">
+                    {en ? `${partnerPct[1]}% off` : `${partnerPct[1]}% reducere`}
+                  </span>
+                )}
+              </Link>
+            )}
           </div>
         </Reveal>
       </section>
-
-      <InspectieModal open={showInspectie} onClose={() => setShowInspectie(false)} />
     </div>
   );
 }
