@@ -6,17 +6,25 @@ import { ArrowLeft, ArrowRight, Plus, Minus, Loader2 } from "lucide-react";
 import PropertyWizard from "@/components/postproperty/PropertyWizard";
 import LanguageToggle from "@/components/LanguageToggle";
 import BoostDialog from "@/components/BoostDialog";
+import BoostCheckoutModal from "@/components/BoostCheckoutModal";
 import { useCountry } from "@/components/CountryContext";
 import { useWiz } from "@/components/postproperty/wizardCopy";
 import { useAuth } from "@/lib/AuthContext";
-import { fetchBoostBalance, applyBoost } from "@/lib/boosts";
+import { fetchBoostBalance, applyBoost, fetchActiveListingCount } from "@/lib/boosts";
+import { getEntitlements } from "@/lib/plans";
+import { fetchMyActiveSubscription } from "@/lib/subscriptions";
 import { useToast } from "@/components/ui/use-toast";
+
+const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "admin"];
 
 export default function PostProperty() {
   const [submitted, setSubmitted] = useState(false);
   const [created, setCreated] = useState(null);
   const [balance, setBalance] = useState(0);
   const [boosting, setBoosting] = useState(false);
+  // Cumpărarea de boost-uri se face AICI, în pagină (cererea clientului) —
+  // dialogul de mai jos; /upgrade rămâne doar pentru cine vrea pagina întreagă.
+  const [buyOpen, setBuyOpen] = useState(false);
   // Câte promovări pune pe anunțul ăsta. Boost-urile se adună și nu expiră,
   // deci numărul chiar înseamnă ceva: fiecare îl urcă mai sus.
   const [qty, setQty] = useState(1);
@@ -26,14 +34,47 @@ export default function PostProperty() {
   const { w } = useWiz();
   const { toast } = useToast();
   const en = lang === "en";
+  const isAdmin = ADMIN_ROLES.includes((user?.role || "").toUpperCase());
+
+  // Limita de anunțuri se spune LA UȘĂ, nu la ultimul pas. Până acum
+  // CheckListingAllowance rula abia la Publică: omul completa cinci pași ca
+  // să afle la final că planul lui nu mai are locuri. Verificarea serverului
+  // rămâne neatinsă — asta e doar vestea, dată înainte de muncă.
+  // undefined = se verifică; null = liber; obiect = blocat.
+  const [gate, setGate] = useState(undefined);
+  useEffect(() => {
+    if (!user?.id) return;
+    if (isAdmin) { setGate(null); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const [sub, count] = await Promise.all([
+          fetchMyActiveSubscription(user.id),
+          fetchActiveListingCount(user.id),
+        ]);
+        if (cancelled) return;
+        const planId = sub?.plan_id || null;
+        const max = getEntitlements(planId).activeListings;
+        setGate(max !== null && count >= max ? { used: count, max, planId } : null);
+      } catch (_) {
+        // O eroare de rețea nu ține omul afară — limita reală e la publicare.
+        if (!cancelled) setGate(null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id, isAdmin]);
 
   // Soldul se citește după publicare, nu la intrarea în formular: până nu
   // există un anunț, nu are ce oferi.
   useEffect(() => {
     if (!submitted || !user?.id) return;
     let cancelled = false;
-    fetchBoostBalance(user.id).then((b) => { if (!cancelled) setBalance(b); });
-    return () => { cancelled = true; };
+    const load = () => fetchBoostBalance(user.id).then((b) => { if (!cancelled) setBalance(b); });
+    load();
+    // Fallback-ul de cumpărare se deschide în filă nouă; la întoarcere, soldul
+    // de aici trebuie să fie deja cel nou.
+    window.addEventListener("focus", load);
+    return () => { cancelled = true; window.removeEventListener("focus", load); };
   }, [submitted, user?.id]);
 
   // ApplyBoost acceptă și anunțul PENDING al propriului autor (23.08) — deci
@@ -182,17 +223,16 @@ export default function PostProperty() {
                     {en ? "Promote now" : "Promovează acum"}
                   </Button>
                 ) : (
-                  <Button asChild className="h-11 rounded-full bg-emerald px-5 text-sm text-white hover:bg-emerald/90">
-                    <Link to="/upgrade">
-                      {balance >= 1
-                        ? (en ? `You have ${balance} boosts` : `Ai ${balance} boost-uri`)
-                        : (en ? "Buy boosts" : "Cumpără boost-uri")}
-                    </Link>
+                  <Button
+                    onClick={() => setBuyOpen(true)}
+                    className="h-11 rounded-full bg-emerald px-5 text-sm text-white hover:bg-emerald/90"
+                  >
+                    {en ? "Buy boosts" : "Cumpără boost-uri"}
                   </Button>
                 )}
                 {boostable && balance >= 1 && (
-                  <Button asChild variant="outline" className="h-11 rounded-full px-5 text-sm">
-                    <Link to="/upgrade">{en ? "Buy more" : "Cumpără mai multe"}</Link>
+                  <Button variant="outline" onClick={() => setBuyOpen(true)} className="h-11 rounded-full px-5 text-sm">
+                    {en ? "Buy more" : "Cumpără mai multe"}
                   </Button>
                 )}
                 <Button asChild variant="outline" className="h-11 gap-1.5 rounded-full px-5 text-sm">
@@ -219,6 +259,43 @@ export default function PostProperty() {
               balance={balance}
               onDone={(res) => setBalance(res.balance ?? balance - 1)}
             />
+            <BoostCheckoutModal
+              open={buyOpen}
+              onOpenChange={setBuyOpen}
+              onDone={(newBalance) => {
+                if (typeof newBalance === "number") setBalance(newBalance);
+              }}
+            />
+          </div>
+        ) : gate === undefined ? (
+          <div className="mt-5 h-64 animate-pulse rounded-2xl border border-border bg-card sm:mt-8" />
+        ) : gate ? (
+          <div className="surface-card mt-5 rounded-2xl p-6 text-center sm:mt-8 sm:p-8">
+            <img
+              src="/images/generated/icon-percent-badge.png"
+              alt=""
+              aria-hidden="true"
+              className="mx-auto h-16 w-16 object-contain"
+            />
+            <h1 className="mt-4 font-heading text-xl font-bold text-navy dark:text-foreground sm:text-2xl">
+              {w.err_limit_t}
+            </h1>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+              {en
+                ? `${gate.used} of ${gate.max} active ${gate.max === 1 ? "listing" : "listings"} on ${gate.planId ? gate.planId.charAt(0).toUpperCase() + gate.planId.slice(1) : "no plan"}. `
+                : `${gate.used} din ${gate.max} ${gate.max === 1 ? "anunț activ" : "anunțuri active"} pe ${gate.planId ? gate.planId.charAt(0).toUpperCase() + gate.planId.slice(1) : "fără plan"}. `}
+              {w.err_limit_d}
+            </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <Button asChild className="h-11 rounded-full bg-emerald px-6 text-white hover:bg-emerald/90 sm:h-12">
+                <Link to="/upgrade">{en ? "See the plans" : "Vezi planurile"}</Link>
+              </Button>
+              <Button asChild variant="outline" className="h-11 gap-1.5 rounded-full px-5 sm:h-12">
+                <Link to="/my-properties">
+                  {en ? "My listings" : "Anunțurile mele"} <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
         ) : (
           <>
