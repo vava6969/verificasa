@@ -491,12 +491,17 @@ export default function PropertyDetail() {
 
               {/* Câte promovări poartă anunțul. Boost-urile se adună și nu expiră,
                   deci numărul e o informație, nu un cronometru — stă exact
-                  înaintea datelor despre locuință, cum a cerut clientul. */}
-              {boostCount(p) > 0 && (
+                  înaintea datelor despre locuință, cum a cerut clientul. Linia
+                  apare pe fiecare anunț, inclusiv la zero — altfel „lipsește". */}
+              {boostCount(p) > 0 ? (
                 <p className="mt-1 text-[11px] font-semibold text-muted-foreground/80">
                   {lang === "en"
                     ? `Promoted · ${boostCount(p)} ${boostCount(p) === 1 ? "boost" : "boosts"} on this listing`
                     : `Promovat · ${boostCount(p)} boost${boostCount(p) === 1 ? "" : "-uri"} pe acest anunț`}
+                </p>
+              ) : (
+                <p className="mt-1 text-[11px] text-muted-foreground/60">
+                  {lang === "en" ? "Boosts used: 0" : "Boost-uri folosite: 0"}
                 </p>
               )}
 
