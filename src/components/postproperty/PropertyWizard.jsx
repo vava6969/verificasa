@@ -160,9 +160,11 @@ export default function PropertyWizard({ onDone, onCancel }) {
     setTimeout(() => confetti({ particleCount: 70, angle: 60, spread: 60, origin: { x: 0, y: origin.y }, colors }), 120);
     setTimeout(() => confetti({ particleCount: 70, angle: 120, spread: 60, origin: { x: 1, y: origin.y }, colors }), 120);
 
-    // Let the success state show, then leave.
+    // Let the success state show, then leave. Anunțul creat pleacă mai departe:
+    // ecranul de final oferă promovarea, iar pentru asta îi trebuie id-ul și
+    // starea de aprobare.
     await new Promise((r) => setTimeout(r, 1500));
-    onDone?.();
+    onDone?.(created);
   };
 
   const Current = STEPS[step];
