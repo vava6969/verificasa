@@ -168,9 +168,15 @@ export const PLAN_BY_ID = Object.fromEntries(PLANS.map((p) => [p.id, p]));
 
 // ---------------------------------------------------------------------------
 // PACHETE DE BOOST (client, 21.08 — prețuri provizorii, le schimbă Andrei)
-// Un singur loc de editat: preț, număr de boost-uri, durata unui boost.
+// Un singur loc de editat: preț și număr de boost-uri.
+//
+// BOOST-URILE NU AU DURATĂ (decizia clientului, 22.08). Un boost stă pe anunț
+// cât stă și anunțul. Nu mai există „până la data X", nu mai există
+// „Prelungește", iar ExpireBoosts nu mai stinge nimic. Câmpurile de dată
+// (Boost.ends_date, Property.boost_ends_date) rămân în schemă — ends_date e
+// obligatoriu acolo — dar nu le mai citește nimeni: se scrie o dată în viitor
+// și atât. Schema n-a fost atinsă, deci nu e nevoie de publish ca să meargă.
 // ---------------------------------------------------------------------------
-export const BOOST_DURATION_DAYS = 7;
 
 // b1 e pachetul „cumperi unul și gata": clientul a cerut explicit ca un
 // proprietar să poată promova un anunț fără să fie obligat să ia un pachet.
@@ -236,13 +242,10 @@ export function compareByPlanThenViews(planOf) {
   };
 }
 
-// Un anunț e promovat doar dacă boost-ul e activ ȘI nu a expirat — nu ne bazăm
-// exclusiv pe flag, ca un ExpireBoosts nerulat să nu lase anunțuri promovate
-// la nesfârșit.
+// Un anunț e promovat dacă are flagul pus. Atât. Data de expirare nu se mai
+// citește — vezi nota de la pachetele de boost.
 export function isBoosted(property) {
-  if (!property?.boost_active) return false;
-  if (!property.boost_ends_date) return true;
-  return new Date(property.boost_ends_date).getTime() > Date.now();
+  return !!property?.boost_active;
 }
 
 // Ordonare în interiorul unei liste deja filtrate: promovatele primele, apoi

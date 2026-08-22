@@ -1,6 +1,6 @@
 import { secrets } from "base44:runtime";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { addCredits, BOOST_DURATION_DAYS } from "../../shared/boosts.js";
+import { addCredits, BOOST_NEVER_ENDS } from "../../shared/boosts.js";
 
 // Confirmă server-side o plată de boost-uri și scrie creditele în registru.
 // Idempotent pe session_id: o reîncărcare a paginii de succes nu dublează.
@@ -58,10 +58,10 @@ export default async function (req: Request): Promise<Response> {
       try {
         const p: any = await svc.entities.Property.get(propertyId);
         if (p && p.created_by_id === me.id && p.approval_status === "APPROVED") {
+          // Boost-ul nu expiră — data se scrie doar pentru că e obligatorie în
+          // schema Boost. Vezi shared/boosts.js.
           const now = Date.now();
-          const currentEnd = p.boost_ends_date ? new Date(p.boost_ends_date).getTime() : 0;
-          const from = currentEnd > now ? currentEnd : now;
-          boostEndsDate = new Date(from + BOOST_DURATION_DAYS * 86400000).toISOString();
+          boostEndsDate = BOOST_NEVER_ENDS;
 
           await svc.entities.Boost.create({
             property_id: propertyId,

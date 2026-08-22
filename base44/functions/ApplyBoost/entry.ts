@@ -1,5 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { getBalance, addCredits, BOOST_DURATION_DAYS } from "../../shared/boosts.js";
+import { getBalance, addCredits, BOOST_NEVER_ENDS } from "../../shared/boosts.js";
 
 // Consumă un credit și promovează un anunț. Verifică server-side că anunțul
 // chiar aparține celui care cere: boost-ul se scrie cu asServiceRole, deci
@@ -33,11 +33,14 @@ export default async function (req: Request): Promise<Response> {
       return Response.json({ error: "Nu ai boost-uri disponibile.", balance: 0 });
     }
 
-    // Un boost activ se prelungește, nu se irosește.
+    // Boost-ul nu expiră, deci nu se mai prelungește nimic: un anunț deja
+    // promovat nu are ce să mai primească, iar creditul nu se cheltuie degeaba.
     const now = Date.now();
-    const currentEnd = p.boost_ends_date ? new Date(p.boost_ends_date).getTime() : 0;
-    const from = currentEnd > now ? currentEnd : now;
-    const endsDate = new Date(from + BOOST_DURATION_DAYS * 86400000).toISOString();
+    if (p.boost_active) {
+      const bal = await getBalance(svc, me.id);
+      return Response.json({ ok: true, already: true, balance: bal });
+    }
+    const endsDate = BOOST_NEVER_ENDS;
 
     // ORDINEA CONTEAZĂ. Înainte, anunțul se promova întâi și creditul se scădea
     // după — fără tranzacție și fără revenire. Dacă scăderea eșua (registrul

@@ -10,7 +10,6 @@ import { useCountry } from "@/components/CountryContext";
 import { useWiz } from "@/components/postproperty/wizardCopy";
 import { useAuth } from "@/lib/AuthContext";
 import { fetchBoostBalance } from "@/lib/boosts";
-import { BOOST_DURATION_DAYS } from "@/lib/plans";
 
 export default function PostProperty() {
   const [submitted, setSubmitted] = useState(false);
@@ -95,8 +94,8 @@ export default function PostProperty() {
                   </p>
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                     {en
-                      ? `A boost lifts this listing above the rest of its band for ${BOOST_DURATION_DAYS} days.`
-                      : `Un boost ridică anunțul peste restul categoriei sale timp de ${BOOST_DURATION_DAYS} zile.`}
+                      ? "A boost lifts this listing above the rest of its band, for as long as it is up."
+                      : "Un boost ridică anunțul peste restul categoriei sale, cât timp e publicat."}
                     {" "}
                     {approved
                       ? (en ? `You have ${balance}.` : `Ai ${balance}.`)

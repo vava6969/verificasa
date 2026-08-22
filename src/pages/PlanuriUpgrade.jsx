@@ -11,7 +11,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
 import { base44 } from "@/api/base44Client";
 import { Reveal as HouseReveal } from "@/components/ui/reveal";
-import { PLANS, FREE_PLAN, BOOST_PACKS, BOOST_DURATION_DAYS, boostUnitPrice, featureText } from "@/lib/plans";
+import { PLANS, FREE_PLAN, BOOST_PACKS, boostUnitPrice, featureText } from "@/lib/plans";
 
 // ---------------------------------------------------------------------------
 // Pagina de planuri, în forma cerută de client: cardurile albastre cu insignă
@@ -642,8 +642,8 @@ export default function PlanuriUpgrade() {
             </Reveal>
             <Reveal as="p" index={1} className="mx-auto w-full text-sm text-gray-600 dark:text-neutral-400 sm:w-[75%] sm:text-base">
               {en
-                ? `A boost lifts one listing above the rest of its band for ${BOOST_DURATION_DAYS} days. Buy a single one, or a pack if you list often.`
-                : `Un boost ridică un anunț peste restul categoriei sale timp de ${BOOST_DURATION_DAYS} zile. Cumperi unul singur, sau un pachet dacă postezi des.`}
+                ? "A boost lifts one listing above the rest of its band, and stays on it for as long as the listing is up. Buy a single one, or a pack if you list often."
+                : "Un boost ridică un anunț peste restul categoriei sale și rămâne pe el cât timp anunțul e publicat. Cumperi unul singur, sau un pachet dacă postezi des."}
             </Reveal>
           </div>
 

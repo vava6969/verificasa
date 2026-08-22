@@ -9,7 +9,7 @@ import StoreBadges from "@/components/StoreBadges";
 import Glyph from "@/components/Glyph";
 import LoopVideo from "@/components/LoopVideo";
 import PhotoMarquee from "@/components/PhotoMarquee";
-import { PLANS, FREE_PLAN, BOOST_PACKS, BOOST_DURATION_DAYS } from "@/lib/plans";
+import { PLANS, FREE_PLAN, BOOST_PACKS } from "@/lib/plans";
 import { startPlanCheckout, startBoostCheckout } from "@/lib/checkout";
 import { TOUR_3D_LINK_SAMPLE, hasStoreLinks } from "@/lib/appLinks";
 
@@ -103,7 +103,7 @@ const CONTENT = {
     pay_err_h: "Nu am putut porni plata",
     pay_err_p: "Încearcă din nou în câteva minute.",
     packs_h: "Sau la bucată",
-    packs_p: `O promovare ridică un anunț peste restul categoriei sale timp de ${BOOST_DURATION_DAYS} zile.`,
+    packs_p: "O promovare ridică un anunț peste restul categoriei sale cât timp anunțul e publicat.",
     packs_unit: (n) => (n === 1 ? "promovare" : "promovări"),
 
     field_h: "Unde ajunge linkul",
@@ -194,7 +194,7 @@ const CONTENT = {
     pay_err_h: "Could not start the payment",
     pay_err_p: "Try again in a few minutes.",
     packs_h: "Or one at a time",
-    packs_p: `A boost lifts one listing above the rest of its band for ${BOOST_DURATION_DAYS} days.`,
+    packs_p: "A boost lifts one listing above the rest of its band, for as long as the listing is up.",
     packs_unit: (n) => (n === 1 ? "boost" : "boosts"),
 
     field_h: "Where the link goes",

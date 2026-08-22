@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useCountry } from "@/components/CountryContext";
 import { useToast } from "@/components/ui/use-toast";
-import { BOOST_DURATION_DAYS, SINGLE_BOOST_PACK } from "@/lib/plans";
+import { SINGLE_BOOST_PACK, isBoosted } from "@/lib/plans";
 import { applyBoost, buyBoostForProperty } from "@/lib/boosts";
 
 // Confirmarea consumului unui boost. Cheltuirea unui credit e ireversibilă, iar
@@ -20,12 +20,9 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
   const en = lang === "en";
 
   const hasCredits = balance >= 1;
-  const now = Date.now();
-  const currentEnd = property?.boost_ends_date ? new Date(property.boost_ends_date).getTime() : 0;
-  const from = currentEnd > now ? currentEnd : now;
-  const until = new Date(from + BOOST_DURATION_DAYS * 86400000);
-  const untilLabel = until.toLocaleDateString(en ? "en-GB" : "ro-RO", { day: "2-digit", month: "long", year: "numeric" });
-  const extending = currentEnd > now;
+  // Boost-ul nu expiră, deci nu se prelungește — un anunț deja promovat nu mai
+  // are ce cumpăra.
+  const already = isBoosted(property);
 
   // Sold zero: cumperi UNUL, pentru ACEST anunț, dintr-o singură apăsare.
   // Backendul pune property_id în metadata sesiunii Stripe, iar
@@ -75,22 +72,26 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
       <AlertDialogContent className="rounded-2xl border-border">
         <AlertDialogHeader>
           <AlertDialogTitle className="font-heading text-xl font-semibold">
-            {extending
-              ? (en ? "Extend the promotion?" : "Prelungești promovarea?")
+            {already
+              ? (en ? "Already promoted" : "Deja promovat")
               : (en ? "Promote this listing?" : "Promovezi acest anunț?")}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-sm text-muted-foreground">
-            {hasCredits
+            {already
               ? (en
-                ? "Promoted listings rank above the rest of their band and are labelled as paid placement."
-                : "Anunțurile promovate se clasează peste restul categoriei lor și sunt marcate ca plasare plătită.")
+                ? "This listing is promoted for as long as it stays up. There is nothing more to buy for it."
+                : "Anunțul e promovat cât timp stă publicat. Nu mai ai ce cumpăra pentru el.")
+              : hasCredits
+              ? (en
+                ? "Promoted listings rank above the rest of their band, for as long as they are up, and are labelled as paid placement."
+                : "Anunțurile promovate se clasează peste restul categoriei lor cât timp sunt publicate și sunt marcate ca plasare plătită.")
               : (en
                 ? `You have no boosts left. Buy one for this listing — ${SINGLE_BOOST_PACK.priceRon.toLocaleString("ro-RO", { minimumFractionDigits: 2 })} RON, applied as soon as you are back.`
                 : `Nu mai ai boost-uri. Cumperi unul pentru acest anunț — ${SINGLE_BOOST_PACK.priceRon.toLocaleString("ro-RO", { minimumFractionDigits: 2 })} RON, se aplică singur la întoarcere.`)}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        {!hasCredits && (
+        {!already && !hasCredits && (
           // Pachetele rămân la un tap distanță — cine promovează des ia 6 sau
           // 12 deodată, la un preț pe boost mai mic.
           <p className="text-sm text-muted-foreground">
@@ -101,13 +102,13 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
           </p>
         )}
 
-        {hasCredits && (
+        {!already && hasCredits && (
           <dl className="space-y-2 rounded-2xl bg-secondary/60 px-4 py-3">
             {[
               [en ? "Listing" : "Anunț", property?.title || "—"],
               [en ? "Cost" : "Cost", en ? "1 boost" : "1 boost"],
               [en ? "Balance after" : "Sold rămas", String(Math.max(0, balance - 1))],
-              [en ? "Visible until" : "Vizibil până la", untilLabel],
+              [en ? "Lasts" : "Durează", en ? "as long as the listing is up" : "cât timp anunțul e publicat"],
             ].map(([label, value]) => (
               <div key={label} className="flex items-baseline justify-between gap-4">
                 <dt className="text-sm text-muted-foreground">{label}</dt>
@@ -121,14 +122,14 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
           <AlertDialogCancel className="min-h-[44px] rounded-full border-border">
             {en ? "Cancel" : "Anulează"}
           </AlertDialogCancel>
-          {hasCredits ? (
+          {already ? null : hasCredits ? (
             <AlertDialogAction
               onClick={(e) => { e.preventDefault(); confirm(); }}
               disabled={pending}
               className="min-h-[44px] gap-2 rounded-full bg-emerald font-bold text-primary-foreground hover:bg-emerald/90"
             >
               {pending && <Loader2 className="h-4 w-4 animate-spin" />}
-              {extending ? (en ? "Extend" : "Prelungește") : (en ? "Promote" : "Promovează")}
+              {en ? "Promote" : "Promovează"}
             </AlertDialogAction>
           ) : (
             <AlertDialogAction

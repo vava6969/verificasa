@@ -6,7 +6,11 @@
 // RedeemCoupon, ApplyBoost, ExpireBoosts) se deployează ÎMPREUNĂ, altfel unele
 // rulează cu o copie veche fără niciun mesaj de eroare.
 
-export const BOOST_DURATION_DAYS = 7;
+// Boost-urile NU expiră (decizia clientului, 22.08). Data rămâne scrisă doar
+// pentru că Boost.ends_date e obligatoriu în schemă; nimeni nu o mai citește.
+// Se pune departe în viitor, ca un ExpireBoosts vechi rămas în cron să nu
+// stingă nimic dacă rulează înainte să fie redeployat.
+export const BOOST_NEVER_ENDS = "2999-12-31T23:59:59.000Z";
 
 // Trebuie să rămână identic cu BOOST_PACKS din src/lib/plans.js.
 export const BOOST_PACKS = {

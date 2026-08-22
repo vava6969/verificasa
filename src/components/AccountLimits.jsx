@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
 import { useToast } from "@/components/ui/use-toast";
-import { getEntitlements, BOOST_DURATION_DAYS } from "@/lib/plans";
+import { getEntitlements } from "@/lib/plans";
 import { fetchMyActiveSubscription } from "@/lib/subscriptions";
 import { fetchBoostBalance, fetchActiveListingCount } from "@/lib/boosts";
 
@@ -187,8 +187,8 @@ export default function AccountLimits({ className = "" }) {
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
           {en
-            ? `One boost lifts a listing for ${BOOST_DURATION_DAYS} days. Spend them from My listings.`
-            : `Un boost ridică un anunț ${BOOST_DURATION_DAYS} zile. Îi folosești din Anunțurile mele.`}
+            ? "One boost lifts a listing above the rest of its band, for as long as the listing is up. Spend them from My listings."
+            : "Un boost ridică un anunț peste restul categoriei sale, cât timp anunțul e publicat. Îi folosești din Anunțurile mele."}
         </p>
 
         <Link

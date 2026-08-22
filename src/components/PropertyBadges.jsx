@@ -34,6 +34,14 @@ const KINDS = {
     label: { ro: "Basic", en: "Basic" },
     className: "bg-white text-neutral-900 shadow-[0_1px_3px_rgba(0,0,0,0.22)] dark:bg-neutral-900 dark:text-white",
   },
+  // Fără iconiță: nu există artwork pentru planul gratuit și nu inventează
+  // nimeni unul. Pastila rămâne scrisă, în tuș pe hartie, ca să se vadă că e
+  // treapta de jos fără să concureze cu insignele plătite.
+  free: {
+    img: null,
+    label: { ro: "Free", en: "Free" },
+    className: "bg-secondary text-muted-foreground",
+  },
 };
 
 const SIZES = {
@@ -65,14 +73,16 @@ export function PropertyBadge({ kind, size = "md", lang = "ro", className, child
         className
       )}
     >
-      <img
-        src={meta.img}
-        alt={size === "xs" ? label : ""}
-        aria-hidden={size === "xs" ? undefined : "true"}
-        className={cn("shrink-0 object-contain", s.img)}
-        loading="lazy"
-      />
-      {size === "xs" ? null : children || label}
+      {meta.img ? (
+        <img
+          src={meta.img}
+          alt={size === "xs" ? label : ""}
+          aria-hidden={size === "xs" ? undefined : "true"}
+          className={cn("shrink-0 object-contain", s.img)}
+          loading="lazy"
+        />
+      ) : null}
+      {size === "xs" ? (meta.img ? null : label) : children || label}
     </span>
   );
 }
@@ -109,15 +119,30 @@ export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", c
     !isImplausible(property) &&
     !!property?.verification_level &&
     property.verification_level !== "unverified";
-  const plan = planId && KINDS[planId] ? planId : null;
+  // Planul stă denormalizat pe anunț (Property.poster_plan, scris server-side)
+  // și anunțurile se citesc de oricine, deci fiecare card îl are fără să mai
+  // ceară nimic. `planId` rămâne pentru cine îl rezolvă deja singur (rândurile
+  // pe plan de pe prima pagină).
+  const resolved = planId || property?.poster_plan || null;
+  const plan = resolved && KINDS[resolved] ? resolved : null;
 
+  // Ordinea cerută de client: se vede Întâi că e promovat, apoi pe ce plan e
+  // proprietarul. „Verificat" trece pe locul trei — dar nu cade de pe card:
+  // ce nu încape ca pastilă scrisă se desenează ca iconiță, vezi mai jos.
+  // Planul NU mai dispare când anunțul e promovat: clientul a cerut explicit
+  // să se vadă amândouă.
   const kinds = [];
   if (boosted) kinds.push("promovat");
-  if (verified) kinds.push("verificat");
   if (isAgent) kinds.push("agent");
-  else if (plan && !boosted) kinds.push(plan);
+  else if (plan) kinds.push(plan);
+  else kinds.push("free");
+  if (verified) kinds.push("verificat");
 
-  const shown = kinds.slice(0, max ?? (size === "xs" ? 2 : size === "sm" ? 1 : 2));
+  // Două pastile scrise încap pe un card de 210px; a treia ar rupe rândul în
+  // două, ceea ce nu se face. Ce nu încape scris merge ca iconiță de 20px.
+  const cap = max ?? (size === "xs" ? 3 : 2);
+  const shown = kinds.slice(0, cap);
+  const spill = size === "xs" ? [] : kinds.slice(cap, cap + 2);
 
   // `reserve` ține rândul deschis și când nu e nicio insignă. Întedărăt un card
   // cu „Promovat" era mai înalt decât vecinii lui și împingea prețul și tot ce
@@ -133,6 +158,9 @@ export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", c
     <div className={cn("pointer-events-none flex flex-nowrap items-center gap-1.5", ROW_H[size], className)}>
       {shown.map((kind) => (
         <PropertyBadge key={kind} kind={kind} size={size} lang={lang} />
+      ))}
+      {spill.map((kind) => (
+        <PropertyBadge key={kind} kind={kind} size="xs" lang={lang} />
       ))}
     </div>
   );

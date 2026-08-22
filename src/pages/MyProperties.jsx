@@ -238,7 +238,7 @@ export default function MyProperties() {
                       title={!approved ? (en ? "Approve the listing first" : "Anunțul trebuie aprobat întâi") : undefined}
                       className="min-h-[44px] w-full rounded-full bg-emerald px-2 text-xs text-primary-foreground hover:bg-emerald/90 disabled:opacity-50 sm:w-auto sm:px-5 sm:text-sm"
                     >
-                      {boosted ? (en ? "Extend" : "Prelungește") : (en ? "Promote" : "Promovează")}
+                      {boosted ? (en ? "Promoted" : "Promovat") : (en ? "Promote" : "Promovează")}
                     </Button>
                     <Button
                       variant="outline"
