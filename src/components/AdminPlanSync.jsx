@@ -60,20 +60,37 @@ export default function AdminPlanSync() {
         }
       }
 
+      // Fiecare anunț pe cont propriu. Câmpul are enum (basic|pro|agent), iar
+      // golirea lui e singura scriere care poate fi refuzată — dacă platforma
+      // nu acceptă null pe un enum, se încearcă șirul gol. Un refuz pe un
+      // singur anunț nu are voie să oprească tot lotul: până acum o singură
+      // eroare arunca din buclă și restul rămâneau neatinse, fără să se vadă
+      // câte apucaseră să se scrie.
       let changed = 0;
+      let failed = 0;
       for (const prop of sorted) {
         const want = plan.get(prop.id) || null;
         const have = prop.poster_plan_override || null;
         if (want === have) continue;
-        // Base44 nu acceptă "" pe un câmp cu enum, deci golirea trece prin null.
-        await base44.entities.Property.update(prop.id, { poster_plan_override: want });
-        changed += 1;
+        try {
+          await base44.entities.Property.update(prop.id, { poster_plan_override: want });
+          changed += 1;
+        } catch (_) {
+          try {
+            await base44.entities.Property.update(prop.id, { poster_plan_override: want || "" });
+            changed += 1;
+          } catch (_e) {
+            failed += 1;
+          }
+        }
       }
 
-      setSeeded({ changed, total: sorted.length, ...DEMO_SPREAD });
+      setSeeded({ changed, failed, total: sorted.length, ...DEMO_SPREAD });
       toast({
-        title: "Planuri demo aplicate",
-        description: `${changed} anunțuri modificate — ${DEMO_SPREAD.agent} Agent, ${DEMO_SPREAD.pro} Pro, ${DEMO_SPREAD.basic} Basic.`,
+        title: failed ? "Planuri demo aplicate parțial" : "Planuri demo aplicate",
+        description: `${changed} anunțuri modificate — ${DEMO_SPREAD.agent} Agent, ${DEMO_SPREAD.pro} Pro, ${DEMO_SPREAD.basic} Basic.`
+          + (failed ? ` ${failed} refuzate.` : ""),
+        variant: failed ? "destructive" : undefined,
       });
     } catch (e) {
       toast({
@@ -159,7 +176,8 @@ export default function AdminPlanSync() {
         </button>
         {seeded && (
           <p className="mt-3 text-sm text-muted-foreground">
-            {seeded.changed} anunțuri modificate din {seeded.total}.
+            {seeded.changed} anunțuri modificate din {seeded.total}
+            {seeded.failed ? ` · ${seeded.failed} refuzate` : ""}.
           </p>
         )}
       </div>
