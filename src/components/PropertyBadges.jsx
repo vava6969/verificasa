@@ -138,11 +138,12 @@ export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", c
   else kinds.push("free");
   if (verified) kinds.push("verificat");
 
-  // Două pastile scrise încap pe un card de 210px; a treia ar rupe rândul în
-  // două, ceea ce nu se face. Ce nu încape scris merge ca iconiță de 20px.
+  // Două pastile scrise, și atât. A treia încercase să încapă ca iconiță de
+  // 20px și ieșea un cerc verde fără cuvânt lângă două pastile scrise — arată
+  // ca o greșeală, nu ca o insignă. Ordinea de mai sus decide cine rămâne:
+  // promovat și planul, exact perechea cerută de client.
   const cap = max ?? (size === "xs" ? 3 : 2);
   const shown = kinds.slice(0, cap);
-  const spill = size === "xs" ? [] : kinds.slice(cap, cap + 2);
 
   // `reserve` ține rândul deschis și când nu e nicio insignă. Întedărăt un card
   // cu „Promovat" era mai înalt decât vecinii lui și împingea prețul și tot ce
@@ -158,9 +159,6 @@ export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", c
     <div className={cn("pointer-events-none flex flex-nowrap items-center gap-1.5", ROW_H[size], className)}>
       {shown.map((kind) => (
         <PropertyBadge key={kind} kind={kind} size={size} lang={lang} />
-      ))}
-      {spill.map((kind) => (
-        <PropertyBadge key={kind} kind={kind} size="xs" lang={lang} />
       ))}
     </div>
   );

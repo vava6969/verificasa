@@ -343,6 +343,11 @@
       "default": 0,
       "title": "Cate boost-uri are anuntul (se aduna, nu expira)"
     },
+    "tour_3d_set_date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Cand a fost pus turul 3D (regula de 3 zile)"
+    },
     "trust_breakdown": {
       "type": "string",
       "title": "Detaliere scor (JSON, scris server-side)",

@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { callFnQuiet } from "@/lib/serverCall";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+// `setTourUrl` din lib se importa cu alt nume: setterul de state de mai
+// jos are exact acelasi nume si l-ar fi umbrit in tacere.
+import { fetchTourStatus, setTourUrl as saveTourUrlRemote, tourReasonText } from "@/lib/tours";
 import DateField from "@/components/DateField";
 import { Image as UIImage } from "@/components/ui/image";
 import GooglePlacesAutocomplete from "@/components/GooglePlacesAutocomplete";
@@ -51,6 +54,37 @@ function Field({ label, children }) {
 
 export default function PropertyEditForm({ property, onDone, isAdmin = false }) {
   const { toast } = useToast();
+  // Starea turului 3D: pe ce plan e omul, câte tururi i-au mai rămas și dacă a
+  // trecut de cele două ferestre de 3 zile. Se citește o dată, la deschidere.
+  const [tour, setTour] = useState(null);
+  const [tourUrl, setTourUrl] = useState(property.tour_3d_url || "");
+  const [savingTour, setSavingTour] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchTourStatus({
+      userId: property.created_by_id,
+      excludePropertyId: property.id,
+      isAdmin,
+    }).then((t) => { if (!cancelled) setTour(t); });
+    return () => { cancelled = true; };
+  }, [property.created_by_id, property.id, isAdmin]);
+
+  const saveTour = async () => {
+    setSavingTour(true);
+    try {
+      const res = await saveTourUrlRemote(property.id, tourUrl.trim());
+      if (res.error) {
+        toast({ title: "Turul 3D nu a fost salvat", description: res.error, variant: "destructive" });
+      } else {
+        toast({ title: tourUrl.trim() ? "Tur 3D salvat" : "Tur 3D șters" });
+        setTour((t) => (t ? { ...t, remaining: res.remaining ?? t.remaining } : t));
+      }
+    } finally {
+      setSavingTour(false);
+    }
+  };
+
   const [form, setForm] = useState({
     title: property.title || "",
     description: property.description || "",
@@ -324,33 +358,57 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         </Field>
       </div>
 
-      {/* Tur 3D (aplicație proprie VerifiCasa) — self-serve pentru proprietar, deblocat cu Plan Pro.
-          Nu există încă plată reală, deci arătăm doar teaser-ul încuiat; link-ul
-          efectiv se setează momentan manual, de admin, mai jos. */}
-      {!isAdmin && (
-        form.tour_3d_url ? (
-          <div className="mt-3 flex items-center gap-3 rounded-2xl border border-emerald/25 bg-card p-4">
-            <img src="/images/generated/icon-video.png" alt="" aria-hidden="true" className="h-12 w-12 shrink-0 object-contain" />
-            <span>
-              <span className="block text-sm font-semibold text-navy dark:text-foreground">Tur 3D activ</span>
-              <span className="block text-xs text-muted-foreground">Vizibil pe anunț</span>
-            </span>
-          </div>
-        ) : (
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4">
-            <div className="flex min-w-0 items-center gap-3">
-              <img src="/images/generated/icon-video.png" alt="" aria-hidden="true" className="h-12 w-12 shrink-0 object-contain opacity-60" />
-              <span className="min-w-0">
-                <span className="block text-sm font-semibold text-navy dark:text-foreground">Tur 3D</span>
-                <span className="block text-xs text-muted-foreground">Disponibil cu Plan Pro</span>
+      {/* Tur 3D — self-serve pentru proprietar, deblocat cu Basic, Pro sau
+          Agent. Regulile (3 zile de la plată, apoi un tur la 3 zile, plus cota
+          din plan) sunt impuse în SetTourUrl; aici doar se arată motivul
+          înainte să apese cineva. */}
+      <div className="mt-3 rounded-2xl border border-border bg-card p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <img
+              src="/images/generated/icon-video.png"
+              alt=""
+              aria-hidden="true"
+              className={`h-12 w-12 shrink-0 object-contain ${tour?.allowed || form.tour_3d_url ? "" : "opacity-60"}`}
+            />
+            <span className="min-w-0">
+              <span className="block text-sm font-semibold text-navy dark:text-foreground">Tur 3D</span>
+              <span className="block text-xs text-muted-foreground">
+                {tour
+                  ? tourReasonText(tour, false) || `Ți-au mai rămas ${tour.remaining} din ${tour.quota}`
+                  : "Se verifică…"}
               </span>
-            </div>
-            <span className="shrink-0 rounded-full bg-gold-soft px-3 py-1.5 text-xs font-semibold text-gold-deep">
-              Plan Pro
             </span>
           </div>
-        )
-      )}
+          {tour && !isAdmin && (
+            <span className="shrink-0 rounded-full bg-secondary px-3 py-1.5 text-xs font-semibold text-muted-foreground">
+              {tour.remaining} / {tour.quota}
+            </span>
+          )}
+        </div>
+
+        {(tour?.allowed || form.tour_3d_url) && (
+          <div className="mt-3 flex flex-wrap items-end gap-2">
+            <label className="min-w-0 flex-1">
+              <span className="mb-1 block text-xs font-semibold text-muted-foreground">Link tur 3D</span>
+              <input
+                value={tourUrl}
+                onChange={(e) => setTourUrl(e.target.value)}
+                placeholder="https://tur3d.verificasa.ro/property/..."
+                className={inputCls}
+              />
+            </label>
+            <button
+              type="button"
+              onClick={saveTour}
+              disabled={savingTour}
+              className="h-11 shrink-0 rounded-full bg-emerald px-5 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+            >
+              {savingTour ? "Se salvează…" : "Salvează turul"}
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Badge-uri & verificări — admin only */}
       {isAdmin && (
@@ -364,7 +422,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
             </Field>
             <label className={`${checkCls} self-end`}><input type="checkbox" className={boxCls} checked={form.owner_verified} onChange={(e) => upd("owner_verified", e.target.checked)} /> Proprietar verificat</label>
             <label className={`${checkCls} self-end`}><input type="checkbox" className={boxCls} checked={form.ai_tour_verified} onChange={(e) => upd("ai_tour_verified", e.target.checked)} /> Activare badge Tur 3D</label>
-            <Field label="Link Tur 3D (admin, Plan Pro)">
+            <Field label="Link Tur 3D (se salvează din blocul de mai sus)">
               <input value={form.tour_3d_url} onChange={(e) => upd("tour_3d_url", e.target.value)} placeholder="https://tur3d.verificasa.ro/property/..." className={inputCls} />
             </Field>
             <Field label="Tur Video URL">
