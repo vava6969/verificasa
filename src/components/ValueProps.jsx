@@ -67,20 +67,31 @@ export default function ValueProps() {
     const SPEED = 30;  // px pe secundă — lent, nu distrage de la conținut
     let carry = 0;     // scrollLeft e întreg; acumulăm subunitățile
 
-    // Reflectorul: cardul al cărui centru e cel mai aproape de centrul benzii.
+    // Reflectorul: cardul a cărui/cărei margine e cea mai apropiată de centru.
+    //
+    // Întâi se citește geometria, abia apoi se scrie `data-spot` — și numai
+    // acolo unde valoarea chiar se schimbă. Varianta veche stingea fiecare
+    // placă în aceeași buclă în care citea `offsetLeft`, inclusiv pe cea
+    // câștigătoare. Citirea lui `offsetLeft` forțează recalculul stilului, așa
+    // că placă aprinsă apuca să pornească drumul înapoi în jos, iar `on`-ul
+    // de după buclă repornea tranziția din poziția aia. La fiecare 40 ms.
+    // Cu un arc cu depășire, asta se vede exact ca un tremurat.
     const spotlight = () => {
+      const kids = rail.children;
       const mid = rail.scrollLeft + rail.clientWidth / 2;
       let best = null;
       let bestDist = Infinity;
-      for (const chip of rail.children) {
+      for (const chip of kids) {
         const dist = Math.abs(chip.offsetLeft + chip.offsetWidth / 2 - mid);
         if (dist < bestDist) {
           bestDist = dist;
           best = chip;
         }
-        if (chip.dataset.spot !== "off") chip.dataset.spot = "off";
       }
-      if (best) best.dataset.spot = "on";
+      for (const chip of kids) {
+        const want = chip === best ? "on" : "off";
+        if (chip.dataset.spot !== want) chip.dataset.spot = want;
+      }
     };
 
     const id = setInterval(() => {

@@ -8,10 +8,16 @@ import ThemeToggle from "@/components/ThemeToggle";
 // password and OAuth consent. One architecture, so the page does not change
 // shape when a user clicks through from sign in to "Ai uitat parola?".
 //
-// A full-bleed photograph sits behind an ink scrim and a solid card. The photos
-// are viewings across the country, and each one names where it is in mono at the
-// foot of the frame — the background states the claim the product makes, instead
-// of just setting a mood.
+// A full-bleed photograph sits behind an ink scrim and a card at 60% opacity.
+// The photos are viewings across the country, and each one names where it is in
+// mono at the foot of the frame — the background states the claim the product
+// makes, instead of just setting a mood, so the card lets it through instead of
+// covering it.
+//
+// The card is sized for a phone, not for a laptop window shrunk down: measured
+// at 375x812, the sign-in screen lands around 470px tall and never scrolls.
+// Secondary text on the card is foreground/70, not muted-foreground — muted ink
+// over a 60% card on a dark photograph drops under the contrast floor.
 //
 // NOTE: the `icon` prop is still accepted by callers but no longer rendered;
 // the wordmark carries the branding instead of a decorative lucide medallion.
@@ -99,25 +105,27 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
       </div>
 
       {/* Card */}
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-6 sm:py-12">
-        <Link to="/" className="mb-4 tap-44 flex min-h-[36px] items-center sm:mb-7">
-          <VerifiCasaLogo size={32} tone="light" tagline={false} />
+      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-4 sm:py-12">
+        <Link to="/" className="mb-3 tap-44 flex min-h-[32px] items-center sm:mb-6">
+          <VerifiCasaLogo size={26} tone="light" tagline={false} />
         </Link>
 
-        <div className="w-full max-w-[26rem] rounded border border-border bg-card p-5 shadow-soft sm:p-8">
-          <h1 className="font-heading text-xl font-extrabold tracking-tight text-foreground sm:text-2xl">
+        <div className="w-full max-w-[21rem] rounded border border-white/25 bg-card/60 p-4 shadow-[0_18px_44px_-20px_rgba(0,0,0,0.55)] backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 sm:max-w-[24rem] sm:p-7">
+          <h1 className="font-heading text-lg font-extrabold tracking-tight text-foreground sm:text-2xl">
             {title}
           </h1>
-          {subtitle && <p className="mt-1.5 text-sm text-muted-foreground">{subtitle}</p>}
+          {subtitle && (
+            <p className="mt-1 text-[13px] leading-snug text-foreground/80 sm:mt-1.5 sm:text-sm">{subtitle}</p>
+          )}
 
-          <div className="mt-5 sm:mt-6">{children}</div>
+          <div className="mt-3.5 sm:mt-5">{children}</div>
         </div>
 
-        {footer && <div className="mt-4 text-center text-sm text-white/80 sm:mt-6">{footer}</div>}
+        {footer && <div className="mt-3 text-center text-[13px] text-white/85 sm:mt-5 sm:text-sm">{footer}</div>}
       </div>
 
       {/* The location of the shot currently on screen. */}
-      <p className="pointer-events-none absolute bottom-5 left-5 z-10 font-mono text-[11px] uppercase tracking-[0.14em] text-white/60">
+      <p className="pointer-events-none absolute bottom-3 left-4 z-10 font-mono text-[10px] uppercase tracking-[0.14em] text-white/60 sm:bottom-5 sm:left-5 sm:text-[11px]">
         {shot.place} <span className="text-white/35">·</span> {shot.area}
       </p>
     </div>

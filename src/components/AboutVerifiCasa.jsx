@@ -72,20 +72,31 @@ export default function AboutVerifiCasa() {
     const SPEED = 34; // px pe secundă — un pic peste banda de motive
     let carry = 0;    // scrollLeft e întreg; acumulăm subunitățile
 
-    // Reflectorul: plăcuța al cărei centru e cel mai aproape de centrul benzii.
+    // Reflectorul: plăcuța a cărui/cărei margine e cea mai apropiată de centru.
+    //
+    // Întâi se citește geometria, abia apoi se scrie `data-spot` — și numai
+    // acolo unde valoarea chiar se schimbă. Varianta veche stingea fiecare
+    // plăcuța în aceeași buclă în care citea `offsetLeft`, inclusiv pe cea
+    // câștigătoare. Citirea lui `offsetLeft` forțează recalculul stilului, așa
+    // că plăcuța aprinsă apuca să pornească drumul înapoi în jos, iar `on`-ul
+    // de după buclă repornea tranziția din poziția aia. La fiecare 40 ms.
+    // Cu un arc cu depășire, asta se vede exact ca un tremurat.
     const spotlight = () => {
+      const kids = rail.children;
       const mid = rail.scrollLeft + rail.clientWidth / 2;
       let best = null;
       let bestDist = Infinity;
-      for (const tile of rail.children) {
+      for (const tile of kids) {
         const dist = Math.abs(tile.offsetLeft + tile.offsetWidth / 2 - mid);
         if (dist < bestDist) {
           bestDist = dist;
           best = tile;
         }
-        if (tile.dataset.spot !== "off") tile.dataset.spot = "off";
       }
-      if (best) best.dataset.spot = "on";
+      for (const tile of kids) {
+        const want = tile === best ? "on" : "off";
+        if (tile.dataset.spot !== want) tile.dataset.spot = want;
+      }
     };
 
     const perSet = audience.length;

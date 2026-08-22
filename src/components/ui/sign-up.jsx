@@ -13,6 +13,10 @@ import { safeReturnTo } from "@/lib/authReturnTo";
 /**
  * AuthComponent — sign in and sign up on one card.
  *
+ * Sized for a phone first: 40px fields, 44px actions, 10px gaps, so sign in
+ * fits a 375x812 screen without scrolling and sign up only just reaches the
+ * fold. The sm: step is the one that gets the roomier version, not the phone.
+ *
  * Copy lives in src/i18n.js under the `au_` keys, the shell is AuthLayout, and
  * the mode toggle is AuthSwitch. Nothing here re-implements a system the app
  * already has.
@@ -120,7 +124,7 @@ export function AuthComponent() {
   if (done) {
     return (
       <AuthLayout title={t("au_done_title")} subtitle={t("au_done_sub")}>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-foreground/80">
           <Loader2 className="h-4 w-4 animate-spin text-primary" aria-hidden="true" />
           {t("au_signing_in")}
         </div>
@@ -145,11 +149,11 @@ export function AuthComponent() {
         </div>
 
         <SubmitButton onClick={verifyOtp} disabled={loading || otp.length < 6} loading={loading}
-          loadingLabel={t("au_otp_verifying")} className="mt-5">
+          loadingLabel={t("au_otp_verifying")} className="mt-4">
           {t("au_otp_verify")}
         </SubmitButton>
 
-        <p className="mt-4 text-center text-sm text-muted-foreground">
+        <p className="mt-3.5 text-center text-[13px] text-foreground/80 sm:text-sm">
           {t("au_otp_missing")}{" "}
           <button type="button" onClick={resendOtp} className="font-semibold text-primary hover:underline">
             {t("au_otp_resend")}
@@ -168,9 +172,9 @@ export function AuthComponent() {
         labels={{ signin: t("au_tab_signin"), signup: t("au_tab_signup") }}
       />
 
-      {error && <ErrorNote className="mt-5">{error}</ErrorNote>}
+      {error && <ErrorNote className="mt-3.5">{error}</ErrorNote>}
 
-      <form onSubmit={isSignup ? submitSignup : submitSignin} className="mt-4 space-y-3 sm:mt-5 sm:space-y-4">
+      <form onSubmit={isSignup ? submitSignup : submitSignin} className="mt-3.5 space-y-2.5 sm:mt-5 sm:space-y-3.5">
         <Field
           id="email"
           name="email"
@@ -182,12 +186,14 @@ export function AuthComponent() {
           autoFocus
         />
 
-        <div className="space-y-1.5">
+        <div className="space-y-1 sm:space-y-1.5">
           <div className="flex items-baseline justify-between gap-3">
-            <label htmlFor="password" className="text-sm font-semibold text-foreground">
+            <label htmlFor="password" className="text-[13px] font-semibold text-foreground sm:text-sm">
               {t("au_password")}
             </label>
-            {!isSignup && (
+            {isSignup ? (
+              <span className="text-[11px] leading-none text-foreground/80">{t("au_pw_hint")}</span>
+            ) : (
               <Link to="/forgot-password" className="text-xs font-medium text-primary hover:underline">
                 {t("au_forgot")}
               </Link>
@@ -200,9 +206,8 @@ export function AuthComponent() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete={isSignup ? "new-password" : "current-password"}
-            className="h-11 sm:h-12"
+            className="h-10 sm:h-11"
           />
-          {isSignup && <p className="text-xs text-muted-foreground">{t("au_pw_hint")}</p>}
         </div>
 
         {isSignup && (
@@ -225,7 +230,7 @@ export function AuthComponent() {
               onChange={setFullName}
               autoComplete="name"
             />
-            <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
+            <label className="flex items-start gap-2.5 text-[13px] leading-snug text-foreground/80 sm:text-sm">
               <input
                 type="checkbox"
                 checked={agreed}
@@ -253,14 +258,13 @@ export function AuthComponent() {
       </form>
 
       {/* Social comes after the form: the email path is the real one. */}
-      <div className="relative my-4 sm:my-6">
-        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
-        <div className="relative flex justify-center">
-          <span className="bg-card px-3 text-xs text-muted-foreground">{t("au_or")}</span>
-        </div>
+      <div className="my-3.5 flex items-center gap-3 sm:my-5">
+        <div className="h-px flex-1 bg-border" />
+        <span className="text-[11px] text-foreground/80 sm:text-xs">{t("au_or")}</span>
+        <div className="h-px flex-1 bg-border" />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
         <SocialButton onClick={() => base44.auth.loginWithProvider("google", safeReturnTo())}>
           <GoogleSvg />Google
         </SocialButton>
@@ -276,8 +280,8 @@ export function AuthComponent() {
 
 function Field({ id, name, label, hint, type = "text", value, onChange, autoComplete, autoFocus }) {
   return (
-    <div className="space-y-1.5">
-      <label htmlFor={id} className="text-sm font-semibold text-foreground">{label}</label>
+    <div className="space-y-1 sm:space-y-1.5">
+      <label htmlFor={id} className="text-[13px] font-semibold text-foreground sm:text-sm">{label}</label>
       <Input
         id={id}
         name={name}
@@ -286,9 +290,9 @@ function Field({ id, name, label, hint, type = "text", value, onChange, autoComp
         onChange={(e) => onChange(e.target.value)}
         autoComplete={autoComplete}
         autoFocus={autoFocus}
-        className="h-11 sm:h-12"
+        className="h-10 sm:h-11"
       />
-      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+      {hint && <p className="text-[10.5px] leading-tight text-foreground/80 sm:text-xs">{hint}</p>}
     </div>
   );
 }
@@ -297,7 +301,7 @@ function SubmitButton({ children, loading, loadingLabel, className = "", ...prop
   return (
     <button
       {...props}
-      className={`flex h-12 w-full items-center justify-center gap-2 rounded bg-primary font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50 ${className}`}
+      className={`flex h-11 w-full items-center justify-center gap-2 rounded bg-primary text-[15px] font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50 sm:h-12 sm:text-base ${className}`}
     >
       {loading ? (
         <>
@@ -316,7 +320,7 @@ function SocialButton({ children, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="flex h-11 items-center justify-center gap-2 rounded border border-border bg-card text-sm font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-secondary/40"
+      className="flex h-10 items-center justify-center gap-2 rounded border border-border bg-card/50 text-[13px] font-medium text-foreground transition-colors hover:border-primary/50 hover:bg-secondary/40 sm:h-11 sm:text-sm"
     >
       {children}
     </button>
