@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
 import { base44 } from "@/api/base44Client";
+import { Reveal as HouseReveal } from "@/components/ui/reveal";
 import { PLANS, BOOST_PACKS, BOOST_DURATION_DAYS, boostUnitPrice } from "@/lib/plans";
 
 // ---------------------------------------------------------------------------
@@ -20,18 +21,39 @@ import { PLANS, BOOST_PACKS, BOOST_DURATION_DAYS, boostUnitPrice } from "@/lib/p
 // pentru că un proprietar trebuie să poată cumpăra exact unul.
 // ---------------------------------------------------------------------------
 
+// Această pagină încă folosea `whileInView` — tiparul retras în 672f244 tocmai
+// pentru că ascundea secțiuni întregi. Problema nu e de stil:
+// starea de repaus era `opacity: 0`, iar singurul lucru care aducea conținutul
+// înapoi era un cadru de animație. Când bucla de cadre e sugrumată — filă în
+// fundal, iframe-ul editorului Base44, telefon încetinit — tween-ul nu pornește
+// niciodată, iar planurile, comutatorul de facturare și TOATE pachetele de
+// boost rămân desenate la opacitate zero, ocupându-și înălțimea. Pagina arată
+// goală, nu stricată, deci nimeni nu raportează o eroare: pur și simplu nu
+// găsești de unde să cumperi.
+//
+// Shim-ul de mai jos păstrează semnătura veche (`as`, `index`), ca să nu fie
+// nevoie să rescriu cele zece locuri care o folosesc, dar dedesubt e Reveal-ul
+// casei: starea de repaus e cea VIZIBILĂ, iar ascunderea se aplică doar după ce
+// avem dovada că un IntersectionObserver e viu și raportează.
+//
+// Mai rămâne un caz de rezolvat: EmailDirectory (pe /contact) are același tipar
+// pe cardurile de email și pe avertismentul de securitate. Nu l-am mutat odată
+// cu ăsta pentru că acolo clasele care contează pentru grilă (`sm:col-span-2`)
+// stau chiar pe elementul animat, deci mutarea cere și rearanjarea grilei.
 function Reveal({ as = "div", index = 0, className, children }) {
-  const MotionTag = motion[as] || motion.div;
+  const delay = index * 0.08;
+  if (as === "div") {
+    return (
+      <HouseReveal delay={delay} className={className}>
+        {children}
+      </HouseReveal>
+    );
+  }
+  const Tag = as;
   return (
-    <MotionTag
-      className={className}
-      initial={{ opacity: 0, y: -20, filter: "blur(10px)" }}
-      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ delay: index * 0.12, duration: 0.5 }}
-    >
-      {children}
-    </MotionTag>
+    <HouseReveal delay={delay}>
+      <Tag className={className}>{children}</Tag>
+    </HouseReveal>
   );
 }
 

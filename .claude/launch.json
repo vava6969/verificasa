@@ -2,11 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "//": "Portul se dă EXPLICIT lui vite și se fixează. Fără --port, vite își alege singur portul (5173, apoi 5174, 5175... dacă sunt ocupate), în timp ce panoul de previzualizare rămâne pe portul pe care și l-a rezervat el — și deschizi o pagină goală, fără nicio eroare. Cu --strictPort, dacă 5273 e ocupat serverul crapă zgomotos în loc să se mute în tăcere.",
       "name": "verificasa-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 5173,
-      "autoPort": true
+      "runtimeArgs": ["run", "dev", "--", "--port", "5273", "--strictPort"],
+      "port": 5273,
+      "autoPort": false
     }
   ]
 }
