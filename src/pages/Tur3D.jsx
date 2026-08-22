@@ -1,11 +1,16 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { useCountry } from "@/components/CountryContext";
+import { useAuth } from "@/lib/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 import { Reveal, RevealGroup, RevealItem } from "@/components/ui/reveal";
 import StoreBadges from "@/components/StoreBadges";
 import Glyph from "@/components/Glyph";
-import { PLANS, BOOST_PACKS, BOOST_DURATION_DAYS } from "@/lib/plans";
+import LoopVideo from "@/components/LoopVideo";
+import PhotoMarquee from "@/components/PhotoMarquee";
+import { PLANS, FREE_PLAN, BOOST_PACKS, BOOST_DURATION_DAYS } from "@/lib/plans";
+import { startPlanCheckout, startBoostCheckout } from "@/lib/checkout";
 import { TOUR_3D_LINK_SAMPLE, hasStoreLinks } from "@/lib/appLinks";
 
 // Pagina care vinde aplicația de tur 3D. Marketing, public, fără login.
@@ -87,6 +92,16 @@ const CONTENT = {
     plans_boosts: "Promovări incluse",
     plans_soon: "în curând",
     plans_cta: "Vezi toate planurile",
+    plans_buy: "Alege planul",
+    plans_buying: "Se deschide plata",
+    plans_free: "Gratuit",
+    plans_free_cta: "Publică un anunț",
+    plans_monthly: "Lunar",
+    plans_yearly: "Anual",
+    packs_buy: "Cumpără",
+    packs_buying: "Se deschide",
+    pay_err_h: "Nu am putut porni plata",
+    pay_err_p: "Încearcă din nou în câteva minute.",
     packs_h: "Sau la bucată",
     packs_p: `O promovare ridică un anunț peste restul categoriei sale timp de ${BOOST_DURATION_DAYS} zile.`,
     packs_unit: (n) => (n === 1 ? "promovare" : "promovări"),
@@ -168,6 +183,16 @@ const CONTENT = {
     plans_boosts: "Boosts included",
     plans_soon: "coming soon",
     plans_cta: "See all plans",
+    plans_buy: "Choose plan",
+    plans_buying: "Opening checkout",
+    plans_free: "Free",
+    plans_free_cta: "Post a listing",
+    plans_monthly: "Monthly",
+    plans_yearly: "Yearly",
+    packs_buy: "Buy",
+    packs_buying: "Opening",
+    pay_err_h: "Could not start the payment",
+    pay_err_p: "Try again in a few minutes.",
     packs_h: "Or one at a time",
     packs_p: `A boost lifts one listing above the rest of its band for ${BOOST_DURATION_DAYS} days.`,
     packs_unit: (n) => (n === 1 ? "boost" : "boosts"),
@@ -195,11 +220,78 @@ const HOUSES = [
   "/images/tur3d/tur3d-house-3-v1.webp",
 ];
 
+// Fotografiile care trec prin banda primului card. Fațade obișnuite, alese
+// tocmai pentru că sunt obișnuite: cardul spune „zece poze arată la fel peste
+// tot", iar banda o arată în loc s-o afirme.
+const MARQUEE = [
+  ...HOUSES,
+  "/images/properties/exterior-01.webp",
+  "/images/properties/exterior-02.webp",
+  "/images/properties/exterior-03.webp",
+  "/images/properties/exterior-04.webp",
+  "/images/properties/exterior-05.webp",
+  "/images/properties/exterior-06.webp",
+  "/images/properties/exterior-07.webp",
+  "/images/properties/exterior-08.webp",
+];
+
+// Clipurile din banda „De ce contează", 5 secunde fiecare, mute.
+//
+// Aceeași regulă ca la linkurile de magazin din lib/appLinks.js: dacă un `src`
+// e `null`, cardul cade pe fotografia lui. Nimic gol, niciodată, și niciun
+// <video> care caută un fișier inexistent.
+//
+// `crossfade` e pornit pe amândouă pentru că sunt clipuri generate: primul și
+// ultimul cadru sunt APROAPE la fel, nu identice, iar bucla nativă ar arăta o
+// tăietură la fiecare tură. 0.35s de dizolvare acoperă îmbinarea. Dacă un clip
+// ajunge vreodată să se închidă perfect pe el însuși, pune 0 și economisește un
+// decodor — vezi comentariul din LoopVideo.
+//
+// Posterul e fotografia care stătea aici înainte, deci și primul cadru, și
+// varianta cu mișcare redusă, arată corect.
+const WHY_MEDIA = [
+  { kind: "marquee" },
+  { kind: "video", src: "/videos/tur3d-day-cycle-v1.mp4", poster: "/images/tur3d/tur3d-easy-phone-v1.webp" },
+  { kind: "video", src: "/videos/tur3d-map-car-v1.mp4", poster: "/images/tur3d/tur3d-reach-map-v1.webp" },
+];
+
 export default function Tur3D() {
   const { lang } = useCountry();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
   const en = lang === "en";
   const c = en ? CONTENT.en : CONTENT.ro;
   const live = hasStoreLinks();
+
+  // Planurile se cumpără DE AICI, nu doar de pe /upgrade. Cererea clientului:
+  // cine citește pagina care vinde tururile 3D e deja convins, iar un link
+  // „vezi toate planurile" îl trimite să se hotărască din nou.
+  //
+  // Paginile de întoarcere din Stripe le decid funcțiile de backend
+  // (/upgrade pentru abonament, /account pentru boost-uri), deci cine cumpără
+  // de aici se întoarce acolo, cu notificarea de plată reușită. Se schimbă în
+  // base44/functions/*/entry.ts, nu în pagina asta.
+  const [annual, setAnnual] = useState(false);
+  const [planPending, setPlanPending] = useState(null);
+  const [packPending, setPackPending] = useState(null);
+
+  const payError = (detail) =>
+    toast({ title: c.pay_err_h, description: detail || c.pay_err_p, variant: "destructive" });
+
+  const buyPlan = async (plan) => {
+    if (!user) { navigate("/login?returnTo=%2Ftur-3d"); return; }
+    setPlanPending(plan.id);
+    const res = await startPlanCheckout(plan.id, annual ? "yearly" : "monthly");
+    if (!res.redirected) { payError(res.error); setPlanPending(null); }
+  };
+
+  const buyPack = async (pack) => {
+    if (!user) { navigate("/login?returnTo=%2Ftur-3d"); return; }
+    setPackPending(pack.id);
+    const res = await startBoostCheckout(pack.id);
+    if (!res.redirected) { payError(res.error); setPackPending(null); }
+  };
 
   return (
     <div>
@@ -308,21 +400,19 @@ export default function Tur3D() {
                 key={w.t}
                 className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft"
               >
-                {/* Primul bloc poartă trioul de fațade, celelalte o singură
-                    fotografie. Aceeași înălțime, ca rândul să nu se clatine. */}
-                {i === 0 ? (
-                  <div className="grid h-40 grid-cols-3 gap-px bg-border sm:h-44">
-                    {HOUSES.map((h, j) => (
-                      <img
-                        key={h}
-                        src={h}
-                        alt={j === 0 ? c.why_trio_alt : ""}
-                        aria-hidden={j === 0 ? undefined : "true"}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                      />
-                    ))}
-                  </div>
+                {/* Aceeași înălțime pe toate trei, ca rândul să nu se clatine,
+                    dar trei feluri de imagine: o bandă care se plimbă, apoi
+                    două clipuri. Cât timp un clip lipsește din /public/videos,
+                    cardul lui rămâne fotografia de azi — vezi WHY_MEDIA. */}
+                {WHY_MEDIA[i]?.kind === "marquee" ? (
+                  <PhotoMarquee images={MARQUEE} className="h-40 border-b border-border sm:h-44" />
+                ) : WHY_MEDIA[i]?.src ? (
+                  <LoopVideo
+                    src={WHY_MEDIA[i].src}
+                    poster={WHY_MEDIA[i].poster}
+                    crossfade={0.35}
+                    className="h-40 border-b border-border sm:h-44"
+                  />
                 ) : (
                   <img
                     src={w.img}
@@ -348,46 +438,101 @@ export default function Tur3D() {
           <p className="mt-2 max-w-[56ch] text-sm text-muted-foreground sm:text-base">{c.plans_p}</p>
         </Reveal>
 
-        <RevealGroup className="mt-7 grid gap-4 md:grid-cols-3">
-          {PLANS.map((plan) => (
-            <RevealItem
-              key={plan.id}
-              className={
-                "rounded-2xl border bg-card p-5 shadow-soft " +
-                (plan.id === "pro" ? "border-emerald ring-1 ring-emerald/40" : "border-border")
-              }
-            >
-              <div className="flex items-center gap-3">
-                {plan.badgeImg && <Glyph src={plan.badgeImg} className="h-11 w-11" />}
-                <div className="min-w-0">
-                  <h3 className="font-heading text-lg font-bold text-foreground">{plan.shortName}</h3>
-                  <p className="text-xs text-muted-foreground tnum">
-                    {plan.monthly.toLocaleString("ro-RO")} RON/{en ? "month" : "lună"}
-                  </p>
-                </div>
-              </div>
+        {/* Lunar / Anual. Comutatorul de pe /upgrade e o pastilă pe framer cu
+            layoutId; aici e nevoie de o singură pereche de butoane, nu de încă
+            un motor de animație pe o pagină de prezentare. */}
+        <Reveal className="mt-6 flex" y={12}>
+          <div className="inline-flex rounded-full border border-border bg-card p-1">
+            {[false, true].map((val) => (
+              <button
+                key={String(val)}
+                type="button"
+                onClick={() => setAnnual(val)}
+                aria-pressed={annual === val}
+                className={
+                  "min-h-[40px] rounded-full px-4 text-sm font-bold transition-[transform,background-color,color] duration-200 ease-out active:scale-[0.96] " +
+                  (annual === val
+                    ? "bg-emerald text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground")
+                }
+              >
+                {val ? c.plans_yearly : c.plans_monthly}
+              </button>
+            ))}
+          </div>
+        </Reveal>
 
-              <dl className="mt-4 space-y-2 border-t border-border pt-4 text-sm">
-                {[
-                  [c.plans_tours, plan.tours3d],
-                  [c.plans_boosts, plan.boostsIncluded],
-                ].map(([label, value]) => (
-                  <div key={label} className="flex items-baseline justify-between gap-3">
-                    <dt className="text-muted-foreground">{label}</dt>
-                    <dd
-                      className={
-                        value == null
-                          ? "shrink-0 text-xs font-semibold italic text-muted-foreground/70"
-                          : "shrink-0 font-extrabold text-emerald tnum"
-                      }
-                    >
-                      {value == null ? c.plans_soon : value}
-                    </dd>
+        <RevealGroup className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[FREE_PLAN, ...PLANS].map((plan) => {
+            const free = plan.id === FREE_PLAN.id;
+            const price = annual ? plan.yearly : plan.monthly;
+            return (
+              <RevealItem
+                key={plan.id}
+                className={
+                  "flex flex-col rounded-2xl border bg-card p-5 shadow-soft " +
+                  (plan.id === "pro" ? "border-emerald ring-1 ring-emerald/40" : "border-border")
+                }
+              >
+                <div className="flex items-center gap-3">
+                  {plan.badgeImg && <Glyph src={plan.badgeImg} className="h-11 w-11" />}
+                  <div className="min-w-0">
+                    <h3 className="font-heading text-lg font-bold text-foreground">{plan.shortName}</h3>
+                    <p className="text-xs text-muted-foreground tnum">
+                      {free
+                        ? c.plans_free
+                        : `${price.toLocaleString("ro-RO")} RON/${annual ? (en ? "year" : "an") : (en ? "month" : "lună")}`}
+                    </p>
                   </div>
-                ))}
-              </dl>
-            </RevealItem>
-          ))}
+                </div>
+
+                <dl className="mt-4 space-y-2 border-t border-border pt-4 text-sm">
+                  {[
+                    [c.plans_tours, plan.tours3d, true],
+                    [c.plans_boosts, plan.boostsIncluded, false],
+                  ].map(([label, value, isTours]) => (
+                    <div key={label} className="flex items-baseline justify-between gap-3">
+                      <dt className="text-muted-foreground">{label}</dt>
+                      <dd className="flex shrink-0 items-baseline gap-1.5">
+                        <span className="font-extrabold text-emerald tnum">{value}</span>
+                        {/* Cifra e reală, aplicația nu e. Cât timp nu există
+                            linkuri de magazin, rândul de tururi o spune — pe
+                            toate treptele, fiindcă e o stare a produsului, nu a
+                            planului. */}
+                        {isTours && !live && value > 0 && (
+                          <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">
+                            {c.plans_soon}
+                          </span>
+                        )}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+
+                {free ? (
+                  <Link
+                    to="/post-property"
+                    className="mt-5 flex min-h-[48px] items-center justify-center rounded-full border border-border bg-background text-sm font-bold text-foreground transition-[transform,border-color,color] duration-200 ease-out hover:border-emerald hover:text-emerald active:scale-[0.96] dark:bg-card"
+                  >
+                    {c.plans_free_cta}
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => buyPlan(plan)}
+                    disabled={planPending === plan.id}
+                    className="mt-5 flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-emerald text-sm font-bold text-primary-foreground transition-[transform,background-color] duration-200 ease-out hover:bg-emerald/90 active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {planPending === plan.id ? (
+                      <><Loader2 className="h-4 w-4 animate-spin" /> {c.plans_buying}</>
+                    ) : (
+                      c.plans_buy
+                    )}
+                  </button>
+                )}
+              </RevealItem>
+            );
+          })}
         </RevealGroup>
 
         <Reveal className="mt-6 rounded-2xl border border-border bg-secondary/40 p-5">
@@ -397,12 +542,27 @@ export default function Tur3D() {
           </div>
           <ul className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {BOOST_PACKS.map((pack) => (
-              <li key={pack.id} className="rounded-xl border border-border bg-card px-3 py-2.5 text-center">
-                <p className="font-heading text-lg font-extrabold text-foreground tnum">{pack.boosts}</p>
-                <p className="text-[11px] text-muted-foreground">{c.packs_unit(pack.boosts)}</p>
-                <p className="mt-1 text-xs font-bold text-emerald tnum">
-                  {pack.priceRon.toLocaleString("ro-RO", { minimumFractionDigits: 2 })} RON
-                </p>
+              <li key={pack.id}>
+                <button
+                  type="button"
+                  onClick={() => buyPack(pack)}
+                  disabled={packPending === pack.id}
+                  className="flex min-h-[44px] w-full flex-col items-center justify-center rounded-xl border border-border bg-card px-3 py-2.5 text-center transition-[transform,border-color] duration-200 ease-out hover:border-emerald active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {packPending === pack.id ? (
+                    <span className="flex items-center gap-1.5 py-2 text-xs font-bold text-muted-foreground">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" /> {c.packs_buying}
+                    </span>
+                  ) : (
+                    <>
+                      <span className="font-heading text-lg font-extrabold text-foreground tnum">{pack.boosts}</span>
+                      <span className="text-[11px] text-muted-foreground">{c.packs_unit(pack.boosts)}</span>
+                      <span className="mt-1 text-xs font-bold text-emerald tnum">
+                        {pack.priceRon.toLocaleString("ro-RO", { minimumFractionDigits: 2 })} RON
+                      </span>
+                    </>
+                  )}
+                </button>
               </li>
             ))}
           </ul>

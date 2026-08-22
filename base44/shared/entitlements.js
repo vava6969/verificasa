@@ -4,12 +4,19 @@
 //
 // ATENȚIE: shared/ e copiat în fiecare funcție la deploy, deci funcțiile care
 // importă de aici se deployează împreună.
+//
+// Matricea cerută de client pe 22.08.2026. Ce e impus de aici:
+//   activeListings, photosPerListing — CheckListingAllowance, la publicare.
+//   boostsIncluded — VerifyCheckoutSession creditează registrul BoostCredit la
+//                    activarea abonamentului.
+//   tours3d, verifications — deocamdată doar afișaj (nu există contor de tururi
+//                    și nici de verificări; verificarea o face manual un admin).
 
 export const ENTITLEMENTS = {
-  none:  { activeListings: 1,    photosPerListing: 8,  boostsPerMonth: 0, priorityWeight: 0 },
-  basic: { activeListings: 1,    photosPerListing: 15, boostsPerMonth: 0, priorityWeight: 1 },
-  pro:   { activeListings: 5,    photosPerListing: 30, boostsPerMonth: 1, priorityWeight: 2 },
-  agent: { activeListings: null, photosPerListing: null, boostsPerMonth: 3, priorityWeight: 3 },
+  none:  { activeListings: 1,  photosPerListing: 8,    tours3d: 0,  boostsIncluded: 0,  verifications: 1, priorityWeight: 0 },
+  basic: { activeListings: 2,  photosPerListing: 15,   tours3d: 2,  boostsIncluded: 2,  verifications: 1, priorityWeight: 1 },
+  pro:   { activeListings: 3,  photosPerListing: 30,   tours3d: 3,  boostsIncluded: 3,  verifications: 1, priorityWeight: 2 },
+  agent: { activeListings: 30, photosPerListing: null, tours3d: 30, boostsIncluded: 45, verifications: 1, priorityWeight: 3 },
 };
 
 export function getEntitlements(planId) {

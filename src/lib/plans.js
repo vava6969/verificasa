@@ -2,36 +2,84 @@
 // de pagina de upgrade, de secțiunea „Planul meu" din Account, și de logica de
 // ordonare a anunțurilor pe planuri de pe homepage/căutare. Rank mai mare =
 // plan mai important (folosit direct la sortare: Agent > Pro > Basic > fără plan).
+// ---------------------------------------------------------------------------
+// LIMITE DE CONT (entitlements)
+// Sursa unică de adevăr pentru CIFRELE fiecărui plan. Textele de mai jos le
+// citesc de aici, deci un număr se schimbă într-un singur loc și se mișcă
+// peste tot: pagina de planuri, pagina de tur 3D, „Limitele contului”,
+// verificarea de la publicare.
+//
+// Trebuie să rămână IDENTIC cu base44/shared/entitlements.js. Acela e cel care
+// contează — verificarea din client e doar curtoazie de interfață.
+// null = nelimitat.
+//
+// Ce e IMPUS și ce e doar AFIȘAT, în august 2026:
+//   activeListings   — impus server-side (CheckListingAllowance, la publicare).
+//   photosPerListing — impus server-side, în aceeași funcție.
+//   boostsIncluded   — acordat O SINGURĂ DATĂ, la activarea abonamentului
+//                      (VerifyCheckoutSession scrie în registrul BoostCredit).
+//                      NU se reacordă la reînnoire: reînnoirile Stripe nu trec
+//                      prin nicio funcție a aplicației, fiindcă nu există webhook.
+//   tours3d          — DOAR afișaj. Aplicația de captură 3D nu e livrată, deci
+//                      nu există nimic de numărat. Când apare, contorul intră aici.
+//   verifications    — DOAR afișaj. Verificarea o face manual un admin; nu
+//                      există contor per cont.
+// ---------------------------------------------------------------------------
+export const ENTITLEMENTS = {
+  none:  { activeListings: 1,  photosPerListing: 8,    tours3d: 0,  boostsIncluded: 0,  verifications: 1, priorityWeight: 0 },
+  basic: { activeListings: 2,  photosPerListing: 15,   tours3d: 2,  boostsIncluded: 2,  verifications: 1, priorityWeight: 1 },
+  pro:   { activeListings: 3,  photosPerListing: 30,   tours3d: 3,  boostsIncluded: 3,  verifications: 1, priorityWeight: 2 },
+  agent: { activeListings: 30, photosPerListing: null, tours3d: 30, boostsIncluded: 45, verifications: 1, priorityWeight: 3 },
+};
+
+export function getEntitlements(planId) {
+  return ENTITLEMENTS[planId] || ENTITLEMENTS.none;
+}
+
+// Un rând de beneficiu. `soon: true` desenează eticheta „în curând” lângă text —
+// se pune DOAR pe ce a marcat clientul el însuși ca nelivrat, ca pagina să nu
+// promită mai mult decât există.
+const F = (ro, en, soon = false) => ({ ro, en, soon });
+
+// ---------------------------------------------------------------------------
+// PLANURILE PLĂTITE
+//
+// `headline` sunt rândurile de deasupra liniei (cu iconițe pe /upgrade),
+// `includes` cele de sub ea, după „Include gratuit” / „Tot ce e în X, plus”.
+// Era un singur vector tăiat cu slice(0, 3); cifra 3 s-a rupt în clipa în care
+// clientul a cerut șase rânduri de headline pe Basic.
+//
+// Planul gratuit NU e aici, e FREE_PLAN mai jos. Ținut separat pentru că
+// PLAN_FILTER_OPTIONS, RecommendedByPlanSection și PLAN_BY_ID iterează PLANS și
+// presupun toate un plan cumpărabil, cu rank nenul.
+// ---------------------------------------------------------------------------
 export const PLANS = [
   {
     id: "basic",
     rank: 1,
     name: "VerifiCasa Basic",
     shortName: "Basic",
-    description: "Ideal pentru proprietarii care listează ocazional un singur imobil.",
-    description_en: "For owners who list a single property now and then.",
+    description: "Ideal pentru proprietarii care listează ocazional un imobil.",
+    description_en: "For owners who list a property now and then.",
     monthly: 35,
     yearly: 336,
     iconImg: "/images/generated/plan-icon-basic-v2.png",
     badgeImg: "/images/generated/plan-badge-basic-v2.png",
     accent: "navy",
-    tours3d: null,
-    boostsIncluded: null,
-    benefits: [
-      "1 anunț activ pe platformă",
-      "Galerie foto/video standard",
-      "Verificare de bază inclusă",
-      "Suport prin email",
-      "Vizibilitate în căutare",
-      "Badge „Verificat”",
+    tours3d: ENTITLEMENTS.basic.tours3d,
+    boostsIncluded: ENTITLEMENTS.basic.boostsIncluded,
+    headline: [
+      F(ENTITLEMENTS.basic.activeListings + " listări de proprietate", ENTITLEMENTS.basic.activeListings + " property listings"),
+      F(ENTITLEMENTS.basic.tours3d + " tururi 3D", ENTITLEMENTS.basic.tours3d + " 3D tours", true),
+      F(ENTITLEMENTS.basic.boostsIncluded + " boost-uri", ENTITLEMENTS.basic.boostsIncluded + " boosts"),
+      F("1 verificare inclusă + badge pe anunțuri", "1 verification included + badge on listings"),
+      F("Poziționare prioritară în căutare", "Priority placement in search"),
+      F("Spațiu dedicat în listări", "Specific listing space"),
     ],
-    benefits_en: [
-      "1 active listing",
-      "Standard photo/video gallery",
-      "Basic verification included",
-      "Email support",
-      "Search visibility",
-      "'Verified' badge",
+    includes: [
+      F("Suport prin email", "Email support"),
+      F("Vizibilitate în căutare", "Search visibility"),
+      F("Badge „Verificat” pe anunț", "Verified badge on listing"),
     ],
   },
   {
@@ -46,23 +94,19 @@ export const PLANS = [
     iconImg: "/images/generated/plan-icon-pro-v2.png",
     badgeImg: "/images/generated/plan-badge-pro-v2.png",
     accent: "emerald",
-    tours3d: null,
-    boostsIncluded: null,
-    benefits: [
-      "Până la 5 anunțuri active",
-      "Galerie extinsă, până la 250MB/fișier",
-      "Poziționare prioritară în căutare",
-      "Badge „Verificat Pro”",
-      "Statistici avansate ale anunțului",
-      "Suport prioritar",
+    tours3d: ENTITLEMENTS.pro.tours3d,
+    boostsIncluded: ENTITLEMENTS.pro.boostsIncluded,
+    headline: [
+      F(ENTITLEMENTS.pro.activeListings + " anunțuri active", ENTITLEMENTS.pro.activeListings + " active listings"),
+      F(ENTITLEMENTS.pro.tours3d + " tururi 3D", ENTITLEMENTS.pro.tours3d + " 3D tours"),
+      F(ENTITLEMENTS.pro.boostsIncluded + " boost-uri", ENTITLEMENTS.pro.boostsIncluded + " boosts"),
+      F("Badge Pro pe anunțuri", "Pro badge on listings"),
+      F("Spațiu dedicat în listări", "Specific listing space"),
     ],
-    benefits_en: [
-      "Up to 5 active listings",
-      "Extended gallery, up to 250MB/file",
-      "Priority placement in search",
-      "'Verified Pro' badge",
-      "Advanced listing stats",
-      "Priority support",
+    includes: [
+      F("Badge „Verificat Pro”", "Verified Pro badge"),
+      F("Statistici avansate ale anunțului", "Advanced listing stats"),
+      F("Suport prioritar", "Priority support"),
     ],
   },
   {
@@ -77,54 +121,50 @@ export const PLANS = [
     iconImg: "/images/generated/plan-icon-agent-v2.png",
     badgeImg: "/images/generated/plan-badge-agent-v2.png",
     accent: "gold",
-    tours3d: null,
-    boostsIncluded: null,
-    benefits: [
-      "Anunțuri nelimitate",
-      "Stocare nelimitată",
-      "Panou dedicat de agenție",
-      "Manager de cont dedicat",
-      "Acces API & integrări",
-      "Permisiuni multi-utilizator",
+    tours3d: ENTITLEMENTS.agent.tours3d,
+    boostsIncluded: ENTITLEMENTS.agent.boostsIncluded,
+    headline: [
+      F(ENTITLEMENTS.agent.activeListings + " anunțuri active", ENTITLEMENTS.agent.activeListings + " active listings"),
+      F(ENTITLEMENTS.agent.tours3d + " tururi 3D", ENTITLEMENTS.agent.tours3d + " 3D tours"),
+      F(ENTITLEMENTS.agent.boostsIncluded + " boost-uri", ENTITLEMENTS.agent.boostsIncluded + " boosts"),
+      F("Badge Pro pe anunțuri", "Pro badge on listings"),
+      F("Spațiu dedicat în listări", "Specific listing space"),
+      F("Panou dedicat de agenție", "Dedicated agency panel", true),
     ],
-    benefits_en: [
-      "Unlimited listings",
-      "Unlimited storage",
-      "Dedicated agency panel",
-      "Dedicated account manager",
-      "API access & integrations",
-      "Multi-user permissions",
-    ],
+    includes: [],
   },
 ];
 
-// Câte tururi 3D și câte boost-uri intră în fiecare plan. `null` înseamnă „nu
-// s-a anunțat încă" — pagina /tur-3d scrie „în curând" în loc să inventeze o
-// cifră. Când clientul dă numerele, se completează mai sus și apar peste tot.
-//
-// ATENȚIE: aceste câmpuri sunt deocamdată DOAR afișaj. Nimic nu numără tururi
-// și nimic nu blochează la limită — ENTITLEMENTS de mai jos nu are noțiunea de
-// tur, iar `boostsPerMonth` nu e citit nicăieri.
-export const PLAN_BY_ID = Object.fromEntries(PLANS.map((p) => [p.id, p]));
-
-// ---------------------------------------------------------------------------
-// LIMITE DE CONT (entitlements)
-// Planurile vindeau „1 anunț activ" / „până la 5" / „nelimitate", dar nimic din
-// cod nu impunea nimic — un cont Basic putea publica cincizeci. Aici e sursa
-// unică de adevăr; verificarea reală se face server-side la publicare, cea din
-// client e doar curtoazie de interfață.
-// null = nelimitat.
-// ---------------------------------------------------------------------------
-export const ENTITLEMENTS = {
-  none:  { activeListings: 1,    photosPerListing: 8,  boostsPerMonth: 0, priorityWeight: 0 },
-  basic: { activeListings: 1,    photosPerListing: 15, boostsPerMonth: 0, priorityWeight: 1 },
-  pro:   { activeListings: 5,    photosPerListing: 30, boostsPerMonth: 1, priorityWeight: 2 },
-  agent: { activeListings: null, photosPerListing: null, boostsPerMonth: 3, priorityWeight: 3 },
+// Planul fără abonament — ce primește oricine își face cont. Nu are preț și nu
+// are buton de cumpărare: e aici ca să fie DECLARAT, nu ca să fie vândut.
+export const FREE_PLAN = {
+  id: "none",
+  rank: 0,
+  name: "VerifiCasa Free",
+  shortName: "Free",
+  description: "Un anunț, verificat, fără costuri.",
+  description_en: "One listing, verified, at no cost.",
+  monthly: 0,
+  yearly: 0,
+  iconImg: null,
+  badgeImg: null,
+  accent: "navy",
+  tours3d: ENTITLEMENTS.none.tours3d,
+  boostsIncluded: ENTITLEMENTS.none.boostsIncluded,
+  headline: [
+    F(ENTITLEMENTS.none.activeListings + " anunț activ", ENTITLEMENTS.none.activeListings + " active listing"),
+    F(ENTITLEMENTS.none.verifications + " verificare", ENTITLEMENTS.none.verifications + " verification"),
+  ],
+  includes: [
+    F("Suport prin email", "Email support"),
+    F("Vizibilitate în căutare", "Search visibility"),
+  ],
 };
 
-export function getEntitlements(planId) {
-  return ENTITLEMENTS[planId] || ENTITLEMENTS.none;
-}
+// Textul unui rând de beneficiu, în limba cerută.
+export const featureText = (f, en) => (en ? f.en : f.ro);
+
+export const PLAN_BY_ID = Object.fromEntries(PLANS.map((p) => [p.id, p]));
 
 // ---------------------------------------------------------------------------
 // PACHETE DE BOOST (client, 21.08 — prețuri provizorii, le schimbă Andrei)

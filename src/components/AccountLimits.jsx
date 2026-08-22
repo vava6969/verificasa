@@ -131,6 +131,28 @@ export default function AccountLimits({ className = "" }) {
           }
           note={en ? "Applies to each listing separately." : "Se aplică fiecărui anunț în parte."}
         />
+        {/* Tururile 3D sunt declarate, nu contorizate: aplicația de captură nu e
+            livrată, deci nu există nimic de numărat. Rândul scrie cifra ȘI
+            spune că nu e activă încă — un contor „0 din 3" ar sugera un
+            consum care nu are cum să existe. */}
+        <AllowanceRow
+          label={en ? "3D tours in your plan" : "Tururi 3D în planul tău"}
+          value={ent.tours3d}
+          note={
+            en
+              ? "Available once the VerifiCasa 3D app ships."
+              : "Devin disponibile odată cu aplicația VerifiCasa 3D."
+          }
+        />
+        <AllowanceRow
+          label={en ? "Boosts included in your plan" : "Boost-uri incluse în plan"}
+          value={ent.boostsIncluded}
+          note={
+            en
+              ? "Credited once when the plan is activated. They are part of the balance below."
+              : "Se acordă o dată, la activarea planului. Intră în soldul de mai jos."
+          }
+        />
       </div>
 
       {atLimit && (

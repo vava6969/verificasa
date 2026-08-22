@@ -1,5 +1,7 @@
 import { secrets } from "base44:runtime";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { getEntitlements } from "../../shared/entitlements.js";
+import { addCredits } from "../../shared/boosts.js";
 
 // Verifică server-side o sesiune Stripe Checkout finalizată (după redirectul de
 // succes din CreateCheckoutSession) și salvează abonamentul rezultat pe entitatea
@@ -105,6 +107,29 @@ export default async function (req: Request): Promise<Response> {
     } catch (_) { /* best-effort */ }
 
     await svc.entities.Subscription.create(record);
+
+    // Boost-urile incluse in plan intra in registrul BoostCredit CHIAR ACUM.
+    // Pana azi, "2x Boosts" pe pagina de planuri nu credita nimic nicaieri:
+    // cifra era doar text. Registrul e append-only, iar functia iese mai sus
+    // daca sesiunea a fost deja procesata, deci creditarea se intampla exact o
+    // data per sesiune de plata.
+    //
+    // ATENTIE, limita cunoscuta: se acorda LA ACTIVARE, nu lunar. Reinnoirile
+    // Stripe nu trec prin nicio functie a aplicatiei (nu exista webhook), deci
+    // luna a doua nu mai crediteaza nimic. Ca sa fie lunar, e nevoie de un
+    // webhook pe `invoice.paid` care sa reia acest bloc.
+    const ent = getEntitlements(planId);
+    if (ent.boostsIncluded > 0) {
+      try {
+        await addCredits(svc, {
+          userId: me.id,
+          delta: ent.boostsIncluded,
+          reason: "plan_grant",
+          sourceId: sessionId,
+          note: `${PLAN_NAMES[planId]} - boost-uri incluse in plan`,
+        });
+      } catch (_) { /* best-effort: planul e activ chiar daca registrul cade */ }
+    }
 
     // Denormalizează planul pe anunțurile utilizatorului. Ordonarea pe planuri
     // (homepage, căutare) citește Property.poster_plan — Subscription.read e

@@ -3,13 +3,15 @@ import { motion } from "framer-motion";
 import NumberFlow from "@number-flow/react";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import ScrambleText from "@/components/ScrambleText";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
 import { base44 } from "@/api/base44Client";
 import { Reveal as HouseReveal } from "@/components/ui/reveal";
-import { PLANS, BOOST_PACKS, BOOST_DURATION_DAYS, boostUnitPrice } from "@/lib/plans";
+import { PLANS, FREE_PLAN, BOOST_PACKS, BOOST_DURATION_DAYS, boostUnitPrice, featureText } from "@/lib/plans";
 
 // ---------------------------------------------------------------------------
 // Pagina de planuri, în forma cerută de client: cardurile albastre cu insignă
@@ -100,6 +102,25 @@ function PricingSwitch({ annual, onSwitch, en }) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// FUNDALUL CARE SE SCHIMBĂ LA TREAPTA ATINSĂ
+//
+// Cererea clientului: când omul trece peste Basic, Pro sau Agent, fundalul
+// întregii pagini devine imaginea treptei respective.
+//
+// Imaginile sunt generate pentru VerifiCasa și urcă în scară odată cu treapta:
+// Basic o singură clădire în lumina dimineții, Pro trei fațade la asfințit,
+// Agent un oraș întreg de pe înălțime. WebP la 1920px, sub 310KB fiecare.
+//
+// Nu e doar hover: `(hover: none)` e adevărat pe telefon, deci fundalul se
+// aprinde și la focus (tastatură) și la apăsare (deget). Un efect care merge
+// doar cu mausul nu există pentru jumătate din trafic.
+const TIER_BACKDROP = {
+  basic: "/images/upgrade/tier-basic-v1.webp",
+  pro: "/images/upgrade/tier-pro-v1.webp",
+  agent: "/images/upgrade/tier-agent-v1.webp",
+};
+
 // Iconițele lucioase existente, mapate pe beneficiile fiecărui plan.
 const FEATURE_ICONS = {
   basic: ["/images/generated/icon-document.png", "/images/generated/icon-video.png", "/images/generated/icon-shield-check.png"],
@@ -108,6 +129,7 @@ const FEATURE_ICONS = {
 };
 
 const INCLUDES_LABEL = {
+  none: { ro: "Include gratuit:", en: "Included free:" },
   basic: { ro: "Include gratuit:", en: "Included free:" },
   pro: { ro: "Tot ce e în Basic, plus:", en: "Everything in Basic, plus:" },
   agent: { ro: "Tot ce e în Pro, plus:", en: "Everything in Pro, plus:" },
@@ -117,39 +139,63 @@ function Tick() {
   return (
     <span
       aria-hidden="true"
-      className="mr-3 grid h-6 w-6 shrink-0 place-content-center rounded-full bg-gradient-to-t from-emerald to-emerald/80 text-[13px] font-bold leading-none text-white shadow-sm shadow-emerald/50"
+      className="mr-2.5 grid h-5 w-5 shrink-0 place-content-center rounded-full bg-gradient-to-t from-emerald to-emerald/80 text-[11px] font-bold leading-none text-white shadow-sm shadow-emerald/50 sm:mr-3 sm:h-6 sm:w-6 sm:text-[13px]"
     >
       ✓
     </span>
   );
 }
 
-function PlanCard({ plan, annual, onSelect, checkingOut, en }) {
+// Eticheta de pe rândurile pe care clientul le-a marcat el însuși ca nelivrate.
+// Rândul rămâne în listă — planul chiar îl include — dar nu se citește ca o
+// promisiune pe care produsul o poate ține azi.
+function SoonTag({ en }) {
+  return (
+    <span className="ml-2 shrink-0 rounded-full bg-neutral-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-neutral-600 dark:bg-white/10 dark:text-neutral-400">
+      {en ? "coming soon" : "în curând"}
+    </span>
+  );
+}
+
+// `free` schimbă subsolul cardului: planul gratuit nu se cumpără, deci nu
+// primește un buton de plată care ar deschide un checkout gol.
+function PlanCard({ plan, annual, onSelect, checkingOut, en, free = false, onTier }) {
   const popular = plan.id === "pro";
   const price = annual ? plan.yearly : plan.monthly;
   const decimals = price % 1 !== 0;
   const icons = FEATURE_ICONS[plan.id] || [];
-  const bens = en && plan.benefits_en ? plan.benefits_en : plan.benefits;
-  const headline = bens.slice(0, 3);
-  const includes = bens.slice(3);
+  const headline = plan.headline || [];
+  const includes = plan.includes || [];
   const label = INCLUDES_LABEL[plan.id] || INCLUDES_LABEL.basic;
+
+  const enter = () => onTier?.(plan.id);
+  const leave = () => onTier?.(null);
 
   return (
     <Card
-      className={`relative flex h-full flex-col overflow-visible border-neutral-200 dark:border-white/10 ${
+      onMouseEnter={enter}
+      onMouseLeave={leave}
+      onFocus={enter}
+      onBlur={leave}
+      onPointerDown={enter}
+      className={`relative flex h-full flex-col overflow-visible border-neutral-200 transition-transform duration-300 ease-out dark:border-white/10 ${
         popular ? "bg-emerald/5 ring-2 ring-emerald dark:bg-emerald/10" : "bg-white dark:bg-neutral-900"
       }`}
     >
+      {/* Insigna atarnata in colt exista doar de la sm in sus. Pe telefon se
+          suprapunea peste pastila „Popular" — masurat, 30px de acoperire pe
+          cardul Pro — si oricum dubla iconita planului, care e chiar langa
+          titlu. Pe desktop atarna in afara cardului, unde nu incurca nimic. */}
       {plan.badgeImg && (
         <img
           src={plan.badgeImg}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute right-3 top-3 z-20 h-12 w-12 object-contain drop-shadow-lg sm:-right-4 sm:-top-9 sm:h-[5.5rem] sm:w-[5.5rem]"
+          className="pointer-events-none absolute z-20 hidden object-contain drop-shadow-lg sm:-right-4 sm:-top-9 sm:block sm:h-[5.5rem] sm:w-[5.5rem]"
         />
       )}
 
-      <CardHeader className="text-left">
+      <CardHeader className="p-4 text-left sm:p-6">
         <div className="mb-2 flex items-start justify-between gap-2">
           <div className="flex items-center gap-3">
             {plan.iconImg && (
@@ -157,10 +203,10 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en }) {
                 src={plan.iconImg}
                 alt=""
                 aria-hidden="true"
-                className="h-12 w-12 shrink-0 object-contain drop-shadow sm:h-14 sm:w-14"
+                className="h-9 w-9 shrink-0 object-contain drop-shadow sm:h-14 sm:w-14"
               />
             )}
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-[1.75rem]">{plan.name}</h3>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white sm:text-[1.75rem]">{plan.name}</h3>
           </div>
           {popular && (
             <span className="shrink-0 rounded-full bg-emerald px-3 py-1 text-sm font-semibold text-white">
@@ -168,27 +214,43 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en }) {
             </span>
           )}
         </div>
-        <p className="mb-4 min-h-[2.5rem] text-sm text-gray-600 dark:text-neutral-400">{en && plan.description_en ? plan.description_en : plan.description}</p>
+        <p className="mb-3 text-[13px] text-gray-600 dark:text-neutral-400 sm:mb-4 sm:min-h-[2.5rem] sm:text-sm">{en && plan.description_en ? plan.description_en : plan.description}</p>
         <div className="flex items-baseline">
-          <span className="text-4xl font-bold text-gray-900 dark:text-white">
+          {free ? (
+            <span className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+              {en ? "Free" : "Gratuit"}
+            </span>
+          ) : (
+          <span className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
             <NumberFlow
               value={price}
               locales="ro-RO"
               format={decimals ? { minimumFractionDigits: 2, maximumFractionDigits: 2 } : { maximumFractionDigits: 0 }}
-              className="text-4xl font-bold"
+              className="text-3xl font-bold sm:text-4xl"
             />
-            <span className="ml-1 align-top text-xl">RON</span>
+            <span className="ml-1 align-top text-lg sm:text-xl">RON</span>
           </span>
-          <span className="ml-1 text-gray-600 dark:text-neutral-400">/{annual ? (en ? "year" : "an") : (en ? "month" : "lună")}</span>
+          )}
+          {!free && (
+            <span className="ml-1 text-gray-600 dark:text-neutral-400">/{annual ? (en ? "year" : "an") : (en ? "month" : "lună")}</span>
+          )}
         </div>
       </CardHeader>
 
-      <CardContent className="flex flex-1 flex-col pt-0">
+      <CardContent className="flex flex-1 flex-col p-4 pt-0 sm:p-6 sm:pt-0">
+        {free ? (
+          <Link
+            to="/post-property"
+            className="mb-3 flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white p-3 text-base font-semibold text-gray-900 transition active:scale-[0.98] dark:border-white/15 dark:bg-white/5 dark:text-white sm:mb-4 sm:min-h-[52px] sm:p-4 sm:text-lg"
+          >
+            {en ? "Post a listing" : "Publică un anunț"}
+          </Link>
+        ) : (
         <button
           type="button"
           onClick={() => onSelect(plan)}
           disabled={checkingOut === plan.id}
-          className={`mb-4 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl p-4 text-lg font-semibold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 ${
+          className={`mb-3 flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl p-3 text-base font-semibold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 sm:mb-4 sm:min-h-[52px] sm:p-4 sm:text-lg ${
             popular
               ? "border border-emerald/70 bg-gradient-to-t from-emerald to-emerald/85 text-white shadow-lg shadow-emerald/50"
               : "border border-neutral-700 bg-gradient-to-t from-neutral-900 to-neutral-600 text-white shadow-lg shadow-neutral-900/40"
@@ -200,28 +262,31 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en }) {
             en ? "Choose plan" : "Alege planul"
           )}
         </button>
+        )}
 
-        <ul className="space-y-3 py-4">
-          {headline.map((text, i) => (
-            <li key={text} className="flex items-center">
+        <ul className="space-y-2 py-3 sm:space-y-3 sm:py-4">
+          {headline.map((f, i) => (
+            <li key={f.ro} className="flex items-center">
               {icons[i] ? (
-                <img src={icons[i]} alt="" aria-hidden="true" className="mr-3 h-7 w-7 shrink-0 object-contain drop-shadow-sm" />
+                <img src={icons[i]} alt="" aria-hidden="true" className="mr-2.5 h-5 w-5 shrink-0 object-contain drop-shadow-sm sm:mr-3 sm:h-7 sm:w-7" />
               ) : (
                 <Tick />
               )}
-              <span className="text-sm font-semibold text-gray-700 dark:text-neutral-300">{text}</span>
+              <span className="text-[13px] font-semibold text-gray-700 dark:text-neutral-300 sm:text-sm">{featureText(f, en)}</span>
+              {f.soon && <SoonTag en={en} />}
             </li>
           ))}
         </ul>
 
         {includes.length > 0 && (
-          <div className="mt-auto space-y-3 border-t border-neutral-200 pt-4 dark:border-white/10">
-            <h4 className="mb-3 text-base font-medium text-gray-900 dark:text-white">{en ? label.en : label.ro}</h4>
-            <ul className="space-y-2">
-              {includes.map((item) => (
-                <li key={item} className="flex items-center">
+          <div className="mt-auto space-y-2 border-t border-neutral-200 pt-3 dark:border-white/10 sm:space-y-3 sm:pt-4">
+            <h4 className="mb-2 text-sm font-medium text-gray-900 dark:text-white sm:mb-3 sm:text-base">{en ? label.en : label.ro}</h4>
+            <ul className="space-y-1.5 sm:space-y-2">
+              {includes.map((f) => (
+                <li key={f.ro} className="flex items-center">
                   <Tick />
-                  <span className="text-sm text-gray-600 dark:text-neutral-400">{item}</span>
+                  <span className="text-[13px] text-gray-600 dark:text-neutral-400 sm:text-sm">{featureText(f, en)}</span>
+                  {f.soon && <SoonTag en={en} />}
                 </li>
               ))}
             </ul>
@@ -296,6 +361,7 @@ function BoostCard({ pack, cheapestUnit, onBuy, pending, en }) {
 
 export default function PlanuriUpgrade() {
   const [annual, setAnnual] = useState(false);
+  const [tier, setTier] = useState(null);
   const [checkingOut, setCheckingOut] = useState(null);
   const [boostPending, setBoostPending] = useState(null);
   const { toast } = useToast();
@@ -380,7 +446,31 @@ export default function PlanuriUpgrade() {
   const cheapestUnit = Math.min(...BOOST_PACKS.map(boostUnitPrice));
 
   return (
-    <div className="relative mx-auto min-h-screen overflow-hidden bg-neutral-100 px-4 pb-24 pt-14 dark:bg-neutral-950 sm:pt-20">
+    <div className="relative mx-auto min-h-screen overflow-hidden bg-neutral-100 px-4 pb-24 pt-8 dark:bg-neutral-950 sm:pt-20">
+      {/* Fundalul treptei atinse. Toate cele trei imagini stau montate tot
+          timpul și doar opacitatea lor se schimbă: montarea unei imagini la
+          hover ar însemna o descărcare exact în clipa în care omul se uită, deci
+          o secundă de gol. Numai opacitatea și scara se animă — nimic aici nu
+          poartă conținut, deci dacă bucla de cadre e sugrumată pagina rămâne
+          pur și simplu pe fundalul ei obișnuit. */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+        {Object.entries(TIER_BACKDROP).map(([id, src]) => (
+          <img
+            key={id}
+            src={src}
+            alt=""
+            className={`absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-700 ease-out ${
+              tier === id ? "scale-100 opacity-100" : "scale-105 opacity-0"
+            }`}
+          />
+        ))}
+        {/* Voalul ține textul lizibil peste orice fotografie ar ajunge aici. */}
+        <div
+          className={`absolute inset-0 bg-neutral-100/[0.88] transition-opacity duration-700 dark:bg-neutral-950/[0.86] ${
+            tier ? "opacity-100" : "opacity-0"
+          }`}
+        />
+      </div>
       {/* Glow radial albastru — semnătura paginii, în forma cerută de client */}
       <div
         className="pointer-events-none absolute left-[10%] right-[10%] top-0 z-0 h-full w-[80%] dark:hidden"
@@ -403,7 +493,7 @@ export default function PlanuriUpgrade() {
           <Reveal as="h1" index={0} className="mb-4 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl md:text-6xl">
             {en ? "Plans that fit " : "Planuri potrivite "}
             <span className="inline-block rounded-xl border border-dashed border-emerald bg-emerald/10 px-2 py-1 dark:bg-emerald/15">
-              {en ? "you" : "pentru tine"}
+              <ScrambleText text={en ? "you" : "pentru tine"} />
             </span>
           </Reveal>
           <Reveal as="p" index={1} className="mx-auto w-[90%] text-sm text-gray-600 dark:text-neutral-400 sm:w-[70%] sm:text-base">
@@ -417,8 +507,11 @@ export default function PlanuriUpgrade() {
           <PricingSwitch annual={annual} onSwitch={setAnnual} en={en} />
         </Reveal>
 
-        <div className="mx-auto mt-2 grid max-w-7xl grid-cols-1 gap-5 py-8 sm:mt-6 md:grid-cols-3 md:gap-4">
-          {PLANS.map((plan, i) => (
+        {/* Patru trepte de când clientul a cerut planul gratuit declarat pe
+            pagină. Pe telefon una sub alta, două pe tabletă, patru de la lg în
+            sus — la md patru carduri de plan devin coloane de 170px. */}
+        <div className="mx-auto mt-2 grid max-w-7xl grid-cols-1 gap-4 py-6 sm:mt-6 sm:grid-cols-2 sm:py-8 lg:grid-cols-4">
+          {[FREE_PLAN, ...PLANS].map((plan, i) => (
             <Reveal key={plan.id} as="div" index={3 + i} className="h-full">
               <PlanCard
                 plan={plan}
@@ -426,6 +519,8 @@ export default function PlanuriUpgrade() {
                 onSelect={selectPlan}
                 checkingOut={checkingOut}
                 en={en}
+                free={plan.id === FREE_PLAN.id}
+                onTier={TIER_BACKDROP[plan.id] ? setTier : undefined}
               />
             </Reveal>
           ))}
