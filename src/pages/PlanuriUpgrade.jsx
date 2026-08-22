@@ -59,6 +59,23 @@ function Reveal({ as = "div", index = 0, className, children }) {
   );
 }
 
+// Adevarat doar pe un dispozitiv unde pointerul poate sta deasupra unui element
+// SI poate pleca de pe el. Se reevalueaza la schimbare, ca un laptop cu ecran
+// tactil sau o fereastra mutata pe alt monitor sa nu ramana blocata pe raspunsul
+// de la montare.
+function useHoverCapable() {
+  const [canHover, setCanHover] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return undefined;
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const sync = () => setCanHover(mq.matches);
+    sync();
+    mq.addEventListener?.("change", sync);
+    return () => mq.removeEventListener?.("change", sync);
+  }, []);
+  return canHover;
+}
+
 function PricingSwitch({ annual, onSwitch, en }) {
   const opts = [
     { value: false, label: en ? "Monthly" : "Lunar" },
@@ -112,9 +129,18 @@ function PricingSwitch({ annual, onSwitch, en }) {
 // Basic o singură clădire în lumina dimineții, Pro trei fațade la asfințit,
 // Agent un oraș întreg de pe înălțime. WebP la 1920px, sub 310KB fiecare.
 //
-// Nu e doar hover: `(hover: none)` e adevărat pe telefon, deci fundalul se
-// aprinde și la focus (tastatură) și la apăsare (deget). Un efect care merge
-// doar cu mausul nu există pentru jumătate din trafic.
+// Intentia initiala a fost ca efectul sa existe si pe telefon, prin
+// `onPointerDown`. In practica asta l-a stricat: pe un ecran tactil
+// `(hover: hover)` e FALS, deci `onMouseLeave` si `onBlur` nu se declanseaza
+// niciodata. Fundalul se aprindea la prima atingere — inclusiv la un scroll
+// pornit cu degetul de pe un card — si RAMANEA aprins, cu voalul de 88% peste
+// tot ce urma. Se vede in captura clientului: randurile din Pro („Badge
+// Verificat Pro", „Statistici avansate", „Suport prioritar") stau pe o
+// fotografie si nu se mai pot citi.
+//
+// Un efect de hover care nu se poate stinge nu e un efect, e o pata. Ramane
+// unde exista un pointer care poate PLECA de pe card; pe telefon cardurile
+// stau pe fundalul curat al paginii, care e si contrastul corect.
 const TIER_BACKDROP = {
   basic: "/images/upgrade/tier-basic-v1.webp",
   pro: "/images/upgrade/tier-pro-v1.webp",
@@ -139,7 +165,7 @@ function Tick() {
   return (
     <span
       aria-hidden="true"
-      className="mr-2.5 grid h-5 w-5 shrink-0 place-content-center rounded-full bg-gradient-to-t from-emerald to-emerald/80 text-[11px] font-bold leading-none text-white shadow-sm shadow-emerald/50 sm:mr-3 sm:h-6 sm:w-6 sm:text-[13px]"
+      className="mr-2.5 mt-px grid h-5 w-5 shrink-0 place-content-center rounded-full bg-gradient-to-t from-emerald to-emerald/80 text-[11px] font-bold leading-none text-white shadow-sm shadow-emerald/50 sm:mr-3 sm:h-6 sm:w-6 sm:text-[13px]"
     >
       ✓
     </span>
@@ -151,7 +177,7 @@ function Tick() {
 // promisiune pe care produsul o poate ține azi.
 function SoonTag({ en }) {
   return (
-    <span className="ml-2 shrink-0 rounded-full bg-neutral-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-neutral-600 dark:bg-white/10 dark:text-neutral-400">
+    <span className="ml-2 mt-px shrink-0 self-start rounded-full bg-neutral-200 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-neutral-600 dark:bg-white/10 dark:text-neutral-400">
       {en ? "coming soon" : "în curând"}
     </span>
   );
@@ -177,7 +203,6 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en, free = false, onTie
       onMouseLeave={leave}
       onFocus={enter}
       onBlur={leave}
-      onPointerDown={enter}
       className={`relative flex h-full flex-col overflow-visible border-neutral-200 transition-transform duration-300 ease-out dark:border-white/10 ${
         popular ? "bg-emerald/5 ring-2 ring-emerald dark:bg-emerald/10" : "bg-white dark:bg-neutral-900"
       }`}
@@ -196,43 +221,57 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en, free = false, onTie
       )}
 
       <CardHeader className="p-4 text-left sm:p-6">
-        <div className="mb-2 flex items-start justify-between gap-2">
-          <div className="flex items-center gap-3">
-            {plan.iconImg && (
-              <img
-                src={plan.iconImg}
-                alt=""
-                aria-hidden="true"
-                className="h-9 w-9 shrink-0 object-contain drop-shadow sm:h-14 sm:w-14"
-              />
-            )}
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white sm:text-[1.75rem]">{plan.name}</h3>
-          </div>
+        {/* Pe telefon iconita sta pe randul ei si titlul coboara dedesubt, ca
+            numele, descrierea si pretul sa porneasca TOATE din aceeasi margine.
+            Cu iconita langa titlu, titlul atarna cu 48px in dreapta restului
+            cardului (masurat la 375px: h3 la x=81, descrierea si pretul la
+            x=33) — iar cardul Free, care nu are iconita, isi punea titlul la
+            x=33. Patru carduri unul sub altul, cu doua indentari diferite:
+            exact ce se vede ca „nealiniat". De la sm in sus e loc pentru
+            lockup-ul aprobat de client, iconita mare langa nume, deci acolo
+            randul nu se mai rupe (`sm:flex-nowrap`). */}
+        <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-2 sm:flex-nowrap">
+          {plan.iconImg && (
+            <img
+              src={plan.iconImg}
+              alt=""
+              aria-hidden="true"
+              className="order-1 h-9 w-9 shrink-0 object-contain drop-shadow sm:h-14 sm:w-14"
+            />
+          )}
           {popular && (
-            <span className="shrink-0 rounded-full bg-emerald px-3 py-1 text-sm font-semibold text-white">
+            <span className="order-2 ml-auto shrink-0 rounded-full bg-emerald px-3 py-1 text-sm font-semibold text-white sm:order-3">
               Popular
             </span>
           )}
+          <h3 className="order-3 w-full text-xl font-bold text-gray-900 dark:text-white sm:order-2 sm:w-auto sm:min-w-0 sm:text-[1.75rem]">
+            {plan.name}
+          </h3>
         </div>
         <p className="mb-3 text-[13px] text-gray-600 dark:text-neutral-400 sm:mb-4 sm:min-h-[2.5rem] sm:text-sm">{en && plan.description_en ? plan.description_en : plan.description}</p>
-        <div className="flex items-baseline">
+        {/* „RON" statea pe `align-top`, adica ridicat in varful unei casete de
+            52px, iar „/luna" — aliniat pe linia de baza a cifrei — cadea cu
+            19px mai jos si la dreapta lui. Nu era o rupere de rand, dar se
+            citea exact ca una: „50 ^RON" si dedesubt „/luna". Totul sta acum
+            pe aceeasi linie de baza. */}
+        <div className="flex flex-wrap items-baseline gap-x-1.5">
           {free ? (
             <span className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
               {en ? "Free" : "Gratuit"}
             </span>
           ) : (
-          <span className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+          <span className="text-3xl font-bold leading-none text-gray-900 dark:text-white sm:text-4xl">
             <NumberFlow
               value={price}
               locales="ro-RO"
               format={decimals ? { minimumFractionDigits: 2, maximumFractionDigits: 2 } : { maximumFractionDigits: 0 }}
               className="text-3xl font-bold sm:text-4xl"
             />
-            <span className="ml-1 align-top text-lg sm:text-xl">RON</span>
+            <span className="ml-1 text-lg font-semibold sm:text-xl">RON</span>
           </span>
           )}
           {!free && (
-            <span className="ml-1 text-gray-600 dark:text-neutral-400">/{annual ? (en ? "year" : "an") : (en ? "month" : "lună")}</span>
+            <span className="text-sm text-gray-600 dark:text-neutral-400 sm:text-base">/{annual ? (en ? "year" : "an") : (en ? "month" : "lună")}</span>
           )}
         </div>
       </CardHeader>
@@ -266,13 +305,13 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en, free = false, onTie
 
         <ul className="space-y-2 py-3 sm:space-y-3 sm:py-4">
           {headline.map((f, i) => (
-            <li key={f.ro} className="flex items-center">
+            <li key={f.ro} className="flex items-start">
               {icons[i] ? (
                 <img src={icons[i]} alt="" aria-hidden="true" className="mr-2.5 h-5 w-5 shrink-0 object-contain drop-shadow-sm sm:mr-3 sm:h-7 sm:w-7" />
               ) : (
                 <Tick />
               )}
-              <span className="text-[13px] font-semibold text-gray-700 dark:text-neutral-300 sm:text-sm">{featureText(f, en)}</span>
+              <span className="text-[13px] font-semibold leading-5 text-gray-700 dark:text-neutral-300 sm:text-sm">{featureText(f, en)}</span>
               {f.soon && <SoonTag en={en} />}
             </li>
           ))}
@@ -283,9 +322,9 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en, free = false, onTie
             <h4 className="mb-2 text-sm font-medium text-gray-900 dark:text-white sm:mb-3 sm:text-base">{en ? label.en : label.ro}</h4>
             <ul className="space-y-1.5 sm:space-y-2">
               {includes.map((f) => (
-                <li key={f.ro} className="flex items-center">
+                <li key={f.ro} className="flex items-start">
                   <Tick />
-                  <span className="text-[13px] text-gray-600 dark:text-neutral-400 sm:text-sm">{featureText(f, en)}</span>
+                  <span className="text-[13px] leading-5 text-gray-600 dark:text-neutral-400 sm:text-sm">{featureText(f, en)}</span>
                   {f.soon && <SoonTag en={en} />}
                 </li>
               ))}
@@ -313,28 +352,46 @@ function BoostCard({ pack, cheapestUnit, onBuy, pending, en }) {
           {en ? "Best rate" : "Cel mai bun preț"}
         </span>
       )}
-      <CardContent className="flex flex-1 flex-col p-5">
-        <div className="flex items-center gap-3">
+      <CardContent className="flex flex-1 flex-col p-4 sm:p-5">
+        {/* Doua coloane la 375px inseamna 124px de continut cu p-5, din care
+            iconita de 40px plus gap-3 lasa 70px pentru text. „boost-uri" nu
+            incape in 70px, deci se rupea cu cratima — si doar pe pachetele de
+            3/6/12, nu si pe „1 boost". Rezultatul: in acelasi rand al grilei,
+            pretul si butonul „Cumpara" stateau cu 24px mai jos pe un card
+            decat pe vecinul lui (masurat: 2521 vs 2545).
+            Pe telefon iconita urca DEASUPRA textului. Langa el nu incape: la
+            320px raman 104px de continut, iar „12 boost-uri" cere 81px — cu
+            iconita si spatiul dintre ele, 121px. Un `whitespace-nowrap` nu
+            rezolva nimic acolo, doar transforma ruperea de rand intr-o
+            revarsare in afara cardului (masurat: 19px in afara). Asezate una
+            peste alta, toate cele patru carduri au exact aceeasi structura —
+            o iconita si UN rand de text — deci preturile si butoanele se
+            aliniaza de la sine, in ambele limbi, pana la 320px.
+            De la sm in sus e loc pentru lockup-ul orizontal de dinainte. */}
+        <div className="flex flex-col items-start gap-1.5 sm:h-12 sm:flex-row sm:items-center sm:gap-3">
           <img
             src="/images/generated/icon-coins.png"
             alt=""
             aria-hidden="true"
-            className="h-10 w-10 shrink-0 object-contain drop-shadow"
+            className="h-8 w-8 shrink-0 object-contain drop-shadow sm:h-10 sm:w-10"
           />
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">
-            {pack.boosts} <span className="text-base font-semibold">{pack.boosts === 1 ? "boost" : "boost-uri"}</span>
+          <p className="whitespace-nowrap text-xl font-bold leading-none text-gray-900 dark:text-white sm:text-2xl">
+            {pack.boosts}{" "}
+            <span className="text-[13px] font-semibold sm:text-base">
+              {pack.boosts === 1 ? "boost" : en ? "boosts" : "boost-uri"}
+            </span>
           </p>
         </div>
 
-        <p className="mt-4 flex items-baseline text-3xl font-bold text-gray-900 dark:text-white">
+        <p className="mt-3 flex items-baseline text-2xl font-bold leading-none text-gray-900 dark:text-white sm:mt-4 sm:text-3xl">
           <NumberFlow
             value={pack.priceRon}
             locales="ro-RO"
             format={decimals ? { minimumFractionDigits: 2, maximumFractionDigits: 2 } : { maximumFractionDigits: 0 }}
           />
-          <span className="ml-1 align-top text-base">RON</span>
+          <span className="ml-1 text-sm font-semibold sm:text-base">RON</span>
         </p>
-        <p className="mt-1 text-xs text-gray-600 dark:text-neutral-400">
+        <p className="mt-1.5 text-[11px] leading-tight text-gray-600 dark:text-neutral-400 sm:text-xs">
           {unit.toFixed(2).replace(".", ",")} RON {en ? "per boost" : "pe boost"}
         </p>
 
@@ -342,7 +399,7 @@ function BoostCard({ pack, cheapestUnit, onBuy, pending, en }) {
           type="button"
           onClick={() => onBuy(pack)}
           disabled={pending === pack.id}
-          className={`mt-5 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl px-4 text-base font-semibold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 ${
+          className={`mt-4 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl px-4 text-base font-semibold sm:mt-5 transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 ${
             pack.popular || pack.single
               ? "border border-emerald/70 bg-gradient-to-t from-emerald to-emerald/85 text-white shadow-lg shadow-emerald/50"
               : "border border-neutral-700 bg-gradient-to-t from-neutral-900 to-neutral-600 text-white shadow-lg shadow-neutral-900/40"
@@ -369,6 +426,14 @@ export default function PlanuriUpgrade() {
   const { lang } = useCountry();
   const navigate = useNavigate();
   const en = lang === "en";
+  const canHover = useHoverCapable();
+
+  // Daca dispozitivul isi pierde capacitatea de hover cat timp o treapta e
+  // aprinsa (fereastra mutata pe un ecran tactil), fundalul se stinge singur in
+  // loc sa ramana blocat.
+  useEffect(() => {
+    if (!canHover) setTier(null);
+  }, [canHover]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -446,7 +511,7 @@ export default function PlanuriUpgrade() {
   const cheapestUnit = Math.min(...BOOST_PACKS.map(boostUnitPrice));
 
   return (
-    <div className="relative mx-auto min-h-screen overflow-hidden bg-neutral-100 px-4 pb-24 pt-8 dark:bg-neutral-950 sm:pt-20">
+    <div className="relative mx-auto min-h-screen overflow-hidden bg-neutral-100 px-4 pb-24 pt-6 dark:bg-neutral-950 sm:pt-20">
       {/* Fundalul treptei atinse. Toate cele trei imagini stau montate tot
           timpul și doar opacitatea lor se schimbă: montarea unei imagini la
           hover ar însemna o descărcare exact în clipa în care omul se uită, deci
@@ -489,14 +554,18 @@ export default function PlanuriUpgrade() {
       />
 
       <div className="relative z-10">
-        <div className="mx-auto mb-6 max-w-3xl text-center">
-          <Reveal as="h1" index={0} className="mb-4 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl md:text-6xl">
+        {/* Titlul, subtitlul si comutatorul mancau 357px din cei ~691px vizibili
+            pe un 375x812 cu antet lipit sus si bara de jos — adica ajungeai la
+            primul card fara sa-l vezi intreg. Subtitlul statea pe `w-[90%]`,
+            ceea ce ii mai adauga un rand degeaba pe telefon. */}
+        <div className="mx-auto mb-5 max-w-3xl text-center sm:mb-6">
+          <Reveal as="h1" index={0} className="mb-3 text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl md:text-6xl">
             {en ? "Plans that fit " : "Planuri potrivite "}
             <span className="inline-block rounded-xl border border-dashed border-emerald bg-emerald/10 px-2 py-1 dark:bg-emerald/15">
               <ScrambleText text={en ? "you" : "pentru tine"} />
             </span>
           </Reveal>
-          <Reveal as="p" index={1} className="mx-auto w-[90%] text-sm text-gray-600 dark:text-neutral-400 sm:w-[70%] sm:text-base">
+          <Reveal as="p" index={1} className="mx-auto w-full text-sm text-gray-600 dark:text-neutral-400 sm:w-[70%] sm:text-base">
             {en
               ? "Pick how visible you want your listings to be. Verification stays free on every plan."
               : "Alege nivelul de vizibilitate potrivit pentru anunțurile tale. Verificarea de bază rămâne mereu gratuită, indiferent de plan."}
@@ -510,7 +579,7 @@ export default function PlanuriUpgrade() {
         {/* Patru trepte de când clientul a cerut planul gratuit declarat pe
             pagină. Pe telefon una sub alta, două pe tabletă, patru de la lg în
             sus — la md patru carduri de plan devin coloane de 170px. */}
-        <div className="mx-auto mt-2 grid max-w-7xl grid-cols-1 gap-4 py-6 sm:mt-6 sm:grid-cols-2 sm:py-8 lg:grid-cols-4">
+        <div className="mx-auto mt-2 grid max-w-7xl grid-cols-1 gap-4 py-5 sm:mt-6 sm:grid-cols-2 sm:py-8 lg:grid-cols-4">
           {[FREE_PLAN, ...PLANS].map((plan, i) => (
             <Reveal key={plan.id} as="div" index={3 + i} className="h-full">
               <PlanCard
@@ -520,7 +589,7 @@ export default function PlanuriUpgrade() {
                 checkingOut={checkingOut}
                 en={en}
                 free={plan.id === FREE_PLAN.id}
-                onTier={TIER_BACKDROP[plan.id] ? setTier : undefined}
+                onTier={canHover && TIER_BACKDROP[plan.id] ? setTier : undefined}
               />
             </Reveal>
           ))}
@@ -532,14 +601,14 @@ export default function PlanuriUpgrade() {
             <Reveal as="h2" index={0} className="mb-3 text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl md:text-4xl">
               {en ? "Boost a listing" : "Promovează un anunț"}
             </Reveal>
-            <Reveal as="p" index={1} className="mx-auto w-[90%] text-sm text-gray-600 dark:text-neutral-400 sm:w-[75%] sm:text-base">
+            <Reveal as="p" index={1} className="mx-auto w-full text-sm text-gray-600 dark:text-neutral-400 sm:w-[75%] sm:text-base">
               {en
                 ? `A boost lifts one listing above the rest of its band for ${BOOST_DURATION_DAYS} days. Buy a single one, or a pack if you list often.`
                 : `Un boost ridică un anunț peste restul categoriei sale timp de ${BOOST_DURATION_DAYS} zile. Cumperi unul singur, sau un pachet dacă postezi des.`}
             </Reveal>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 pt-3 lg:grid-cols-4">
             {BOOST_PACKS.map((pack, i) => (
               <Reveal key={pack.id} as="div" index={2 + i} className="h-full">
                 <BoostCard
