@@ -12,7 +12,7 @@ import { useWiz, SELLER_ROLE_EN } from "./wizardCopy";
 
 export default function StepPhotos({
   form, set, uploading, onFiles, agreed, setAgreed,
-  boostQty, setBoostQty, boostBalance,
+  boostQty, setBoostQty, boostBalance, onBuyBoosts,
 }) {
   const { w, en } = useWiz();
   const urls = form.images ? form.images.split(",").filter(Boolean) : [];
@@ -59,21 +59,21 @@ export default function StepPhotos({
 
       {/* PROMOVARE — pe ultimul pas al formularului, după macheta clientului:
           titlu, soldul, minus/plus. Cantitatea se aplică la Publică; linkul de
-          cumpărare se deschide în filă nouă ca formularul să nu se piardă. */}
+          cumpărare deschide plata în pagină (BoostCheckoutModal), deci
+          formularul completat pe jumătate nu se pierde. */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3">
         <div className="min-w-0">
           <p className="text-sm font-bold text-foreground">{w.p_boost_t}</p>
           <p className="text-xs text-muted-foreground">
             {boostBalance > 0 ? w.p_boost_have(boostBalance) : w.p_boost_none}
             {" · "}
-            <a
-              href="/upgrade"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={onBuyBoosts}
               className="font-semibold text-emerald underline-offset-2 hover:underline"
             >
               {boostBalance > 0 ? w.p_boost_more : w.p_boost_buy}
-            </a>
+            </button>
           </p>
           {boostQty > 0 && (
             <p className="mt-1 text-[11px] text-muted-foreground/80">{w.p_boost_note}</p>

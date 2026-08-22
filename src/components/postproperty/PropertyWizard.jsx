@@ -20,6 +20,7 @@ import StepBasics from "./StepBasics";
 import StepLocation from "./StepLocation";
 import StepDetails from "./StepDetails";
 import StepFeatures, { countFeatures } from "./StepFeatures";
+import BoostCheckoutModal from "@/components/BoostCheckoutModal";
 import StepPhotos from "./StepPhotos";
 import { useWiz } from "./wizardCopy";
 
@@ -54,6 +55,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
   // cumpărarea se deschide în altă filă, iar la întoarcere contorul e la zi.
   const [boostQty, setBoostQty] = useState(0);
   const [boostBalance, setBoostBalance] = useState(0);
+  const [buyOpen, setBuyOpen] = useState(false);
   useEffect(() => {
     if (!user?.id) return;
     let cancelled = false;
@@ -317,6 +319,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
                   form={form} set={set} uploading={uploading} onFiles={handleFile}
                   agreed={agreed} setAgreed={setAgreed}
                   boostQty={boostQty} setBoostQty={setBoostQty} boostBalance={boostBalance}
+                  onBuyBoosts={() => setBuyOpen(true)}
                 />
               </>
             )}
@@ -359,6 +362,14 @@ export default function PropertyWizard({ onDone, onCancel }) {
           </span>
         )}
       </div>
+
+      <BoostCheckoutModal
+        open={buyOpen}
+        onOpenChange={setBuyOpen}
+        onDone={(newBalance) => {
+          if (typeof newBalance === "number") setBoostBalance(newBalance);
+        }}
+      />
     </div>
   );
 }
