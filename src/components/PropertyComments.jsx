@@ -8,7 +8,7 @@ import { Image as UIImage } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { createNotification } from "@/lib/notifications";
 import ReportModal from "@/components/ReportModal";
-import { MessageSquare, ShieldCheck, BadgeCheck, Lock, Heart, Reply, Send, Trash2 } from "lucide-react";
+import { ShieldCheck, BadgeCheck, Lock, Heart, Reply, Send, Trash2 } from "lucide-react";
 
 const ROLE_BADGE = {
   SUPER_ADMIN: { label: "Super Admin", cls: "bg-gold text-navy" },
@@ -246,10 +246,9 @@ export default function PropertyComments({ property }) {
 
   return (
     <div className="rounded border border-border bg-white p-4 shadow-soft dark:bg-card sm:p-6">
-      <div className="flex items-center gap-2">
-        <MessageSquare className="h-5 w-5 text-emerald" />
-        <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">Comentarii</h3>
-      </div>
+      {/* Bula de chat stătea înaintea titlului și împingea cuvântul cu 28px
+          dincolo de marginea din stânga a tot ce urmează sub el. */}
+      <h3 className="font-heading text-lg font-bold text-navy dark:text-foreground">Comentarii</h3>
       <p className="mt-1 text-xs text-muted-foreground">
         {isAuthenticated
           ? user?.is_verified ? "Poți publica comentarii și răspunsuri (cont verificat)." : "Doar conturile verificate pot publica. Aprecierile sunt libere."

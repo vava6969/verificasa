@@ -204,7 +204,7 @@ export default function Conversation() {
     <div className="fixed inset-0 z-50 flex flex-col bg-background">
       {/* Header — shows other participant's name + avatar */}
       <div
-        className="flex items-center gap-2 border-b border-border bg-card px-2 py-2.5 shadow-sm sm:px-4"
+        className="flex items-center gap-2 border-b border-border bg-card px-3 py-2.5 shadow-sm sm:px-4"
         style={{ paddingTop: "calc(0.625rem + env(safe-area-inset-top))" }}
       >
         <button

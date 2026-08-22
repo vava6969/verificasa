@@ -123,13 +123,10 @@ export default function Messages() {
     <div className="mx-auto flex h-[calc(100vh-7rem)] w-full max-w-2xl flex-col overflow-hidden bg-background lg:h-[calc(100vh-3.5rem)]">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border bg-card px-4 py-3">
+        {/* Iconița decorativă de 32px ținea titlul la 58px, iar căutarea și
+            lista de sub el la 12 și la 8. Trei margini din stânga pe un ecran
+            de 375px. Titlul stă acum în gutieră, ca tot restul paginii. */}
         <div className="flex items-center gap-2.5">
-          <img
-            src="/images/generated/icon-chat.png"
-            alt=""
-            aria-hidden="true"
-            className="h-8 w-8 shrink-0 object-contain"
-          />
           <h1 className="font-heading text-xl font-bold text-navy dark:text-foreground">
             {en ? "Messages" : "Mesaje"}
           </h1>
@@ -160,7 +157,7 @@ export default function Messages() {
       </div>
 
       {/* Search */}
-      <div className="bg-card px-3 pb-3 pt-1">
+      <div className="bg-card px-4 pb-3 pt-1">
         <div className="relative">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -174,7 +171,7 @@ export default function Messages() {
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto px-2 pb-20 pt-2 lg:pb-2">
+      <div className="flex-1 overflow-y-auto px-4 pb-20 pt-2 lg:pb-2">
         {conversations === null ? (
           <div className="space-y-2">
             {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-[72px] rounded-2xl" />)}

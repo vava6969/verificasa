@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, SlidersHorizontal, ArrowRight } from "lucide-react";
+import { Search, ArrowRight } from "lucide-react";
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import SearchBar from "@/components/SearchBar";
 import { useCountry } from "@/components/CountryContext";
@@ -30,8 +30,10 @@ export default function HeroSearch() {
 
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerContent className="rounded-t-3xl border-border px-4 pb-8 md:hidden">
-          <DrawerTitle className="mt-4 flex items-center gap-2 px-1 font-heading text-base">
-            <SlidersHorizontal className="h-4 w-4 text-emerald" /> {t("sb_btn")}
+          {/* Titlul foii pornea de la 40px — px-1 plus o iconiță de 16px înaintea
+              cuvântului — peste câmpurile de dedesubt, care pornesc de la 16. */}
+          <DrawerTitle className="mt-4 font-heading text-base">
+            {t("sb_btn")}
           </DrawerTitle>
           <div className="mt-4">
             <SearchBar onSubmitted={() => setOpen(false)} />

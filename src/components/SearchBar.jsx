@@ -77,7 +77,7 @@ export default function SearchBar({ compact = false, onSubmitted }) {
 
       {/* Quick filter toggles */}
       {/* un singur rând derulabil pe telefon, se înfășoară de la md în sus */}
-      <div className="no-scrollbar mt-2 flex items-center gap-2 overflow-x-auto px-1 pb-1 md:flex-wrap">
+      <div className="no-scrollbar -mx-1 mt-2 flex items-center gap-2 overflow-x-auto px-1 pb-1 md:flex-wrap">
         {TOGGLES.map((tg) => {
           const active = !!toggles[tg.key];
           return (

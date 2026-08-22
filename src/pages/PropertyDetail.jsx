@@ -245,7 +245,7 @@ export default function PropertyDetail() {
           </button>
         </div>
       )}
-      <div className="mx-auto max-w-7xl px-3 pb-4 pt-3 sm:px-6 sm:pb-6 sm:pt-4 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 pb-4 pt-3 sm:px-6 sm:pb-6 sm:pt-4 lg:px-8">
         <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
           {/* LEFT */}
           <div className="min-w-0 space-y-4 sm:space-y-6 lg:col-span-2">

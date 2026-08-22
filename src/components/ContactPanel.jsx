@@ -60,7 +60,7 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
   return (
     <>
     <div className="rounded-2xl border border-border bg-card">
-      <div className="p-5 sm:p-6">
+      <div className="p-4 sm:p-6">
       <h3 className="font-heading text-lg font-semibold text-foreground">{t("contact_h")}</h3>
       <p className="mt-0.5 text-xs text-muted-foreground">{t("contact_sub")}</p>
 

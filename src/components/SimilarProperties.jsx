@@ -57,7 +57,7 @@ export default function SimilarProperties({ property }) {
   if (items.length === 0) return null;
 
   return (
-    <Reveal className="overflow-hidden rounded border border-border bg-white p-3 shadow-soft sm:p-6">
+    <Reveal className="overflow-hidden rounded border border-border bg-white p-4 shadow-soft sm:p-6">
       <div className="flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
           <div className="min-w-0">
