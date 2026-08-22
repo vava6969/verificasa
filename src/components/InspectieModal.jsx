@@ -296,12 +296,19 @@ export default function InspectieModal({ open, onClose }) {
             <Button type="button" variant="outline" onClick={back} className="min-h-[48px] gap-1.5 rounded-full">
               <ArrowLeft className="h-4 w-4" /> {step === 0 ? t("ins_close") : t("up_back")}
             </Button>
+            {/* Cele doua butoane stateau pe aceeasi pozitie JSX fara `key`, deci
+                React refolosea acelasi nod DOM si ii muta doar type-ul,
+                "button" -> "submit", in mijlocul click-ului. Browserul rula apoi
+                trimiterea formularului ca activation behaviour a ACELUIASI
+                click: „Continua" pe pasul 2 avansa SI trimitea, cu `message`
+                gol. `key` distinct opreste refolosirea nodului; ultimul buton
+                cheama `submit` direct, ca sa nu mai existe cale implicita. */}
             {step < STEPS.length - 1 ? (
-              <Button type="button" onClick={next} className="min-h-[48px] flex-1 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
+              <Button key="next" type="button" onClick={next} className="min-h-[48px] flex-1 gap-1.5 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90">
                 {L("Continuă", "Continue")} <ArrowRight className="h-4 w-4" />
               </Button>
             ) : (
-              <Button type="submit" disabled={sending} className="min-h-[48px] flex-1 gap-2 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 disabled:opacity-60">
+              <Button key="submit" type="button" onClick={submit} disabled={sending} className="min-h-[48px] flex-1 gap-2 rounded-full bg-emerald text-white shadow-soft hover:bg-emerald/90 disabled:opacity-60">
                 <Send className="h-4 w-4" /> {sending ? t("ins_sending") : t("ins_btn")}
               </Button>
             )}
