@@ -10,13 +10,43 @@ import { cn } from "@/lib/utils";
 //
 // Aici sunt două steaguri, nu meniul combinat monedă+limbă din Header: pe un
 // formular, moneda se alege în câmpul de preț, nu în antet.
-export default function LanguageToggle({ className }) {
+//
+// `variant="bare"` scoate pastila și steagurile și lasă doar RO / EN scris. Pe
+// paginile de autentificare comutatorul stă peste fotografie, lângă siglă: cu
+// pastila albă și două steaguri colorate, alegerea limbii era obiectul cel mai
+// zgomotos de pe ecran, mai tare decât marca. E o unealtă, deci se scrie, nu se
+// îmbracă.
+export default function LanguageToggle({ className, variant = "pill" }) {
   const { lang, setLang } = useCountry();
 
   const opts = [
     { code: "ro", label: "Română", short: "RO", Flag: FlagRO },
     { code: "en", label: "English", short: "EN", Flag: FlagGB },
   ];
+
+  if (variant === "bare") {
+    return (
+      <div className={cn("flex items-center text-xs font-bold tracking-wide", className)} role="group" aria-label="Limbă / Language">
+        {opts.map(({ code, label, short }, i) => (
+          <React.Fragment key={code}>
+            {i > 0 && <span className="px-1 text-white/30" aria-hidden="true">/</span>}
+            <button
+              type="button"
+              onClick={() => setLang(code)}
+              aria-label={label}
+              aria-pressed={lang === code}
+              className={cn(
+                "tap-44 transition-colors",
+                lang === code ? "text-white" : "text-white/55 hover:text-white/85"
+              )}
+            >
+              {short}
+            </button>
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div

@@ -99,6 +99,10 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
               "linear-gradient(180deg, hsl(var(--navy-deep) / 0.48) 0%, hsl(var(--navy-deep) / 0.68) 100%)",
           }}
         />
+        {/* Marca și comenzile stau direct pe fotografie, iar prima imagine are o
+            fereastră luminoasă exact sub ele. Fără puțin pământ sub rândul de
+            sus, albul se pierde în geam. */}
+        <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/45 to-transparent" />
       </div>
 
       {/* Un singur rând sus: sigla în stânga, limba și tema în dreapta.
@@ -111,19 +115,19 @@ export default function AuthLayout({ title, subtitle, footer, children }) {
           nu mai avea ce centra, sigla urca în rândul comenzilor și pastila de
           limbă se așeza direct peste ea. Acum sunt în același rând, deci nu au
           cum să se mai suprapună, iar coloana de dedesubt îi rezervă locul. */}
-      <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-4 py-2.5 sm:px-5 sm:py-4">
-        <Link to="/" className="tap-44 flex min-h-[32px] items-center">
-          <VerifiCasaLogo size={24} tone="light" tagline={false} />
+      <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-5">
+        <Link to="/" className="tap-44 flex items-center">
+          <VerifiCasaLogo size={44} tone="light" tagline={false} />
         </Link>
-        <div className="flex items-center gap-2">
-          <LanguageToggle />
-          <ThemeToggle className="rounded-full" />
+        <div className="flex items-center gap-3">
+          <LanguageToggle variant="bare" />
+          <ThemeToggle className="h-8 w-8 justify-center border-transparent bg-transparent px-0 text-white/60 hover:border-transparent hover:bg-transparent hover:text-white" />
         </div>
       </div>
 
       {/* Card */}
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 pb-[calc(var(--cookie-banner-h,0px)+1rem)] pt-[3.25rem] sm:pt-24">
-        <div className="dark w-full max-w-[21rem] rounded border border-white/15 bg-card/55 px-4 py-3.5 shadow-[0_26px_60px_-26px_rgba(0,0,0,0.8)] backdrop-blur-2xl backdrop-saturate-150 sm:max-w-[24rem] sm:p-7">
+      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 pb-[calc(var(--cookie-banner-h,0px)+1rem)] pt-[4rem] sm:pt-28">
+        <div className="dark w-full max-w-[19.5rem] rounded border border-white/12 bg-card/55 px-4 py-3.5 shadow-[0_26px_60px_-26px_rgba(0,0,0,0.8)] backdrop-blur-2xl sm:max-w-[22rem] sm:p-6">
           <h1 className="font-heading text-lg font-extrabold tracking-tight text-foreground sm:text-2xl">
             {title}
           </h1>
