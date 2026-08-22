@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { callFnQuiet } from "@/lib/serverCall";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -176,7 +177,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
         payload.tour_3d_url = form.tour_3d_url;
       }
       await base44.entities.Property.update(property.id, payload);
-      base44.functions.invoke("ComputeTrustScore", { property_id: property.id }).catch(() => {});
+      callFnQuiet("ComputeTrustScore", { property_id: property.id });
       toast({ title: "Anunț actualizat" });
       onDone();
     } catch (err) {

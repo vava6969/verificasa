@@ -71,10 +71,12 @@ export function PropertyBadge({ kind, size = "md", lang = "ro", className, child
  * Rândul standard de insigne pentru un card: promovarea întâi (e plătită și
  * trebuie declarată), apoi cine a postat, apoi verificarea.
  *
- * Verificarea se citește din `verification_level`, nu din `trust_score`:
- * scorul se calculează într-o funcție de backend care nu a rulat încă pe
- * anunțurile existente, deci ar lăsa aproape toate anunțurile fără insignă,
- * deși 27 dintre ele chiar sunt verificate.
+ * Verificarea se citește DOAR din `verification_level`, niciodată din
+ * `trust_score`. Scorul e de acum un scor de completitudine (v3): un anunț bine
+ * completat ajunge singur la 80 din 100 fără ca nimeni din afară să fi confirmat
+ * ceva. Cu vechiul prag de 40 pe scor, oricine umplea formularul își acorda
+ * singur insigna „Verificat" — exact minciuna pe care listingSanity a fost
+ * scris să o oprească.
  */
 export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", className }) {
   const boosted = property?.boost_active || property?.featured;
@@ -83,8 +85,8 @@ export function PropertyBadgeRow({ property, planId, size = "md", lang = "ro", c
   // să poarte „Verificat", oricât de mare i-ar fi scorul din date.
   const verified =
     !isImplausible(property) &&
-    ((property?.verification_level && property.verification_level !== "unverified") ||
-      (typeof property?.trust_score === "number" && property.trust_score >= 40));
+    !!property?.verification_level &&
+    property.verification_level !== "unverified";
   const plan = planId && KINDS[planId] ? planId : null;
 
   if (!boosted && !verified && !isAgent && !plan) return null;

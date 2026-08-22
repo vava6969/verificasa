@@ -552,13 +552,14 @@ export default function PropertyDetail() {
                 score={p.trust_score}
                 breakdown={p.trust_breakdown ? (() => { try { return JSON.parse(p.trust_breakdown); } catch { return null; } })() : null}
                 labels={{
-                  title: lang === "en" ? "Trust score" : "Scor de încredere",
+                  title: lang === "en" ? "Listing score" : "Scor anunț",
                   sub: lang === "en"
-                    ? "Built from evidence, not from how many photos were uploaded."
-                    : "Calculat din dovezi, nu din câte poze au fost încărcate.",
-                  high: t("pc_trust_high"),
-                  mid: t("pc_verified"),
-                  low: lang === "en" ? "Not verified" : "Neverificat",
+                    ? "How completely this listing is filled in. Outside verification is the last 20 points."
+                    : "Cât de complet e completat anunțul. Verificarea din afară e ultimele 20 de puncte.",
+                  high: lang === "en" ? "Complete" : "Anunț complet",
+                  mid: lang === "en" ? "Partly filled in" : "Parțial completat",
+                  low: lang === "en" ? "Incomplete" : "Incomplet",
+                  missing: lang === "en" ? "What would raise it" : "Ce ar ridica scorul",
                   pending: lang === "en"
                     ? "The breakdown is published at the listing's next recalculation."
                     : "Detalierea se publică la următoarea recalculare a anunțului.",

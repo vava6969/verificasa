@@ -10,6 +10,9 @@ export async function fetchBoostBalance(userId) {
     const rows = await base44.entities.BoostCredit.filter({ user_id: userId }, "-created_date", 500);
     return (rows || []).reduce((sum, r) => sum + (Number(r.delta) || 0), 0);
   } catch (e) {
+    // Un refuz de permisiune arăta identic cu „zero boost-uri". Soldul rămâne 0
+    // ca interfața să nu crape, dar motivul real ajunge în consolă.
+    console.warn("[VerifiCasa] fetchBoostBalance a eșuat:", e?.message || e);
     return 0;
   }
 }

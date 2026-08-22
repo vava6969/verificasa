@@ -50,7 +50,10 @@ export default function ContactPanel({ property, ownerUser, onMessage }) {
 
   const trustMarkers = [
     p.owner_verified && t("badge_owner_v"),
-    typeof p.trust_score === "number" && p.trust_score >= 40 && t("pd_trust_inspection"),
+    // „Anunț verificat online" e o afirmație de verificare, deci se ia din
+    // verification_level. Pe scor ar apărea la orice anunț bine completat, iar
+    // scorul e de completitudine, nu de verificare.
+    p.verification_level && p.verification_level !== "unverified" && t("pd_trust_inspection"),
     t("pd_trust_response"),
   ].filter(Boolean);
 

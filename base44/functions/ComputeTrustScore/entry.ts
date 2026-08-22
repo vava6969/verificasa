@@ -1,29 +1,31 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 
-// Scorul de încredere (0-100), reconstruit ca scor de DOVEZI, nu ca metru de
-// completare a formularului. Clientul avea dreptate: vechea versiune număra
-// pozele și lungimea descrierii, deci putea doar să crească și o controla
-// integral cel care posta.
+// Scorul de încredere (0-100) — scor de COMPLETITUDINE.
 //
-// Patru benzi + scăderi. Ponderea e deliberată: banda pe care postatorul o
-// controlează complet valorează cel mai puțin, iar banda confirmată de
-// altcineva valorează cel mai mult.
+// Regula, în cuvintele clientului: dacă anunțul e completat cu tot ce se cere
+// și omul s-a străduit peste asta, scorul crește. Deci umplerea formularului
+// ESTE scorul, iar detalierea arată exact ce ar mai fi de adăugat.
 //
-//   Dovezi verificate     45  — lucruri confirmate de altcineva
-//   Măsurători             20  — citirile de instrument, ponderate după cât de
-//                                greu e de falsificat fiecare
-//   Calitatea anunțului    20  — poze/descriere/completitudine (plafonat jos)
-//   Coerență de piață      15  — preț/mp față de anunțurile aprobate de același
-//                                tip din același oraș (cerut explicit de client)
-//   Scăderi                 —  — reclamații nerezolvate, vechime, contact invalid
+// ISTORIC, ca să nu se rescrie a treia oară: versiunea 2 era intenționat opusă —
+// un scor de DOVEZI, unde completarea formularului valora puțin, pentru că e
+// controlată integral de cel care postează. Clientul a cerut explicit
+// (22.08.2026) modelul de completitudine, peste decizia anterioară.
 //
-// Detalierea se salvează în Property.trust_breakdown și se afișează public pe
-// pagina anunțului: un anunț care punctează prost arată DE CE.
+//   Esențial            30  — ce cere formularul ca să poți publica
+//   Detalii             25  — câmpurile opționale pe care le completează cine se străduiește
+//   Peste așteptări     25  — tur 3D, video, poze multe, coordonate, măsurători
+//   Verificare          20  — singura bandă pe care NU o poate umple singur
+//   Scăderi              —  — sesizări deschise
+//
+// Plafon fără nicio verificare: 80. Suta se atinge doar cu confirmare din
+// afară. Consecința importantă: 80 e atins de oricine completează bine, deci
+// insigna „Verificat" NU se mai poate lua după scor — se citește din
+// `verification_level` (vezi PropertyBadges.jsx și ContactPanel.jsx).
 //
 // Notă: răspundem mereu cu status 200 și un câmp `error` (SDK-ul din browser
 // aruncă o eroare generică pe orice status non-2xx).
 
-const MIN_COMPARABLES = 5;
+const MIN_PHOTOS = 3;
 
 function band(key: string, label: string, points: number, max: number, reason: string) {
   return { key, label, points: Math.round(points), max, reason };
@@ -46,105 +48,95 @@ export default async function (req: Request): Promise<Response> {
 
     const bands: any[] = [];
     const deductions: any[] = [];
+    const missing: string[] = [];
 
-    // ---- 1. Dovezi verificate (max 45) — confirmate de altcineva ----
-    let ev = 0;
-    const evParts: string[] = [];
-    if (p.owner_verified) { ev += 12; evParts.push("proprietar verificat"); }
-    if (p.verification_level === "field_certified") { ev += 15; evParts.push("certificat pe teren"); }
-    else if (p.verification_level === "video_ai") { ev += 7; evParts.push("verificare video"); }
-    if (p.approved_by_id && p.approval_status === "APPROVED") { ev += 8; evParts.push("aprobat de un administrator"); }
-    if (p.tour_3d_url) { ev += 6; evParts.push("tur 3D"); }
-    if (p.inspection_report_url) { ev += 4; evParts.push("raport de inspecție"); }
-    ev = Math.min(ev, 45);
-    bands.push(band("evidence", "Dovezi verificate", ev, 45,
-      evParts.length ? `Confirmat: ${evParts.join(", ")}.` : "Nicio verificare independentă încă."));
-
-    // ---- 2. Măsurători (max 20) — ponderate după cât de greu e de falsificat ----
-    let ms = 0;
-    const msParts: string[] = [];
-    if (p.noise_db != null) { ms += 5; msParts.push("zgomot"); }
-    if (p.internet_speed_mbps != null) { ms += 4; msParts.push("internet"); }
-    if (p.water_pressure_ok != null) { ms += 3; msParts.push("presiune apă"); }
-    if (p.light_orientation) { ms += 3; msParts.push("orientare"); }
-    if (p.metro_distance_min != null) { ms += 2; msParts.push("transport"); }
-    if (p.monthly_utilities_estimate != null) { ms += 2; msParts.push("utilități"); }
-    if (p.maintenance_fee != null) { ms += 1; msParts.push("întreținere"); }
-    ms = Math.min(ms, 20);
-    bands.push(band("measured", "Măsurători", ms, 20,
-      msParts.length ? `Înregistrate: ${msParts.join(", ")}.` : "Nicio măsurătoare înregistrată."));
-
-    // ---- 3. Calitatea anunțului (max 20) — plafonat jos, e partea gestionabilă ----
     const photoCount = Array.isArray(p.images) ? p.images.length : 0;
     const descLen = (p.description || "").trim().length;
-    let q = 0;
-    q += Math.min(photoCount, 6) * 1.5;                       // max 9
-    q += descLen >= 240 ? 5 : Math.round((descLen / 240) * 5); // max 5
-    if (p.rooms != null && p.surface_sqm != null) q += 2;
-    if (p.floor && p.building_year != null) q += 2;
-    if (p.available_from) q += 1;
-    if (p.phone) q += 1;
-    q = Math.min(Math.round(q), 20);
-    bands.push(band("quality", "Calitatea anunțului", q, 20,
-      `${photoCount} ${photoCount === 1 ? "fotografie" : "fotografii"}, descriere de ${descLen} caractere.`));
+    const phoneDigits = (p.phone || "").replace(/\D/g, "");
 
-    // ---- 4. Coerență de piață (max 15) — comparativ cu anunțurile existente ----
-    let market = 0;
-    let marketReason = "";
-    let marketApplies = false;
-    const sqm = Number(p.surface_sqm) || 0;
-    const price = Number(p.price_monthly) || 0;
-
-    if (sqm > 0 && price > 0 && p.city && p.property_type) {
-      try {
-        const peers: any[] = await svc.entities.Property.filter(
-          {
-            city: p.city,
-            property_type: p.property_type,
-            transaction_type: p.transaction_type || "RENT",
-            approval_status: "APPROVED",
-          },
-          "-created_date",
-          200
-        );
-        const rates = peers
-          .filter((x: any) => x.id !== p.id && Number(x.surface_sqm) > 0 && Number(x.price_monthly) > 0)
-          .map((x: any) => Number(x.price_monthly) / Number(x.surface_sqm))
-          .filter((r: number) => isFinite(r) && r > 0);
-
-        if (rates.length >= MIN_COMPARABLES) {
-          marketApplies = true;
-          const mean = rates.reduce((a, b) => a + b, 0) / rates.length;
-          const variance = rates.reduce((a, b) => a + (b - mean) ** 2, 0) / rates.length;
-          const sd = Math.sqrt(variance) || mean * 0.15;
-          const rate = price / sqm;
-          const z = Math.abs(rate - mean) / sd;
-          // în ±1σ = punctaj complet; degradează liniar; peste 3σ = 0 și semnalat
-          market = z <= 1 ? 15 : z >= 3 ? 0 : Math.round(15 * (1 - (z - 1) / 2));
-          const pct = Math.round(((rate - mean) / mean) * 100);
-          marketReason =
-            z >= 3
-              ? `Preț atipic: ${pct > 0 ? "+" : ""}${pct}% față de media zonei (${rates.length} anunțuri comparabile).`
-              : `${pct > 0 ? "+" : ""}${pct}% față de media a ${rates.length} anunțuri comparabile din ${p.city}.`;
-        } else {
-          marketReason = `Sub ${MIN_COMPARABLES} anunțuri comparabile în ${p.city}; banda nu se aplică.`;
-        }
-      } catch (_) {
-        marketReason = "Comparația de piață nu a putut fi rulată.";
-      }
-    } else {
-      marketReason = "Lipsesc suprafața sau prețul pentru comparație.";
+    // ---- 1. Esențial (30) — ce cere formularul ----
+    let req_ = 0;
+    const reqChecks: [boolean, number, string][] = [
+      [(p.title || "").trim().length >= 10, 4, "titlu"],
+      [Number(p.price_monthly) > 0, 4, "preț"],
+      [!!p.city, 3, "oraș"],
+      [!!p.property_type, 3, "tip proprietate"],
+      [p.rooms != null, 3, "camere"],
+      [Number(p.surface_sqm) > 0, 3, "suprafață"],
+      [!!p.floor, 3, "etaj"],
+      [phoneDigits.length >= 9, 4, "telefon"],
+      [photoCount >= MIN_PHOTOS, 3, `minim ${MIN_PHOTOS} fotografii`],
+    ];
+    for (const [ok, pts, name] of reqChecks) {
+      if (ok) req_ += pts; else missing.push(name);
     }
-    if (marketApplies) bands.push(band("market", "Coerență de piață", market, 15, marketReason));
+    bands.push(band("required", "Esențial", req_, 30,
+      req_ === 30 ? "Tot ce cere formularul e completat."
+                  : `Lipsesc: ${reqChecks.filter(([ok]) => !ok).map(([, , n]) => n).join(", ")}.`));
 
-    // ---- 5. Scăderi ----
-    // Reclamații nerezolvate
+    // ---- 2. Detalii (25) — opționalele ----
+    let det = 0;
+    const detParts: string[] = [];
+    if (descLen >= 120) { det += 4; detParts.push("descriere"); } else if (descLen > 0) { det += Math.round((descLen / 120) * 4); }
+    if (descLen >= 300) det += 3;
+    const detChecks: [boolean, number, string][] = [
+      [Number(p.deposit) > 0, 2, "garanție"],
+      [p.total_floors != null, 2, "total etaje"],
+      [p.building_year != null, 2, "an construcție"],
+      [!!p.available_from, 2, "disponibil din"],
+      [!!p.zone, 2, "zonă"],
+      [!!p.landmark, 2, "punct de reper"],
+      [!!p.whatsapp_phone, 2, "WhatsApp"],
+    ];
+    for (const [ok, pts, name] of detChecks) {
+      if (ok) { det += pts; detParts.push(name); } else missing.push(name);
+    }
+    const featureCount = Array.isArray(p.features) ? p.features.length : 0;
+    if (featureCount >= 3) det += 2;
+    if (featureCount >= 6) det += 2;
+    if (featureCount < 3) missing.push("facilități");
+    det = Math.min(det, 25);
+    bands.push(band("details", "Detalii", det, 25,
+      detParts.length ? `Completate: ${detParts.join(", ")}.` : "Niciun câmp opțional completat."));
+
+    // ---- 3. Peste așteptări (25) ----
+    let extra = 0;
+    const extraParts: string[] = [];
+    const bonusPhotos = Math.max(0, photoCount - MIN_PHOTOS);
+    if (bonusPhotos > 0) { extra += Math.min(bonusPhotos * 1.5, 9); extraParts.push(`${photoCount} fotografii`); }
+    else missing.push("mai multe fotografii");
+    if (p.tour_3d_url) { extra += 6; extraParts.push("tur 3D"); } else missing.push("tur 3D");
+    if (p.ai_video_url) { extra += 4; extraParts.push("video"); } else missing.push("video");
+    if (p.latitude != null && p.longitude != null) { extra += 3; extraParts.push("locație pe hartă"); }
+    else missing.push("locație exactă pe hartă");
+    let measured = 0;
+    for (const f of ["noise_db", "internet_speed_mbps", "water_pressure_ok", "light_orientation", "metro_distance_min", "monthly_utilities_estimate", "maintenance_fee"]) {
+      if (p[f] != null && p[f] !== "") measured += 1;
+    }
+    if (measured > 0) { extra += Math.min(measured, 3); extraParts.push(`${measured} măsurători`); }
+    extra = Math.min(Math.round(extra), 25);
+    bands.push(band("extra", "Peste așteptări", extra, 25,
+      extraParts.length ? `Adăugate: ${extraParts.join(", ")}.` : "Nimic peste minimul cerut."));
+
+    // ---- 4. Verificare (20) — singura bandă pe care nu o umpli singur ----
+    let ver = 0;
+    const verParts: string[] = [];
+    if (p.owner_verified) { ver += 6; verParts.push("proprietar verificat"); }
+    if (p.verification_level === "field_certified") { ver += 8; verParts.push("certificat pe teren"); }
+    else if (p.verification_level === "video_ai") { ver += 4; verParts.push("verificare video"); }
+    if (p.approved_by_id && p.approval_status === "APPROVED") { ver += 4; verParts.push("aprobat de administrator"); }
+    if (p.inspection_report_url) { ver += 2; verParts.push("raport de inspecție"); }
+    ver = Math.min(ver, 20);
+    bands.push(band("verified", "Verificare", ver, 20,
+      verParts.length ? `Confirmat: ${verParts.join(", ")}.` : "Nicio verificare independentă încă."));
+
+    // ---- 5. Scăderi — doar sesizările deschise ----
+    // Penalizarea pentru „anunț vechi" a dispărut odată cu modelul de dovezi:
+    // într-un scor de completitudine, vechimea nu înseamnă că lipsește ceva.
     try {
       const reports: any[] = await svc.entities.Report.filter(
         { target_id: property_id, target_type: "property" }, "-created_date", 50
       );
-      // Doar sesizările încă deschise scad scorul — cele rezolvate sau
-      // respinse de admin nu (vezi enum-ul Report.status).
       const open = reports.filter((r: any) => (r.status || "PENDING") === "PENDING");
       if (open.length) {
         const pts = Math.min(open.length * 6, 18);
@@ -152,36 +144,19 @@ export default async function (req: Request): Promise<Response> {
       }
     } catch (_) { /* best-effort */ }
 
-    // Vechime: anunțul neatins de 60+ zile începe să se stingă
-    const touched = p.updated_date || p.created_date;
-    if (touched) {
-      const days = Math.floor((Date.now() - new Date(touched).getTime()) / 86400000);
-      if (days > 60) {
-        const pts = Math.min(Math.floor((days - 60) / 30) * 4 + 4, 16);
-        deductions.push({ key: "stale", label: "Anunț neactualizat", points: pts, reason: `Fără modificări de ${days} de zile.` });
-      }
-    }
-
-    // Contact invalid
-    const digits = (p.phone || "").replace(/\D/g, "");
-    if (!digits || digits.length < 9) {
-      deductions.push({ key: "contact", label: "Contact incomplet", points: 6, reason: "Numărul de telefon lipsește sau e invalid." });
-    }
-
-    // ---- Total, rescalat dacă banda de piață nu se aplică ----
-    const rawMax = bands.reduce((a, b) => a + b.max, 0);
     const rawPoints = bands.reduce((a, b) => a + b.points, 0);
-    const scaled = rawMax > 0 ? (rawPoints / rawMax) * 100 : 0;
     const totalDeductions = deductions.reduce((a, d) => a + d.points, 0);
-    const score = Math.max(0, Math.min(100, Math.round(scaled - totalDeductions)));
+    const score = Math.max(0, Math.min(100, Math.round(rawPoints - totalDeductions)));
 
     const breakdown = {
-      version: 2,
+      version: 3,
+      model: "completeness",
       computed_at: new Date().toISOString(),
       bands,
       deductions,
-      market_applies: marketApplies,
-      market_note: marketApplies ? undefined : marketReason,
+      // Ce ar mai ridica scorul, în ordinea în care apare în formular.
+      missing: missing.slice(0, 12),
+      self_max: 80,
     };
 
     await svc.entities.Property.update(property_id, {
@@ -191,6 +166,6 @@ export default async function (req: Request): Promise<Response> {
 
     return Response.json({ ok: true, score, breakdown });
   } catch (e: any) {
-    return Response.json({ error: e?.message || "Eroare la calcularea scorului." });
+    return Response.json({ error: e?.message || String(e) || "Eroare la calcularea scorului." });
   }
 }

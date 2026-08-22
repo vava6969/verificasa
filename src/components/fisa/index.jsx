@@ -106,15 +106,22 @@ export function Meter({ label, used = 0, limit, unlimited = false, reset, classN
 
 /**
  * The score, shown with its working. Bands come from the ComputeTrustScore
- * breakdown; a listing that scores badly shows WHY, deductions included.
- * Falls back to the bare figure while a listing has no stored breakdown yet.
+ * breakdown; a listing that scores badly shows WHY, deductions included, and
+ * what would raise it. Falls back to the bare figure while a listing has no
+ * stored breakdown yet.
+ *
+ * Verdictele sunt despre COMPLETITUDINE, nu despre verificare. Scorul e de
+ * completitudine (v3) și un anunț bine completat ajunge singur la 80 din 100,
+ * deci un verdict „Verificat" la 40 ar fi fost o afirmație pe care nimeni din
+ * afară nu a confirmat-o.
  */
 export function ScoreLedger({ score, breakdown, className, labels = {} }) {
   const s = Math.max(0, Math.min(100, Math.round(score ?? 0)));
-  const verdict = s >= 75 ? (labels.high || "Încredere ridicată") : s >= 40 ? (labels.mid || "Verificat") : (labels.low || "Neverificat");
-  const tone = s >= 40 ? "verde" : "ink";
+  const verdict = s >= 75 ? (labels.high || "Anunț complet") : s >= 40 ? (labels.mid || "Parțial completat") : (labels.low || "Incomplet");
+  const tone = s >= 75 ? "verde" : "ink";
   const bands = Array.isArray(breakdown?.bands) ? breakdown.bands : [];
   const deductions = Array.isArray(breakdown?.deductions) ? breakdown.deductions : [];
+  const missing = Array.isArray(breakdown?.missing) ? breakdown.missing : [];
 
   return (
     <section className={cn("overflow-hidden rounded-2xl border border-border bg-card", className)}>
@@ -166,6 +173,19 @@ export function ScoreLedger({ score, breakdown, className, labels = {} }) {
               </div>
             ))}
           </Ledger>
+
+          {/* Ce ar ridica scorul. Fără asta, un scor de completitudine e doar o
+              cifră care te judecă fără să-ți spună ce să faci. */}
+          {missing.length > 0 && (
+            <div className="border-t border-border py-3">
+              <p className="text-xs font-semibold text-foreground">
+                {labels.missing || "Ce ar ridica scorul"}
+              </p>
+              <p className="mt-1 max-w-[62ch] text-xs text-muted-foreground">
+                {missing.join(" · ")}
+              </p>
+            </div>
+          )}
         </div>
       ) : (
         <p className="px-4 py-3 text-xs text-muted-foreground">

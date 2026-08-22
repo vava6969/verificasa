@@ -13,6 +13,7 @@ import AdminReports from "@/components/AdminReports";
 import AdminResolvedReports from "@/components/AdminResolvedReports";
 import AdminStatCard from "@/components/AdminStatCard";
 import AdminDataCleanup from "@/components/AdminDataCleanup";
+import { callFn, callFnQuiet } from "@/lib/serverCall";
 import InspectionContactModal from "@/components/InspectionContactModal";
 import { useLoadMore } from "@/hooks/useLoadMore";
 import LoadMoreButton from "@/components/admin/LoadMoreButton";
@@ -106,12 +107,32 @@ export default function Admin() {
       await base44.entities.Property.update(p.id, patch);
       toast({ title: status === "APPROVED" ? "Anunt aprobat" : "Anunt respins" });
       log(status === "APPROVED" ? "approve" : "reject", "property", p.id, p.title);
-      try { base44.functions.invoke("NotifyOnPropertyDecision", { property_id: p.id, decision: status }).catch(() => {}); } catch {}
-      // Aprobarea de admin e o dovadă verificată — recalculăm scorul ca banda
-      // „Dovezi verificate" să reflecte imediat decizia.
-      try { base44.functions.invoke("ComputeTrustScore", { property_id: p.id }).catch(() => {}); } catch {}
+      callFnQuiet("NotifyOnPropertyDecision", { property_id: p.id, decision: status });
+      // Aprobarea de admin intră în banda de verificare — recalculăm scorul ca
+      // decizia să se vadă imediat.
+      callFnQuiet("ComputeTrustScore", { property_id: p.id });
       load();
     } catch { toast({ title: "Eroare", variant: "destructive" }); }
+  };
+
+  // Recalculează scorul ȘI arată răspunsul brut. Ăsta e instrumentul care
+  // spune de ce un anunț stă pe 0: până acum fiecare apel era înghițit de un
+  // `.catch(() => {})`, deci eșecul nu apărea nicăieri.
+  const [scoring, setScoring] = useState(null);
+  const recomputeScore = async (p) => {
+    setScoring(p.id);
+    const res = await callFn("ComputeTrustScore", { property_id: p.id });
+    setScoring(null);
+    if (res.ok) {
+      toast({
+        title: `Scor: ${res.data.score}/100`,
+        description: (res.data.breakdown?.bands || [])
+          .map((b) => `${b.label} ${b.points}/${b.max}`).join(" · "),
+      });
+      load();
+    } else {
+      toast({ title: "Scorul nu s-a putut calcula", description: res.error, variant: "destructive" });
+    }
   };
 
   const delProperty = async (p) => {
@@ -700,6 +721,12 @@ export default function Admin() {
                         <Button size="sm" variant="outline" onClick={() => toggleAiTour(p)}
                           className={"gap-1 " + (p.ai_tour_verified ? "border-emerald bg-emerald text-white hover:bg-emerald/90" : "border-emerald/40 text-emerald hover:bg-emerald-soft")}>
                           {p.ai_tour_verified ? "Tur 3D" : "+ Tur 3D"}
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => recomputeScore(p)} disabled={scoring === p.id}
+                          title="Recalculează scorul și arată răspunsul"
+                          className="gap-1 border-border text-muted-foreground hover:text-foreground">
+                          <RefreshCw className={"h-3.5 w-3.5" + (scoring === p.id ? " animate-spin" : "")} />
+                          {typeof p.trust_score === "number" ? p.trust_score : "—"}
                         </Button>
                         <Button size="sm" variant="outline" onClick={() => delProperty(p)} className="gap-1 border-destructive/30 text-destructive hover:bg-destructive/10">
                           <Trash2 className="h-3.5 w-3.5" />
