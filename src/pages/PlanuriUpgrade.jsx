@@ -59,23 +59,6 @@ function Reveal({ as = "div", index = 0, className, children }) {
   );
 }
 
-// Adevarat doar pe un dispozitiv unde pointerul poate sta deasupra unui element
-// SI poate pleca de pe el. Se reevalueaza la schimbare, ca un laptop cu ecran
-// tactil sau o fereastra mutata pe alt monitor sa nu ramana blocata pe raspunsul
-// de la montare.
-function useHoverCapable() {
-  const [canHover, setCanHover] = useState(false);
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return undefined;
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const sync = () => setCanHover(mq.matches);
-    sync();
-    mq.addEventListener?.("change", sync);
-    return () => mq.removeEventListener?.("change", sync);
-  }, []);
-  return canHover;
-}
-
 function PricingSwitch({ annual, onSwitch, en }) {
   const opts = [
     { value: false, label: en ? "Monthly" : "Lunar" },
@@ -119,46 +102,10 @@ function PricingSwitch({ annual, onSwitch, en }) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// FUNDALUL CARE SE SCHIMBĂ LA TREAPTA ATINSĂ
-//
-// Cererea clientului: când omul trece peste Basic, Pro sau Agent, fundalul
-// întregii pagini devine imaginea treptei respective.
-//
-// Imaginile sunt generate pentru VerifiCasa și urcă în scară odată cu treapta:
-// Basic o singură clădire în lumina dimineții, Pro trei fațade la asfințit,
-// Agent un oraș întreg de pe înălțime. WebP la 1920px, sub 310KB fiecare.
-//
-// Intentia initiala a fost ca efectul sa existe si pe telefon, prin
-// `onPointerDown`. In practica asta l-a stricat: pe un ecran tactil
-// `(hover: hover)` e FALS, deci `onMouseLeave` si `onBlur` nu se declanseaza
-// niciodata. Fundalul se aprindea la prima atingere — inclusiv la un scroll
-// pornit cu degetul de pe un card — si RAMANEA aprins, cu voalul de 88% peste
-// tot ce urma. Se vede in captura clientului: randurile din Pro („Badge
-// Verificat Pro", „Statistici avansate", „Suport prioritar") stau pe o
-// fotografie si nu se mai pot citi.
-//
-// Un efect de hover care nu se poate stinge nu e un efect, e o pata. Ramane
-// unde exista un pointer care poate PLECA de pe card; pe telefon cardurile
-// stau pe fundalul curat al paginii, care e si contrastul corect.
-//
-// Treapta gratuita nu avea imagine, deci trei carduri din patru schimbau pagina
-// si unul nu facea nimic — se citea ca un efect stricat, nu ca o treapta.
-// Nu s-a generat o imagine noua: e RECICLATA din /tur-3d, o pagina mult mai
-// putin vizitata, si e referita acolo unde sta deja. Un singur fisier, un
-// singur download, aceeasi memorie cache pentru cine a trecut pe acolo.
-// Casa aceea — o singura cladire modesta, fotografiata frontal pe vreme
-// acoperita — sta exact sub Basic pe scara si nu are marcaje de tur 3D arse in
-// imagine, cum are tur3d-interior-hotspot (doua bile albe, care ar fi promis
-// un tur 3D tocmai pe planul care nu primeste niciunul).
-// ATENTIE: daca se schimba vreodata poza casei de pe /tur-3d, se schimba si
-// fundalul treptei gratuite de aici.
-const TIER_BACKDROP = {
-  none: "/images/tur3d/tur3d-house-1-v1.webp",
-  basic: "/images/upgrade/tier-basic-v1.webp",
-  pro: "/images/upgrade/tier-pro-v1.webp",
-  agent: "/images/upgrade/tier-agent-v1.webp",
-};
+// Fundalul-fotografie care se aprindea la hover pe o treaptă A EXISTAT aici
+// (TIER_BACKDROP + useHoverCapable) și a fost SCOS la cererea clientului,
+// 23.08 („remove the hover photos background"). El îl ceruse inițial, apoi
+// l-a văzut și l-a respins. Nu-l readuce fără să citezi ambele decizii.
 
 // Iconițele lucioase existente, mapate pe beneficiile fiecărui plan.
 const FEATURE_ICONS = {
@@ -198,7 +145,7 @@ function SoonTag({ en }) {
 
 // `free` schimbă subsolul cardului: planul gratuit nu se cumpără, deci nu
 // primește un buton de plată care ar deschide un checkout gol.
-function PlanCard({ plan, annual, onSelect, checkingOut, en, free = false, onTier }) {
+function PlanCard({ plan, annual, onSelect, checkingOut, en, free = false }) {
   const popular = plan.id === "pro";
   const price = annual ? plan.yearly : plan.monthly;
   const decimals = price % 1 !== 0;
@@ -207,15 +154,8 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en, free = false, onTie
   const includes = plan.includes || [];
   const label = INCLUDES_LABEL[plan.id] || INCLUDES_LABEL.basic;
 
-  const enter = () => onTier?.(plan.id);
-  const leave = () => onTier?.(null);
-
   return (
     <Card
-      onMouseEnter={enter}
-      onMouseLeave={leave}
-      onFocus={enter}
-      onBlur={leave}
       className={`relative isolate flex h-full flex-col overflow-visible border-neutral-200 bg-white transition-transform duration-300 ease-out dark:border-white/10 dark:bg-neutral-900 ${
         popular ? "ring-2 ring-emerald" : ""
       }`}
@@ -238,15 +178,18 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en, free = false, onTie
         />
       )}
       {/* Insigna atarnata in colt exista doar de la sm in sus. Pe telefon se
-          suprapunea peste pastila „Popular" — masurat, 30px de acoperire pe
-          cardul Pro — si oricum dubla iconita planului, care e chiar langa
-          titlu. Pe desktop atarna in afara cardului, unde nu incurca nimic. */}
+          suprapunea peste pastila „Popular" si oricum dubla iconita planului.
+          Fisierele -v3 sunt taiate pe conturul artei (cele vechi aveau margini
+          transparente intre 22% si 51%, deci trei cutii identice aratau trei
+          medalii de marimi si pozitii diferite — exact „nealinierea" reclamata
+          de client). Fara `-right` negativ: cardul Agent e lipit de marginea
+          ferestrei, iar `overflow-x: clip` de pe html reteza ce atarna afara. */}
       {plan.badgeImg && (
         <img
           src={plan.badgeImg}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute z-20 hidden object-contain drop-shadow-lg sm:-right-4 sm:-top-9 sm:block sm:h-[5.5rem] sm:w-[5.5rem]"
+          className="pointer-events-none absolute z-20 hidden object-contain drop-shadow-lg sm:right-3 sm:-top-6 sm:block sm:h-16 sm:w-16"
         />
       )}
 
@@ -455,7 +398,6 @@ function BoostCard({ pack, cheapestUnit, onBuy, pending, en }) {
 
 export default function PlanuriUpgrade() {
   const [annual, setAnnual] = useState(false);
-  const [tier, setTier] = useState(null);
   const [checkingOut, setCheckingOut] = useState(null);
   const [boostPending, setBoostPending] = useState(null);
   const { toast } = useToast();
@@ -463,14 +405,6 @@ export default function PlanuriUpgrade() {
   const { lang } = useCountry();
   const navigate = useNavigate();
   const en = lang === "en";
-  const canHover = useHoverCapable();
-
-  // Daca dispozitivul isi pierde capacitatea de hover cat timp o treapta e
-  // aprinsa (fereastra mutata pe un ecran tactil), fundalul se stinge singur in
-  // loc sa ramana blocat.
-  useEffect(() => {
-    if (!canHover) setTier(null);
-  }, [canHover]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -549,32 +483,6 @@ export default function PlanuriUpgrade() {
 
   return (
     <div className="relative mx-auto min-h-screen overflow-hidden bg-neutral-100 px-4 pb-24 pt-6 dark:bg-neutral-950 sm:pt-20">
-      {/* Fundalul treptei atinse. Toate cele trei imagini stau montate tot
-          timpul și doar opacitatea lor se schimbă: montarea unei imagini la
-          hover ar însemna o descărcare exact în clipa în care omul se uită, deci
-          o secundă de gol. Numai opacitatea și scara se animă — nimic aici nu
-          poartă conținut, deci dacă bucla de cadre e sugrumată pagina rămâne
-          pur și simplu pe fundalul ei obișnuit. */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
-        {Object.entries(TIER_BACKDROP).map(([id, src]) => (
-          <img
-            key={id}
-            src={src}
-            alt=""
-            decoding="async"
-            fetchPriority="low"
-            className={`absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-700 ease-out ${
-              tier === id ? "scale-100 opacity-100" : "scale-105 opacity-0"
-            }`}
-          />
-        ))}
-        {/* Voalul ține textul lizibil peste orice fotografie ar ajunge aici. */}
-        <div
-          className={`absolute inset-0 bg-neutral-100/[0.88] transition-opacity duration-700 dark:bg-neutral-950/[0.86] ${
-            tier ? "opacity-100" : "opacity-0"
-          }`}
-        />
-      </div>
       {/* Glow radial albastru — semnătura paginii, în forma cerută de client */}
       <div
         className="pointer-events-none absolute left-[10%] right-[10%] top-0 z-0 h-full w-[80%] dark:hidden"
@@ -628,7 +536,6 @@ export default function PlanuriUpgrade() {
                 checkingOut={checkingOut}
                 en={en}
                 free={plan.id === FREE_PLAN.id}
-                onTier={canHover && TIER_BACKDROP[plan.id] ? setTier : undefined}
               />
             </Reveal>
           ))}
