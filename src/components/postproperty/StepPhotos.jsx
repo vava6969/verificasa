@@ -1,8 +1,13 @@
 import React from "react";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2, ArrowUpRight } from "lucide-react";
 import { Image as UIImage } from "@/components/ui/image";
 import { Field, inputCls } from "./wizardUi";
 import { MIN_PHOTOS, MAX_PHOTOS, onlyPhoneDigits } from "@/lib/propertyPayload";
+
+// Aplicația de captură 3D. Când există un URL real, butonul de mai jos se
+// aprinde singur — până atunci se vede stins și marcat „În curând", ca să nu
+// trimitem proprietarul într-o filă goală. Un singur loc de schimbat.
+const TOUR_3D_APP_URL = null;
 
 export default function StepPhotos({ form, set, uploading, onFiles, agreed, setAgreed }) {
   const urls = form.images ? form.images.split(",").filter(Boolean) : [];
@@ -37,6 +42,46 @@ export default function StepPhotos({ form, set, uploading, onFiles, agreed, setA
         <p className={"mt-2 text-xs font-semibold " + (urls.length >= MIN_PHOTOS ? "text-emerald" : "text-amber-600")}>
           {urls.length} / {MIN_PHOTOS} poze minime
         </p>
+      </div>
+
+      {/* Tur 3D (opțional) — aceeași casetă ca în formularul de editare, dar
+          aici capătă și butonul care deschide aplicația de captură. Turul nu e
+          o condiție ca să publici: rămâne un pas separat, făcut după poze. */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <img
+            src="/images/generated/icon-video.png"
+            alt=""
+            aria-hidden="true"
+            className={"h-12 w-12 shrink-0 object-contain" + (TOUR_3D_APP_URL ? "" : " opacity-60")}
+          />
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold text-navy dark:text-foreground">Tur 3D (opțional)</span>
+            <span className="block text-xs text-muted-foreground">
+              Îl faci cu aplicația noastră, din telefon · Plan Pro
+            </span>
+          </span>
+        </div>
+
+        {TOUR_3D_APP_URL ? (
+          <a
+            href={TOUR_3D_APP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full bg-emerald px-5 text-sm font-bold text-white shadow-soft transition hover:bg-emerald/90 active:scale-[0.98]"
+          >
+            Deschide aplicația 3D
+            <ArrowUpRight className="h-4 w-4" />
+          </a>
+        ) : (
+          // Fără URL nu desenăm un buton: un dreptunghi rotunjit care arată
+          // exact ca butonul de alături cere să fie apăsat și nu face nimic,
+          // iar motivul stătea doar în `title` — invizibil pe telefon. O
+          // pastilă de stare spune adevărul fără să promită o acțiune.
+          <span className="shrink-0 rounded-full bg-gold-soft px-3 py-1.5 text-xs font-semibold text-gold-deep">
+            În curând
+          </span>
+        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

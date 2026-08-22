@@ -153,7 +153,7 @@ export default function Account() {
       title: en ? "Listings" : "Anunțuri",
       items: [
         { label: en ? "My listings" : "Anunțurile mele", path: "/my-properties" },
-        { label: en ? "Add a listing" : "Adaugă un anunț", path: "/owner" },
+        { label: en ? "Add a listing" : "Adaugă un anunț", path: "/post-property" },
         { label: en ? "Saved" : "Salvate", path: "/saved" },
         { label: en ? "Saved searches" : "Căutări salvate", path: "/searches" },
       ],

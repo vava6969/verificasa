@@ -1,11 +1,11 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useCountry } from "@/components/CountryContext";
 import HeroSearch from "@/components/HeroSearch";
 import HeroPhoto from "@/components/HeroPhoto";
 import LoopVideo from "@/components/LoopVideo";
 import HeroCountdown from "@/components/HeroCountdown";
 import InspectieModal from "@/components/InspectieModal";
-import ListeazaPopup from "@/components/ListeazaPopup";
 import MapSearchCTA from "@/components/MapSearchCTA";
 import ActionCards from "@/components/ActionCards";
 import ValueProps from "@/components/ValueProps";
@@ -21,7 +21,6 @@ export default function Landing() {
   const { t, lang } = useCountry();
   const en = lang === "en";
   const [showInspectie, setShowInspectie] = useState(false);
-  const [showListeaza, setShowListeaza] = useState(false);
 
   return (
     <div>
@@ -54,13 +53,15 @@ export default function Landing() {
             </Reveal>
 
             <Reveal delay={0.2} className="mt-3 flex flex-wrap items-center gap-2 sm:mt-4 sm:gap-3">
-              <button
-                type="button"
-                onClick={() => setShowListeaza(true)}
-                className="min-h-[44px] rounded-full bg-emerald px-5 text-[13px] font-bold text-primary-foreground shadow-lg transition-transform hover:scale-[1.03] sm:min-h-[48px] sm:px-6 sm:text-sm"
+              {/* Butonul principal duce DIRECT în formularul de publicare.
+                  Deschidea un pop-up explicativ care se închidea în el însuși,
+                  deci apăsai „Adaugă anunț" și nu ajungeai nicăieri. */}
+              <Link
+                to="/post-property"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-emerald px-5 text-[13px] font-bold text-primary-foreground shadow-lg transition-transform hover:scale-[1.03] sm:min-h-[48px] sm:px-6 sm:text-sm"
               >
                 {t("hdr_add")}
-              </button>
+              </Link>
               <button
                 type="button"
                 onClick={() => setShowInspectie(true)}
@@ -139,13 +140,12 @@ export default function Landing() {
               >
                 {t("owner_btn_inspectie")}
               </button>
-              <button
-                type="button"
-                onClick={() => setShowListeaza(true)}
-                className="min-h-[48px] rounded-full border border-white/50 px-6 text-sm font-bold text-white transition-colors hover:bg-white/15"
+              <Link
+                to="/post-property"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-white/50 px-6 text-sm font-bold text-white transition-colors hover:bg-white/15"
               >
                 {t("owner_btn_listeaza")}
-              </button>
+              </Link>
             </div>
 
             <ul className="mt-6 grid grid-cols-2 gap-x-6 border-t border-white/20 pt-4 sm:mt-8 sm:grid-cols-4">
@@ -160,7 +160,6 @@ export default function Landing() {
       </section>
 
       <InspectieModal open={showInspectie} onClose={() => setShowInspectie(false)} />
-      <ListeazaPopup open={showListeaza} onClose={() => setShowListeaza(false)} />
     </div>
   );
 }

@@ -4,9 +4,13 @@ import VerifiCasaLogo from "@/components/VerifiCasaLogo";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Plus } from "lucide-react";
 import PropertyWizard from "@/components/postproperty/PropertyWizard";
+import LanguageToggle from "@/components/LanguageToggle";
+import { useCountry } from "@/components/CountryContext";
 
 export default function PostProperty() {
   const [submitted, setSubmitted] = useState(false);
+  const { lang } = useCountry();
+  const en = lang === "en";
 
   return (
     <div className="min-h-screen bg-secondary/40 dark:bg-background">
@@ -15,13 +19,20 @@ export default function PostProperty() {
           <Link to="/" className="flex min-h-[44px] min-w-0 items-center gap-2">
             <VerifiCasaLogo size={34} tagline={false} />
           </Link>
-          <Link
-            to="/"
-            aria-label="Înapoi la site"
-            className="flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted-foreground transition hover:bg-secondary hover:text-emerald"
-          >
-            <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">Înapoi la site</span>
-          </Link>
+          <div className="flex shrink-0 items-center gap-1.5">
+            {/* Formularul își desenează propriul antet, deci selectorul din
+                Header nu ajunge aici — fără ăsta, pagina rămâne blocată în
+                română și nu ai de unde să schimbi. */}
+            <LanguageToggle />
+            <Link
+              to="/"
+              aria-label={en ? "Back to site" : "Înapoi la site"}
+              className="flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted-foreground transition hover:bg-secondary hover:text-emerald"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">{en ? "Back to site" : "Înapoi la site"}</span>
+            </Link>
+          </div>
         </div>
       </div>
 

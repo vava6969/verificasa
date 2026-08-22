@@ -176,7 +176,7 @@ export default function About() {
               variant="outline"
               className="h-12 rounded-full border-white/40 bg-transparent px-7 text-base text-white hover:bg-white/10 hover:text-white"
             >
-              <Link to="/owner">{c.cta_list}</Link>
+              <Link to="/post-property">{c.cta_list}</Link>
             </Button>
           </motion.div>
         </div>

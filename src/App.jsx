@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "next-themes"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -35,6 +35,7 @@ import CookiePolicy from '@/pages/CookiePolicy';
 import Contact from '@/pages/Contact';
 import PlanuriUpgrade from '@/pages/PlanuriUpgrade';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import RedirectToLogin from '@/components/RedirectToLogin';
 import { CountryProvider } from '@/components/CountryContext';
 import Account from '@/pages/Account';
 import MyReports from '@/pages/MyReports';
@@ -98,7 +99,7 @@ const AuthenticatedApp = () => {
         <Route path="/property/:id" element={<PropertyDetail />} />
         <Route path="/profile/:id" element={<UserProfile />} />
         <Route path="/map" element={<MapSearch />} />
-        <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route element={<ProtectedRoute unauthenticatedElement={<RedirectToLogin />} />}>
           <Route path="/owner" element={<Owner />} />
           <Route path="/my-properties" element={<MyProperties />} />
           <Route path="/admin" element={<Admin />} />
@@ -111,7 +112,7 @@ const AuthenticatedApp = () => {
           <Route path="/my-reports" element={<MyReports />} />
         </Route>
       </Route>
-      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+      <Route element={<ProtectedRoute unauthenticatedElement={<RedirectToLogin />} />}>
         <Route path="/post-property" element={<PostProperty />} />
         <Route path="/messages/:id" element={<Conversation />} />
       </Route>
