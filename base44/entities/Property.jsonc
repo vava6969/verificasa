@@ -328,6 +328,23 @@
       ],
       "title": "Planul postatorului (denormalizat, scris doar server-side)"
     },
+    "poster_plan_override": {
+      // EXISTA IN SCHEMA DEPLOYATA dar lipsea din fisierul asta: citit peste
+      // REST, 10 anunturi il poarta chiar acum. resolvePropertyPlan il ia
+      // INAINTEA lui poster_plan, deci el decide randurile de pe prima pagina
+      // pentru datele de demonstratie. Se scrie DOAR de mana, din panoul
+      // Base44 - niciun rand de cod din aplicatie nu il atinge.
+      //
+      // E declarat aici ca sa nu dispara: un push de schema din repo peste
+      // schema deployata l-ar fi sters, si odata cu el toate suprascrierile.
+      "type": "string",
+      "enum": [
+        "basic",
+        "pro",
+        "agent"
+      ],
+      "title": "Plan fortat manual (demo) - bate poster_plan"
+    },
     "boost_active": {
       "type": "boolean",
       "default": false,
