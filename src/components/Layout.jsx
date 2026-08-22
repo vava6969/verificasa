@@ -20,7 +20,7 @@ export default function Layout() {
   }, [pathname]);
   // Footerul e o secțiune de marketing/legal — îl arătăm doar pe paginile unde
   // are sens (homepage, contact și paginile legale), nu în restul aplicației.
-  const FOOTER_PATHS = ["/", "/contact", "/terms", "/privacy", "/data-deletion", "/cookies"];
+  const FOOTER_PATHS = ["/", "/tur-3d", "/contact", "/terms", "/privacy", "/data-deletion", "/cookies"];
   const showFooter = FOOTER_PATHS.includes(pathname);
   const hideBottomNav = false;
 

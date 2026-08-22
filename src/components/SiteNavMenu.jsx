@@ -40,6 +40,7 @@ export default function SiteNavMenu() {
     ...(isAuthenticated
       ? [{ label: en ? "Notifications" : "Notificări", path: "/notificari", badge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null }]
       : []),
+    { label: en ? "3D Tour" : "Tur 3D", path: "/tur-3d" },
     { label: en ? "Plans" : "Planuri", path: "/upgrade" },
     { label: en ? "Search" : "Caută", path: "/search" },
     { label: en ? "Map" : "Hartă", path: "/map" },
