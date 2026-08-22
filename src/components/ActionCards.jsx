@@ -49,18 +49,19 @@ export default function ActionCards() {
               <span className="group relative flex h-32 items-end overflow-hidden rounded-2xl sm:h-44">
                 {c.partner ? (
                   <>
-                    <span className="absolute inset-0 bg-emerald/12 dark:bg-emerald/20" />
+                    {/* Verdele e al MĂRCII partenerului (partners.js), nu un
+                        token de-al nostru — de-aia stă în style, nu în clase.
+                        Spălatul de 12% de dinainte lăsa cardul aproape gol
+                        lângă două fotografii întregi. */}
+                    <span
+                      className="absolute inset-0"
+                      style={{ background: `linear-gradient(135deg, ${partner?.brandDeep || "#047857"}, ${partner?.brand || "#059669"})` }}
+                    />
                     <span className="absolute inset-x-0 top-0 flex h-full items-center justify-center p-4 pb-14">
-                      <img
-                        src={partner?.logo}
-                        alt={partner?.name || ""}
-                        className="max-h-12 w-auto max-w-[62%] object-contain dark:hidden"
-                        loading="lazy"
-                      />
                       <img
                         src={partner?.logoLight || partner?.logo}
                         alt={partner?.name || ""}
-                        className="hidden max-h-12 w-auto max-w-[62%] object-contain dark:block"
+                        className="max-h-12 w-auto max-w-[62%] object-contain"
                         loading="lazy"
                       />
                     </span>
@@ -81,12 +82,14 @@ export default function ActionCards() {
                 )}
 
                 <span className="relative flex w-full items-center justify-between gap-2 p-4 sm:p-5">
-                  <span className={`text-lg font-bold sm:text-xl ${c.partner ? "text-foreground" : "text-white"}`}>
+                  <span className="text-lg font-bold text-white sm:text-xl">
                     {c.title}
                   </span>
                   <span
                     aria-hidden="true"
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald text-lg leading-none text-primary-foreground"
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg leading-none ${
+                      c.partner ? "bg-white text-emerald" : "bg-emerald text-primary-foreground"
+                    }`}
                   >
                     →
                   </span>

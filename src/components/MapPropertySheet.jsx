@@ -6,6 +6,7 @@ import { useCountry } from "@/components/CountryContext";
 import { Image } from "@/components/ui/image";
 import { PropertyBadgeRow } from "@/components/PropertyBadges";
 import { coverOf } from "@/lib/covers";
+import { floorLabel } from "@/lib/propertyPayload";
 
 // Panoul care urcă de jos când atingi un anunț pe hartă. E cardul din listă,
 // în miniatură și pe toată lățimea: fotografia conduce, insignele stau pe
@@ -28,7 +29,7 @@ export default function MapPropertySheet({ property, onClose, lang, coverMap }) 
     ? [
         p.rooms != null && `${p.rooms} ${en ? (p.rooms === 1 ? "room" : "rooms") : "cam."}`,
         p.surface_sqm != null && `${p.surface_sqm} mp`,
-        p.floor,
+        floorLabel(p.floor, en),
       ]
         .filter(Boolean)
         .join(" · ")

@@ -4,6 +4,7 @@ import { useCountry } from "@/components/CountryContext";
 import { Image } from "@/components/ui/image";
 import { PropertyBadgeRow } from "@/components/PropertyBadges";
 import { coverOf } from "@/lib/covers";
+import { floorLabel } from "@/lib/propertyPayload";
 
 // Banda de carduri de pe hartă, pe telefon.
 //
@@ -36,7 +37,7 @@ function RailCard({ property, coverMap, lang, active }) {
   const specs = [
     p.rooms != null && `${p.rooms} ${en ? (p.rooms === 1 ? "room" : "rooms") : "cam."}`,
     p.surface_sqm != null && `${p.surface_sqm} mp`,
-    p.floor,
+    floorLabel(p.floor, en),
   ]
     .filter(Boolean)
     .join(" · ");

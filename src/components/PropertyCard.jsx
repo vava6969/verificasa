@@ -9,6 +9,7 @@ import { Image } from "@/components/ui/image";
 import { base44 } from "@/api/base44Client";
 import { PropertyBadgeRow } from "@/components/PropertyBadges";
 import { coverOf } from "@/lib/covers";
+import { floorLabel } from "@/lib/propertyPayload";
 
 // Cardul de anunț. Fotografia conduce, prețul e primul lucru citit, iar sub el
 // stă o singură linie de caracteristici. Codul anunțului, contorul de
@@ -98,7 +99,7 @@ export default function PropertyCard({ property, hot = false, coverMap }) {
   const specs = [
     p.rooms != null && `${p.rooms} ${en ? (p.rooms === 1 ? "room" : "rooms") : "cam."}`,
     p.surface_sqm != null && `${p.surface_sqm} mp`,
-    p.floor,
+    floorLabel(p.floor, en),
   ].filter(Boolean).join(" · ");
 
   const place = p.zone || p.city ? `${p.zone ? p.zone + ", " : ""}${p.city || ""}` : t("info_missing");

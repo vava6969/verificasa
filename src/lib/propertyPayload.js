@@ -10,6 +10,17 @@ export const MIN_PHOTOS = 3;
 // oricare, din oricare grup (verificate + dotări + opțiuni la un loc).
 export const MIN_FEATURES = 3;
 
+// Eticheta etajului pe carduri. Datele au valori amestecate — „Parter", „0",
+// „2", „2/4" — iar un număr gol pe card („· 8") nu spune nimic. 0 și parter
+// devin „Parter", numerele devin „Etaj N", formatele libere rămân cum sunt.
+export const floorLabel = (f, en = false) => {
+  const s = String(f ?? "").trim();
+  if (!s) return null;
+  if (/^(parter|p|0)$/i.test(s)) return en ? "Ground floor" : "Parter";
+  if (/^\d+(\s*\/\s*\d+)?$/.test(s)) return (en ? "Floor " : "Etaj ") + s.replace(/\s+/g, "");
+  return s;
+};
+
 export const onlyPhoneDigits = (v) => {
   const clean = String(v || "").replace(/[^0-9+]/g, "");
   if (clean.startsWith("+")) return "+" + clean.slice(1).replace(/\+/g, "");

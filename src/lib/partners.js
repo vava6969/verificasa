@@ -13,6 +13,11 @@ export const PARTNERS = [
     // suprafață întunecată — fără casetă albă în spate.
     logo: "/images/partners/residence-vertical.png",
     logoLight: "/images/partners/residence-vertical-white.png",
+    // Verdele MĂRCII LUI, nu al nostru — folosit ca fundal oriunde cardul e
+    // „al partenerului" (cardul de acțiune de pe Landing). Nu e token de-al
+    // casei tocmai ca să nu se amestece cu verdele VerifiCasa.
+    brand: "#059669",
+    brandDeep: "#047857",
     url: "https://residencevertical.ro/?ref=verificasa",
     code: "VERIFICASA",
     discount: "10% reducere",

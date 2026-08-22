@@ -4,6 +4,7 @@ import { useCountry } from "@/components/CountryContext";
 import { Image } from "@/components/ui/image";
 import { PropertyBadgeRow } from "@/components/PropertyBadges";
 import { buildCoverMap, coverOf } from "@/lib/covers";
+import { floorLabel } from "@/lib/propertyPayload";
 
 // Panourile de sub hartă, pe telefon. Ultimul dintre ele e o listă de carduri
 // în miniatură — aceeași limbă ca PropertyCard: fotografie, insigne pe
@@ -21,7 +22,7 @@ function MiniPropertyCard({ property, coverMap, lang }) {
   const specs = [
     p.rooms != null && `${p.rooms} ${en ? (p.rooms === 1 ? "room" : "rooms") : "cam."}`,
     p.surface_sqm != null && `${p.surface_sqm} mp`,
-    p.floor,
+    floorLabel(p.floor, en),
   ]
     .filter(Boolean)
     .join(" · ");

@@ -421,13 +421,10 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
               </select>
             </Field>
             <label className={`${checkCls} self-end`}><input type="checkbox" className={boxCls} checked={form.owner_verified} onChange={(e) => upd("owner_verified", e.target.checked)} /> Proprietar verificat</label>
+            {/* Linkul turului stă DOAR în blocul „Tur 3D" de mai sus (cererea
+                clientului, 23.08) — al doilea câmp de aici doar îl dubla.
+                Valorile existente se salvează în continuare nevăzute. */}
             <label className={`${checkCls} self-end`}><input type="checkbox" className={boxCls} checked={form.ai_tour_verified} onChange={(e) => upd("ai_tour_verified", e.target.checked)} /> Activare badge Tur 3D</label>
-            <Field label="Link Tur 3D (se salvează din blocul de mai sus)">
-              <input value={form.tour_3d_url} onChange={(e) => upd("tour_3d_url", e.target.value)} placeholder="https://tur3d.verificasa.ro/property/..." className={inputCls} />
-            </Field>
-            <Field label="Tur Video URL">
-              <input value={form.ai_video_url} onChange={(e) => upd("ai_video_url", e.target.value)} placeholder="https://..." className={inputCls} />
-            </Field>
           </div>
         </>
       )}
