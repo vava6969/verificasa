@@ -127,7 +127,10 @@ export default function Contact() {
     const body = encodeURIComponent(`${message}\n\n—\n${name}\n${email}`);
     window.location.href = `mailto:${INBOX}?subject=${subject}&body=${body}`;
     toast({ title: c.ok_t, description: c.ok_d });
-    setForm(EMPTY);
+    // Formularul NU se goleste. `mailto:` nu raspunde daca a deschis ceva sau
+    // nu, iar pe un desktop fara client de email configurat nu se intampla
+    // nimic vizibil — golirea insemna ca omul isi pierdea mesajul scris si nu
+    // mai avea ce copia in adresa listata mai jos.
   };
 
   return (
