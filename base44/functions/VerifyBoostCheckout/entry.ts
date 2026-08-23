@@ -73,7 +73,6 @@ export default async function (req: Request): Promise<Response> {
           await svc.entities.Property.update(propertyId, {
             boost_active: true,
             boost_ends_date: boostEndsDate,
-            boost_expiry_warned: false,
             // Boost-urile se aduna pe acelasi anunt - vezi ApplyBoost.
             boost_count: (Number(p.boost_count) || 0) + 1,
           });
