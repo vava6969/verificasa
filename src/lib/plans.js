@@ -15,7 +15,6 @@
 //
 // Ce e IMPUS și ce e doar AFIȘAT, în august 2026:
 //   activeListings   — impus server-side (CheckListingAllowance, la publicare).
-//   photosPerListing — impus server-side, în aceeași funcție.
 //   boostsIncluded   — acordat O SINGURĂ DATĂ, la activarea abonamentului
 //                      (VerifyCheckoutSession scrie în registrul BoostCredit).
 //                      NU se reacordă la reînnoire: reînnoirile Stripe nu trec
@@ -24,12 +23,16 @@
 //                      nu există nimic de numărat. Când apare, contorul intră aici.
 //   verifications    — DOAR afișaj. Verificarea o face manual un admin; nu
 //                      există contor per cont.
+//
+// Fotografiile NU mai variază pe plan (decizia clientului, 23.08): oricine
+// poate posta poze, limita e flat — vezi MAX_PHOTOS în propertyPayload.js,
+// aceeași cifră impusă și server-side în CheckListingAllowance.
 // ---------------------------------------------------------------------------
 export const ENTITLEMENTS = {
-  none:  { activeListings: 1,  photosPerListing: 8,    tours3d: 0,  boostsIncluded: 0,  verifications: 1, priorityWeight: 0 },
-  basic: { activeListings: 2,  photosPerListing: 15,   tours3d: 2,  boostsIncluded: 2,  verifications: 1, priorityWeight: 1 },
-  pro:   { activeListings: 3,  photosPerListing: 30,   tours3d: 3,  boostsIncluded: 3,  verifications: 1, priorityWeight: 2 },
-  agent: { activeListings: 30, photosPerListing: null, tours3d: 30, boostsIncluded: 45, verifications: 1, priorityWeight: 3 },
+  none:  { activeListings: 1,  tours3d: 0,  boostsIncluded: 0,  verifications: 1, priorityWeight: 0 },
+  basic: { activeListings: 2,  tours3d: 2,  boostsIncluded: 2,  verifications: 1, priorityWeight: 1 },
+  pro:   { activeListings: 3,  tours3d: 3,  boostsIncluded: 3,  verifications: 1, priorityWeight: 2 },
+  agent: { activeListings: 30, tours3d: 30, boostsIncluded: 45, verifications: 1, priorityWeight: 3 },
 };
 
 export function getEntitlements(planId) {
