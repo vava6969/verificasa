@@ -1,5 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { getBalance, addCredits, BOOST_NEVER_ENDS } from "../../shared/boosts.js";
+import { getBalance, addCredits, boostEndsAt } from "../../shared/boosts.js";
 
 // Consumă un credit și promovează un anunț. Verifică server-side că anunțul
 // chiar aparține celui care cere: boost-ul se scrie cu asServiceRole, deci
@@ -46,8 +46,10 @@ export default async function (req: Request): Promise<Response> {
 
     // Boost-urile se adună pe același anunț și nu expiră: al doilea nu
     // prelungește nimic, urcă anunțul mai sus. Vezi compareByBoostThenViews.
+    // Fiecare promovare REPORNEșTE ceasul la 21 de zile de la ACUM — nu se
+    // adună cu ce mai era rămas dintr-o promovare anterioară.
     const now = Date.now();
-    const endsDate = BOOST_NEVER_ENDS;
+    const endsDate = boostEndsAt(now);
     const nextCount = (Number(p.boost_count) || 0) + want;
 
     // ORDINEA CONTEAZĂ. Înainte, anunțul se promova întâi și creditul se scădea
@@ -77,6 +79,7 @@ export default async function (req: Request): Promise<Response> {
         boost_active: true,
         boost_ends_date: endsDate,
         boost_count: nextCount,
+        boost_expiry_warned: false,
       });
     } catch (applyErr: any) {
       const restored = await addCredits(svc, {
