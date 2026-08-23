@@ -15,7 +15,7 @@ export default async function (req: Request): Promise<Response> {
     const sessionId = body?.session_id;
     if (!sessionId) return Response.json({ error: "session_id lipsă." });
 
-    const secretKey = secrets.get("StripeTest");
+    const secretKey = secrets.get("StripeSecretKey");
     if (!secretKey) return Response.json({ error: "Plățile nu sunt configurate încă." });
 
     const svc = base44.asServiceRole;
