@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import { callFnQuiet } from "@/lib/serverCall";
 import LocationAutocomplete from "@/components/LocationAutocomplete";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,9 @@ import { fetchTourStatus, setTourUrl as saveTourUrlRemote, tourReasonText } from
 import DateField from "@/components/DateField";
 import { Image as UIImage } from "@/components/ui/image";
 import GooglePlacesAutocomplete from "@/components/GooglePlacesAutocomplete";
+import BoostDialog from "@/components/BoostDialog";
+import { fetchBoostBalance } from "@/lib/boosts";
+import { boostCount } from "@/lib/plans";
 import { Trash2, Camera } from "lucide-react";
 import { uploadPhotos } from "@/lib/imageUpload";
 
@@ -54,6 +58,18 @@ function Field({ label, children }) {
 
 export default function PropertyEditForm({ property, onDone, isAdmin = false }) {
   const { toast } = useToast();
+  const { user } = useAuth();
+  // Promovarea din formularul de editare (cererea clientului, 23.08) —
+  // folosește soldul celui care editează acum (proprietar SAU admin), la fel
+  // cum ApplyBoost permite deja ambelor roluri să promoveze acest anunț.
+  const [boostBalance, setBoostBalance] = useState(0);
+  const [boostOpen, setBoostOpen] = useState(false);
+  const [liveProperty, setLiveProperty] = useState(property);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    fetchBoostBalance(user.id).then(setBoostBalance);
+  }, [user?.id]);
   // Starea turului 3D: pe ce plan e omul, câte tururi i-au mai rămas și dacă a
   // trecut de cele două ferestre de 3 zile. Se citește o dată, la deschidere.
   const [tour, setTour] = useState(null);
@@ -408,6 +424,38 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
             </button>
           </div>
         )}
+
+        {/* Promovare — același BoostDialog folosit în "Anunțurile mele", doar
+            mutat și aici ca să nu fie nevoie să ieși din formular. Sold-ul afișat
+            e al celui care editează acum (owner sau admin). */}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-secondary/40 p-3">
+          <div className="min-w-0">
+            <span className="block text-sm font-semibold text-navy dark:text-foreground">Promovează anunțul</span>
+            <span className="block text-xs text-muted-foreground">
+              {boostCount(liveProperty) > 0
+                ? `ai ${boostCount(liveProperty)} promovăr${boostCount(liveProperty) === 1 ? "e" : "i"}`
+                : "nepromovat încă"}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setBoostOpen(true)}
+            className="h-11 shrink-0 rounded-full bg-emerald px-5 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            Promovează
+          </button>
+        </div>
+
+        <BoostDialog
+          open={boostOpen}
+          onOpenChange={setBoostOpen}
+          property={liveProperty}
+          balance={boostBalance}
+          onDone={(res) => {
+            setBoostBalance(res.balance ?? boostBalance);
+            setLiveProperty((p) => ({ ...p, boost_active: true, boost_count: res.boost_count ?? (boostCount(p) + 1) }));
+          }}
+        />
       </div>
 
       {/* Badge-uri & verificări — admin only */}
