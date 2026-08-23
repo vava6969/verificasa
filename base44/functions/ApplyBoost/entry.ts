@@ -44,10 +44,10 @@ export default async function (req: Request): Promise<Response> {
       });
     }
 
-    // Boost-urile se adună pe același anunț (contorul crește), dar durata de
-    // viață e una singură pentru tot anunțul, nu per boost individual.
-    // Fiecare promovare REPORNEȘTE ceasul la 21 de zile de la ACUM — nu se
-    // adună cu ce mai era rămas dintr-o promovare anterioară.
+    // Boost-urile se adună pe același anunț, dar FIECARE grup aplicat are
+    // propriul lui ceas de 21 de zile, independent de celelalte (decizia
+    // clientului, 23.08). Grupul asta primește starts_date/ends_date proprii
+    // în rândul Boost de mai jos; nu se atinge nimic din grupurile anterioare.
     const now = Date.now();
     const endsDate = boostEndsAt(now);
     const nextCount = (Number(p.boost_count) || 0) + want;
@@ -79,7 +79,6 @@ export default async function (req: Request): Promise<Response> {
         boost_active: true,
         boost_ends_date: endsDate,
         boost_count: nextCount,
-        boost_expiry_warned: false,
       });
     } catch (applyErr: any) {
       const restored = await addCredits(svc, {
