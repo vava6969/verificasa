@@ -56,3 +56,24 @@ export async function countActiveListings(svc, userId, excludeId) {
     return 0;
   }
 }
+
+// Pune sau scoate poster_plan de pe TOATE anunțurile unui utilizator —
+// versiunea „un singur user” a SyncPosterPlans (folosită de VerifyCheckoutSession,
+// StripeWebhook și AdminGrantPlan, ca să nu se aștepte după o baleiere a
+// TUTUROR anunțurilor la fiecare eveniment). planId = null șterge badge-ul.
+export async function stampPosterPlan(svc, userId, planId) {
+  try {
+    const mine = await svc.entities.Property.filter({ created_by_id: userId }, "-created_date", 200);
+    const updates = (mine || [])
+      .filter((p) => (p.poster_plan || null) !== planId)
+      .map((p) => ({ id: p.id, poster_plan: planId }));
+    if (!updates.length) return;
+    try {
+      await svc.entities.Property.bulkUpdate(updates);
+    } catch (_) {
+      for (const u of updates) {
+        try { await svc.entities.Property.update(u.id, { poster_plan: u.poster_plan }); } catch (_) { /* best-effort */ }
+      }
+    }
+  } catch (_) { /* best-effort */ }
+}
