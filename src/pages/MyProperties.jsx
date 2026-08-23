@@ -120,6 +120,16 @@ export default function MyProperties() {
 
   }, [user?.id]);
 
+  // Soldul de boost-uri (BoostCredit) e o entitate separată de Property, deci
+  // nu intra în subscribe-ul de mai sus. Fără asta, promovarea dintr-un alt
+  // tab/pagină — sau chiar din același tab, dacă răspunsul de rețea întârzie —
+  // rămâne "în urmă" până la un refresh manual.
+  useEffect(() => {
+    if (!user?.id) return undefined;
+    const unsub = base44.entities.BoostCredit.subscribe(() => loadBalance());
+    return () => { try { unsub && unsub(); } catch { /* noop */ } };
+  }, [user?.id]);
+
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
