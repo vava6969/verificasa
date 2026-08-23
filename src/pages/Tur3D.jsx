@@ -9,7 +9,7 @@ import StoreBadges from "@/components/StoreBadges";
 import Glyph from "@/components/Glyph";
 import LoopVideo from "@/components/LoopVideo";
 import PhotoMarquee from "@/components/PhotoMarquee";
-import { PLANS, FREE_PLAN, BOOST_PACKS } from "@/lib/plans";
+import { usePlanConfigs } from "@/hooks/usePlanConfigs";
 import { startPlanCheckout, startBoostCheckout } from "@/lib/checkout";
 import { TOUR_3D_LINK_SAMPLE, hasStoreLinks } from "@/lib/appLinks";
 
@@ -263,6 +263,9 @@ export default function Tur3D() {
   const en = lang === "en";
   const c = en ? CONTENT.en : CONTENT.ro;
   const live = hasStoreLinks();
+  // Planurile și pachetele vin din configurarea Admin → Planuri & Prețuri
+  // (cu fallback pe valorile statice) — aceeași sursă ca /upgrade.
+  const { plans, freePlan, boostPacks } = usePlanConfigs();
 
   // Planurile se cumpără DE AICI, nu doar de pe /upgrade. Cererea clientului:
   // cine citește pagina care vinde tururile 3D e deja convins, iar un link
@@ -463,8 +466,8 @@ export default function Tur3D() {
         </Reveal>
 
         <RevealGroup className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[FREE_PLAN, ...PLANS].map((plan) => {
-            const free = plan.id === FREE_PLAN.id;
+          {[freePlan, ...plans].map((plan) => {
+            const free = plan.id === "none";
             const price = annual ? plan.yearly : plan.monthly;
             return (
               <RevealItem
@@ -541,7 +544,7 @@ export default function Tur3D() {
             <p className="text-xs text-muted-foreground">{c.packs_p}</p>
           </div>
           <ul className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {BOOST_PACKS.map((pack) => (
+            {boostPacks.map((pack) => (
               <li key={pack.id}>
                 <button
                   type="button"
