@@ -6,11 +6,19 @@
 // RedeemCoupon, ApplyBoost, ExpireBoosts) se deployează ÎMPREUNĂ, altfel unele
 // rulează cu o copie veche fără niciun mesaj de eroare.
 
-// Boost-urile NU expiră (decizia clientului, 22.08). Data rămâne scrisă doar
-// pentru că Boost.ends_date e obligatoriu în schemă; nimeni nu o mai citește.
-// Se pune departe în viitor, ca un ExpireBoosts vechi rămas în cron să nu
-// stingă nimic dacă rulează înainte să fie redeployat.
-export const BOOST_NEVER_ENDS = "2999-12-31T23:59:59.000Z";
+// Boost-urile DUREAZĂ 21 de zile de la ultima promovare (decizia clientului,
+// 23.08 — înlocuiește decizia anterioară din 22.08, când nu expirau deloc).
+// Fiecare promovare nouă REPORNEȘTE ceasul la 21 de zile de la momentul ei,
+// nu se adună cu ce mai era rămas. ExpireBoosts trimite un avertisment cu
+// BOOST_WARNING_DAYS_BEFORE înainte, apoi stinge boost-ul la scadență.
+export const BOOST_DURATION_DAYS = 21;
+export const BOOST_WARNING_DAYS_BEFORE = 3;
+
+export function boostEndsAt(fromDate = new Date()) {
+  const d = new Date(fromDate);
+  d.setDate(d.getDate() + BOOST_DURATION_DAYS);
+  return d.toISOString();
+}
 
 // Trebuie să rămână identic cu BOOST_PACKS din src/lib/plans.js.
 export const BOOST_PACKS = {
