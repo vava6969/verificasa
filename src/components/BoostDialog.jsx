@@ -145,7 +145,7 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
                 [en ? "Cost" : "Cost", en ? `${qty} boost${qty === 1 ? "" : "s"}` : `${qty} boost${qty === 1 ? "" : "-uri"}`],
                 [en ? "Balance after" : "Sold rămas", String(Math.max(0, balance - qty))],
                 [en ? "Boosts after" : "Boost-uri după", String(have + qty)],
-                [en ? "Lasts" : "Durează", en ? "as long as the listing is up" : "cât timp anunțul e publicat"],
+                [en ? "Lasts" : "Durează", en ? "21 days from now" : "21 de zile de acum"],
               ].map(([label, value]) => (
                 <div key={label} className="flex items-baseline justify-between gap-4">
                   <dt className="text-sm text-muted-foreground">{label}</dt>
