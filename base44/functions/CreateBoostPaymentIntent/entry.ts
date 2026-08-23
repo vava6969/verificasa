@@ -17,7 +17,7 @@ export default async function (req: Request): Promise<Response> {
     const me = await base44.auth.me().catch(() => null);
     if (!me?.id) return Response.json({ error: "Trebuie să fii autentificat." });
 
-    const secretKey = secrets.get("StripeTest");
+    const secretKey = secrets.get("StripeSecretKey");
     if (!secretKey) return Response.json({ error: "Plățile nu sunt configurate încă." });
     const publishableKey = secrets.get("StripePublic");
     if (!publishableKey) return Response.json({ error: "embedded_unavailable" });
