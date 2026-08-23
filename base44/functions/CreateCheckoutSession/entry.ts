@@ -4,17 +4,16 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 // Creează o sesiune Stripe Checkout (mod abonament) pentru planul + intervalul
 // cerut din pagina „Planuri Upgrade” și returnează URL-ul de plată către care
 // frontend-ul redirecționează browserul. Cheia secretă Stripe rămâne doar pe
-// server — necesită secretul StripeTest setat în Settings → Secrets ale acestei
-// aplicații (Stripe Dashboard → Developers → API keys, momentan sk_test_...
-// din sandbox-ul Stripe; la lansare, adaugă un secret separat cu cheia live
-// și schimbă numele de mai jos).
+// server — secretul StripeSecretKey (LIVE, 23.08 — înlocuiește StripeTest
+// folosit până azi pentru testare în Sandbox).
 //
-// Prețurile sunt cele create în Stripe (mod test) pentru VerifiCasa Basic/Pro/Agent,
-// lunar + anual, în RON — vezi PlanuriUpgrade.jsx pentru sumele afișate în UI.
+// Prețurile sunt cele create în Stripe (mod LIVE, 23.08) pentru VerifiCasa
+// Basic/Pro/Agent, lunar + anual, în RON — vezi PlanuriUpgrade.jsx pentru
+// sumele afișate în UI.
 const PRICE_MAP: Record<string, { monthly: string; yearly: string }> = {
-  basic: { monthly: "price_1U4lpPPq70JhwVjjf3HRAvrG", yearly: "price_1U4lpSPq70JhwVjj6EQtrzc4" },
-  pro: { monthly: "price_1U4lpVPq70JhwVjjIx1V9Yfa", yearly: "price_1U4lpXPq70JhwVjj0lyu1xZW" },
-  agent: { monthly: "price_1U4lpaPq70JhwVjjxrzOPFZ3", yearly: "price_1U4lpcPq70JhwVjjPyfjXJGK" },
+  basic: { monthly: "price_1U4luqPq70JhwVjjB0qJtPFy", yearly: "price_1U4luqPq70JhwVjjFY0SDXvN" },
+  pro: { monthly: "price_1U4lunPq70JhwVjjlRKp54aL", yearly: "price_1U4lunPq70JhwVjjXUSGSSx4" },
+  agent: { monthly: "price_1U4lulPq70JhwVjjfToP9I6A", yearly: "price_1U4lulPq70JhwVjjuGIg4MmA" },
 };
 
 export default async function (req: Request): Promise<Response> {
@@ -26,9 +25,9 @@ export default async function (req: Request): Promise<Response> {
     // non-2xx și mesajul nostru detaliat nu mai ajunge la utilizator.
     if (!me?.id) return Response.json({ error: "Trebuie să fii autentificat." });
 
-    const secretKey = secrets.get("StripeTest");
+    const secretKey = secrets.get("StripeSecretKey");
     if (!secretKey) {
-      return Response.json({ error: "Plățile nu sunt configurate încă — lipsește secretul StripeTest." });
+      return Response.json({ error: "Plățile nu sunt configurate încă — lipsește secretul StripeSecretKey." });
     }
 
     let body: any = {};
