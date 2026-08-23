@@ -88,8 +88,8 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
           <AlertDialogDescription className="text-sm text-muted-foreground">
             {have > 0
               ? (en
-                ? `This listing already carries ${have} ${have === 1 ? "boost" : "boosts"}. Another one lifts it higher still, and none of them expire.`
-                : `Anunțul are deja ${have} boost${have === 1 ? "" : "-uri"}. Încă unul îl ridică și mai sus, și niciunul nu expiră.`)
+                ? `This listing already carries ${have} ${have === 1 ? "boost" : "boosts"}. Another one resets the 21-day clock and lifts it higher still.`
+                : `Anunțul are deja ${have} boost${have === 1 ? "" : "-uri"}. Încă unul repornește ceasul de 21 de zile și îl ridică și mai sus.`)
               : hasCredits
               ? (en
                 ? "Promoted listings rank above the rest of their band for 21 days and are labelled as paid placement."
