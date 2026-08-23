@@ -92,8 +92,8 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
                 : `Anunțul are deja ${have} boost${have === 1 ? "" : "-uri"}. Încă unul îl ridică și mai sus, și niciunul nu expiră.`)
               : hasCredits
               ? (en
-                ? "Promoted listings rank above the rest of their band, for as long as they are up, and are labelled as paid placement."
-                : "Anunțurile promovate se clasează peste restul categoriei lor cât timp sunt publicate și sunt marcate ca plasare plătită.")
+                ? "Promoted listings rank above the rest of their band for 21 days and are labelled as paid placement."
+                : "Anunțurile promovate se clasează peste restul categoriei lor timp de 21 de zile și sunt marcate ca plasare plătită.")
               : (en
                 ? `You have no boosts left. Buy one for this listing — ${SINGLE_BOOST_PACK.priceRon.toLocaleString("ro-RO", { minimumFractionDigits: 2 })} RON, applied as soon as you are back.`
                 : `Nu mai ai boost-uri. Cumperi unul pentru acest anunț — ${SINGLE_BOOST_PACK.priceRon.toLocaleString("ro-RO", { minimumFractionDigits: 2 })} RON, se aplică singur la întoarcere.`)}
