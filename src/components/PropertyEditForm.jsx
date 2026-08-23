@@ -433,7 +433,7 @@ export default function PropertyEditForm({ property, onDone, isAdmin = false }) 
             <span className="block text-sm font-semibold text-navy dark:text-foreground">Promovează anunțul</span>
             <span className="block text-xs text-muted-foreground">
               {boostCount(liveProperty) > 0
-                ? `ai ${boostCount(liveProperty)} promovăr${boostCount(liveProperty) === 1 ? "e" : "i"}`
+                ? `ai ${boostCount(liveProperty)} ${boostCount(liveProperty) === 1 ? "promovare" : "promovări"}`
                 : "nepromovat încă"}
             </span>
           </div>
