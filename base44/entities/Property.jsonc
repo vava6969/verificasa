@@ -17,7 +17,7 @@
     },
     "price_monthly": {
       "type": "number",
-      "title": "Preț"
+      "title": "Pre\u021b"
     },
     "transaction_type": {
       "type": "string",
@@ -26,7 +26,7 @@
         "SALE"
       ],
       "default": "RENT",
-      "title": "Tip tranzacție"
+      "title": "Tip tranzac\u021bie"
     },
     "currency": {
       "type": "string",
@@ -36,7 +36,7 @@
         "GBP"
       ],
       "default": "EUR",
-      "title": "Monedă"
+      "title": "Moned\u0103"
     },
     "country": {
       "type": "string",
@@ -44,15 +44,15 @@
         "RO"
       ],
       "default": "RO",
-      "title": "Țară"
+      "title": "\u021aar\u0103"
     },
     "county": {
       "type": "string",
-      "title": "Județ"
+      "title": "Jude\u021b"
     },
     "city": {
       "type": "string",
-      "title": "Oraș"
+      "title": "Ora\u0219"
     },
     "zone": {
       "type": "string",
@@ -60,19 +60,19 @@
     },
     "landmark": {
       "type": "string",
-      "title": "Punct de reper / Stradă"
+      "title": "Punct de reper / Strad\u0103"
     },
     "property_type": {
       "type": "string",
       "enum": [
-        "Garsonieră",
+        "Garsonier\u0103",
         "2 Camere",
         "3 Camere",
         "4+ Camere",
-        "Casă",
+        "Cas\u0103",
         "Studio",
         "Teren",
-        "Spațiu Comercial"
+        "Spa\u021biu Comercial"
       ],
       "title": "Tip proprietate"
     },
@@ -82,7 +82,7 @@
     },
     "surface_sqm": {
       "type": "number",
-      "title": "Suprafață (mp)"
+      "title": "Suprafa\u021b\u0103 (mp)"
     },
     "floor": {
       "type": "string",
@@ -90,11 +90,11 @@
     },
     "total_floors": {
       "type": "number",
-      "title": "Total etaje clădire"
+      "title": "Total etaje cl\u0103dire"
     },
     "building_year": {
       "type": "number",
-      "title": "An construcție"
+      "title": "An construc\u021bie"
     },
     "deposit": {
       "type": "number",
@@ -120,7 +120,7 @@
       "items": {
         "type": "string"
       },
-      "title": "Facilități"
+      "title": "Facilit\u0103\u021bi"
     },
     "phone": {
       "type": "string",
@@ -128,7 +128,7 @@
     },
     "whatsapp_phone": {
       "type": "string",
-      "title": "WhatsApp (digital internațional)"
+      "title": "WhatsApp (digital interna\u021bional)"
     },
     "seller_role": {
       "type": "string",
@@ -137,7 +137,7 @@
         "Agent"
       ],
       "default": "Proprietar",
-      "title": "Rol vânzător"
+      "title": "Rol v\u00e2nz\u0103tor"
     },
     "available_from": {
       "type": "string",
@@ -157,7 +157,7 @@
     },
     "tour_3d_url": {
       "type": "string",
-      "title": "Link Tur 3D (Matterport — setat de admin)"
+      "title": "Link Tur 3D (Matterport \u2014 setat de admin)"
     },
     "latitude": {
       "type": "number",
@@ -190,7 +190,7 @@
       "enum": [
         "Activ",
         "Rezervat",
-        "Închis"
+        "\u00cenchis"
       ],
       "default": "Activ",
       "title": "Status"
@@ -203,7 +203,7 @@
         "REJECTED"
       ],
       "default": "PENDING",
-      "title": "Aprobare anunț"
+      "title": "Aprobare anun\u021b"
     },
     "approved_by_id": {
       "type": "string",
@@ -216,7 +216,7 @@
     "approved_date": {
       "type": "string",
       "format": "date-time",
-      "title": "Data aprobării"
+      "title": "Data aprob\u0103rii"
     },
     "featured": {
       "type": "boolean",
@@ -226,7 +226,7 @@
     "views_count": {
       "type": "number",
       "default": 0,
-      "title": "Vizualizări"
+      "title": "Vizualiz\u0103ri"
     },
     "verification_level": {
       "type": "string",
@@ -240,7 +240,7 @@
     },
     "inspection_report_url": {
       "type": "string",
-      "title": "Raport inspecție (PDF)"
+      "title": "Raport inspec\u021bie (PDF)"
     },
     "noise_db": {
       "type": "number",
@@ -248,16 +248,16 @@
     },
     "light_orientation": {
       "type": "string",
-      "title": "Orientare lumină"
+      "title": "Orientare lumin\u0103"
     },
     "water_pressure_ok": {
       "type": "boolean",
       "default": true,
-      "title": "Presiune apă OK"
+      "title": "Presiune ap\u0103 OK"
     },
     "internet_speed_mbps": {
       "type": "number",
-      "title": "Viteză internet (Mbps)"
+      "title": "Vitez\u0103 internet (Mbps)"
     },
     "metro_distance_min": {
       "type": "number",
@@ -270,15 +270,15 @@
         "verificasa_guarantee"
       ],
       "default": "standard",
-      "title": "Opțiune garanție"
+      "title": "Op\u021biune garan\u021bie"
     },
     "monthly_utilities_estimate": {
       "type": "number",
-      "title": "Estimare utilități/lună"
+      "title": "Estimare utilit\u0103\u021bi/lun\u0103"
     },
     "maintenance_fee": {
       "type": "number",
-      "title": "Întreținere/lună"
+      "title": "\u00centre\u021binere/lun\u0103"
     },
     "price_fairness": {
       "type": "string",
@@ -287,17 +287,17 @@
         "corect",
         "peste_medie"
       ],
-      "title": "Corectitudine preț"
+      "title": "Corectitudine pre\u021b"
     },
     "commission_free": {
       "type": "boolean",
       "default": false,
-      "title": "Fără comision"
+      "title": "F\u0103r\u0103 comision"
     },
     "reserve_instant": {
       "type": "boolean",
       "default": false,
-      "title": "Rezervare instantă"
+      "title": "Rezervare instant\u0103"
     },
     "is_swap_available": {
       "type": "boolean",
@@ -317,7 +317,7 @@
     "external_inspection_pending": {
       "type": "boolean",
       "default": false,
-      "title": "Inspecție externă în curs"
+      "title": "Inspec\u021bie extern\u0103 \u00een curs"
     },
     "poster_plan": {
       "type": "string",
@@ -329,14 +329,6 @@
       "title": "Planul postatorului (denormalizat, scris doar server-side)"
     },
     "poster_plan_override": {
-      // EXISTA IN SCHEMA DEPLOYATA dar lipsea din fisierul asta: citit peste
-      // REST, 10 anunturi il poarta chiar acum. resolvePropertyPlan il ia
-      // INAINTEA lui poster_plan, deci el decide randurile de pe prima pagina
-      // pentru datele de demonstratie. Se scrie DOAR de mana, din panoul
-      // Base44 - niciun rand de cod din aplicatie nu il atinge.
-      //
-      // E declarat aici ca sa nu dispara: un push de schema din repo peste
-      // schema deployata l-ar fi sters, si odata cu el toate suprascrierile.
       "type": "string",
       "enum": [
         "basic",
@@ -348,17 +340,17 @@
     "boost_active": {
       "type": "boolean",
       "default": false,
-      "title": "Boost activ"
+      "title": "Boost activ (adev\u0103rat c\u00e2t timp exist\u0103 cel pu\u021bin un grup Boost cu status=active)"
     },
     "boost_ends_date": {
       "type": "string",
       "format": "date-time",
-      "title": "Boost expira la (nefolosit - boost-urile nu expira)"
+      "title": "Cea mai \u00eendep\u0103rtat\u0103 expirare dintre grupurile de boost active (informativ, pentru afi\u0219aj)"
     },
     "boost_count": {
       "type": "number",
       "default": 0,
-      "title": "Cate boost-uri are anuntul (se aduna, nu expira)"
+      "title": "C\u00e2te boost-uri active are anun\u021bul ACUM (23.08: scade c\u00e2nd fiecare grup expir\u0103 dup\u0103 21 de zile, nu mai e istoric)"
     },
     "tour_3d_set_date": {
       "type": "string",
