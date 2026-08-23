@@ -476,10 +476,12 @@ export default function Admin() {
           ) : tab === "date" ? (
             <div className="space-y-4">
               <AdminDataCleanup onDone={load} />
-              <AdminPlanSync />
             </div>
           ) : tab === "planuri" ? (
-            <AdminPlansPricing canEdit={isSuper || user?.role === "admin"} />
+            <div className="space-y-4">
+              <AdminPlansPricing canEdit={isSuper || user?.role === "admin"} />
+              <AdminPlanSync />
+            </div>
           ) : tab === "loguri" ? (
             <PropertyLogs properties={properties || []} audit={audit || []} comments={comments || []} inquiries={inquiries || []} />
 
