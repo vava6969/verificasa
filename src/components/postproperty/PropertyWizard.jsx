@@ -14,6 +14,7 @@ import { callFnQuiet } from "@/lib/serverCall";
 import { fetchMyActiveSubscription } from "@/lib/subscriptions";
 import { fetchBoostBalance, applyBoost } from "@/lib/boosts";
 import { fetchTourStatus, setTourUrl as saveTourUrl } from "@/lib/tours";
+import { createNotification } from "@/lib/notifications";
 import {
   EMPTY_FORM, MIN_PHOTOS, MAX_PHOTOS, MIN_FEATURES, buildPropertyPayload,
 } from "@/lib/propertyPayload";
@@ -158,6 +159,9 @@ export default function PropertyWizard({ onDone, onCancel }) {
 
     // Limitele planului se verifică server-side înainte de publicare — altfel
     // planurile vând „1 anunț activ" fără ca nimic să îl impună.
+    // `slotsLeftBefore` ține locurile rămase înainte de acest anunț — folosit
+    // mai jos ca să știm dacă tocmai s-a ocupat ultimul loc din plan.
+    let slotsLeftBefore = null;
     if (!isAdmin) {
       try {
         const res = await base44.functions.invoke("CheckListingAllowance", { photo_count: imagesCount });
@@ -170,6 +174,7 @@ export default function PropertyWizard({ onDone, onCancel }) {
           });
           throw new Error("allowance");
         }
+        slotsLeftBefore = typeof data.remaining === "number" ? data.remaining : null;
       } catch (e) {
         if (e?.message === "allowance") throw e;
         // O eroare de rețea nu trebuie să blocheze publicarea — limita rămâne
@@ -220,6 +225,18 @@ export default function PropertyWizard({ onDone, onCancel }) {
       base44.functions.invoke("NotifyAdminsOnNewProperty", {
         property_id: created.id, title: form.title, owner_name: form.owner_name || "",
       }).catch(() => {});
+    }
+
+    // Notificare in-app la epuizare (cererea clientului, 23.08): dacă mai era
+    // UN singur loc înainte de acest anunț, acum locurile din plan s-au terminat.
+    if (!isAdmin && slotsLeftBefore === 1 && user?.id) {
+      createNotification({
+        userId: user.id,
+        type: "system",
+        text: "Ai folosit toate locurile de anunț din planul tău.",
+        link: "/account",
+        actorName: "VerifiCasa",
+      });
     }
     callFnQuiet("ComputeTrustScore", { property_id: created.id });
     toast(isAdmin
