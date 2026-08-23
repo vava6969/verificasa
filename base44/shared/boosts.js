@@ -43,6 +43,25 @@ export async function addCredits(svc, { userId, delta, reason, sourceId, note })
     balance_after: after,
     note: (note || "").slice(0, 300),
   });
+
+  // Notificare in-app la epuizare (cererea clientului, 23.08): doar la o
+  // CHELTUIALĂ care lasă soldul pe 1 sau pe 0 — nu la achiziție/bonus/plan_grant,
+  // altfel omul e anunțat că "mai are 1" chiar când tocmai a cumpărat unul singur.
+  if (reason === "spend" && delta < 0 && after >= 0 && after <= 1) {
+    try {
+      await svc.entities.Notification.create({
+        user_id: userId,
+        type: "system",
+        text: after === 0
+          ? "Ai folosit ultimul boost din cont. Cumpără mai multe din Contul meu."
+          : "Ți-a mai rămas un singur boost în cont.",
+        link: "/account",
+        actor_name: "VerifiCasa",
+        read: false,
+      });
+    } catch (_) { /* best-effort — nu blocăm promovarea pentru o notificare picătă */ }
+  }
+
   return after;
 }
 
