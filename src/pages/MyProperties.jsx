@@ -208,7 +208,7 @@ export default function MyProperties() {
             return (
               <RevealItem key={p.id}>
                 <article className="rounded-2xl border border-border bg-card p-3 shadow-sm transition-shadow hover:shadow-md sm:p-4">
-                  <div className="flex gap-3 sm:gap-4">
+                  <Link to={`/property/${p.id}`} className="flex gap-3 sm:gap-4">
                     <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-secondary sm:h-28 sm:w-40">
                       {cover ? (
                         <UIImage src={cover} alt={p.title || ""} fittingType="fill" className="h-full w-full object-cover" />
@@ -239,7 +239,7 @@ export default function MyProperties() {
                         </span>
                       </div>
                     </div>
-                  </div>
+                  </Link>
 
                   <div className="mt-3 grid grid-cols-3 gap-2 sm:mt-4 sm:flex sm:justify-end">
                     <Button
