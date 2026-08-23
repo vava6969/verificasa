@@ -6,7 +6,7 @@ import { addCredits } from "../../shared/boosts.js";
 // credite de boost (registrul BoostCredit). NU schimbă planul utilizatorului.
 // Permis TUTUROR rolurilor de admin (ADMIN are drept de grant, nu de editare
 // a planurilor globale — aceea e treabă de SUPER_ADMIN).
-const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN", "ADMIN"];
+const ADMIN_ROLES = ["SUPER_ADMIN", "ADMIN"];
 
 export default async function (req: Request): Promise<Response> {
   try {
