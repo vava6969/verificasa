@@ -1,5 +1,6 @@
 import { secrets } from "base44:runtime";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { getStripeKey } from "../../shared/stripeKey.js";
 
 // Creează o sesiune Stripe Checkout (mod abonament) pentru planul + intervalul
 // cerut din pagina „Planuri Upgrade” și returnează URL-ul de plată către care
@@ -25,15 +26,23 @@ export default async function (req: Request): Promise<Response> {
     // non-2xx și mesajul nostru detaliat nu mai ajunge la utilizator.
     if (!me?.id) return Response.json({ error: "Trebuie să fii autentificat." });
 
-    const secretKey = secrets.get("StripeSecretKey");
+    const secretKey = getStripeKey(secrets);
     if (!secretKey) {
-      return Response.json({ error: "Plățile nu sunt configurate încă — lipsește secretul StripeSecretKey." });
+      return Response.json({ error: "Plățile nu sunt configurate încă — lipsește cheia Stripe." });
     }
 
     let body: any = {};
     try { body = await req.json(); } catch (_) { body = {}; }
     const { plan_id, interval } = body || {};
-    const priceId = PRICE_MAP[plan_id]?.[interval];
+    // Price ID-ul curent vine din PlanConfig — la o schimbare de preț din
+    // Admin, AdminUpdatePlanConfig rotește prețul în Stripe și scrie aici noul
+    // ID, deci checkout-ul folosește instant prețul nou. PRICE_MAP e fallback.
+    let priceId = PRICE_MAP[plan_id]?.[interval] || "";
+    try {
+      const rows = await base44.asServiceRole.entities.PlanConfig.filter({ plan_id }, "-updated_date", 1);
+      const dbId = interval === "yearly" ? rows?.[0]?.stripe_price_yearly_id : rows?.[0]?.stripe_price_monthly_id;
+      if (dbId) priceId = dbId;
+    } catch (_) { /* fallback pe PRICE_MAP */ }
     if (!priceId) {
       return Response.json({ error: "Plan sau interval de facturare necunoscut." });
     }

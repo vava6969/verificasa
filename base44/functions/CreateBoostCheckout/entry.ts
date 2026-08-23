@@ -1,6 +1,7 @@
 import { secrets } from "base44:runtime";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 import { BOOST_PACKS } from "../../shared/boosts.js";
+import { getStripeKey } from "../../shared/stripeKey.js";
 
 // Sesiune Stripe Checkout pentru un pachet de boost-uri. Spre deosebire de
 // planuri, aici e mode=payment (plată unică), nu subscription.
@@ -14,13 +15,27 @@ export default async function (req: Request): Promise<Response> {
     const me = await base44.auth.me().catch(() => null);
     if (!me?.id) return Response.json({ error: "Trebuie să fii autentificat." });
 
-    const secretKey = secrets.get("StripeSecretKey");
+    const secretKey = getStripeKey(secrets);
     if (!secretKey) return Response.json({ error: "Plățile nu sunt configurate încă." });
 
     let body: any = {};
     try { body = await req.json(); } catch (_) { body = {}; }
     const packId = body?.pack_id;
-    const pack = (BOOST_PACKS as any)[packId];
+    // Pachetul curent vine din BoostPackConfig (editabil din Admin → Planuri &
+    // Prețuri) — prețul schimbat de admin e live la următorul checkout.
+    // BOOST_PACKS static rămâne fallback.
+    let pack: any = (BOOST_PACKS as any)[packId];
+    try {
+      const rows = await base44.asServiceRole.entities.BoostPackConfig.filter({ pack_id: packId }, "-updated_date", 1);
+      if (rows?.[0]) {
+        if (rows[0].active === false) return Response.json({ error: "Acest pachet nu mai este disponibil." });
+        pack = {
+          boosts: Number(rows[0].boosts) || 1,
+          priceRon: Number(rows[0].price_ron) || 0,
+          label: Number(rows[0].boosts) === 1 ? "1 boost" : `${rows[0].boosts} boost-uri`,
+        };
+      }
+    } catch (_) { /* fallback pe BOOST_PACKS */ }
     if (!pack) return Response.json({ error: "Pachet de boost necunoscut." });
 
     const origin = req.headers.get("origin") || req.headers.get("referer") || "https://verificasa.ro";

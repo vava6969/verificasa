@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { getEntitlements, getActivePlan, countActiveListings, MAX_PHOTOS_PER_LISTING } from "../../shared/entitlements.js";
+import { getActivePlan, countActiveListings, MAX_PHOTOS_PER_LISTING } from "../../shared/entitlements.js";
+import { getPlanLimits, getUserExtras } from "../../shared/planConfig.js";
 
 // Verifică server-side dacă utilizatorul mai are voie să publice un anunț și
 // câte fotografii poate încărca. Planurile vindeau „1 anunț activ" / „până la 5"
@@ -20,19 +21,23 @@ export default async function (req: Request): Promise<Response> {
 
     const svc = base44.asServiceRole;
     const planId = await getActivePlan(svc, me.id);
-    const ent = getEntitlements(planId);
+    // Limitele vin din PlanConfig (editabil din Admin → Planuri & Prețuri),
+    // plus extra-limitele acordate manual acestui utilizator (UserOverride).
+    const ent = await getPlanLimits(svc, planId);
+    const extras = await getUserExtras(svc, me.id);
+    const limit = ent.activeListings === null ? null : ent.activeListings + extras.extraListings;
     const used = await countActiveListings(svc, me.id, excludeId);
 
-    const listingsOk = ent.activeListings === null || used < ent.activeListings;
+    const listingsOk = limit === null || used < limit;
     // Fotografiile nu mai depind de plan (23.08) — limita e flat, aceeași
     // pentru toată lumea, indiferent dacă are abonament sau nu.
     const photosOk = photoCount <= MAX_PHOTOS_PER_LISTING;
 
     let error: string | null = null;
     if (!listingsOk) {
-      error = ent.activeListings === 1
+      error = limit === 1
         ? "Planul tău permite un singur anunț activ. Dezactivează anunțul curent sau treci pe un plan superior."
-        : `Planul tău permite ${ent.activeListings} anunțuri active, iar tu ai deja ${used}.`;
+        : `Planul tău permite ${limit} anunțuri active, iar tu ai deja ${used}.`;
     } else if (!photosOk) {
       error = `Poți încărca maximum ${MAX_PHOTOS_PER_LISTING} fotografii per anunț.`;
     }
@@ -43,9 +48,9 @@ export default async function (req: Request): Promise<Response> {
       error,
       plan_id: planId,
       used,
-      limit_listings: ent.activeListings,
+      limit_listings: limit,
       limit_photos: MAX_PHOTOS_PER_LISTING,
-      remaining: ent.activeListings === null ? null : Math.max(0, ent.activeListings - used),
+      remaining: limit === null ? null : Math.max(0, limit - used),
     });
   } catch (e: any) {
     return Response.json({ error: e?.message || "Eroare la verificarea limitelor." });

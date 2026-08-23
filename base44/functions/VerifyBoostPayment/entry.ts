@@ -18,7 +18,7 @@ export default async function (req: Request): Promise<Response> {
     const piId = typeof body?.payment_intent_id === "string" ? body.payment_intent_id : "";
     if (!piId) return Response.json({ error: "payment_intent_id lipsă." });
 
-    const secretKey = secrets.get("StripeSecretKey");
+    const secretKey = secrets.get("StripeSecretKey") || secrets.get("StripePaymentMethodVC");
     if (!secretKey) return Response.json({ error: "Plățile nu sunt configurate încă." });
 
     const svc = base44.asServiceRole;

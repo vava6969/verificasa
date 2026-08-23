@@ -11,7 +11,8 @@ import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
 import { base44 } from "@/api/base44Client";
 import { Reveal as HouseReveal } from "@/components/ui/reveal";
-import { PLANS, FREE_PLAN, BOOST_PACKS, boostUnitPrice, featureText } from "@/lib/plans";
+import { boostUnitPrice, featureText } from "@/lib/plans";
+import { usePlanConfigs } from "@/hooks/usePlanConfigs";
 
 // ---------------------------------------------------------------------------
 // Pagina de planuri, în forma cerută de client: cardurile albastre cu insignă
@@ -146,7 +147,9 @@ function SoonTag({ en }) {
 // `free` schimbă subsolul cardului: planul gratuit nu se cumpără, deci nu
 // primește un buton de plată care ar deschide un checkout gol.
 function PlanCard({ plan, annual, onSelect, checkingOut, en, free = false }) {
-  const popular = plan.id === "pro";
+  // Eticheta poate fi setată din Admin → Planuri & Prețuri (custom_tag);
+  // fallback-ul istoric marchează Pro drept „Popular".
+  const popular = plan.tag ? true : plan.id === "pro";
   const price = annual ? plan.yearly : plan.monthly;
   const decimals = price % 1 !== 0;
   const icons = FEATURE_ICONS[plan.id] || [];
@@ -214,7 +217,7 @@ function PlanCard({ plan, annual, onSelect, checkingOut, en, free = false }) {
           )}
           {popular && (
             <span className="order-2 ml-auto shrink-0 rounded-full bg-emerald px-3 py-1 text-sm font-semibold text-white sm:order-3">
-              Popular
+              {plan.tag || "Popular"}
             </span>
           )}
           <h3 className="order-3 w-full text-xl font-bold text-gray-900 dark:text-white sm:order-2 sm:w-auto sm:min-w-0 sm:text-[1.75rem]">
@@ -405,6 +408,9 @@ export default function PlanuriUpgrade() {
   const { lang } = useCountry();
   const navigate = useNavigate();
   const en = lang === "en";
+  // Planurile și pachetele dinamice — configurate din Admin, cu fallback pe
+  // valorile statice; realtime, deci o salvare din admin se vede pe loc aici.
+  const { plans, freePlan, boostPacks } = usePlanConfigs();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -479,7 +485,7 @@ export default function PlanuriUpgrade() {
     }
   };
 
-  const cheapestUnit = Math.min(...BOOST_PACKS.map(boostUnitPrice));
+  const cheapestUnit = Math.min(...boostPacks.map(boostUnitPrice));
 
   return (
     <div className="relative mx-auto min-h-screen overflow-hidden bg-neutral-100 px-4 pb-24 pt-6 dark:bg-neutral-950 sm:pt-20">
@@ -527,7 +533,7 @@ export default function PlanuriUpgrade() {
             pagină. Pe telefon una sub alta, două pe tabletă, patru de la lg în
             sus — la md patru carduri de plan devin coloane de 170px. */}
         <div className="mx-auto mt-2 grid max-w-7xl grid-cols-1 gap-4 py-5 sm:mt-6 sm:grid-cols-2 sm:py-8 lg:grid-cols-4">
-          {[FREE_PLAN, ...PLANS].map((plan, i) => (
+          {[freePlan, ...plans].map((plan, i) => (
             <Reveal key={plan.id} as="div" index={3 + i} className="h-full">
               <PlanCard
                 plan={plan}
@@ -535,7 +541,7 @@ export default function PlanuriUpgrade() {
                 onSelect={selectPlan}
                 checkingOut={checkingOut}
                 en={en}
-                free={plan.id === FREE_PLAN.id}
+                free={plan.id === "none"}
               />
             </Reveal>
           ))}
@@ -555,7 +561,7 @@ export default function PlanuriUpgrade() {
           </div>
 
           <div className="grid grid-cols-2 gap-4 pt-3 lg:grid-cols-4">
-            {BOOST_PACKS.map((pack, i) => (
+            {boostPacks.map((pack, i) => (
               <Reveal key={pack.id} as="div" index={2 + i} className="h-full">
                 <BoostCard
                   pack={pack}

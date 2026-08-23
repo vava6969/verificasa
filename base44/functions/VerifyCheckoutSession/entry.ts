@@ -1,7 +1,8 @@
 import { secrets } from "base44:runtime";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { getEntitlements } from "../../shared/entitlements.js";
+import { getPlanLimits } from "../../shared/planConfig.js";
 import { addCredits } from "../../shared/boosts.js";
+import { getStripeKey } from "../../shared/stripeKey.js";
 
 // Verifică server-side o sesiune Stripe Checkout finalizată (după redirectul de
 // succes din CreateCheckoutSession) și salvează abonamentul rezultat pe entitatea
@@ -29,9 +30,9 @@ export default async function (req: Request): Promise<Response> {
     const sessionId = body?.session_id;
     if (!sessionId) return Response.json({ error: "session_id lipsă." });
 
-    const secretKey = secrets.get("StripeSecretKey");
+    const secretKey = getStripeKey(secrets);
     if (!secretKey) {
-      return Response.json({ error: "Plățile nu sunt configurate încă — lipsește secretul StripeSecretKey." });
+      return Response.json({ error: "Plățile nu sunt configurate încă — lipsește cheia Stripe." });
     }
 
     const svc = base44.asServiceRole;
@@ -118,7 +119,9 @@ export default async function (req: Request): Promise<Response> {
     // Stripe nu trec prin nicio functie a aplicatiei (nu exista webhook), deci
     // luna a doua nu mai crediteaza nimic. Ca sa fie lunar, e nevoie de un
     // webhook pe `invoice.paid` care sa reia acest bloc.
-    const ent = getEntitlements(planId);
+    // Numărul de boost-uri incluse vine din PlanConfig (editabil din Admin),
+    // cu fallback pe matricea statică.
+    const ent = await getPlanLimits(svc, planId);
     if (ent.boostsIncluded > 0) {
       try {
         await addCredits(svc, {
