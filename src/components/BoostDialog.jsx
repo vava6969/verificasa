@@ -17,12 +17,19 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
   const { lang } = useCountry();
   const { toast } = useToast();
   const [pending, setPending] = useState(false);
+  const [qty, setQty] = useState(1);
   const en = lang === "en";
 
   const hasCredits = balance >= 1;
   // Boost-urile se adună pe același anunț și nu expiră: al doilea nu prelungește
   // nimic, urcă anunțul mai sus în categoria lui.
   const have = boostCount(property);
+
+  // Cantitatea se reseteză la 1 de fiecare dată când dialogul se redeschide pe
+  // un alt anunț, ca să nu rămână "lipită" o valoare de la promovarea anterioară.
+  React.useEffect(() => { if (open) setQty(1); }, [open, property?.id]);
+
+  const clampQty = (n) => Math.max(1, Math.min(50, Math.min(balance || 1, n)));
 
   // Sold zero: cumperi UNUL, pentru ACEST anunț, dintr-o singură apăsare.
   // Backendul pune property_id în metadata sesiunii Stripe, iar
@@ -49,12 +56,14 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
   const confirm = async () => {
     if (!property?.id || pending) return;
     setPending(true);
-    const res = await applyBoost(property.id);
+    const res = await applyBoost(property.id, qty);
     setPending(false);
     if (res.ok) {
       toast({
         title: en ? "Listing promoted" : "Anunț promovat",
-        description: en ? `Visible until ${untilLabel}.` : `Vizibil până la ${untilLabel}.`,
+        description: en
+          ? `${qty} boost${qty === 1 ? "" : "s"} applied.`
+          : `${qty} boost${qty === 1 ? "" : "-uri"} aplicat${qty === 1 ? "" : "e"}.`,
       });
       onOpenChange(false);
       onDone?.(res);
@@ -103,20 +112,48 @@ export default function BoostDialog({ open, onOpenChange, property, balance, onD
         )}
 
         {hasCredits && (
-          <dl className="space-y-2 rounded-2xl bg-secondary/60 px-4 py-3">
-            {[
-              [en ? "Listing" : "Anunț", property?.title || "—"],
-              [en ? "Cost" : "Cost", en ? "1 boost" : "1 boost"],
-              [en ? "Balance after" : "Sold rămas", String(Math.max(0, balance - 1))],
-              [en ? "Boosts after" : "Boost-uri după", String(have + 1)],
-              [en ? "Lasts" : "Durează", en ? "as long as the listing is up" : "cât timp anunțul e publicat"],
-            ].map(([label, value]) => (
-              <div key={label} className="flex items-baseline justify-between gap-4">
-                <dt className="text-sm text-muted-foreground">{label}</dt>
-                <dd className="truncate text-right text-sm font-semibold text-foreground">{value}</dd>
+          <>
+            <div className="flex items-center justify-between gap-4 rounded-2xl bg-secondary/60 px-4 py-3">
+              <span className="text-sm font-semibold text-foreground">
+                {en ? "How many boosts?" : "Câte boost-uri?"}
+              </span>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setQty((q) => clampQty(q - 1))}
+                  disabled={qty <= 1}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-lg font-bold disabled:opacity-40"
+                  aria-label={en ? "Fewer" : "Mai puține"}
+                >
+                  −
+                </button>
+                <span className="w-6 text-center text-base font-bold tnum">{qty}</span>
+                <button
+                  type="button"
+                  onClick={() => setQty((q) => clampQty(q + 1))}
+                  disabled={qty >= balance}
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-lg font-bold disabled:opacity-40"
+                  aria-label={en ? "More" : "Mai multe"}
+                >
+                  +
+                </button>
               </div>
-            ))}
-          </dl>
+            </div>
+            <dl className="space-y-2 rounded-2xl bg-secondary/60 px-4 py-3">
+              {[
+                [en ? "Listing" : "Anunț", property?.title || "—"],
+                [en ? "Cost" : "Cost", en ? `${qty} boost${qty === 1 ? "" : "s"}` : `${qty} boost${qty === 1 ? "" : "-uri"}`],
+                [en ? "Balance after" : "Sold rămas", String(Math.max(0, balance - qty))],
+                [en ? "Boosts after" : "Boost-uri după", String(have + qty)],
+                [en ? "Lasts" : "Durează", en ? "as long as the listing is up" : "cât timp anunțul e publicat"],
+              ].map(([label, value]) => (
+                <div key={label} className="flex items-baseline justify-between gap-4">
+                  <dt className="text-sm text-muted-foreground">{label}</dt>
+                  <dd className="truncate text-right text-sm font-semibold text-foreground">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </>
         )}
 
         <AlertDialogFooter>
