@@ -6,17 +6,23 @@
 // importă de aici se deployează împreună.
 //
 // Matricea cerută de client pe 22.08.2026. Ce e impus de aici:
-//   activeListings, photosPerListing — CheckListingAllowance, la publicare.
-//   boostsIncluded — VerifyCheckoutSession creditează registrul BoostCredit la
+//   activeListings   — CheckListingAllowance, la publicare.
+//   boostsIncluded   — VerifyCheckoutSession creditează registrul BoostCredit la
 //                    activarea abonamentului.
 //   tours3d, verifications — deocamdată doar afișaj (nu există contor de tururi
 //                    și nici de verificări; verificarea o face manual un admin).
+//
+// Fotografiile NU mai variază pe plan (decizia clientului, 23.08): oricine
+// poate posta poze, limita e flat 20/anunț pentru toată lumea. Vezi
+// MAX_PHOTOS_PER_LISTING mai jos — impus în CheckListingAllowance, nu aici.
+// Trebuie să rămână identic cu MAX_PHOTOS din src/lib/propertyPayload.js.
+export const MAX_PHOTOS_PER_LISTING = 20;
 
 export const ENTITLEMENTS = {
-  none:  { activeListings: 1,  photosPerListing: 8,    tours3d: 0,  boostsIncluded: 0,  verifications: 1, priorityWeight: 0 },
-  basic: { activeListings: 2,  photosPerListing: 15,   tours3d: 2,  boostsIncluded: 2,  verifications: 1, priorityWeight: 1 },
-  pro:   { activeListings: 3,  photosPerListing: 30,   tours3d: 3,  boostsIncluded: 3,  verifications: 1, priorityWeight: 2 },
-  agent: { activeListings: 30, photosPerListing: null, tours3d: 30, boostsIncluded: 45, verifications: 1, priorityWeight: 3 },
+  none:  { activeListings: 1,  tours3d: 0,  boostsIncluded: 0,  verifications: 1, priorityWeight: 0 },
+  basic: { activeListings: 2,  tours3d: 2,  boostsIncluded: 2,  verifications: 1, priorityWeight: 1 },
+  pro:   { activeListings: 3,  tours3d: 3,  boostsIncluded: 3,  verifications: 1, priorityWeight: 2 },
+  agent: { activeListings: 30, tours3d: 30, boostsIncluded: 45, verifications: 1, priorityWeight: 3 },
 };
 
 export function getEntitlements(planId) {
