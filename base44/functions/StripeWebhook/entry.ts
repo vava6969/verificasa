@@ -1,7 +1,8 @@
 import { secrets } from "base44:runtime";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 import { sendVC, getUserById, APP_URL } from "../../shared/email.js";
-import { stampPosterPlan } from "../../shared/entitlements.js";
+import { stampPosterPlan, getEntitlements } from "../../shared/entitlements.js";
+import { addCredits } from "../../shared/boosts.js";
 
 // Webhook Stripe — singurul loc unde aplicația AFLĂ ce se întâmplă cu un
 // abonament DUPĂ prima plată (reînnoiri, anulări, plăți eșuate). Până acum
@@ -21,9 +22,15 @@ import { stampPosterPlan } from "../../shared/entitlements.js";
 //                                  current_period_end. Dacă abonamentul era
 //                                  cancelled/expired și tocmai s-a replătit,
 //                                  redevine active și badge-ul reapare.
-//                                  NU re-acordă boost-urile incluse — rămân
-//                                  O SINGURĂ DATĂ, la fel ca până acum (decizie
-//                                  nemodificată; discutăm separat dacă se schimbă).
+//                                  Reînnoirile REALE (billing_reason =
+//                                  subscription_cycle în Stripe, nu prima
+//                                  factură) recreditează boostsIncluded din
+//                                  plan (decizia clientului, 23.08: "de
+//                                  fiecare dată când cineva reînnoiește,
+//                                  primește un recharge la tot ce conține
+//                                  planul"). Prima factură e deja acoperită
+//                                  de VerifyCheckoutSession, deci nu se
+//                                  dublează aici.
 //   customer.subscription.updated — dacă status-ul Stripe e canceled/unpaid/
 //                                  past_due: badge-ul dispare + email.
 //   customer.subscription.deleted — abonamentul s-a încheiat definitiv:
@@ -134,6 +141,25 @@ export default async function (req: Request): Promise<Response> {
       if (sub.status !== "active") {
         await stampPosterPlan(svc, sub.user_id, sub.plan_id);
       }
+
+      // Reînnoire REALĂ (nu prima factură a abonamentului, care trece deja
+      // prin VerifyCheckoutSession) — recreditează boost-urile incluse în plan.
+      // Idempotent pe id-ul facturii Stripe, ca un retry de webhook să nu
+      // crediteze de două ori.
+      const billingReason = obj.billing_reason || "";
+      if (billingReason === "subscription_cycle" && obj.id) {
+        const already = await svc.entities.BoostCredit.filter({ source_id: obj.id }, "-created_date", 1);
+        if (!already.length) {
+          const ent = getEntitlements(sub.plan_id);
+          if (ent?.boostsIncluded) {
+            await addCredits(svc, {
+              userId: sub.user_id, delta: ent.boostsIncluded, reason: "plan_grant",
+              sourceId: obj.id, note: `Reînnoire ${sub.plan_id}`,
+            });
+          }
+        }
+      }
+
       return Response.json({ ok: true, event: "invoice.paid" });
     }
 
