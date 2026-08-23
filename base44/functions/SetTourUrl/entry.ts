@@ -110,7 +110,26 @@ export default async function (req: Request): Promise<Response> {
       tour_3d_set_date: new Date().toISOString(),
     });
 
-    return Response.json({ ok: true, remaining: Math.max(0, gate.remaining - 1) });
+    const remainingAfter = Math.max(0, gate.remaining - 1);
+
+    // Notificare in-app la epuizare (cererea clientului, 23.08): la 1 sau la
+    // 0 tururi rămase din cotă, după ce tocmai s-a folosit unul.
+    if (!isAdmin && remainingAfter <= 1) {
+      try {
+        await svc.entities.Notification.create({
+          user_id: p.created_by_id,
+          type: "system",
+          text: remainingAfter === 0
+            ? "Ai folosit toate tururile 3D din planul tău."
+            : "Ți-a mai rămas un singur tur 3D din planul tău.",
+          link: "/upgrade",
+          actor_name: "VerifiCasa",
+          read: false,
+        });
+      } catch (_) { /* best-effort */ }
+    }
+
+    return Response.json({ ok: true, remaining: remainingAfter });
   } catch (e: any) {
     return Response.json({ error: e?.message || String(e) });
   }
