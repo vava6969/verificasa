@@ -17,7 +17,7 @@
     },
     "recipient_id": {
       "type": "string",
-      "title": "Destinatar (ID) — pentru RLS pe citire"
+      "title": "Destinatar (ID) \u2014 pentru RLS pe citire"
     },
     "content": {
       "type": "string",
@@ -63,24 +63,6 @@
     "sender_id",
     "content"
   ],
-  // RLS in doi pasi, deliberat.
-  //
-  // PASUL 1 (acesta): `create` e inchis. Era `null`, adica oricine, inclusiv un
-  // apelant anonim pe REST, putea scrie mesaje in orice conversatie.
-  // `created_by_id` acopera si mesajul de sistem, care pleaca cu
-  // sender_id: "system" dar e creat de utilizatorul logat.
-  //
-  // PASUL 2 (dupa publish + backfill): `read` si `update` raman deocamdata
-  // deschise INTENTIONAT. Message nu are decat `sender_id` — nu exista camp
-  // care sa spuna cine e destinatarul, deci orice regula de citire scrisa azi
-  // ar ascunde mesajele chiar de la omul caruia ii sunt adresate, si ar rupe
-  // read_at (destinatarul stampileaza, nu expeditorul).
-  // `recipient_id` de mai sus e campul care lipsea. Ordinea obligatorie:
-  //   1. publish (campurile noi sunt inghitite tacut la `create` pana atunci),
-  //   2. backfill pe mesajele existente, care nu au recipient_id,
-  //   3. abia apoi read/update devin
-  //      {"$or":[{"data.sender_id":"{{user.id}}"},{"data.recipient_id":"{{user.id}}"}, ...admin]}.
-  // Inversarea ordinii scoate utilizatorii din propriul istoric.
   "rls": {
     "create": {
       "$or": [
@@ -92,8 +74,59 @@
         }
       ]
     },
-    "read": null,
-    "update": null,
+    "read": {
+      "$or": [
+        {
+          "data.sender_id": "{{user.id}}"
+        },
+        {
+          "data.recipient_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "ADMIN"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "SUPER_ADMIN"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.sender_id": "{{user.id}}"
+        },
+        {
+          "data.recipient_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "ADMIN"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "SUPER_ADMIN"
+          }
+        }
+      ]
+    },
     "delete": {
       "$or": [
         {
