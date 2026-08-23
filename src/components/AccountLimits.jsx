@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { useCountry } from "@/components/CountryContext";
 import { useToast } from "@/components/ui/use-toast";
 import { getEntitlements } from "@/lib/plans";
+import { MAX_PHOTOS } from "@/lib/propertyPayload";
 import { fetchMyActiveSubscription } from "@/lib/subscriptions";
 import { fetchBoostBalance, fetchActiveListingCount } from "@/lib/boosts";
 
@@ -124,12 +125,12 @@ export default function AccountLimits({ className = "" }) {
         />
         <AllowanceRow
           label={en ? "Photos per listing" : "Fotografii per anunț"}
-          value={
-            ent.photosPerListing === null
-              ? (en ? "Unlimited" : "Nelimitat")
-              : ent.photosPerListing
+          value={MAX_PHOTOS}
+          note={
+            en
+              ? "Same for every plan — applies to each listing separately."
+              : "La fel pentru orice plan — se aplică fiecărui anunț în parte."
           }
-          note={en ? "Applies to each listing separately." : "Se aplică fiecărui anunț în parte."}
         />
         {/* Tururile 3D sunt declarate, nu contorizate: aplicația de captură nu e
             livrată, deci nu există nimic de numărat. Rândul scrie cifra ȘI
