@@ -1,6 +1,7 @@
 import { secrets } from "base44:runtime";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 import { sendVC, getUserById, APP_URL } from "../../shared/email.js";
+import { stampPosterPlan } from "../../shared/entitlements.js";
 
 // Webhook Stripe — singurul loc unde aplicația AFLĂ ce se întâmplă cu un
 // abonament DUPĂ prima plată (reînnoiri, anulări, plăți eșuate). Până acum
@@ -27,6 +28,10 @@ import { sendVC, getUserById, APP_URL } from "../../shared/email.js";
 //                                  past_due: badge-ul dispare + email.
 //   customer.subscription.deleted — abonamentul s-a încheiat definitiv:
 //                                  badge-ul dispare + email.
+//
+// stampPosterPlan (pune/scoate poster_plan de pe anunțurile unui utilizator)
+// vine din shared/entitlements.js — aceeași funcție o folosește și
+// AdminGrantPlan, ca să nu existe două copii care se pot dezacorda.
 
 const STATUS_MAP: Record<string, string> = {
   active: "active",
@@ -59,26 +64,6 @@ async function verifyStripeSignature(payload: string, sigHeader: string, secret:
   let diff = 0;
   for (let i = 0; i < hex.length; i++) diff |= hex.charCodeAt(i) ^ v1.charCodeAt(i);
   return diff === 0;
-}
-
-// Pune sau scoate poster_plan de pe TOATE anunțurile unui singur utilizator —
-// versiunea „un singur user" a SyncPosterPlans, ca webhook-ul să nu aștepte
-// după o baleiere completă a tuturor proprietăților la fiecare eveniment.
-async function stampPosterPlan(svc: any, userId: string, planId: string | null) {
-  try {
-    const mine = await svc.entities.Property.filter({ created_by_id: userId }, "-created_date", 200);
-    const updates = (mine || [])
-      .filter((p: any) => (p.poster_plan || null) !== planId)
-      .map((p: any) => ({ id: p.id, poster_plan: planId }));
-    if (!updates.length) return;
-    try {
-      await svc.entities.Property.bulkUpdate(updates);
-    } catch (_) {
-      for (const u of updates) {
-        try { await svc.entities.Property.update(u.id, { poster_plan: u.poster_plan }); } catch (_) { /* best-effort */ }
-      }
-    }
-  } catch (_) { /* best-effort */ }
 }
 
 async function notifyLostPlan(base44: any, userId: string, planLabel: string, reason: "cancelled" | "unpaid") {
