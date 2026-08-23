@@ -1,5 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { getEntitlements, getActivePlan, countActiveListings } from "../../shared/entitlements.js";
+import { getEntitlements, getActivePlan, countActiveListings, MAX_PHOTOS_PER_LISTING } from "../../shared/entitlements.js";
 
 // Verifică server-side dacă utilizatorul mai are voie să publice un anunț și
 // câte fotografii poate încărca. Planurile vindeau „1 anunț activ" / „până la 5"
@@ -24,7 +24,9 @@ export default async function (req: Request): Promise<Response> {
     const used = await countActiveListings(svc, me.id, excludeId);
 
     const listingsOk = ent.activeListings === null || used < ent.activeListings;
-    const photosOk = ent.photosPerListing === null || photoCount <= ent.photosPerListing;
+    // Fotografiile nu mai depind de plan (23.08) — limita e flat, aceeași
+    // pentru toată lumea, indiferent dacă are abonament sau nu.
+    const photosOk = photoCount <= MAX_PHOTOS_PER_LISTING;
 
     let error: string | null = null;
     if (!listingsOk) {
@@ -32,7 +34,7 @@ export default async function (req: Request): Promise<Response> {
         ? "Planul tău permite un singur anunț activ. Dezactivează anunțul curent sau treci pe un plan superior."
         : `Planul tău permite ${ent.activeListings} anunțuri active, iar tu ai deja ${used}.`;
     } else if (!photosOk) {
-      error = `Planul tău permite ${ent.photosPerListing} fotografii per anunț.`;
+      error = `Poți încărca maximum ${MAX_PHOTOS_PER_LISTING} fotografii per anunț.`;
     }
 
     return Response.json({
@@ -42,7 +44,7 @@ export default async function (req: Request): Promise<Response> {
       plan_id: planId,
       used,
       limit_listings: ent.activeListings,
-      limit_photos: ent.photosPerListing,
+      limit_photos: MAX_PHOTOS_PER_LISTING,
       remaining: ent.activeListings === null ? null : Math.max(0, ent.activeListings - used),
     });
   } catch (e: any) {
