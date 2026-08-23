@@ -70,6 +70,17 @@ export default function Owner() {
 
   useEffect(() => { load(); }, [user?.id]);
 
+  // La fel ca în MyProperties.jsx: soldul de boost-uri e o entitate separată
+  // (BoostCredit), nu intră automat în niciun alt subscribe. Fără asta,
+  // promovarea din alt tab/pagină rămâne "în urmă" aici până la refresh manual.
+  useEffect(() => {
+    if (!user?.id) return undefined;
+    const unsub = base44.entities.BoostCredit.subscribe(() => {
+      fetchBoostBalance(user.id).then(setBalance);
+    });
+    return () => { try { unsub && unsub(); } catch { /* noop */ } };
+  }, [user?.id]);
+
   const en = lang === "en";
   const totalViews = (properties || []).reduce((a, p) => a + (p.views_count || 0), 0);
 
