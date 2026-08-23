@@ -152,13 +152,15 @@ export default function Owner() {
                 const approved = p.approval_status === "APPROVED";
                 return (
                 <div key={p.id} className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-soft sm:gap-4 sm:p-4">
-                  <div className="h-16 w-24 shrink-0 overflow-hidden rounded-xl bg-secondary">
-                    {p.images?.[0] ? <UIImage src={p.images[0]} fittingType="fill" className="h-full w-full" /> : null}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-heading font-bold text-navy line-clamp-1 dark:text-foreground">{p.title}</p>
-                    <p className="truncate text-xs text-muted-foreground">{p.zone}, {p.city} · {p.property_type}</p>
-                  </div>
+                  <Link to={`/property/${p.id}`} className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
+                    <div className="h-16 w-24 shrink-0 overflow-hidden rounded-xl bg-secondary">
+                      {p.images?.[0] ? <UIImage src={p.images[0]} fittingType="fill" className="h-full w-full" /> : null}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-heading font-bold text-navy line-clamp-1 dark:text-foreground">{p.title}</p>
+                      <p className="truncate text-xs text-muted-foreground">{p.zone}, {p.city} · {p.property_type}</p>
+                    </div>
+                  </Link>
                   <div className="flex w-full flex-wrap items-center gap-2 text-xs sm:w-auto sm:gap-3">
                     <span className="flex items-center gap-1 text-muted-foreground"><Eye className="h-3.5 w-3.5" /> {p.views_count || 0}</span>
                     <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${p.approval_status === "APPROVED" ? "bg-emerald-soft text-emerald" : "bg-gold-soft text-gold-deep"}`}>
