@@ -471,6 +471,20 @@ export default function MapSearch() {
     catch { return new Set(); }
   });
 
+  // Cheia CARTO pentru basemaps (ridică rate-limit-ul pe tile-urile gratuite).
+  // Lipsa ei nu strică harta: CDN-ul public cartocdn servește și fără ea.
+  const [mapKey, setMapKey] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await base44.functions.invoke("GetMapKey", {});
+        if (!cancelled && res?.key) setMapKey(res.key);
+      } catch { /* harta merge și fără cheie */ }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
   // Leaflet primește culori concrete, nu tokeni CSS — vezi useMapColors.
   const mapColors = useMapColors();
   const drawColor = mapColors.draw;
@@ -767,7 +781,7 @@ export default function MapSearch() {
             <TileLayer
               key="plan"
               className="vc-tiles-plan"
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+              url={`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${mapKey ? `?key=${mapKey}` : ""}`}
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
             />
           ) : (
