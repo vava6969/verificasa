@@ -781,7 +781,7 @@ export default function MapSearch() {
             <TileLayer
               key="plan"
               className="vc-tiles-plan"
-              url={`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${mapKey ? `?api_key=${mapKey}` : ""}`}
+              url={`https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${mapKey ? `?key=${mapKey}` : ""}`}
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
             />
           ) : (
