@@ -1239,10 +1239,13 @@ export const STR = {
   },
 };
 
-export function makeT(lang) {
+// `overrides` = texte schimbate din Admin → Texte site: { key: { ro, en } }.
+// Un text gol înseamnă „folosește textul din cod".
+export function makeT(lang, overrides = null) {
   const dict = STR[lang] || STR.ro;
   return (key, vars) => {
-    let s = dict[key] ?? STR.ro[key] ?? key;
+    const o = overrides?.[key];
+    let s = (o && o[lang]) || dict[key] || STR.ro[key] || key;
     if (vars) for (const k in vars) s = s.replace(`{${k}}`, vars[k]);
     return s;
   };

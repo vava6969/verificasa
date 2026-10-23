@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { Image as UIImage } from "@/components/ui/image";
-import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil, History, Flag, ClipboardCheck, Crown, Mail, Phone, Wrench, CreditCard } from "lucide-react";
+import { ShieldAlert, Check, X, Trash2, RefreshCw, Search, Users, ShieldCheck, Clock, ClipboardList, Building2, MessageSquare, FileText, Pencil, History, Flag, ClipboardCheck, Crown, Mail, Phone, Wrench, CreditCard, KeyRound, Languages } from "lucide-react";
 import PropertyEditForm from "@/components/PropertyEditForm";
 import PropertyLogs from "@/components/PropertyLogs";
 import AdminReports from "@/components/AdminReports";
@@ -15,6 +15,8 @@ import AdminStatCard from "@/components/AdminStatCard";
 import AdminDataCleanup from "@/components/AdminDataCleanup";
 import AdminPlanSync from "@/components/AdminPlanSync";
 import AdminPlansPricing from "@/components/admin/AdminPlansPricing";
+import AdminIntegrations from "@/components/admin/AdminIntegrations";
+import SiteTextEditor from "@/components/admin/SiteTextEditor";
 import { callFn, callFnQuiet } from "@/lib/serverCall";
 import InspectionContactModal from "@/components/InspectionContactModal";
 import { useLoadMore } from "@/hooks/useLoadMore";
@@ -289,6 +291,8 @@ export default function Admin() {
     { k: "comments", label: "Comentarii",          icon: MessageSquare },
     { k: "audit",    label: "Audit log",           icon: FileText },
     { k: "planuri",  label: "Planuri & Prețuri",   icon: CreditCard },
+    { k: "texte",    label: "Texte site",          icon: Languages },
+    ...(isSuper || user?.role === "admin" ? [{ k: "integrari", label: "Integrări & chei API", icon: KeyRound }] : []),
     { k: "loguri",   label: "Loguri proprietate",  icon: History },
     { k: "date",     label: "Curățare date",       icon: Wrench },
   ];
@@ -482,6 +486,10 @@ export default function Admin() {
               <AdminPlansPricing canEdit={isSuper || user?.role === "admin"} />
               <AdminPlanSync />
             </div>
+          ) : tab === "texte" ? (
+            <SiteTextEditor />
+          ) : tab === "integrari" ? (
+            <AdminIntegrations canEdit={isSuper || user?.role === "admin"} />
           ) : tab === "loguri" ? (
             <PropertyLogs properties={properties || []} audit={audit || []} comments={comments || []} inquiries={inquiries || []} />
 

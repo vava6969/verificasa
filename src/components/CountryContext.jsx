@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useMemo, useState, useCallback, useEffect } from "react";
 import { makeT } from "@/i18n";
+import { base44 } from "@/api/base44Client";
 
 const CountryContext = createContext(null);
 
@@ -61,7 +62,21 @@ export function CountryProvider({ children }) {
     [convert, currency]
   );
 
-  const t = useMemo(() => makeT(lang), [lang]);
+  // Texte editate din Admin → Texte site. Se încarcă o dată, apoi se
+  // actualizează în timp real; până atunci (sau fără rețea) rămân textele din cod.
+  const [overrides, setOverrides] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    const load = () => base44.entities.SiteText.list("-updated_date", 1000)
+      .then((rows) => { if (alive) setOverrides(Object.fromEntries((rows || []).map((r) => [r.key, { ro: r.ro || "", en: r.en || "" }]))); })
+      .catch(() => {});
+    load();
+    let unsubscribe = null;
+    try { unsubscribe = base44.entities.SiteText.subscribe?.(() => load()); } catch (_) { /* realtime opțional */ }
+    return () => { alive = false; if (typeof unsubscribe === "function") unsubscribe(); };
+  }, []);
+
+  const t = useMemo(() => makeT(lang, overrides), [lang, overrides]);
 
   const value = useMemo(
     () => ({ country, setCountry, currency, setCurrency, lang, setLang, t, legalInfo, convert, formatPrice }),
